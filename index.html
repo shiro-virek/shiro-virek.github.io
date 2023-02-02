@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EAP</title>
+    <style>
+			button {
+			  background-color: white; 
+			  border: none;
+			  color: black;
+			  text-align: center;
+			  text-decoration: none;
+			  display: inline-block;
+			  font-size: 14px;
+			  font-weight: bold;
+			  cursor: pointer;
+			  border-radius: 50%;
+			  width: 20px;
+			  height: 20px;
+			  opacity: 0.5;
+			}
+
+			#previousButton{
+				position: fixed; 
+				bottom: 10px; 
+				left: 10px;
+			}
+
+			#nextButton{
+				position: fixed; 
+				bottom: 10px; 
+				right: 10px;
+			}
+
+			#randomButton{
+				position: fixed; 
+				bottom: 10px; 
+				left: 50%;
+				transform: translateX(-50%);
+			}
+
+		</style>
+  </head>
+  <body>
+		<script type="text/javascript">
+			let currentScript = -1;
+			let scriptCount = 0;
+			const scripts = [];
+
+			initScripts = function(){					
+				scripts.push("scripts/art-1.js");
+				scripts.push("scripts/art-2.js");
+				scripts.push("scripts/art-3.js");
+
+				scriptCount = scripts.length;
+			}
+
+			removeCanvasListeners = () =>{				
+				var canvas = document.getElementById('myCanvas');
+				canvas.replaceWith(canvas.cloneNode(true));
+			}
+
+			removePreviousScript = () =>{				
+				var previousScript = document.getElementById("artScript");
+				if (previousScript){
+					previousScript.outerHTML = "";
+					previousScript.remove();
+				}
+			}
+
+			increaseScriptIndex = () =>{				
+		    if (currentScript < scriptCount - 1)
+					currentScript++;
+				else
+					currentScript = 0;
+			}
+
+			decreaseScriptIndex = () =>{				
+		    if (currentScript > 0)
+					currentScript--;
+				else
+					currentScript = scriptCount - 1;
+			}
+
+			randomScriptIndex = () =>{	
+					currentScript = Math.floor(Math.random() * (scriptCount));
+			}
+
+			setCurrentScript = () => {				
+		    var js = document.createElement("script");
+		    debugger
+		    js.id = "artScript";
+		    js.src = scripts[currentScript];
+  			js.setAttribute("type", "text/javascript");
+  			js.setAttribute("async", true);
+
+		    document.body.appendChild(js); 
+			}
+
+			loadScript = (getScriptIndexFunction) =>{
+				removeCanvasListeners();
+				removePreviousScript();
+				getScriptIndexFunction;
+				setCurrentScript();
+			}
+
+			loadNextScript = () =>{
+				loadScript(increaseScriptIndex());
+			}
+
+			loadPreviousScript = () =>{
+				loadScript(decreaseScriptIndex());
+			}
+
+			loadRandomScript = () =>{
+				loadScript(randomScriptIndex());
+			}
+
+			window.addEventListener('load', () => {
+	  		initScripts();
+	  		loadNextScript();
+			});
+		</script>
+		<div>
+			<canvas id="myCanvas" style="margin:0; padding:0; position:absolute; top:0; left:0" ></canvas>
+		</div>
+		<button onclick="loadPreviousScript()" id="previousButton"><</button>		
+		<button onclick="loadRandomScript()" id="randomButton">R</button>
+		<button onclick="loadNextScript()" id="nextButton">></button>
+  </body>
+</html>
