@@ -33,8 +33,8 @@
 
 	randomize = () => {
 		ROTATE = getRandomBool();
-		OPACITY = 0.5;
-		THICKNESS = getRandomInt(1, 10);
+		OPACITY = getRandomInt(1, 10) / 10;
+		THICKNESS = getRandomInt(3, 100);
 		LINE_1_LENGTH = getRandomInt(1, 10);
 	 	LINE_2_LENGTH = getRandomInt(1, 10);
 	 	ANGLE_1 = getRandomInt(1, 30);
@@ -98,7 +98,7 @@
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
 		let colorTrail = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
 
-		let lineWidth = parseInt(distance / THICKNESS);			
+		let lineWidth = scale(distance, 0, 100, 0, THICKNESS);			
 		
 		this.drawLine(lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);	
 		
