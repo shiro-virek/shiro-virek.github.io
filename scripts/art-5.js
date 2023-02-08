@@ -11,6 +11,10 @@
 	let MAX_DISTANCE_TO_CENTER = 30;
 	let TENTACLES_MOVEMENT = true;
 	let SHOW_RINGS = true;
+	let SATURATION = 50;
+	let LIGHTNESS_FACTOR = 50;
+
+	let HUE = 0;
 
 	let distanceToCenter = 0;
 	let movingToCenter = false; 
@@ -108,8 +112,6 @@
 	      else
 	        distanceToCenter += 1;   
 	  }
-
-	  console.log(distanceToCenter);
 	}
 
 	addParticles = () => {
@@ -119,6 +121,28 @@
 	     objects.push(new TrailingObject(i, 3, mouseX, mouseY)); 
 	     objects.push(new TrailingObject(i, 4, mouseX, mouseY)); 
 	  }   
+	}
+
+	getRandomBool = () => {
+		return Math.random() < 0.5;
+	}
+
+	getRandomInt = (min, max) => {
+		return Math.floor(Math.random() * max) + min;
+	}
+
+	randomize = () => {
+		HUE = getRandomInt(1, 360);
+		LIGHTNESS_FACTOR = getRandomInt(0, 100);
+		SATURATION = getRandomInt(0, 100);
+		SHOW_RINGS = getRandomBool();
+
+		OBJECTS_COUNT = getRandomInt(10, 60); //60
+		RINGS_DISTANCE = getRandomInt(10, 20); //20
+		RINGS_SPEED = getRandomInt(1, 5); 
+		CENTER_MOVEMENT_SPEED = getRandomInt(1, 5);
+		MAX_DISTANCE_TO_CENTER = getRandomInt(0, 60); 
+		TENTACLES_MOVEMENT = getRandomBool();
 	}
 
 	addEvents = () => {
@@ -139,6 +163,7 @@
 	}
 
 	init = () => {
+		randomize();
 		addEvents();
 		drawFrame();
 		addParticles();
@@ -151,7 +176,7 @@
 			canvas.width = width;
 	  		canvas.height = height;
 			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#000000";
+			ctx.fillStyle = "#333";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#000000';
@@ -188,16 +213,15 @@
 
 		for (let i = 0; i < OBJECTS_COUNT * 4; i++){ 
 			objects[i].update();
-		    colorValue = (i * 255 / (OBJECTS_COUNT * 4));
 
-		    let color;
-	 
+		    let lightness = (i * LIGHTNESS_FACTOR / (OBJECTS_COUNT * 4));			   	
+	 	
 		    if (SHOW_RINGS && isLight(i))
-		       color = new Color(0, colorValue + 20, 0, 255);
+		       color = `hsl(${HUE}, ${SATURATION}%, ${lightness + 10}%)`; 
 		    else
-		       color = new Color(0, colorValue , 0, 255);
+		       color = `hsl(${HUE}, ${SATURATION}%, ${lightness}%)`;
 	    
-			drawCircle(objects[i].xCenter, objects[i].yCenter,  objects[i].diameter, color.getRGBA()); 
+			drawCircle(objects[i].xCenter, objects[i].yCenter,  objects[i].diameter, color); 
 		}
 
 		updateColorFactor();

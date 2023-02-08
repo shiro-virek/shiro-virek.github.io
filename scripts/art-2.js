@@ -30,7 +30,7 @@
 			canvas.width = width;
 	  		canvas.height = height;
 			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#000000";
+			ctx.fillStyle = "#333";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#000000';

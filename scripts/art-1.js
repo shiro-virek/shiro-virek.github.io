@@ -50,10 +50,8 @@
 	 	}
 	}
 
-	init = () => {	
+	addEvents = () => {
 		let canvas = document.getElementById(CANVAS_ID);
-
-		randomize();
 
 		canvas.addEventListener('mousemove', e => {
 		  paint(e.offsetX, e.offsetY);
@@ -67,11 +65,17 @@
 		  e.preventDefault();
 		  paint(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
-
-		drawFrame(canvas);
 	}
 
-	drawFrame = (canvas) => {
+	init = () => {	
+		randomize();
+		addEvents();
+		drawFrame();
+	}
+
+	drawFrame = () => {
+		let canvas = document.getElementById(CANVAS_ID);
+
 		if (canvas.getContext){
 			canvas.width = width;
 	  		canvas.height = height;

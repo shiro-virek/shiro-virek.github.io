@@ -10,6 +10,8 @@
 	let MINIMUM_DIAMETER = 5;
 	let MAXIMUM_DIAMETER = 15;
 	let AMPLITUDE = 50;
+	let ALL_SIN = false;
+
 	let lastRender = 0
 
 	let objects = [];
@@ -32,14 +34,15 @@
 			this.setNewFireObject();
 		}    
 	  
-		setNewFireObject(){
+		setNewFireObject(notFirstTime){
+			this.notFirstTime = notFirstTime;
 			this.sin = getRandomBool();
-			this.yCenter = height + 100 - getRandomInt(50);
+			this.yCenter = height + 100 - getRandomInt(1, 50);
 			this.diameter = MAXIMUM_DIAMETER;
 			this.radius = this.diameter / 2;  
 			this.speed = 5;
-			this.life = getRandomInt(MAXIMUM_LIFE) + MINIMUM_LIFE;
-			this.xCenter = getRandomInt(width);
+			this.life = getRandomInt(MINIMUM_LIFE, MAXIMUM_LIFE);
+			this.xCenter = getRandomInt(1, width);
 		}
 
 		getColor(){
@@ -56,7 +59,7 @@
 		update() {   
 			this.yCenter -= this.speed;    
 
-			if (this.sin)
+			if (this.sin || ALL_SIN)
 				this.xMovement = (AMPLITUDE * (Math.sin(degToRad(this.yCenter)))) + this.xCenter; //float
 			else
 				this.xMovement = (AMPLITUDE * (Math.cos(degToRad(this.yCenter)))) + this.xCenter; //float
@@ -65,7 +68,7 @@
 			if (this.life > 0)
 				this.life--;
 			else{
-				this.setNewFireObject();
+				this.setNewFireObject(true);
 			}
 		} 
 	} 
@@ -74,17 +77,27 @@
 		return Math.random() < 0.5;
 	}
 
-	getRandomInt = (max) => {
-		return Math.floor(Math.random() * max);
+	getRandomInt = (min, max) => {
+		return Math.floor(Math.random() * max) + min;
 	}
 
 	degToRad = (deg) => {
 	    return deg * (Math.PI / 180.0);
 	}
 
+	randomize = () => {
+		PARTICLES_COUNT = getRandomInt(50, 1000);
+		MINIMUM_LIFE = getRandomInt(10, 90)
+		MAXIMUM_LIFE = getRandomInt(100, 200);
+		MINIMUM_DIAMETER = getRandomInt(1, 10);
+		MAXIMUM_DIAMETER = getRandomInt(12, 20);
+		AMPLITUDE = getRandomInt(10, 100);
+		ALL_SIN = getRandomBool();
+	}
+
 	addFire = (mouseX, mouseY) => {
-		let obj = new Particle();
-		obj.setNewFireObject();
+		let obj = new Particle(true);
+		obj.setNewFireObject(true);
 		obj.xCenter = mouseX;
 		obj.yCenter = mouseY;
 		objects.push(obj);
@@ -93,7 +106,7 @@
 
 	addParticles = () => {
 		for (i = 0; i < PARTICLES_COUNT ; i++){  
-			obj = new Particle();          
+			obj = new Particle(false);          
 			objects.push(obj); 
 		}
 	}
@@ -117,6 +130,7 @@
 
 	init = () => {
 		addEvents();
+		randomize();
 		drawFrame();
 		addParticles();
 	}
@@ -128,7 +142,7 @@
 			canvas.width = width;
 	  		canvas.height = height;
 			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#000000";
+			ctx.fillStyle = "#333";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#000000';
@@ -154,7 +168,8 @@
 		for (i = 0; i < PARTICLES_COUNT; i++){ 
 			objects[i].update();
 
-			drawCircle(objects[i].xMovement, objects[i].yCenter,  objects[i].getDiameter(), objects[i].getColor().getRGBA());   	 
+			if (objects[i].notFirstTime)
+				drawCircle(objects[i].xMovement, objects[i].yCenter,  objects[i].getDiameter(), objects[i].getColor().getRGBA());   	 
 		}
 	}
 
