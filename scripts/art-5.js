@@ -164,9 +164,9 @@
 
 	init = () => {
 		randomize();
+		addParticles();
 		addEvents();
 		drawFrame();
-		addParticles();
 	}
 
 	drawFrame = () => {

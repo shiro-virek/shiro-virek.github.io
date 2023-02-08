@@ -129,10 +129,10 @@
 	}
 
 	init = () => {
-		addEvents();
 		randomize();
-		drawFrame();
 		addParticles();
+		addEvents();
+		drawFrame();
 	}
 
 	drawFrame = () => {
