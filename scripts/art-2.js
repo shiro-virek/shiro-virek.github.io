@@ -5,8 +5,20 @@
 	let lastPosY = 0;
 	let lastPosX = 0;
 	let CANVAS_ID = "myCanvas"
+	let ENTROPY_1 = 2;
+	let CIRCLES = 5;
 
 	init = () => {
+		randomize();
+		addEvents();
+		drawFrame();
+	}
+
+	getRandomInt = (min, max) => {
+		return Math.floor(Math.random() * max) + min;
+	}
+
+	addEvents = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 
 		canvas.addEventListener('mousemove', e => {
@@ -21,16 +33,20 @@
 		  e.preventDefault();
 		  paint(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
-
-		drawFrame(canvas);
 	}
 
-	drawFrame = (canvas) => {
+	randomize = () => {	
+		ENTROPY_1 = getRandomInt(1, 10);
+		CIRCLES = getRandomInt(3, 10);
+	}
+
+	drawFrame = () => {
+		let canvas = document.getElementById(CANVAS_ID);
 		if (canvas.getContext){
 			canvas.width = width;
 	  		canvas.height = height;
 			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#333";
+			ctx.fillStyle = "#000";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#000000';
@@ -51,8 +67,11 @@
 	}
 			
 	paint = (xPointer, yPointer) => {	
+		if (lastPosX == 0) lastPosX = xPointer;
+		if (lastPosY == 0) lastPosY = yPointer;
+
 		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))		
-		let color = 'hsl(' + parseInt(distance * 360 / width) + ', 100%, 50%, 0.01)';
+		let color = `hsl(${parseInt(distance)}, 100%, 50%, 0.01)`;
 		let size = 5;
 		
 		let steps = parseInt(distance / size)
@@ -83,17 +102,14 @@
 				yMod = parseInt((size * i) * Math.sin(angleCart));
 			}	
 
-			let entropyX = ((Math.random() * 2) + 9) / 10 ;
-			let entropyY = ((Math.random() * 2) + 9) / 10 ;
+			let entropy = ((Math.random() * ENTROPY_1) + 9) / 10;
 
-			x = (lastPosX + xMod) * entropyX;
-			y = (lastPosY + yMod) * entropyY;
+			x = (lastPosX + xMod) * entropy;
+			y = (lastPosY + yMod) * entropy;
 
-			this.drawCircle(x, y, size, color, color);		
-			this.drawCircle(x, y, size * 2, color, color);
-			this.drawCircle(x, y, size * 3, color, color);
-			this.drawCircle(x, y, size * 4, color, color);
-			this.drawCircle(x, y, size * 5, color, color);
+			for (let i = 0; i <= CIRCLES; i++){
+				this.drawCircle(x, y, size * i, color, color);
+			}
 		}
 
 		lastPosX = xPointer;

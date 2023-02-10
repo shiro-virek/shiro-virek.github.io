@@ -4,8 +4,8 @@
 	let height = window.innerHeight;
 	let CANVAS_ID = "myCanvas"
 
-	let PARTICLES_COUNT = 1000;
-	let MINIMUM_LIFE = 50;
+	let PARTICLES_COUNT = 500;
+	let MINIMUM_LIFE = 20;
 	let MAXIMUM_LIFE = 100;
 	let MINIMUM_DIAMETER = 5;
 	let MAXIMUM_DIAMETER = 15;
@@ -142,7 +142,7 @@
 			canvas.width = width;
 	  		canvas.height = height;
 			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#333";
+			ctx.fillStyle = "#000";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#000000';
@@ -188,7 +188,5 @@
 
 	init();
 
-	window.requestAnimationFrame(loop)
-
-	
+	window.requestAnimationFrame(loop)	
 }
