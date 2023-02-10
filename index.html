@@ -44,13 +44,13 @@
   </head>
   <body>
 		<script type="text/javascript">
-			let currentScript = -1;
+			let currentScript = 0;
 			let scriptCount = 0;
 			const scripts = [];
 
 			initScripts = function(){					
-				scripts.push("scripts/art-1.js");
-				scripts.push("scripts/art-2.js");
+				//scripts.push("scripts/art-1.js");
+				//scripts.push("scripts/art-2.js");
 				scripts.push("scripts/art-4.js");
 				scripts.push("scripts/art-5.js");
 
@@ -85,7 +85,7 @@
 			}
 
 			randomScriptIndex = () =>{	
-					currentScript = Math.floor(Math.random() * (scriptCount));
+					currentScript = Math.floor(Math.random() * scriptCount);
 			}
 
 			setCurrentScript = () => {				
@@ -117,16 +117,20 @@
 				loadScript(randomScriptIndex());
 			}
 
+			reload = () => {
+				location.reload();
+			}
+
 			window.addEventListener('load', () => {
 	  		initScripts();
-	  		loadNextScript();
+	  		loadRandomScript();
 			});
 		</script>
 		<div>
 			<canvas id="myCanvas" style="margin:0; padding:0; position:absolute; top:0; left:0" ></canvas>
 		</div>
 		<!--<button onclick="loadPreviousScript()" id="previousButton"><</button>-->		
-		<button onclick="loadRandomScript()" id="randomButton">R</button>
+		<button onclick="reload()" id="randomButton">R</button>
 		<!--<button onclick="loadNextScript()" id="nextButton">></button>-->
   </body>
 </html>
