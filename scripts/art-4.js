@@ -87,7 +87,7 @@
 	}
 
 	randomize = () => {
-		PARTICLES_COUNT = getRandomInt(50, 1000);
+		PARTICLES_COUNT = getRandomInt(50, screen.height * screen.width / 1000);
 		MINIMUM_LIFE = getRandomInt(10, 90)
 		MAXIMUM_LIFE = getRandomInt(100, 200);
 		MINIMUM_DIAMETER = getRandomInt(1, 10);
@@ -96,13 +96,13 @@
 		ALL_SIN = getRandomBool();
 	}
 
-	addFire = (mouseX, mouseY) => {
+	addFire = (mouseX, mouseY, keepSameSize = false) => {
+		if (keepSameSize) objects.shift(); 
 		let obj = new Particle(true);
 		obj.setNewFireObject(true);
 		obj.xCenter = mouseX;
 		obj.yCenter = mouseY;
 		objects.push(obj);
-		PARTICLES_COUNT++; 
 	}
 
 	addParticles = () => {
@@ -175,7 +175,7 @@
 	}
 
 	trackMouse = (mouseX, mouseY) => {
-		addFire(mouseX, mouseY);
+		addFire(mouseX, mouseY, true);
 	}
 
 	loop = (timestamp) => {
