@@ -97,7 +97,7 @@
 	}
 
 	addParticle = (mouseX, mouseY, keepSameSize = false) => {
-		if (keepSameSize) objects.shift(); //REVISAR ESTA LINEA
+		if (keepSameSize) objects.shift();
 		let obj = new Particle(true);
 		obj.setNewParticleObject(true);
 		obj.xCenter = mouseX;
