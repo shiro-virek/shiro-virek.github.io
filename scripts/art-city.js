@@ -81,15 +81,15 @@
 			let color2 = `hsl(${building.hue}, ${building.saturation}%, ${building.light - 20}%)`; 
 			let color3 = `hsl(${building.hue}, ${building.saturation}%, ${building.light + 20}%)`; 
 	
-			let blockWidthFactor = Math.cos(angle * RAD_CONST) * building.buildingSideAWidth;
-			let blockHeightFactor = Math.sin(angle * RAD_CONST) * building.buildingSideAWidth;
+			building.blockWidthFactor = Math.cos(angle * RAD_CONST) * building.buildingSideAWidth;
+			building.blockHeightFactor = Math.sin(angle * RAD_CONST) * building.buildingSideAWidth;
 
 			//Left Face			
 			ctx.fillStyle = color;
 			ctx.beginPath();
 			ctx.moveTo(building.x, building.y); 
-			ctx.lineTo(building.x - blockWidthFactor, building.y - blockHeightFactor);  
-			ctx.lineTo(building.x - blockWidthFactor, building.y - (blockHeightFactor + building.height)); 
+			ctx.lineTo(building.x - building.blockWidthFactor, building.y - building.blockHeightFactor);  
+			ctx.lineTo(building.x - building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height); 
 			ctx.lineTo(building.x, building.y); 
 			ctx.fill();		
@@ -98,8 +98,8 @@
 			ctx.fillStyle = color2;
 			ctx.beginPath();
 			ctx.moveTo(building.x, building.y); 
-			ctx.lineTo(building.x + blockWidthFactor, building.y - blockHeightFactor);  
-			ctx.lineTo(building.x + blockWidthFactor, building.y - (blockHeightFactor + building.height)); 
+			ctx.lineTo(building.x + building.blockWidthFactor, building.y - building.blockHeightFactor);  
+			ctx.lineTo(building.x + building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height);
 			ctx.lineTo(building.x, building.y); 
 			ctx.fill();
@@ -108,13 +108,37 @@
 			ctx.fillStyle = color3;
 			ctx.beginPath();
 			ctx.moveTo(building.x, building.y - building.height);
-			ctx.lineTo(building.x - blockWidthFactor, building.y - (blockHeightFactor + building.height));  
-			ctx.lineTo(building.x, building.y -  ((blockHeightFactor * 2) + building.height)); 
-			ctx.lineTo(building.x + blockWidthFactor, building.y - (blockHeightFactor + building.height)); 
+			ctx.lineTo(building.x - building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height));  
+			ctx.lineTo(building.x, building.y -  ((building.blockHeightFactor * 2) + building.height)); 
+			ctx.lineTo(building.x + building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height); 
 			ctx.fill();			
 
 			drawWindows(ctx, building);
+			drawDoor(ctx, building);
+		}
+	}
+
+	drawDoor = (ctx, building) => {
+		if (building.leftDoor){
+			let halfBuildingFactor = building.blockWidthFactor / 2;
+			let doorHeight = 20;
+			let doorWidth = 20;
+			let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
+			let doorHeightFactor = (Math.sin(angle * RAD_CONST) * (doorWidth)) - (doorHeight);
+
+			ctx.fillStyle = "#FF0000";			
+			ctx.beginPath();
+			let wx = building.x - Math.cos(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
+			let wy = building.y - Math.sin(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
+			ctx.moveTo(wx, wy); 
+			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor);  
+			ctx.lineTo(wx - doorWidthFactor, wy - (doorHeightFactor + doorHeight)); 
+			ctx.lineTo(wx, wy - doorHeight); 
+			ctx.lineTo(wx, wy); 
+			ctx.fill();
+		} else {
+
 		}
 	}
 
@@ -124,8 +148,8 @@
 		
 		let windowWidth = ((building.buildingSideAWidth - (building.margin * (building.cols + 1))) / building.cols);
 		let windowHeight = ((building.height - FIRST_FLOOR_HEIGHT - (building.margin * (building.rows + 1))) / building.rows);
-		let blockWidthFactor = Math.cos(angle * RAD_CONST) * windowWidth;
-		let blockHeightFactor = Math.sin(angle * RAD_CONST) * windowWidth;
+		building.windowWidthFactor = Math.cos(angle * RAD_CONST) * windowWidth;
+		building.windowHeightFactor = Math.sin(angle * RAD_CONST) * windowWidth;
 
 		for (let ix = 0; ix < building.cols; ix++){
 			for (let iy = 0; iy < building.rows; iy++){
@@ -135,8 +159,8 @@
 				let wx = building.x - (Math.cos(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix)));
 				let wy = building.y - FIRST_FLOOR_HEIGHT - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix))) - (building.margin + ((building.margin + windowHeight) * iy));
 				ctx.moveTo(wx, wy); 
-				ctx.lineTo(wx - blockWidthFactor, wy - blockHeightFactor);  
-				ctx.lineTo(wx - blockWidthFactor, wy - (blockHeightFactor + windowHeight)); 
+				ctx.lineTo(wx - building.windowWidthFactor, wy - building.windowHeightFactor);  
+				ctx.lineTo(wx - building.windowWidthFactor, wy - (building.windowHeightFactor + windowHeight)); 
 				ctx.lineTo(wx, wy - windowHeight); 
 				ctx.lineTo(wx, wy); 
 				ctx.fill();
@@ -147,29 +171,29 @@
 				let wy1 = building.y - FIRST_FLOOR_HEIGHT - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix))) - (building.margin + ((building.margin + windowHeight) * iy));
 				ctx.beginPath();
 				ctx.moveTo(wx1, wy1); 
-				ctx.lineTo(wx1 + blockWidthFactor, wy1 - blockHeightFactor);  
-				ctx.lineTo(wx1 + blockWidthFactor, wy1 - (blockHeightFactor + windowHeight)); 
+				ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - building.windowHeightFactor);  
+				ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - (building.windowHeightFactor + windowHeight)); 
 				ctx.lineTo(wx1, wy1 - windowHeight);
 				ctx.lineTo(wx1, wy1); 
 				ctx.fill();
 
 				switch(building.windowType){
 					case WindowTypes.MiniWindow:
-						drawMiniWindow(ctx, wx, wy, wx1, wy1, windowHeight, windowWidth, blockWidthFactor, blockHeightFactor, colorDark, colorLight);
+						drawMiniWindow(ctx, building, wx, wy, wx1, wy1, windowHeight, windowWidth, colorDark, colorLight);
 						break;
 					case WindowTypes.Split:
-						drawSplitWindow(ctx, wx, wy, wx1, wy1, windowHeight, blockWidthFactor, blockHeightFactor, colorDark, colorLight);
+						drawSplitWindow(ctx, building, wx, wy, wx1, wy1, windowHeight, colorDark, colorLight);
 						break;
 				}
 			}
 		}
 	}			
 
-	drawMiniWindow = (ctx, wx, wy, wx1, wy1, windowHeight, windowWidth, blockWidthFactor, blockHeightFactor, color1, color2) => {
+	drawMiniWindow = (ctx, building, wx, wy, wx1, wy1, windowHeight, windowWidth, color1, color2) => {
 		let halfWindowHeight = (windowHeight / 2);
 		let halfWindowWidth = (windowWidth / 2);
-		let halfWidthFactor = blockWidthFactor / 2;
-		let halfHeightFactor = blockHeightFactor / 2 
+		let halfWidthFactor = building.windowWidthFactor / 2;
+		let halfHeightFactor = building.windowHeightFactor / 2 
 		ctx.strokeStyle = color1;
 		ctx.beginPath();
 		ctx.moveTo(wx, wy - halfWindowHeight); 
@@ -179,24 +203,24 @@
 
 		ctx.strokeStyle = color2;
 		ctx.beginPath();
-		ctx.moveTo(wx1 + blockWidthFactor, wy1 - blockHeightFactor - halfWindowHeight);
+		ctx.moveTo(wx1 + building.windowWidthFactor, wy1 - building.windowHeightFactor - halfWindowHeight);
 		ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor - halfWindowHeight);  
 		ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor);  
 		ctx.stroke();
 	}
 	
-	drawSplitWindow = (ctx, wx, wy, wx1, wy1, windowHeight, blockWidthFactor, blockHeightFactor, color1, color2) => {
+	drawSplitWindow = (ctx, building, wx, wy, wx1, wy1, windowHeight, color1, color2) => {
 		let halfWindowHeight = (windowHeight / 2);
 		ctx.strokeStyle = color1;
 		ctx.beginPath();
 		ctx.moveTo(wx, wy - halfWindowHeight); 
-		ctx.lineTo(wx - blockWidthFactor, wy - blockHeightFactor - halfWindowHeight);  				
+		ctx.lineTo(wx - building.windowWidthFactor, wy - building.windowHeightFactor - halfWindowHeight);  				
 		ctx.stroke();
 
 		ctx.strokeStyle = color2;
 		ctx.beginPath();
 		ctx.moveTo(wx1, wy1 - halfWindowHeight); 
-		ctx.lineTo(wx1 + blockWidthFactor, wy1 - blockHeightFactor - halfWindowHeight);  
+		ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - building.windowHeightFactor - halfWindowHeight);  
 		ctx.stroke();
 	}
 
@@ -213,6 +237,7 @@
 		building.hue = getRandomInt(1, 360);
 		building.saturation = getRandomInt(0, 100);
 		building.light = getRandomInt(20, 80);		
+		building.leftDoor = getRandomBool();
 
 		if (building.margin > 2){			
 			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
