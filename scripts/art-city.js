@@ -10,6 +10,7 @@
 	let MINIMUM_HEIGHT = 40;
 	let MAXIMUM_HEIGHT = 360;
 	let RAD_CONST = 0.0175;
+	let FIRST_FLOOR_HEIGHT = 20;
 
 	let lastRender = 0
 
@@ -113,7 +114,7 @@
 		ctx.strokeStyle = '#000000';
 
 		let windowWidth = ((building.buildingSideAWidth - (building.margin * (building.cols + 1))) / building.cols);
-		let windowHeight = ((building.height - (building.margin * (building.rows + 1))) / building.rows);
+		let windowHeight = ((building.height - FIRST_FLOOR_HEIGHT - (building.margin * (building.rows + 1))) / building.rows);
 		let blockWidthFactor = Math.cos(angle * RAD_CONST) * windowWidth;
 		let blockHeightFactor = Math.sin(angle * RAD_CONST) * windowWidth;
 
@@ -123,7 +124,7 @@
 				ctx.fillStyle = colorLight;
 				ctx.beginPath();
 				let wx = building.x - (Math.cos(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix)));
-				let wy = building.y - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix))) - (building.margin + ((building.margin + windowHeight) * iy));
+				let wy = building.y - FIRST_FLOOR_HEIGHT - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix))) - (building.margin + ((building.margin + windowHeight) * iy));
 				ctx.moveTo(wx, wy); 
 				ctx.lineTo(wx - blockWidthFactor, wy - blockHeightFactor);  
 				ctx.lineTo(wx - blockWidthFactor, wy - (blockHeightFactor + windowHeight)); 
@@ -134,8 +135,7 @@
 				//Right
 				ctx.fillStyle = colorDark;
 				wx = building.x + (Math.cos(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix)));
-				wy = building.y - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix))) - (building.margin + ((building.margin + windowHeight) * iy));
-
+				wy = building.y - FIRST_FLOOR_HEIGHT - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix))) - (building.margin + ((building.margin + windowHeight) * iy));
 				ctx.beginPath();
 				ctx.moveTo(wx, wy); 
 				ctx.lineTo(wx + blockWidthFactor, wy - blockHeightFactor);  
