@@ -15,12 +15,12 @@
 
 	let objects = [];
 
+	const CWHues = [232, 203, 189, 173, 162];
+
 	class Building{
-		constructor(x, y, height, hue = 80){
+		constructor(x, y){
 			this.x = x;
 			this.y = y;
-			this.height = height;
-			this.hue = hue;
 		}
 	}
 
@@ -38,12 +38,12 @@
 		let canvas = document.getElementById(CANVAS_ID);
 
 		canvas.addEventListener('click', e => {
-		  addBuilding(e.offsetX, e.offsetY, getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT), getRandomInt(1, 360));
+		  addBuilding(e.offsetX, e.offsetY);
 		}, false);
 	}
 
 	randomize = () => {	
-		angle = getRandomInt(20, 45);
+		angle = getRandomInt(0, 40);
 	}
 
 	drawFrame = () => {
@@ -66,9 +66,9 @@
 			let ctx = canvas.getContext('2d');
 			ctx.strokeStyle = '#000000';
 
-			let color = `hsl(${building.hue}, ${100}%, ${50}%)`; 
-			let color2 = `hsl(${building.hue}, ${100}%, ${30}%)`; 
-			let color3 = `hsl(${building.hue}, ${100}%, ${70}%)`; 
+			let color = `hsl(${building.hue}, ${building.saturation}%, ${building.light}%)`; 
+			let color2 = `hsl(${building.hue}, ${building.saturation}%, ${building.light - 20}%)`; 
+			let color3 = `hsl(${building.hue}, ${building.saturation}%, ${building.light + 20}%)`; 
 	
 			let blockWidthFactor = Math.cos(angle * RAD_CONST) * building.buildingSideAWidth;
 			let blockHeightFactor = Math.sin(angle * RAD_CONST) * building.buildingSideAWidth;
@@ -81,12 +81,9 @@
 			ctx.lineTo(building.x - blockWidthFactor, building.y - (blockHeightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height); 
 			ctx.lineTo(building.x, building.y); 
-			ctx.fill();
-			ctx.stroke();
-			
+			ctx.fill();		
 
-			//Right Face
-			
+			//Right Face			
 			ctx.fillStyle = color2;
 			ctx.beginPath();
 			ctx.moveTo(building.x, building.y); 
@@ -95,9 +92,7 @@
 			ctx.lineTo(building.x, building.y - building.height);
 			ctx.lineTo(building.x, building.y); 
 			ctx.fill();
-			ctx.stroke();
 			
-
 			//Top Face
 			ctx.fillStyle = color3;
 			ctx.beginPath();
@@ -106,16 +101,15 @@
 			ctx.lineTo(building.x, building.y -  ((blockHeightFactor * 2) + building.height)); 
 			ctx.lineTo(building.x + blockWidthFactor, building.y - (blockHeightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height); 
-			ctx.fill();
-			ctx.stroke();				
+			ctx.fill();			
 
 			drawWindows(ctx, building);
 		}
 	}
 
 	drawWindows = (ctx, building) => {		
-		let colorLight = `hsl(${232}, ${100}%, ${50}%)`; 				
-		let colorDark = `hsl(${232}, ${100}%, ${20}%)`; 
+		let colorLight = `hsl(${building.CWHue}, ${building.CWSaturation}%, ${building.CWLight + 20}%)`; 				
+		let colorDark = `hsl(${building.CWHue}, ${building.CWSaturation}%, ${building.CWLight}%)`; 
 		ctx.strokeStyle = '#000000';
 
 		let windowWidth = ((building.buildingSideAWidth - (building.margin * (building.cols + 1))) / building.cols);
@@ -125,7 +119,6 @@
 
 		for (let ix = 0; ix < building.cols; ix++){
 			for (let iy = 0; iy < building.rows; iy++){
-
 				//Left
 				ctx.fillStyle = colorLight;
 				ctx.beginPath();
@@ -137,8 +130,6 @@
 				ctx.lineTo(wx, wy - windowHeight); 
 				ctx.lineTo(wx, wy); 
 				ctx.fill();
-				ctx.stroke();
-
 				
 				//Right
 				ctx.fillStyle = colorDark;
@@ -152,21 +143,26 @@
 				ctx.lineTo(wx, wy - windowHeight);
 				ctx.lineTo(wx, wy); 
 				ctx.fill();
-				ctx.stroke();
 			}
 		}
 	}				
 
-	addBuilding = (x, y, height, hue = 80) => {	
-		let building = new Building(x, y, height, hue);		
-		building.rows = getRandomInt(1, Math.floor(height / 20)); 
+	addBuilding = (x, y) => {	
+		let building = new Building(x, y);		
+		building.height = getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
+		building.rows = getRandomInt(1, Math.floor(building.height / 20)); 
 		building.cols = getRandomInt(1, 5);		
-		building.margin = getRandomInt(0, 5);
+		building.margin = getRandomInt(0, 15);
 		building.buildingSideAWidth = getRandomInt(40, 60);
+		building.CWHue = CWHues[(Math.floor(Math.random() * CWHues.length))];
+		building.CWLight= getRandomInt(10,50);
+		building.CWSaturation = getRandomInt(0,100);
+		building.hue = getRandomInt(1, 360);
+		building.saturation = getRandomInt(0, 100);
+		building.light = getRandomInt(20, 80);		
 
 		objects.push(building);
 		BUILDINGS_COUNT++; 
-		console.log(objects);
 	}			
 			
 	draw = () => {	
