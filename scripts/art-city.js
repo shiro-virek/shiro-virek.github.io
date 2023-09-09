@@ -20,8 +20,11 @@
 	
 	const WindowTypes = Object.freeze({
 		Regular: Symbol("regular"),
-		Split: Symbol("split"),
-		MiniWindow: Symbol("miniWindow")
+		Split: Symbol("split"),		
+		SplitV: Symbol("splitV"),
+		MiniWindow: Symbol("miniWindow"),
+		Triangular: Symbol("triangular"),
+		Interlaced: Symbol("interlaced")
 	});
 
 	class Building{
@@ -164,7 +167,7 @@
 				ctx.lineTo(wx, wy - windowHeight); 
 				ctx.lineTo(wx, wy); 
 				ctx.fill();
-				
+
 				//Right
 				ctx.fillStyle = colorDark;
 				let wx1 = building.x + (Math.cos(angle * RAD_CONST) * (building.margin + ((building.margin + windowWidth) * ix)));
@@ -175,7 +178,7 @@
 				ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - (building.windowHeightFactor + windowHeight)); 
 				ctx.lineTo(wx1, wy1 - windowHeight);
 				ctx.lineTo(wx1, wy1); 
-				ctx.fill();
+				ctx.fill();		
 
 				switch(building.windowType){
 					case WindowTypes.MiniWindow:
@@ -184,7 +187,28 @@
 					case WindowTypes.Split:
 						drawSplitWindow(ctx, building, wx, wy, wx1, wy1, windowHeight, colorDark, colorLight);
 						break;
+					case WindowTypes.Triangular:
+						drawTriangularWindow(ctx, building, wx, wy, wx1, wy1, windowHeight, windowWidth, colorDark, colorLight);
+						break;
+					case WindowTypes.SplitV:
+						drawSpliVtWindow(ctx, building, wx, wy, wx1, wy1, windowHeight, colorDark, colorLight);
+						break;
+					case WindowTypes.Interlaced:
+						drawTriangularWindow(ctx, building, wx, wy, wx1, wy1, windowHeight, windowWidth, colorDark, colorLight);
+						break;
 				}
+				
+				ctx.strokeStyle = colorDark;
+				ctx.beginPath();		
+				ctx.moveTo(wx, wy); 
+				ctx.lineTo(wx - building.windowWidthFactor, wy - building.windowHeightFactor);	
+				ctx.stroke();
+				ctx.strokeStyle = colorLight;
+				ctx.beginPath();		
+				ctx.moveTo(wx1, wy1); 
+				ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - building.windowHeightFactor);	
+				ctx.stroke();
+				
 			}
 		}
 	}			
@@ -224,6 +248,24 @@
 		ctx.stroke();
 	}
 
+	drawTriangularWindow = (ctx, building, wx, wy, wx1, wy1, windowHeight, windowWidth, color1, color2) => {
+		ctx.fillStyle = color1;
+		ctx.beginPath();
+		ctx.moveTo(wx, wy); 			
+		ctx.lineTo(wx, wy - windowHeight);  
+		ctx.lineTo(wx - building.windowWidthFactor, wy - building.windowHeightFactor);  			
+		ctx.lineTo(wx, wy); 		
+		ctx.fill();
+
+		ctx.fillStyle = color2;
+		ctx.beginPath();		
+		ctx.moveTo(wx1, wy1); 
+		ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - building.windowHeightFactor);		
+		ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - building.windowHeightFactor - windowHeight); 		
+		ctx.lineTo(wx1, wy1); 
+		ctx.fill();
+	}
+
 	addBuilding = (x, y) => {	
 		let building = new Building(x, y);		
 		building.height = getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
@@ -238,11 +280,9 @@
 		building.saturation = getRandomInt(0, 100);
 		building.light = getRandomInt(20, 80);		
 		building.leftDoor = getRandomBool();
-
-		if (building.margin > 2){			
-			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
-			building.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
-		}
+		
+		var rand = getRandomInt(0, Object.keys(WindowTypes).length);
+		building.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 
 		objects.push(building);
 		BUILDINGS_COUNT++; 
