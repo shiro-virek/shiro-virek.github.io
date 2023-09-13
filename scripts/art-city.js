@@ -24,7 +24,8 @@
 		SplitV: Symbol("splitV"),
 		MiniWindow: Symbol("miniWindow"),
 		Triangular: Symbol("triangular"),
-		Interlaced: Symbol("interlaced")
+		Interlaced: Symbol("interlaced"),
+		MiniWindowCenter: Symbol("miniWindowCenter")
 	});
 
 	class Building{
@@ -123,26 +124,26 @@
 	}
 
 	drawDoor = (ctx, building) => {
-		if (building.leftDoor){
-			let halfBuildingFactor = building.blockWidthFactor / 2;
-			let doorHeight = 20;
-			let doorWidth = 20;
+		//if (building.leftDoor){
+			let halfWidthFactor = building.blockWidthFactor / 2;
+			let halfHeightFactor = building.blockHeightFactor / 2;
+			let doorHeight = 40;
+			let doorWidth = 40;
 			let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
-			let doorHeightFactor = (Math.sin(angle * RAD_CONST) * (doorWidth)) - (doorHeight);
-
+			let doorHeightFactor = Math.sin(angle * RAD_CONST) * (doorWidth);
 			ctx.fillStyle = "#FF0000";			
 			ctx.beginPath();
 			let wx = building.x - Math.cos(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
 			let wy = building.y - Math.sin(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
 			ctx.moveTo(wx, wy); 
-			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor);  
-			ctx.lineTo(wx - doorWidthFactor, wy - (doorHeightFactor + doorHeight)); 
-			ctx.lineTo(wx, wy - doorHeight); 
+			ctx.lineTo(wx, wy - doorHeight);  
+			ctx.lineTo(wx - doorWidthFactor - doorWidth, wy - doorHeightFactor - doorHeight); 
+			ctx.lineTo(wx, wy - doorHeightFactor); 
 			ctx.lineTo(wx, wy); 
 			ctx.fill();
-		} else {
+		////} else {
 
-		}
+		//}
 	}
 
 	drawWindows = (ctx, building) => {		
