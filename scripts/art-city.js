@@ -196,7 +196,10 @@
 						drawSplitVWindow(ctx, building, wx, wy, wx1, wy1, colorDark, colorLight);
 						break;
 					case WindowTypes.Interlaced:
-						drawInterlacedWindow(ctx, building, wx, wy, wx1, wy1, colorDark, colorLight);
+						drawInterlacedWindow(ctx, building, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter);
+						break;
+					case WindowTypes.MiniWindowCenter:
+						drawMiniWindowCenter(ctx, building, wx, wy, wx1, wy1, colorDark, colorLight);
 						break;
 				}
 				
@@ -277,7 +280,7 @@
 		ctx.stroke();
 	}
 	
-	drawInterlacedWindow = (ctx, building, wx, wy, wx1, wy1, colorDark, colorLight) => {		
+	drawInterlacedWindow = (ctx, building, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter) => {		
 		let thirdHeightFactor = building.windowHeightFactor / 3;
 		let thirdWidthFactor = building.windowWidthFactor / 3;
 		let thirdWindowWidth = (building.windowWidth / 3);
@@ -286,19 +289,64 @@
 		ctx.fillStyle = colorDark;
 		ctx.beginPath();
 		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor); 
-		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight);		
-		ctx.moveTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 			
-		ctx.moveTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2); 					
-		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight);		
+		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight);		
+		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 			
+		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2); 					
+		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor);		
 		ctx.fill();
 
-		/*
+		ctx.fillStyle = colorDark;
+		ctx.beginPath();
+		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight * 2); 
+		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight * 3);		
+		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
+		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
+		ctx.lineTo(wx - thirdWindowWidth,  wy - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.fill();
+		
+		ctx.fillStyle = colorDarker;
+		ctx.beginPath();
+		ctx.moveTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor); 
+		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight);		
+		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 			
+		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2); 					
+		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor);		
+		ctx.fill();
+
+		ctx.fillStyle = colorDarker;
+		ctx.beginPath();
+		ctx.moveTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight * 2); 
+		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight * 3);		
+		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
+		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
+		ctx.lineTo(wx1 + thirdWindowWidth,  wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.fill();
+	}
+	
+	drawMiniWindowCenter = (ctx, building, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter) => {		
+		let thirdHeightFactor = building.windowHeightFactor / 3;
+		let thirdWidthFactor = building.windowWidthFactor / 3;
+		let thirdWindowWidth = (building.windowWidth / 3);
+		let thirdWindowHeight = (building.windowHeight / 3);
+
+		ctx.strokeStyle = colorDark;
+		ctx.beginPath();
+		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight); 
+		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
+		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 					
+		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor  - thirdWindowHeight);		
+		ctx.stroke();	
+		
 		ctx.strokeStyle = colorLight;
 		ctx.beginPath();
-		ctx.moveTo(wx1 + halfWindowWidth, wy1 - halfHeightFactor); 
-		ctx.lineTo(wx1 + halfWindowWidth, wy1 - halfHeightFactor - building.windowHeight);  
+		ctx.moveTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight); 
+		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
+		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 					
+		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight);		
 		ctx.stroke();
-		*/
+
 	}
 
 	drawTriangularWindow = (ctx, building, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter) => {
@@ -334,7 +382,7 @@
 		building.leftDoor = getRandomBool();
 		
 		var rand = getRandomInt(0, Object.keys(WindowTypes).length);
-		building.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
+		building.windowType = WindowTypes.MiniWindowCenter; // WindowTypes[Object.keys(WindowTypes)[rand]];
 
 		objects.push(building);
 		BUILDINGS_COUNT++; 
