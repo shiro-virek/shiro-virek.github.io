@@ -288,38 +288,38 @@
 
 		ctx.fillStyle = colorDark;
 		ctx.beginPath();
-		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor); 
-		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight);		
-		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 			
-		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2); 					
-		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor);		
+		ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor); 
+		ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);		
+		ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 			
+		ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2); 					
+		ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor);		
 		ctx.fill();
 
 		ctx.fillStyle = colorDark;
 		ctx.beginPath();
-		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight * 2); 
-		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight * 3);		
-		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
-		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
-		ctx.lineTo(wx - thirdWindowWidth,  wy - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2); 
+		ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 3);		
+		ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
+		ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
+		ctx.lineTo(wx - thirdWidthFactor,  wy - thirdHeightFactor - thirdWindowHeight * 2);		
 		ctx.fill();
 		
 		ctx.fillStyle = colorDarker;
 		ctx.beginPath();
-		ctx.moveTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor); 
-		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight);		
-		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 			
-		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2); 					
-		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor);		
+		ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor); 
+		ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
+		ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 			
+		ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2); 					
+		ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor);		
 		ctx.fill();
 
 		ctx.fillStyle = colorDarker;
 		ctx.beginPath();
-		ctx.moveTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight * 2); 
-		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight * 3);		
-		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
-		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
-		ctx.lineTo(wx1 + thirdWindowWidth,  wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2); 
+		ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 3);		
+		ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
+		ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
+		ctx.lineTo(wx1 + thirdWidthFactor,  wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
 		ctx.fill();
 	}
 	
@@ -331,20 +331,20 @@
 
 		ctx.strokeStyle = colorDark;
 		ctx.beginPath();
-		ctx.moveTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight); 
-		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor - thirdWindowHeight * 2);		
-		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
-		ctx.lineTo(wx - thirdWindowWidth * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 					
-		ctx.lineTo(wx - thirdWindowWidth, wy - thirdHeightFactor  - thirdWindowHeight);		
+		ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight); 
+		ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
+		ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 					
+		ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);		
 		ctx.stroke();	
 		
 		ctx.strokeStyle = colorLight;
 		ctx.beginPath();
-		ctx.moveTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight); 
-		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
-		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
-		ctx.lineTo(wx1 + thirdWindowWidth * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 					
-		ctx.lineTo(wx1 + thirdWindowWidth, wy1 - thirdHeightFactor - thirdWindowHeight);		
+		ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight); 
+		ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
+		ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
+		ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 					
+		ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
 		ctx.stroke();
 
 	}
@@ -382,7 +382,7 @@
 		building.leftDoor = getRandomBool();
 		
 		var rand = getRandomInt(0, Object.keys(WindowTypes).length);
-		building.windowType = WindowTypes.MiniWindowCenter; // WindowTypes[Object.keys(WindowTypes)[rand]];
+		building.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 
 		objects.push(building);
 		BUILDINGS_COUNT++; 
