@@ -45,6 +45,15 @@
 		return Math.floor(Math.random() * max) + min;
 	}
 
+	function getRandomFloat(min, max, decimals) {
+		const str = (Math.random() * (max - min) + min).toFixed(
+		  decimals,
+		);
+	  
+		return parseFloat(str);
+	  }
+	  
+
 	getRandomBool = () => {
 		return Math.random() < 0.5;
 	}
@@ -85,15 +94,15 @@
 			let colorLight = `hsl(${building.hue}, ${building.saturation}%, ${building.light - 20}%)`; 
 			let color3 = `hsl(${building.hue}, ${building.saturation}%, ${building.light + 20}%)`; 
 	
-			building.blockWidthFactor = Math.cos(angle * RAD_CONST) * building.buildingSideAWidth;
-			building.blockHeightFactor = Math.sin(angle * RAD_CONST) * building.buildingSideAWidth;
+			building.widthFactor = Math.cos(angle * RAD_CONST) * building.width;
+			building.heightFactor = Math.sin(angle * RAD_CONST) * building.width;
 
 			//Left Face			
 			ctx.fillStyle = color;
 			ctx.beginPath();
 			ctx.moveTo(building.x, building.y); 
-			ctx.lineTo(building.x - building.blockWidthFactor, building.y - building.blockHeightFactor);  
-			ctx.lineTo(building.x - building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height)); 
+			ctx.lineTo(building.x - building.widthFactor, building.y - building.heightFactor);  
+			ctx.lineTo(building.x - building.widthFactor, building.y - (building.heightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height); 
 			ctx.lineTo(building.x, building.y); 
 			ctx.fill();		
@@ -102,8 +111,8 @@
 			ctx.fillStyle = colorLight;
 			ctx.beginPath();
 			ctx.moveTo(building.x, building.y); 
-			ctx.lineTo(building.x + building.blockWidthFactor, building.y - building.blockHeightFactor);  
-			ctx.lineTo(building.x + building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height)); 
+			ctx.lineTo(building.x + building.widthFactor, building.y - building.heightFactor);  
+			ctx.lineTo(building.x + building.widthFactor, building.y - (building.heightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height);
 			ctx.lineTo(building.x, building.y); 
 			ctx.fill();
@@ -112,21 +121,35 @@
 			ctx.fillStyle = color3;
 			ctx.beginPath();
 			ctx.moveTo(building.x, building.y - building.height);
-			ctx.lineTo(building.x - building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height));  
-			ctx.lineTo(building.x, building.y -  ((building.blockHeightFactor * 2) + building.height)); 
-			ctx.lineTo(building.x + building.blockWidthFactor, building.y - (building.blockHeightFactor + building.height)); 
+			ctx.lineTo(building.x - building.widthFactor, building.y - (building.heightFactor + building.height));  
+			ctx.lineTo(building.x, building.y -  ((building.heightFactor * 2) + building.height)); 
+			ctx.lineTo(building.x + building.widthFactor, building.y - (building.heightFactor + building.height)); 
 			ctx.lineTo(building.x, building.y - building.height); 
 			ctx.fill();			
 
 			drawWindows(ctx, building);
-			drawDoor(ctx, building);
+			//drawDoor(ctx, building);
+
+			if (building.modules > 1){
+				let widthDecrement = building.width * getRandomFloat(0.05, 0.3, 2); 	
+				building.y -= building.height + widthDecrement / 2;			
+				let heightDecrement = building.height * getRandomFloat(0, 0.7, 2);; 
+				building.modules--;
+				let windowWidth = (building.width / building.cols);
+				building.width -= widthDecrement;
+				building.height -= heightDecrement;
+				building.firstFloorHeight = 0;
+				building.rows = getRowsNumber(building);
+				building.cols = Math.floor(building.width / windowWidth);
+				drawBuilding(building);
+			}
 		}
 	}
 
 	drawDoor = (ctx, building) => {
 		//if (building.leftDoor){
-			let halfWidthFactor = building.blockWidthFactor / 2;
-			let halfHeightFactor = building.blockHeightFactor / 2;
+			let halfWidthFactor = building.widthFactor / 2;
+			let halfHeightFactor = building.heightFactor / 2;
 			let doorHeight = 40;
 			let doorWidth = 40;
 			let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
@@ -152,8 +175,8 @@
 		let colorLighter = `hsl(${building.CWHue}, ${building.CWSaturation}%, ${building.CWLight + 40}%)`;
 		let colorDarker = `hsl(${building.CWHue}, ${building.CWSaturation}%, ${building.CWLight - 20}%)`;
 		
-		building.windowWidth = ((building.buildingSideAWidth - (building.margin * (building.cols + 1))) / building.cols);
-		building.windowHeight = ((building.height - FIRST_FLOOR_HEIGHT - (building.margin * (building.rows + 1))) / building.rows);
+		building.windowWidth = ((building.width - (building.margin * (building.cols + 1))) / building.cols);
+		building.windowHeight = ((building.height -  building.firstFloorHeight - (building.margin * (building.rows + 1))) / building.rows);
 		building.windowWidthFactor = Math.cos(angle * RAD_CONST) * building.windowWidth;
 		building.windowHeightFactor = Math.sin(angle * RAD_CONST) * building.windowWidth;
 
@@ -163,7 +186,7 @@
 				ctx.fillStyle = colorLight;
 				ctx.beginPath();
 				let wx = building.x - (Math.cos(angle * RAD_CONST) * (building.margin + ((building.margin + building.windowWidth) * ix)));
-				let wy = building.y - FIRST_FLOOR_HEIGHT - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + building.windowWidth) * ix))) - (building.margin + ((building.margin + building.windowHeight) * iy));
+				let wy = building.y - building.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + building.windowWidth) * ix))) - (building.margin + ((building.margin + building.windowHeight) * iy));
 				ctx.moveTo(wx, wy); 
 				ctx.lineTo(wx - building.windowWidthFactor, wy - building.windowHeightFactor);  
 				ctx.lineTo(wx - building.windowWidthFactor, wy - (building.windowHeightFactor + building.windowHeight)); 
@@ -174,7 +197,7 @@
 				//Right
 				ctx.fillStyle = colorDark;
 				let wx1 = building.x + (Math.cos(angle * RAD_CONST) * (building.margin + ((building.margin + building.windowWidth) * ix)));
-				let wy1 = building.y - FIRST_FLOOR_HEIGHT - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + building.windowWidth) * ix))) - (building.margin + ((building.margin + building.windowHeight) * iy));
+				let wy1 = building.y -  building.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (building.margin + ((building.margin + building.windowWidth) * ix))) - (building.margin + ((building.margin + building.windowHeight) * iy));
 				ctx.beginPath();
 				ctx.moveTo(wx1, wy1); 
 				ctx.lineTo(wx1 + building.windowWidthFactor, wy1 - building.windowHeightFactor);  
@@ -367,13 +390,17 @@
 		ctx.fill();
 	}
 
+	getRowsNumber = (building) => {
+		return getRandomInt(1, Math.floor(building.height / 20)); 
+	}
+
 	addBuilding = (x, y) => {	
 		let building = new Building(x, y);		
 		building.height = getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
-		building.rows = getRandomInt(1, Math.floor(building.height / 20)); 
+		building.rows = getRowsNumber(building);
 		building.cols = getRandomInt(1, 5);		
 		building.margin = getRandomInt(0, 15);
-		building.buildingSideAWidth = getRandomInt(40, 60);
+		building.width = getRandomInt(40, 60);
 		building.CWHue = CWHues[(Math.floor(Math.random() * CWHues.length))];
 		building.CWLight= getRandomInt(10,50);
 		building.CWSaturation = getRandomInt(0,100);
@@ -381,6 +408,8 @@
 		building.saturation = getRandomInt(0, 100);
 		building.light = getRandomInt(20, 80);		
 		building.leftDoor = getRandomBool();
+		building.modules = getRandomInt(1, 3);
+		building.firstFloorHeight = FIRST_FLOOR_HEIGHT;
 		
 		var rand = getRandomInt(0, Object.keys(WindowTypes).length);
 		building.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
