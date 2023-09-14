@@ -374,7 +374,6 @@
 		ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 					
 		ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
 		ctx.stroke();
-
 	}
 
 	drawTriangularWindow = (ctx, building, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter) => {
@@ -398,6 +397,15 @@
 		return getRandomInt(1, Math.floor(building.height / 20)); 
 	}
 
+	getNumberOfModules = () => {
+		let dice = getRandomInt(1, 6);
+
+		if (dice > 4)
+			return getRandomInt(1, 3);
+		else 
+			return getRandomInt(1, 10);
+	}
+
 	addBuilding = (x, y) => {	
 		let building = new Building(x, y);		
 		building.height = getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
@@ -418,7 +426,7 @@
 		var rand = getRandomInt(0, Object.keys(WindowTypes).length);
 		building.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 		
-		let numberOfModules = getRandomInt(1, 10);
+		let numberOfModules = getNumberOfModules(); 
 
 		let lastModule = building;
 	
@@ -427,7 +435,7 @@
 			for (let i=1; i <= numberOfModules; i++){				
 				let widthDecrement = lastModule.width * getRandomFloat(0.05, 0.3, 2); 							
 				
-				let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - widthDecrement / 2);
+				let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - widthDecrement / 3);
 
 				let heightDecrement = lastModule.height * getRandomFloat(0, 0.7, 2); 
 				newModule.width = lastModule.width - widthDecrement;
