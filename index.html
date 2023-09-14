@@ -46,17 +46,15 @@
 		<script type="text/javascript">
 			let currentScript = 0;
 			let scriptCount = 0;
+			const art = ["tentacles", "confetti", "fire", "rotators", "blurry", "city"];
 			const scripts = [];
 
-			initScripts = function(){					
-				scripts.push("scripts/art-tentacles.js");
-				scripts.push("scripts/art-confetti.js");
-				scripts.push("scripts/art-fire.js");
-				scripts.push("scripts/art-rotators.js");
-				scripts.push("scripts/art-blurry.js");
-				scripts.push("scripts/art-city.js");
-
-				scriptCount = scripts.length;
+			initScripts = function(){	
+				art.forEach(element => {					
+					scripts.push(`scripts/art-${element}.js`);
+				});											
+					
+				scriptCount = scripts.length;				
 			}
 
 			removeCanvasListeners = () =>{				
@@ -72,32 +70,46 @@
 				}
 			}
 
+			setScriptIndexByURL = () =>{					
+				const queryString = window.location.search;
+				const urlParams = new URLSearchParams(queryString);
+				let artItem = urlParams.get("art");					
+				let artItemIndex = art.indexOf(artItem);
+				if (artItemIndex >= 0){						
+					let randomButton = document.getElementById("randomButton");
+					randomButton.style.display = "none";
+					currentScript = artItemIndex;
+				} else {					
+					randomScriptIndex();
+				}
+			}
+
 			increaseScriptIndex = () =>{				
-		    if (currentScript < scriptCount - 1)
+		    	if (currentScript < scriptCount - 1)
 					currentScript++;
 				else
 					currentScript = 0;
 			}
 
 			decreaseScriptIndex = () =>{				
-		    if (currentScript > 0)
+		    	if (currentScript > 0)
 					currentScript--;
 				else
 					currentScript = scriptCount - 1;
 			}
 
 			randomScriptIndex = () =>{	
-					currentScript = Math.floor(Math.random() * scriptCount);
+				currentScript = Math.floor(Math.random() * scriptCount);
 			}
 
 			setCurrentScript = () => {				
-		    var js = document.createElement("script");
-		    js.id = "artScript";
-		    js.src = scripts[currentScript];
-  			js.setAttribute("type", "text/javascript");
-  			js.setAttribute("async", true);
+				var js = document.createElement("script");
+				js.id = "artScript";
+				js.src = scripts[currentScript];
+				js.setAttribute("type", "text/javascript");
+				js.setAttribute("async", true);
 
-		    document.body.appendChild(js); 
+				document.body.appendChild(js); 
 			}
 
 			loadScript = (getScriptIndexFunction) =>{
@@ -119,13 +131,24 @@
 				loadScript(randomScriptIndex());
 			}
 
+			loadScriptByUrl = () => {				
+				loadScript(setScriptIndexByURL());
+			}
+
 			reload = () => {
 				location.reload();
 			}
 
 			window.addEventListener('load', () => {
-	  		initScripts();
-	  		loadRandomScript();
+				initScripts();			
+
+				const queryString = window.location.search;
+				const urlParams = new URLSearchParams(queryString);
+				if (urlParams.has('art')){
+					loadScriptByUrl();
+				} else {					
+					loadRandomScript();
+				}
 			});
 		</script>
 		<div>
