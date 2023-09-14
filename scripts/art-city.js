@@ -97,15 +97,15 @@
 		if (canvas.getContext){
 			let ctx = canvas.getContext('2d');
 			ctx.strokeStyle = '#000000';
-			drawModule(ctx, building);
+			drawModule(ctx, building, true);
 		
 			if (building.modules.length > 1){				
-				building.modules.forEach((module) => drawModule(ctx, module));
+				building.modules.forEach((module) => drawModule(ctx, module, false));
 			}
 		}
 	}
 
-	drawModule = (ctx, building) => {
+	drawModule = (ctx, building, firstModule) => {
 		let color = `hsl(${building.hue}, ${building.saturation}%, ${building.light}%)`; 
 		let colorLight = `hsl(${building.hue}, ${building.saturation}%, ${building.light - 20}%)`; 
 		let color3 = `hsl(${building.hue}, ${building.saturation}%, ${building.light + 20}%)`; 
@@ -144,31 +144,38 @@
 		ctx.fill();			
 
 		drawWindows(ctx, building);
-		//drawDoor(ctx, building);	
 		
+		if (firstModule) drawDoor(ctx, building);		
 	}
 
 	drawDoor = (ctx, building) => {
-		//if (building.leftDoor){
-			let halfWidthFactor = building.widthFactor / 2;
-			let halfHeightFactor = building.heightFactor / 2;
-			let doorHeight = 40;
-			let doorWidth = 40;
-			let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
-			let doorHeightFactor = Math.sin(angle * RAD_CONST) * (doorWidth);
-			ctx.fillStyle = "#FF0000";			
-			ctx.beginPath();
-			let wx = building.x - Math.cos(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
-			let wy = building.y - Math.sin(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
-			ctx.moveTo(wx, wy); 
-			ctx.lineTo(wx, wy - doorHeight);  
-			ctx.lineTo(wx - doorWidthFactor - doorWidth, wy - doorHeightFactor - doorHeight); 
-			ctx.lineTo(wx, wy - doorHeightFactor); 
-			ctx.lineTo(wx, wy); 
-			ctx.fill();
-		////} else {
+		let halfWidthFactor = building.widthFactor / 2;
+		let halfHeightFactor = building.heightFactor / 2;
+		let doorHeight = 10;
+		let doorWidth = 10;
+		let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
+		let doorHeightFactor = Math.sin(angle * RAD_CONST) * (doorHeight);
 
-		//}
+		ctx.fillStyle = `hsl(${building.hue}, ${building.saturation}%, ${building.light - 40}%)`; 
+		ctx.beginPath();
+		let wx = building.x - Math.cos(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
+		let wy = building.y - Math.sin(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
+		ctx.moveTo(wx, wy); 
+		ctx.lineTo(wx, wy - doorHeight);  
+		ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight); 
+		ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor); 
+		ctx.lineTo(wx, wy); 
+		ctx.fill();
+
+		ctx.fillStyle = `hsl(${building.hue}, ${building.saturation}%, ${building.light - 60}%)`; 
+		ctx.beginPath();
+		let wx1 = building.x + Math.cos(angle * RAD_CONST) * (building.width / 2 - doorWidth / 2);
+		ctx.moveTo(wx1, wy); 
+		ctx.lineTo(wx1, wy - doorHeight);  
+		ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight); 
+		ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor); 
+		ctx.lineTo(wx1, wy); 
+		ctx.fill();
 	}
 
 	drawWindows = (ctx, building) => {		
@@ -403,13 +410,11 @@
 		building.CWSaturation = getRandomInt(0,100);
 		building.hue = getRandomInt(1, 360);
 		building.saturation = getRandomInt(0, 100);
-		building.light = getRandomInt(20, 80);		
-		building.leftDoor = getRandomBool();
+		building.light = getRandomInt(20, 80);	
 		building.firstFloorHeight = FIRST_FLOOR_HEIGHT;
 
 		building.calculateProps();
-		
-		
+				
 		var rand = getRandomInt(0, Object.keys(WindowTypes).length);
 		building.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 		
