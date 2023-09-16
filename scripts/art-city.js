@@ -52,7 +52,7 @@
 			this.calculateProps();
 					
 			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
-			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
+			this.windowType = WindowTypes.SplitV; //WindowTypes[Object.keys(WindowTypes)[rand]];
 			
 			this.randomizeModules();
 		}
@@ -350,18 +350,20 @@
 		}
 
 		drawSplitVWindow = (ctx, wx, wy, wx1, wy1) => {		
-			let halfHeightFactor = this.windowHeightFactor / 2 
 			let halfWindowWidth = (this.windowWidth / 2);
+			let halfHeightFactor = Math.sin(angle * RAD_CONST) * halfWindowWidth;
+			let halfWidthFactor = Math.cos(angle * RAD_CONST) * halfWindowWidth;
 			ctx.strokeStyle = this.colorCWBase();
+
 			ctx.beginPath();
-			ctx.moveTo(wx - halfWindowWidth, wy - halfHeightFactor); 
-			ctx.lineTo(wx - halfWindowWidth, wy - halfHeightFactor - this.windowHeight);  				
+			ctx.moveTo(wx - halfWidthFactor, wy - halfHeightFactor); 
+			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor - this.windowHeight);  				
 			ctx.stroke();
 
 			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
-			ctx.moveTo(wx1 + halfWindowWidth, wy1 - halfHeightFactor); 
-			ctx.lineTo(wx1 + halfWindowWidth, wy1 - halfHeightFactor - this.windowHeight);  
+			ctx.moveTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor); 
+			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor - this.windowHeight);  
 			ctx.stroke();
 		}
 		
