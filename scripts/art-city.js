@@ -55,7 +55,7 @@
 			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 			
-			let numberOfModules =  3; //this.multipleModules ? this.getNumberOfModules() : 1; 
+			let numberOfModules = this.multipleModules ? this.getNumberOfModules() : 1; 
 
 			let lastModule = this;
 		
@@ -422,11 +422,10 @@
 			let dice = getRandomInt(1, 6);
 
 			if (dice > 4)
-				return getRandomInt(1, 3);
+				return getRandomInt(2, 3);
 			else 
-				return getRandomInt(1, 10);
+				return getRandomInt(4, 10);
 		}
-
 	}
 
 	init = () => {
