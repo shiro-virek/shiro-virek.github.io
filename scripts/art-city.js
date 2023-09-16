@@ -48,14 +48,13 @@
 			this.saturation = getRandomInt(0, 100);
 			this.light = getRandomInt(20, 80);	
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
-			this.multipleModules = getRandomBool();
 
 			this.calculateProps();
 					
 			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 			
-			let numberOfModules = this.multipleModules ? this.getNumberOfModules() : 1; 
+			let numberOfModules = this.getNumberOfModules(); 
 
 			let lastModule = this;
 		
@@ -103,7 +102,7 @@
 			this.windowWidth = ((this.width - (this.margin * (this.cols + 1))) / this.cols);
 			this.windowHeight = ((this.height -  this.firstFloorHeight - (this.margin * (this.rows + 1))) / this.rows);
 			this.windowWidthFactor = Math.cos(angle * RAD_CONST) * this.windowWidth;
-			this.windowHeightFactor = Math.sin(angle * RAD_CONST) * this.windowWidth;
+			this.windowHeightFactor = Math.sin(angle * RAD_CONST) * this.windowWidth;			
 		}
 		
 		drawBuilding = (ctx) => {
@@ -115,24 +114,20 @@
 		}
 			
 		drawModule = (ctx, firstModule) => {
-			let color = `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`; 
-			let colorLight = `hsl(${this.hue}, ${this.saturation}%, ${this.light - 20}%)`; 
-			let color3 = `hsl(${this.hue}, ${this.saturation}%, ${this.light + 20}%)`; 
-
 			this.widthFactor = Math.cos(angle * RAD_CONST) * this.width;
 			this.heightFactor = Math.sin(angle * RAD_CONST) * this.width;
 
-			this.drawLeftFace(ctx, color);
-			this.drawRightFace(ctx, colorLight);
-			this.drawTopFace(ctx, color3);
+			this.drawLeftFace(ctx);
+			this.drawRightFace(ctx);
+			this.drawTopFace(ctx);
 		
-			this.drawWindows(ctx, this);
+			this.drawWindows(ctx);
 			
-			if (firstModule) this.drawDoor(ctx, this);		
+			if (firstModule) this.drawDoor(ctx);		
 		}
 
-		drawLeftFace = (ctx, color) => {	
-			ctx.fillStyle = color;
+		drawLeftFace = (ctx) => {	
+			ctx.fillStyle = this.colorBase();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y); 
 			ctx.lineTo(this.x - this.widthFactor, this.y - this.heightFactor);  
@@ -142,8 +137,8 @@
 			ctx.fill();		
 		}
 				
-		drawRightFace = (ctx, color) => {
-			ctx.fillStyle = color;
+		drawRightFace = (ctx) => {
+			ctx.fillStyle = this.colorDark();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y); 
 			ctx.lineTo(this.x + this.widthFactor, this.y - this.heightFactor);  
@@ -154,7 +149,7 @@
 		}
 
 		drawTopFace = (ctx, color) => {
-			ctx.fillStyle = color;
+			ctx.fillStyle = this.colorLight();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y - this.height);
 			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height));  
@@ -172,7 +167,7 @@
 			let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
 			let doorHeightFactor = Math.sin(angle * RAD_CONST) * (doorHeight);
 
-			ctx.fillStyle = `hsl(${this.hue}, ${this.saturation}%, ${this.light - 40}%)`; 
+			ctx.fillStyle = this.colorDarker();
 			ctx.beginPath();
 			let wx = this.x - Math.cos(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
 			let wy = this.y - Math.sin(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
@@ -183,7 +178,7 @@
 			ctx.lineTo(wx, wy); 
 			ctx.fill();
 
-			ctx.fillStyle = `hsl(${this.hue}, ${this.saturation}%, ${this.light - 60}%)`; 
+			ctx.fillStyle = this.colorDarkest();
 			ctx.beginPath();
 			let wx1 = this.x + Math.cos(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
 			ctx.moveTo(wx1, wy); 
@@ -194,8 +189,8 @@
 			ctx.fill();
 		}
 
-		drawLeftWindow = (ctx, color, wx, wy) => {
-			ctx.fillStyle = color;
+		drawLeftWindow = (ctx, wx, wy) => {
+			ctx.fillStyle = this.colorCWLight();
 			ctx.beginPath();
 			ctx.moveTo(wx, wy); 
 			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);  
@@ -205,8 +200,8 @@
 			ctx.fill();
 		}
 
-		drawRightWindow = (ctx, color, wx, wy) => {
-			ctx.fillStyle = color;
+		drawRightWindow = (ctx, wx, wy) => {
+			ctx.fillStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx, wy); 
 			ctx.lineTo(wx + this.windowWidthFactor, wy - this.windowHeightFactor);  
@@ -216,12 +211,7 @@
 			ctx.fill();		
 		}
 
-		drawWindows = (ctx) => {		
-			let colorLight = `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 20}%)`; 				
-			let colorDark = `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight}%)`; 
-			let colorLighter = `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 40}%)`;
-			let colorDarker = `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 20}%)`;
-			
+		drawWindows = (ctx) => {				
 			for (let ix = 0; ix < this.cols; ix++){
 				for (let iy = 0; iy < this.rows; iy++){
 					let wx = this.x - (Math.cos(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
@@ -229,47 +219,47 @@
 					let wx1 = this.x + (Math.cos(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
 					let wy1 = this.y -  this.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
 			
-					this.drawLeftWindow(ctx, colorLight, wx, wy);
-					this.drawRightWindow(ctx, colorDark, wx1, wy1);	
+					this.drawLeftWindow(ctx, wx, wy);
+					this.drawRightWindow(ctx, wx1, wy1);	
 
 					switch(this.windowType){
 						case WindowTypes.MiniWindow:
-							this.drawMiniWindow(ctx, wx, wy, wx1, wy1, colorDark, colorLight);
+							this.drawMiniWindow(ctx, wx, wy, wx1, wy1);
 							break;
 						case WindowTypes.Split:
-							this.drawSplitWindow(ctx, wx, wy, wx1, wy1, colorDark, colorLight);
+							this.drawSplitWindow(ctx, wx, wy, wx1, wy1);
 							break;
 						case WindowTypes.Triangular:
-							this.drawTriangularWindow(ctx, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter);
+							this.drawTriangularWindow(ctx, wx, wy, wx1, wy1);
 							break;
 						case WindowTypes.SplitV:
-							this.drawSplitVWindow(ctx, wx, wy, wx1, wy1, colorDark, colorLight);
+							this.drawSplitVWindow(ctx, wx, wy, wx1, wy1);
 							break;
 						case WindowTypes.Interlaced:
-							this.drawInterlacedWindow(ctx, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter);
+							this.drawInterlacedWindow(ctx, wx, wy, wx1, wy1);
 							break;
 						case WindowTypes.MiniWindowCenter:
-							this.drawMiniWindowCenter(ctx, wx, wy, wx1, wy1, colorDark, colorLight);
+							this.drawMiniWindowCenter(ctx, wx, wy, wx1, wy1);
 							break;
 					}
 					
 					//Draw lights and shadows
-					ctx.strokeStyle = colorLighter;
+					ctx.strokeStyle = this.colorCWLighter();
 					ctx.beginPath();		
 					ctx.moveTo(wx, wy); 
 					ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);	
 					ctx.stroke();
-					ctx.strokeStyle = colorLight;
+					ctx.strokeStyle = this.colorCWLight();
 					ctx.beginPath();		
 					ctx.moveTo(wx1, wy1); 
 					ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);	
 					ctx.stroke();
-					ctx.strokeStyle = colorDark;
+					ctx.strokeStyle = this.colorCWBase();
 					ctx.beginPath();		
 					ctx.moveTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor); 
 					ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - this.windowHeight);	
 					ctx.stroke();
-					ctx.strokeStyle = colorDarker;
+					ctx.strokeStyle = this.colorCWDark();
 					ctx.beginPath();		
 					ctx.moveTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor); 
 					ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - this.windowHeight);	
@@ -277,20 +267,21 @@
 				}
 			}
 		}	
-		
-		drawMiniWindow = (ctx, wx, wy, wx1, wy1, colorDark, colorLight) => {
+
+		drawMiniWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowHeight = (this.windowHeight / 2);
 			let halfWindowWidth = (this.windowWidth / 2);
 			let halfWidthFactor = this.windowWidthFactor / 2;
 			let halfHeightFactor = this.windowHeightFactor / 2 
-			ctx.strokeStyle = colorDark;
+
+			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx, wy - halfWindowHeight); 
 			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor - halfWindowHeight);					
 			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor);  
 			ctx.stroke();
 
-			ctx.strokeStyle = colorLight;
+			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
 			ctx.moveTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - halfWindowHeight);
 			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor - halfWindowHeight);  
@@ -298,44 +289,43 @@
 			ctx.stroke();
 		}
 		
-		drawSplitWindow = (ctx, wx, wy, wx1, wy1, colorDark, colorLight) => {
+		drawSplitWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowHeight = (this.windowHeight / 2);
-			ctx.strokeStyle = colorDark;
+			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx, wy - halfWindowHeight); 
 			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - halfWindowHeight);  				
 			ctx.stroke();
 
-			ctx.strokeStyle = colorLight;
+			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
 			ctx.moveTo(wx1, wy1 - halfWindowHeight); 
 			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - halfWindowHeight);  
 			ctx.stroke();
 		}
 
-		drawSplitVWindow = (ctx, wx, wy, wx1, wy1, colorDark, colorLight) => {		
+		drawSplitVWindow = (ctx, wx, wy, wx1, wy1) => {		
 			let halfHeightFactor = this.windowHeightFactor / 2 
 			let halfWindowWidth = (this.windowWidth / 2);
-			ctx.strokeStyle = colorDark;
+			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx - halfWindowWidth, wy - halfHeightFactor); 
 			ctx.lineTo(wx - halfWindowWidth, wy - halfHeightFactor - this.windowHeight);  				
 			ctx.stroke();
 
-			ctx.strokeStyle = colorLight;
+			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
 			ctx.moveTo(wx1 + halfWindowWidth, wy1 - halfHeightFactor); 
 			ctx.lineTo(wx1 + halfWindowWidth, wy1 - halfHeightFactor - this.windowHeight);  
 			ctx.stroke();
 		}
 		
-		drawInterlacedWindow = (ctx, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter) => {		
+		drawInterlacedWindow = (ctx, wx, wy, wx1, wy1) => {		
 			let thirdHeightFactor = this.windowHeightFactor / 3;
 			let thirdWidthFactor = this.windowWidthFactor / 3;
-			let thirdWindowWidth = (this.windowWidth / 3);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
-			ctx.fillStyle = colorDark;
+			ctx.fillStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor); 
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);		
@@ -344,7 +334,7 @@
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor);		
 			ctx.fill();
 
-			ctx.fillStyle = colorDark;
+			ctx.fillStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2); 
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 3);		
@@ -353,7 +343,7 @@
 			ctx.lineTo(wx - thirdWidthFactor,  wy - thirdHeightFactor - thirdWindowHeight * 2);		
 			ctx.fill();
 			
-			ctx.fillStyle = colorDarker;
+			ctx.fillStyle = this.colorCWDark();
 			ctx.beginPath();
 			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor); 
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
@@ -362,7 +352,7 @@
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor);		
 			ctx.fill();
 
-			ctx.fillStyle = colorDarker;
+			ctx.fillStyle = this.colorCWDark();
 			ctx.beginPath();
 			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2); 
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 3);		
@@ -372,13 +362,12 @@
 			ctx.fill();
 		}
 		
-		drawMiniWindowCenter = (ctx, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter) => {		
+		drawMiniWindowCenter = (ctx, wx, wy, wx1, wy1) => {		
 			let thirdHeightFactor = this.windowHeightFactor / 3;
 			let thirdWidthFactor = this.windowWidthFactor / 3;
-			let thirdWindowWidth = (this.windowWidth / 3);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
-			ctx.strokeStyle = colorDark;
+			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight); 
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2);		
@@ -387,7 +376,7 @@
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);		
 			ctx.stroke();	
 			
-			ctx.strokeStyle = colorLight;
+			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
 			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight); 
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
@@ -397,15 +386,15 @@
 			ctx.stroke();
 		}
 
-		drawTriangularWindow = (ctx, wx, wy, wx1, wy1, colorDark, colorLight, colorDarker, colorLighter) => {
-			ctx.fillStyle = colorLighter;
+		drawTriangularWindow = (ctx, wx, wy, wx1, wy1) => {
+			ctx.fillStyle = this.colorCWLighter();
 			ctx.beginPath();
 			ctx.moveTo(wx, wy - this.windowHeight);				
 			ctx.lineTo(wx -  this.windowWidthFactor, wy - this.windowHeight - this.windowHeightFactor); 
 			ctx.lineTo(wx -  this.windowWidthFactor, wy - this.windowHeightFactor); 		
 			ctx.fill();
 
-			ctx.fillStyle = colorDarker;
+			ctx.fillStyle = this.colorCWDark();
 			ctx.beginPath();		
 			ctx.moveTo(wx1, wy1); 
 			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);		
@@ -422,10 +411,22 @@
 			let dice = getRandomInt(1, 6);
 
 			if (dice > 4)
-				return getRandomInt(2, 3);
+				return getRandomInt(1, 3);
 			else 
-				return getRandomInt(4, 10);
+				return getRandomInt(1, 10);
 		}
+
+		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`; 
+		colorLight  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light + 20}%)`; 
+		colorDark = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light - 20}%)`; 		
+		colorDarker  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light - 40}%)`;		
+		colorDarkest  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light - 60}%)`; 	
+
+		colorCWBase = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight}%)`; 
+		colorCWLight = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 20}%)`; 
+		colorCWLighter = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 40}%)`;
+		colorCWDark = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 20}%)`;
+		colorCWDarker = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 40}%)`;
 	}
 
 	init = () => {
