@@ -221,56 +221,60 @@
 			
 					this.drawLeftWindow(ctx, wx, wy);
 					this.drawRightWindow(ctx, wx1, wy1);	
-
-					switch(this.windowType){
-						case WindowTypes.MiniWindow:
-							this.drawMiniWindow(ctx, wx, wy, wx1, wy1);
-							break;
-						case WindowTypes.Split:
-							this.drawSplitWindow(ctx, wx, wy, wx1, wy1);
-							break;
-						case WindowTypes.Triangular:
-							this.drawTriangularWindow(ctx, wx, wy, wx1, wy1);
-							break;
-						case WindowTypes.SplitV:
-							this.drawSplitVWindow(ctx, wx, wy, wx1, wy1);
-							break;
-						case WindowTypes.Interlaced:
-							this.drawInterlacedWindow(ctx, wx, wy, wx1, wy1);
-							break;
-						case WindowTypes.MiniWindowCenter:
-							this.drawMiniWindowCenter(ctx, wx, wy, wx1, wy1);
-							break;
-					}
-					
-					//Draw lights and shadows
-					ctx.strokeStyle = this.colorCWLighter();
-					ctx.beginPath();		
-					ctx.moveTo(wx, wy); 
-					ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);	
-					ctx.stroke();
-					ctx.strokeStyle = this.colorCWLight();
-					ctx.beginPath();		
-					ctx.moveTo(wx1, wy1); 
-					ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);	
-					ctx.stroke();
-					ctx.strokeStyle = this.colorCWBase();
-					ctx.beginPath();		
-					ctx.moveTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor); 
-					ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - this.windowHeight);	
-					ctx.stroke();
-					ctx.strokeStyle = this.colorCWDark();
-					ctx.beginPath();		
-					ctx.moveTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor); 
-					ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - this.windowHeight);	
-					ctx.stroke();
+					this.drawSpecialWindow(ctx, wx, wy, wx1, wy1);					
+					this.drawWindowsEdges(ctx, wx, wy, wx1, wy1);				
 				}
 			}
 		}	
 
+		drawWindowsEdges = (ctx, wx, wy, wx1, wy1) => {
+			ctx.strokeStyle = this.colorCWLighter();
+			ctx.beginPath();		
+			ctx.moveTo(wx, wy); 
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);	
+			ctx.stroke();
+			ctx.strokeStyle = this.colorCWLight();
+			ctx.beginPath();		
+			ctx.moveTo(wx1, wy1); 
+			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);	
+			ctx.stroke();
+			ctx.strokeStyle = this.colorCWBase();
+			ctx.beginPath();		
+			ctx.moveTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor); 
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - this.windowHeight);	
+			ctx.stroke();
+			ctx.strokeStyle = this.colorCWDark();
+			ctx.beginPath();		
+			ctx.moveTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor); 
+			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - this.windowHeight);	
+			ctx.stroke();
+		}
+
+		drawSpecialWindow = (ctx, wx, wy, wx1, wy1) => {
+			switch(this.windowType){
+				case WindowTypes.MiniWindow:
+					this.drawMiniWindow(ctx, wx, wy, wx1, wy1);
+					break;
+				case WindowTypes.Split:
+					this.drawSplitWindow(ctx, wx, wy, wx1, wy1);
+					break;
+				case WindowTypes.Triangular:
+					this.drawTriangularWindow(ctx, wx, wy, wx1, wy1);
+					break;
+				case WindowTypes.SplitV:
+					this.drawSplitVWindow(ctx, wx, wy, wx1, wy1);
+					break;
+				case WindowTypes.Interlaced:
+					this.drawInterlacedWindow(ctx, wx, wy, wx1, wy1);
+					break;
+				case WindowTypes.MiniWindowCenter:
+					this.drawMiniWindowCenter(ctx, wx, wy, wx1, wy1);
+					break;
+			}
+		}
+
 		drawMiniWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowHeight = (this.windowHeight / 2);
-			let halfWindowWidth = (this.windowWidth / 2);
 			let halfWidthFactor = this.windowWidthFactor / 2;
 			let halfHeightFactor = this.windowHeightFactor / 2 
 
@@ -445,8 +449,7 @@
 		);
 	  
 		return parseFloat(str);
-	  }
-	  
+	}
 
 	getRandomBool = () => {
 		return Math.random() < 0.5;
