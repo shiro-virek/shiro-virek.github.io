@@ -54,12 +54,14 @@
 			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 			
-			let numberOfModules = this.getNumberOfModules(); 
+			this.randomizeModules();
+		}
 
-			let lastModule = this;
-		
-			if (numberOfModules > 1){
-				
+		randomizeModules = () => {
+			let numberOfModules = this.getNumberOfModules(); 
+			let lastModule = this;		
+
+			if (numberOfModules > 1){				
 				for (let i=1; i <= numberOfModules; i++){				
 					let widthDecrement = lastModule.width * getRandomFloat(0.05, 0.3, 2); 							
 					
@@ -120,6 +122,7 @@
 			this.drawLeftFace(ctx);
 			this.drawRightFace(ctx);
 			this.drawTopFace(ctx);
+			this.drawLights(ctx);
 		
 			this.drawWindows(ctx);
 			
@@ -148,7 +151,7 @@
 			ctx.fill();
 		}
 
-		drawTopFace = (ctx, color) => {
+		drawTopFace = (ctx) => {
 			ctx.fillStyle = this.colorLight();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y - this.height);
@@ -158,10 +161,28 @@
 			ctx.lineTo(this.x, this.y - this.height); 
 			ctx.fill();		
 		}
+
+		drawLights = (ctx) => {			
+			ctx.strokeStyle = this.colorLight();
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y); 
+			ctx.lineTo(this.x , this.y - this.height);
+			ctx.stroke();
+
+			ctx.strokeStyle = this.colorLighter();
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y - this.height);
+			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height)); 
+			ctx.stroke(); 
+			
+			ctx.strokeStyle = this.colorBase();
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y - this.height);
+			ctx.lineTo(this.x + this.widthFactor, this.y - (this.heightFactor + this.height)); 
+			ctx.stroke(); 
+		}
 			
 		drawDoor = (ctx) => {
-			let halfWidthFactor = this.widthFactor / 2;
-			let halfHeightFactor = this.heightFactor / 2;
 			let doorHeight = 10;
 			let doorWidth = 10;
 			let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
@@ -187,6 +208,18 @@
 			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor); 
 			ctx.lineTo(wx1, wy); 
 			ctx.fill();
+			
+			ctx.strokeStyle = this.colorLight();
+			ctx.beginPath();
+			ctx.moveTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight); 
+			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor); 
+			ctx.stroke();
+
+			ctx.strokeStyle = this.colorBase();
+			ctx.beginPath();			
+			ctx.moveTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight); 
+			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor);  
+			ctx.stroke();
 		}
 
 		drawLeftWindow = (ctx, wx, wy) => {
@@ -422,6 +455,7 @@
 
 		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`; 
 		colorLight  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light + 20}%)`; 
+		colorLighter  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light + 40}%)`; 
 		colorDark = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light - 20}%)`; 		
 		colorDarker  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light - 40}%)`;		
 		colorDarkest  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light - 60}%)`; 	
@@ -496,7 +530,6 @@
 				let canvas = document.getElementById(CANVAS_ID);
 				if (canvas.getContext){
 					let ctx = canvas.getContext('2d');
-					ctx.strokeStyle = '#000000';
 					objects[i].drawBuilding(ctx);
 				}			
 			}				
