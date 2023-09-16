@@ -57,6 +57,14 @@
 			this.randomizeModules();
 		}
 
+		getAngleDecrement = (widthDecrement) => {			
+			if (angle <= 3 ) return 0;
+			if (angle > 3 && angle < 20)
+				return widthDecrement / 4;
+			else
+				return widthDecrement / 2; 
+		}
+
 		randomizeModules = () => {
 			let numberOfModules = this.getNumberOfModules(); 
 			let lastModule = this;		
@@ -65,7 +73,7 @@
 				for (let i=1; i <= numberOfModules; i++){				
 					let widthDecrement = lastModule.width * getRandomFloat(0.05, 0.3, 2); 							
 					
-					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - widthDecrement / 3);
+					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement));
 
 					let heightDecrement = lastModule.height * getRandomFloat(0, 0.7, 2); 
 					newModule.width = lastModule.width - widthDecrement;
