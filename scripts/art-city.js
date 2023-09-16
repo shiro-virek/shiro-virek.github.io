@@ -52,7 +52,7 @@
 			this.calculateProps();
 					
 			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
-			this.windowType = WindowTypes.SplitV; //WindowTypes[Object.keys(WindowTypes)[rand]];
+			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 			
 			this.randomizeModules();
 		}
