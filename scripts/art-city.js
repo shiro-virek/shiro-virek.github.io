@@ -92,16 +92,11 @@
 		}
 	}
 
-	drawBuilding = (building) => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext){
-			let ctx = canvas.getContext('2d');
-			ctx.strokeStyle = '#000000';
-			drawModule(ctx, building, true);
+	drawBuilding = (ctx, building) => {
+		drawModule(ctx, building, true);
 		
-			if (building.modules.length > 1){				
-				building.modules.forEach((module) => drawModule(ctx, module, false));
-			}
+		if (building.modules.length > 1){				
+			building.modules.forEach((module) => drawModule(ctx, module, false));
 		}
 	}
 
@@ -479,7 +474,12 @@
 
 		if (BUILDINGS_COUNT > 0)
 			for (let i = 0; i < BUILDINGS_COUNT; i++){
-				this.drawBuilding(objects[i]);
+				let canvas = document.getElementById(CANVAS_ID);
+				if (canvas.getContext){
+					let ctx = canvas.getContext('2d');
+					ctx.strokeStyle = '#000000';
+					this.drawBuilding(ctx, objects[i]);
+				}			
 			}				
 	}
 
