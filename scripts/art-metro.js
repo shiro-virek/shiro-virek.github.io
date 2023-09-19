@@ -11,8 +11,6 @@
 	let lastRender = 0
 
 	let objects = [];
-
-	const CWHues = [232, 203, 189, 173, 162];
 	
 	const LineTypes = Object.freeze({
 		Regular: Symbol("regular")
@@ -41,10 +39,13 @@
 
 			let lastX = this.x;
 			let lastY = this.y;
+			let lastDirection = 0; //determine from mouse position
+			let baseDirection = 45 * getRandomInt(0, 7);
 
 			for (let index = 0; index < 10; index++) {
 				let length = getRandomInt(20, 200);
-				let direction = 45 * getRandomInt(0, 7);
+				let direction = baseDirection + this.getDirection(lastDirection);
+				console.log(direction);
 
 				let deltaX = Math.cos(direction * RAD_CONST) * length;
 				let deltaY = Math.sin(direction * RAD_CONST) * length;
@@ -52,12 +53,17 @@
 				let newX = lastX + deltaX;				
 				let newY = lastY + deltaY;	
 				let point = new Point(newX, newY);
-				this.points.push(point);
-				
+				this.points.push(point);			
+
 				lastX = newX;
 				lastY = newY;
+				lastDirection = direction;
 			}			
 			
+		}
+
+		getDirection = (lastDirection) => {
+			return  45 * getRandomInt(0, 2);
 		}
 
 		drawMetroLine = (ctx) => {				
