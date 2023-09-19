@@ -3,7 +3,6 @@
 	let height = 0;
 	let lastPosY = 0;
 	let lastPosX = 0;
-	let angle;
 	let CANVAS_ID = "myCanvas"
 	let LINES_COUNT = 0;
 	let RAD_CONST = 0.0175;
@@ -26,6 +25,7 @@
 		}
 	}
 
+
 	class Line{
 		constructor(x, y){
 			this.x = x;
@@ -39,11 +39,23 @@
 			this.saturation = 100;
 			this.light = getRandomInt(20, 80);	
 
+			let lastX = this.x;
+			let lastY = this.y;
+
 			for (let index = 0; index < 10; index++) {
-				let randomX = getRandomInt(1, 200);				
-				let randomY = getRandomInt(1, 200);
-				let point = new Point(randomX, randomY);
-				this.points.push(point);				
+				let length = getRandomInt(20, 200);
+				let direction = 45 * getRandomInt(0, 7);
+
+				let deltaX = Math.cos(direction * RAD_CONST) * length;
+				let deltaY = Math.sin(direction * RAD_CONST) * length;
+
+				let newX = lastX + deltaX;				
+				let newY = lastY + deltaY;	
+				let point = new Point(newX, newY);
+				this.points.push(point);
+				
+				lastX = newX;
+				lastY = newY;
 			}			
 			
 		}
