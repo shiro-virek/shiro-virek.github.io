@@ -21,14 +21,22 @@
 			this.x = x;
 			this.y = y;	
 		}
+
 	}
 
+	class Station{
+		constructor(x, y){
+			this.x = x;
+			this.y = y;	
+		}
+	}
 
 	class Line{
 		constructor(x, y){
 			this.x = x;
 			this.y = y;			
-			this.points = [];			
+			this.points = [];	
+			this.stations = [];
 		}		
 
 		randomize = () => {
@@ -39,31 +47,43 @@
 
 			let lastX = this.x;
 			let lastY = this.y;
-			let lastDirection = 0; //determine from mouse position
+			let lastDirection = 0; 
 			let baseDirection = 45 * getRandomInt(0, 7);
+			let numberOfPoints  = getRandomInt(3, 12);
 
-			for (let index = 0; index < 10; index++) {
+			let firstPoint = new Point(this.x, this.y);			
+			this.points.push(firstPoint);
+			let firstStation = new Station(this.x, this.y);
+			this.stations.push(firstStation);
+
+			for (let index = 0; index < numberOfPoints; index++) {
 				let length = getRandomInt(20, 200);
 				let direction = baseDirection + this.getDirection(lastDirection);
-				console.log(direction);
-
+	
 				let deltaX = Math.cos(direction * RAD_CONST) * length;
 				let deltaY = Math.sin(direction * RAD_CONST) * length;
 
 				let newX = lastX + deltaX;				
 				let newY = lastY + deltaY;	
-				let point = new Point(newX, newY);
-				this.points.push(point);			
+				let point = new Point(newX, newY);			
+
+				if (newX < 0 || newX > width || newY < 0 || newY > height) 
+					continue;
+
+				this.points.push(point);	
 
 				lastX = newX;
 				lastY = newY;
+
 				lastDirection = direction;
 			}			
-			
+
+			let lastStation = new Station(lastX, lastY);
+			this.stations.push(lastStation);			
 		}
 
 		getDirection = (lastDirection) => {
-			return  45 * getRandomInt(0, 2);
+			return  45 * getRandomInt(0, 3);
 		}
 
 		drawMetroLine = (ctx) => {				
@@ -73,19 +93,33 @@
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y);
 
+			this.drawSegments(ctx);
+			this.drawStations(ctx);
+		
+		}	
+
+		drawSegments = (ctx) => {
 			for (let index = 0; index < this.points.length; index++) {
 				const element = this.points[index];
 				ctx.lineTo(element.x, element.y); 
 			}
+			ctx.stroke(); 	
+		}
 
-			ctx.stroke(); 			
-		}			
+		drawStations = (ctx) => {
+
+			//ctx.isPointInPath(20, 50)
+
+			for (let index = 0; index < this.stations.length; index++) {
+				const element = this.stations[index];
+				drawCircle(element.x, element.y, 3, "#FFF", "#FFF");
+			}
+		}		
 
 		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`; 
 	}
 
 	init = () => {
-		randomize();
 		addEvents();
 		drawFrame();
 	}
@@ -114,10 +148,6 @@
 		}, false);
 	}
 
-	randomize = () => {	
-		angle = getRandomInt(0, 40);
-	}
-
 	drawFrame = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 		if (canvas.getContext){
@@ -131,6 +161,18 @@
 			ctx.strokeRect(0, 0, width, height);
 		}
 	}	
+
+	drawCircle = (x, y, radio, color = '#00FF00', fillcolor = '#00FF00') => {
+		let canvas = document.getElementById(CANVAS_ID);
+		if (canvas.getContext){
+			let ctx = canvas.getContext('2d');
+			ctx.strokeStyle = color;
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.arc(x, y, radio, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+	}
 
 	addMetroLine = (x, y) => {	
 		let line = new Line(x, y);	
