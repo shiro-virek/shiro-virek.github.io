@@ -19,21 +19,48 @@
 		Regular: Symbol("regular")
 	});
 
+	class Point{
+		constructor(x, y){
+			this.x = x;
+			this.y = y;	
+		}
+	}
+
 	class Line{
 		constructor(x, y){
 			this.x = x;
-			this.y = y;
-			this.segments = [];			
+			this.y = y;			
+			this.points = [];			
 		}		
 
 		randomize = () => {
-			this.hue = getRandomInt(1, 360);
-			this.saturation = getRandomInt(0, 100);
+			this.lineThickness = LINE_THICKNESS;
+			this.hue = getRandomInt(1, 360);			
+			this.saturation = 100;
 			this.light = getRandomInt(20, 80);	
+
+			for (let index = 0; index < 10; index++) {
+				let randomX = getRandomInt(1, 200);				
+				let randomY = getRandomInt(1, 200);
+				let point = new Point(randomX, randomY);
+				this.points.push(point);				
+			}			
+			
 		}
 
-		drawLine = (ctx) => {
-			
+		drawMetroLine = (ctx) => {				
+			ctx.lineCap = "round";
+			ctx.lineWidth = this.lineThickness;
+			ctx.strokeStyle = this.colorBase();
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y);
+
+			for (let index = 0; index < this.points.length; index++) {
+				const element = this.points[index];
+				ctx.lineTo(element.x, element.y); 
+			}
+
+			ctx.stroke(); 			
 		}			
 
 		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`; 
@@ -65,7 +92,7 @@
 		let canvas = document.getElementById(CANVAS_ID);
 
 		canvas.addEventListener('click', e => {
-			addLine(e.offsetX, e.offsetY);
+			addMetroLine(e.offsetX, e.offsetY);
 		}, false);
 	}
 
@@ -87,7 +114,7 @@
 		}
 	}	
 
-	addLine = (x, y) => {	
+	addMetroLine = (x, y) => {	
 		let line = new Line(x, y);	
 		line.randomize();	
 		objects.push(line);
@@ -102,7 +129,7 @@
 				let canvas = document.getElementById(CANVAS_ID);
 				if (canvas.getContext){
 					let ctx = canvas.getContext('2d');
-					objects[i].drawLine(ctx);
+					objects[i].drawMetroLine(ctx);
 				}			
 			}				
 	}
