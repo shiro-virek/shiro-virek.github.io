@@ -7,6 +7,7 @@
 	let LINES_COUNT = 0;
 	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
+	let ALPHABETIC_SYMBOL = false;
 
 	let lastRender = 0
 
@@ -21,7 +22,6 @@
 			this.x = x;
 			this.y = y;	
 		}
-
 	}
 
 	class Station{
@@ -37,6 +37,7 @@
 			this.y = y;			
 			this.points = [];	
 			this.stations = [];
+			this.symbol = ALPHABETIC_SYMBOL ? "A" : 1;
 		}		
 
 		randomize = () => {
@@ -44,6 +45,13 @@
 			this.hue = getRandomInt(1, 360);			
 			this.saturation = 100;
 			this.light = getRandomInt(20, 80);	
+		
+			if (objects.length > 0)
+				if (ALPHABETIC_SYMBOL)
+					this.symbol = nextCharacter(objects[objects.length - 1].symbol)
+				else
+					this.symbol = objects[objects.length - 1].symbol + 1;
+
 
 			let lastX = this.x;
 			let lastY = this.y;
@@ -112,7 +120,7 @@
 
 			for (let index = 0; index < this.stations.length; index++) {
 				const element = this.stations[index];
-				drawCircle(element.x, element.y, 3, "#FFF", "#FFF");
+				drawCircle(ctx, element.x, element.y, 3, "#FFF", "#FFF");
 			}
 		}		
 
@@ -120,8 +128,13 @@
 	}
 
 	init = () => {
+		randomize();
 		addEvents();
 		drawFrame();
+	}
+
+	randomize = () => {
+		ALPHABETIC_SYMBOL = getRandomBool();
 	}
 
 	getRandomInt = (min, max) => {
@@ -148,6 +161,29 @@
 		}, false);
 	}
 
+	drawLinesInfo = (ctx, canvas) => {
+		let marginTop = 30;
+		let marginLeft = 30;
+		let symbolSide = 15;
+		let lineHeight = 20;
+		
+		ctx.fillStyle = "#FFF";
+		let frameWidth = 100;
+		let frameHeight = marginTop + LINES_COUNT * lineHeight;
+		ctx.fillRect(marginTop, marginLeft, frameWidth, frameHeight);
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = '#000000';
+		ctx.strokeRect(marginTop, marginLeft, frameWidth, frameHeight);
+
+		for (let i = 0; i < LINES_COUNT; i++){
+			drawRectangle(ctx, marginLeft + 10, marginTop + 10 + i * lineHeight, symbolSide, symbolSide, '#000', objects[i].colorBase());
+			ctx.fillStyle = "#000";
+			ctx.font = "10px Arial";
+			ctx.fillText(`Line ${objects[i].symbol}`, marginLeft + symbolSide + 20, marginTop + 20 + i * lineHeight); 
+		}		
+
+	}
+
 	drawFrame = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 		if (canvas.getContext){
@@ -162,17 +198,37 @@
 		}
 	}	
 
-	drawCircle = (x, y, radio, color = '#00FF00', fillcolor = '#00FF00') => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext){
-			let ctx = canvas.getContext('2d');
-			ctx.strokeStyle = color;
-			ctx.fillStyle = color;
-			ctx.beginPath();
-			ctx.arc(x, y, radio, 0, 2 * Math.PI);
-			ctx.fill();
-		}
+	drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
+		ctx.strokeStyle = color;
+		ctx.fillStyle = fillColor;
+		ctx.beginPath();
+		ctx.arc(x, y, radio, 0, 2 * Math.PI);
+		ctx.fill();	
+	}     
+
+	drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
+		ctx.strokeStyle = color;
+		ctx.fillStyle = fillColor;
+		ctx.beginPath();
+		ctx.rect(x, y, width, height);
+		ctx.fill();
+		ctx.stroke();
 	}
+	
+	drawLines = () => {
+		for (let i = 0; i < LINES_COUNT; i++){
+			let canvas = document.getElementById(CANVAS_ID);
+			if (canvas.getContext){
+				let ctx = canvas.getContext('2d');
+				objects[i].drawMetroLine(ctx);
+			}			
+		}		
+	}
+
+	nextCharacter = (c) => {
+		return String.fromCharCode(c.charCodeAt(0) + 1);
+	}
+	 
 
 	addMetroLine = (x, y) => {	
 		let line = new Line(x, y);	
@@ -184,14 +240,15 @@
 	draw = () => {	
 		drawFrame();
 
-		if (LINES_COUNT > 0)
-			for (let i = 0; i < LINES_COUNT; i++){
-				let canvas = document.getElementById(CANVAS_ID);
-				if (canvas.getContext){
-					let ctx = canvas.getContext('2d');
-					objects[i].drawMetroLine(ctx);
-				}			
-			}				
+		if (LINES_COUNT > 0){
+			let canvas = document.getElementById(CANVAS_ID);
+			if (canvas.getContext){
+				let ctx = canvas.getContext('2d')
+				drawLines(ctx);
+				drawLinesInfo(ctx, canvas);
+			}
+		}
+				
 	}
 
 	width = window.innerWidth;
