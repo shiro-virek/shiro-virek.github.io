@@ -58,14 +58,14 @@
 			let lastDirection = 0; 
 			let baseDirection = 45 * getRandomInt(0, 7);
 			let numberOfPoints  = getRandomInt(3, 12);
-			let stationThreshold = 100;			
+			let stationThresholdMax = 100;		
+			let stationThresholdMin = 50;		
 
 			let firstPoint = new Point(this.x, this.y);			
 			this.points.push(firstPoint);
 			let firstStation = new Station(this.x, this.y);
 			this.stations.push(firstStation);
 
-			let lastStationExists = true;
 
 			for (let index = 0; index < numberOfPoints; index++) {
 				let length = getRandomInt(20, 200);
@@ -83,18 +83,19 @@
 
 				let newStationX = 0;
 				let newStationY = 0; 
-				if (length < stationThreshold) {
-					lastStationExists = false;					
-					newStationX = lastX + Math.cos(direction * RAD_CONST) * (length / 2);
-					newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);
-				}else{
-					lastStationExists = true;		
-					newStationX = newX;
-					newStationY = newY;
-				}
 
-				let newStation = new Station(newStationX, newStationY);
-				this.stations.push(newStation);
+				if (length > stationThresholdMin) {
+					if (length < stationThresholdMax) {
+						newStationX = newX;
+						newStationY = newY;
+					}else{				
+						newStationX = lastX + Math.cos(direction * RAD_CONST) * (length / 2);
+						newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);	
+					}					
+
+					let newStation = new Station(newStationX, newStationY);
+					this.stations.push(newStation);
+				}
 
 				this.points.push(point);	
 
@@ -104,10 +105,13 @@
 				lastDirection = direction;
 			}			
 
-			if (!lastStationExists){
-				let lastStation = new Station(lastX, lastY);
-				this.stations.push(lastStation);				
-			}			
+
+			let lastAddedStation = this.stations[this.stations.length - 1];
+
+			if (lastAddedStation.x != lastX && lastAddedStation.y != lastY){
+				let endStation = new Station(lastX, lastY);
+				this.stations.push(endStation);	
+			}				
 		}
 
 		getDirection = (lastDirection) => {
