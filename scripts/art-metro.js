@@ -58,11 +58,14 @@
 			let lastDirection = 0; 
 			let baseDirection = 45 * getRandomInt(0, 7);
 			let numberOfPoints  = getRandomInt(3, 12);
+			let stationThreshold = 100;			
 
 			let firstPoint = new Point(this.x, this.y);			
 			this.points.push(firstPoint);
 			let firstStation = new Station(this.x, this.y);
 			this.stations.push(firstStation);
+
+			let lastStationExists = true;
 
 			for (let index = 0; index < numberOfPoints; index++) {
 				let length = getRandomInt(20, 200);
@@ -78,8 +81,18 @@
 				if (newX < 0 || newX > width || newY < 0 || newY > height) 
 					continue;
 
-				let newStationX = lastX + Math.cos(direction * RAD_CONST) * (length / 2);
-				let newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);
+				let newStationX = 0;
+				let newStationY = 0; 
+				if (length < stationThreshold) {
+					lastStationExists = false;					
+					newStationX = lastX + Math.cos(direction * RAD_CONST) * (length / 2);
+					newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);
+				}else{
+					lastStationExists = true;		
+					newStationX = newX;
+					newStationY = newY;
+				}
+
 				let newStation = new Station(newStationX, newStationY);
 				this.stations.push(newStation);
 
@@ -91,8 +104,10 @@
 				lastDirection = direction;
 			}			
 
-			let lastStation = new Station(lastX, lastY);
-			this.stations.push(lastStation);			
+			if (!lastStationExists){
+				let lastStation = new Station(lastX, lastY);
+				this.stations.push(lastStation);				
+			}			
 		}
 
 		getDirection = (lastDirection) => {
