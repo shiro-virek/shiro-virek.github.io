@@ -77,6 +77,11 @@
 				if (newX < 0 || newX > width || newY < 0 || newY > height) 
 					continue;
 
+				let newStationX = lastX + Math.cos(direction * RAD_CONST) * (length / 2);
+				let newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);
+				let newStation = new Station(newStationX, newStationY);
+				this.stations.push(newStation);
+
 				this.points.push(point);	
 
 				lastX = newX;
@@ -102,7 +107,6 @@
 
 			this.drawSegments(ctx);
 			this.drawStations(ctx);
-		
 		}	
 
 		drawSegments = (ctx) => {
@@ -114,12 +118,11 @@
 		}
 
 		drawStations = (ctx) => {
-
 			//ctx.isPointInPath(20, 50)
 
 			for (let index = 0; index < this.stations.length; index++) {
 				const element = this.stations[index];
-				drawCircle(ctx, element.x, element.y, 3, "#FFF", "#FFF");
+				drawCircle(ctx, element.x, element.y, 3, "#000", "#FFF");
 			}
 		}		
 
@@ -227,9 +230,11 @@
 	drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
 		ctx.strokeStyle = color;
 		ctx.fillStyle = fillColor;
+		ctx.lineWidth = 1;
 		ctx.beginPath();
 		ctx.arc(x, y, radio, 0, 2 * Math.PI);
 		ctx.fill();	
+		ctx.stroke();	
 	}     
 
 	drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
