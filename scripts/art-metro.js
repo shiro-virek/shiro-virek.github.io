@@ -8,6 +8,7 @@
 	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
 	let ALPHABETIC_SYMBOL = false;
+	let MAX_LINES = 15;
 
 	let lastRender = 0
 
@@ -184,8 +185,8 @@
 	}
 
 	drawLinesInfo = (ctx, canvas) => {
-		let marginTop = 30;
-		let marginLeft = 30;
+		let marginTop = 10;
+		let marginLeft = 10;
 		let symbolSide = 15;
 		let lineHeight = 20;
 		let headerHeight = 80;
@@ -262,10 +263,12 @@
 	 
 
 	addMetroLine = (x, y) => {	
-		let line = new Line(x, y);	
-		line.randomize();	
-		objects.push(line);
-		LINES_COUNT++; 
+		if (LINES_COUNT < MAX_LINES) {
+			let line = new Line(x, y);	
+			line.randomize();	
+			objects.push(line);
+			LINES_COUNT++; 			
+		}
 	}			
 			
 	draw = () => {	
