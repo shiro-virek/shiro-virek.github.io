@@ -10,6 +10,14 @@
 	let ALPHABETIC_SYMBOL = false;
 	let MAX_LINES = 15;
 
+	let INFO_MARGIN_TOP = 10;
+	let INFO_MARGIN_LEFT = 10;
+	let INFO_SYMBOL_SIDE = 15;
+	let INFO_LINE_HEIGHT = 20;
+	let INFO_HEADER_HEIGHT = 80;
+	let INFO_PADDING = 10;
+	let INFO_WIDTH = 100;
+
 	let lastRender = 0
 
 	let objects = [];
@@ -77,6 +85,10 @@
 				let newX = lastX + deltaX;				
 				let newY = lastY + deltaY;	
 				let point = new Point(newX, newY);			
+
+				let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + MAX_LINES * INFO_LINE_HEIGHT;
+				if (newX < INFO_MARGIN_LEFT + INFO_WIDTH && newY < INFO_MARGIN_TOP + infoHeight) 
+					continue;
 
 				if (newX < 0 || newX > width || newY < 0 || newY > height) 
 					continue;
@@ -203,33 +215,26 @@
 		return Math.floor(linesLength / 100);
 	}
 
-	drawLinesInfo = (ctx, canvas) => {
-		let marginTop = 10;
-		let marginLeft = 10;
-		let symbolSide = 15;
-		let lineHeight = 20;
-		let headerHeight = 80;
-		let padding = 10;
-		
+	drawLinesInfo = (ctx, canvas) => {		
 		ctx.fillStyle = "#FFF";
-		let frameWidth = 100;
-		let frameHeight = marginTop + headerHeight + LINES_COUNT * lineHeight;
-		ctx.fillRect(marginLeft, marginTop, frameWidth, frameHeight);
+		let infoWidth = INFO_WIDTH;
+		let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + LINES_COUNT * INFO_LINE_HEIGHT;
+		ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = '#000000';
-		ctx.strokeRect(marginLeft, marginTop, frameWidth, frameHeight);
+		ctx.strokeRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
 
 		ctx.font = "10px Arial";
 		ctx.fillStyle = "#000";	
-		ctx.fillText(`City Metro System`, marginLeft + padding, marginTop + padding * 2); 
-		ctx.fillText(`Stations: ${getNumberOfStations()}`, marginLeft + padding, marginTop + padding * 2 + lineHeight); 
-		ctx.fillText(`Lines: ${getNumberOfLines()}`, marginLeft + padding, marginTop + padding * 2 + lineHeight * 2); 
-		ctx.fillText(`Length: ${getLinesLength()} km.`, marginLeft + padding, marginTop + padding * 2 + lineHeight * 3); 
+		ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2); 
+		ctx.fillText(`Stations: ${getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT); 
+		ctx.fillText(`Lines: ${getNumberOfLines()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2); 
+		ctx.fillText(`Length: ${getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3); 
 
 		for (let i = 0; i < LINES_COUNT; i++){
-			drawRectangle(ctx, marginLeft + padding, marginTop + headerHeight + padding + i * lineHeight, symbolSide, symbolSide, '#000', objects[i].colorBase());
+			drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', objects[i].colorBase());
 			ctx.fillStyle = "#000";			
-			ctx.fillText(`Line ${objects[i].symbol}`, marginLeft + symbolSide + padding * 2, marginTop + headerHeight + padding * 2 + i * lineHeight); 
+			ctx.fillText(`Line ${objects[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT); 
 		}	
 	}
 
