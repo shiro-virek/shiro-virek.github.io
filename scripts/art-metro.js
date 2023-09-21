@@ -9,6 +9,7 @@
 	let LINE_THICKNESS = 10;
 	let ALPHABETIC_SYMBOL = false;
 	let MAX_LINES = 15;
+	let LINE_TRANSFER_MAX_DISTANCE = 30;
 
 	let INFO_MARGIN_TOP = 10;
 	let INFO_MARGIN_LEFT = 10;
@@ -36,9 +37,43 @@
 	}
 
 	class Station {
-		constructor(x, y) {
+		constructor(x, y, lineSymbol) {
 			this.x = x;
 			this.y = y;
+			this.lineSymbol = lineSymbol;
+		}
+
+		drawStation = (ctx) => {
+			drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
+
+			this.drawTransfers(ctx);
+		}
+
+		drawTransfers = (ctx) => {
+			let returnObjects = [];
+
+			quad.retrieve(returnObjects, this);
+
+			for (let x = 0; x < returnObjects.length; x++) {
+				let otherStation = returnObjects[x];
+
+				if (otherStation == this || otherStation.lineSymbol == this.lineSymbol)
+					continue;
+
+				let catX = Math.abs(this.x - otherStation.x);
+				let catY = Math.abs(this.y - otherStation.y);
+				let distance = Math.sqrt(catX * catX + catY * catY);
+
+				if (distance < LINE_TRANSFER_MAX_DISTANCE) {
+					ctx.strokeStyle = "#FFF";
+					ctx.lineWidth = 10;
+					ctx.line = "round";
+					ctx.beginPath();
+					ctx.moveTo(this.x, this.y);
+					ctx.lineTo(otherStation.x, otherStation.y);
+					ctx.stroke();
+				}
+			}
 		}
 
 		getTop = () => this.y;
@@ -78,9 +113,8 @@
 
 			let firstPoint = new Point(this.x, this.y);
 			this.points.push(firstPoint);
-			let firstStation = new Station(this.x, this.y);
+			let firstStation = new Station(this.x, this.y, this.symbol);
 			this.stations.push(firstStation);
-
 
 			for (let index = 0; index < numberOfPoints; index++) {
 				let length = getRandomInt(20, 200);
@@ -112,7 +146,7 @@
 						newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);
 					}
 
-					let newStation = new Station(newStationX, newStationY);
+					let newStation = new Station(newStationX, newStationY, this.symbol);
 					this.stations.push(newStation);
 				}
 
@@ -128,7 +162,7 @@
 			let lastAddedStation = this.stations[this.stations.length - 1];
 
 			if (lastAddedStation.x != lastX && lastAddedStation.y != lastY) {
-				let endStation = new Station(lastX, lastY);
+				let endStation = new Station(lastX, lastY, this.symbol);
 				this.stations.push(endStation);
 			}
 		}
@@ -145,7 +179,6 @@
 			ctx.moveTo(this.x, this.y);
 
 			this.drawSegments(ctx);
-			this.drawStations(ctx);
 		}
 
 		drawSegments = (ctx) => {
@@ -160,8 +193,8 @@
 			//ctx.isPointInPath(20, 50)
 
 			for (let index = 0; index < this.stations.length; index++) {
-				const element = this.stations[index];
-				drawCircle(ctx, element.x, element.y, 3, "#000", "#FFF");
+				const currentStation = this.stations[index];
+				currentStation.drawStation(ctx);
 			}
 		}
 
@@ -267,12 +300,12 @@
 		}
 
 		retrieve = (returnObjects, pRect) => {
-			let index = getIndex(pRect);
-			if (index != -1 && nodes[0] != null) {
+			let index = this.getIndex(pRect);
+			if (index != -1 && this.nodes[0] != null) {
 				this.nodes[index].retrieve(returnObjects, pRect);
 			}
 
-			returnObjects.addAll(this.objects);
+			returnObjects.push(...this.objects);
 
 			return returnObjects;
 		}
@@ -436,15 +469,18 @@
 	}
 
 	drawLines = () => {
-		for (let i = 0; i < LINES_COUNT; i++) {
-			let canvas = document.getElementById(CANVAS_ID);
-			if (canvas.getContext) {
-				let ctx = canvas.getContext('2d');
+		let canvas = document.getElementById(CANVAS_ID);
+		if (canvas.getContext) {			
+			let ctx = canvas.getContext('2d');			
+			for (let i = 0; i < LINES_COUNT; i++) {
 				objects[i].drawMetroLine(ctx);
+			}
+			for (let i = 0; i < LINES_COUNT; i++) {
+				objects[i].drawStations(ctx);
 			}
 		}
 	}
-
+	
 	nextCharacter = (c) => {
 		return String.fromCharCode(c.charCodeAt(0) + 1);
 	}
