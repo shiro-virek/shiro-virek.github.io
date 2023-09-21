@@ -60,19 +60,23 @@
 				if (otherStation == this || otherStation.lineSymbol == this.lineSymbol)
 					continue;
 
-				let catX = Math.abs(this.x - otherStation.x);
-				let catY = Math.abs(this.y - otherStation.y);
-				let distance = Math.sqrt(catX * catX + catY * catY);
+				this.drawTransfer(ctx, otherStation, this);
+			}
+		}
 
-				if (distance < LINE_TRANSFER_MAX_DISTANCE) {
-					ctx.strokeStyle = "#FFF";
-					ctx.lineWidth = 10;
-					ctx.line = "round";
-					ctx.beginPath();
-					ctx.moveTo(this.x, this.y);
-					ctx.lineTo(otherStation.x, otherStation.y);
-					ctx.stroke();
-				}
+		drawTransfer = (ctx, station1, station2) => {
+			let catX = Math.abs(station2.x - station1.x);
+			let catY = Math.abs(station2.y - station1.y);
+			let distance = Math.sqrt(catX * catX + catY * catY);
+
+			if (distance < LINE_TRANSFER_MAX_DISTANCE) {
+				ctx.strokeStyle = "#FFF";
+				ctx.lineWidth = 10;
+				ctx.lineCap = "round";
+				ctx.beginPath();
+				ctx.moveTo(station1.x, station1.y);
+				ctx.lineTo(station2.x, station2.y);
+				ctx.stroke();
 			}
 		}
 
@@ -95,7 +99,7 @@
 			this.lineThickness = LINE_THICKNESS;
 			this.hue = getRandomInt(1, 360);
 			this.saturation = 100;
-			this.light = getRandomInt(20, 80);
+			this.light = getRandomInt(20, 50);
 
 			if (objects.length > 0)
 				if (ALPHABETIC_SYMBOL)
