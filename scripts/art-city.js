@@ -310,14 +310,18 @@
 					break;
 				case WindowTypes.MiniWindowCenter:
 					this.drawMiniWindowCenter(ctx, wx, wy, wx1, wy1);
+					break;				
+				case WindowTypes.BorderWindow:
+					this.drawBorderWindow(ctx, wx, wy, wx1, wy1);
 					break;
 			}
 		}
 
 		drawMiniWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowHeight = (this.windowHeight / 2);
-			let halfWidthFactor = this.windowWidthFactor / 2;
-			let halfHeightFactor = this.windowHeightFactor / 2 
+			let halfWindowWidth = (this.windowWidth / 2);
+			let halfWidthFactor = Math.cos(angle * RAD_CONST) * halfWindowWidth;
+			let halfHeightFactor = Math.sin(angle * RAD_CONST) * halfWindowWidth; 
 
 			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
@@ -368,8 +372,10 @@
 		}
 		
 		drawInterlacedWindow = (ctx, wx, wy, wx1, wy1) => {		
-			let thirdHeightFactor = this.windowHeightFactor / 3;
-			let thirdWidthFactor = this.windowWidthFactor / 3;
+			let thirdHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3);
+			let thirdWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3);
+			let twoThirdsHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
+			let twoThirdsWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
 			ctx.fillStyle = this.colorCWBase();
@@ -385,8 +391,8 @@
 			ctx.beginPath();
 			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2); 
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 3);		
-			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
-			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 3); 			
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 2); 					
 			ctx.lineTo(wx - thirdWidthFactor,  wy - thirdHeightFactor - thirdWindowHeight * 2);		
 			ctx.fill();
 			
@@ -394,8 +400,8 @@
 			ctx.beginPath();
 			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor); 
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
-			ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 			
-			ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2); 					
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight); 			
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor); 					
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor);		
 			ctx.fill();
 
@@ -403,23 +409,25 @@
 			ctx.beginPath();
 			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2); 
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 3);		
-			ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 3); 			
-			ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 					
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 3); 			
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 2); 					
 			ctx.lineTo(wx1 + thirdWidthFactor,  wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
 			ctx.fill();
 		}
 		
 		drawMiniWindowCenter = (ctx, wx, wy, wx1, wy1) => {		
-			let thirdHeightFactor = this.windowHeightFactor / 3;
-			let thirdWidthFactor = this.windowWidthFactor / 3;
+			let thirdHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3);
+			let thirdWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3);
+			let twoThirdsHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
+			let twoThirdsWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
 			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
 			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight); 
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2);		
-			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
-			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 					
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 2); 			
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight); 					
 			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);		
 			ctx.stroke();	
 			
@@ -427,8 +435,8 @@
 			ctx.beginPath();
 			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight); 
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
-			ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight * 2); 			
-			ctx.lineTo(wx1 + thirdWidthFactor * 2, wy1 - thirdHeightFactor * 2 - thirdWindowHeight); 					
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 2); 			
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight); 					
 			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
 			ctx.stroke();
 		}
