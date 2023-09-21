@@ -18,6 +18,7 @@
 	let INFO_HEADER_HEIGHT = 80;
 	let INFO_PADDING = 10;
 	let INFO_WIDTH = 100;
+	let DRAW_QUADTREE = false;
 
 	let lastRender = 0
 
@@ -347,7 +348,7 @@
 	drawQuadtree = (ctx, quad) => {
 		if (quad != null) {
 			if (quad.bounds != null) {
-				ctx.strokeStyle = "#FFF";
+				ctx.strokeStyle = "#333";
 				ctx.lineWidth = 1;
 				ctx.strokeRect(quad.bounds.x, quad.bounds.y, quad.bounds.width, quad.bounds.height);
 			}
@@ -505,9 +506,9 @@
 			let canvas = document.getElementById(CANVAS_ID);
 			if (canvas.getContext) {
 				let ctx = canvas.getContext('2d')
+				if (DRAW_QUADTREE) drawQuadtree(ctx, quad);
 				drawLines(ctx);
 				drawLinesInfo(ctx, canvas);
-				//drawQuadtree(ctx, quad);
 				populateQuadTree(quad);
 			}
 		}
