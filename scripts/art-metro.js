@@ -72,7 +72,7 @@
 
 			if (distance < LINE_TRANSFER_MAX_DISTANCE) {
 				ctx.strokeStyle = "#FFF";
-				ctx.lineWidth = 10;
+				ctx.lineWidth = 5;
 				ctx.lineCap = "round";
 				ctx.beginPath();
 				ctx.moveTo(station1.x, station1.y);
