@@ -15,9 +15,9 @@
 	let INFO_MARGIN_LEFT = 10;
 	let INFO_SYMBOL_SIDE = 15;
 	let INFO_LINE_HEIGHT = 20;
-	let INFO_HEADER_HEIGHT = 80;
+	let INFO_HEADER_HEIGHT = 100;
 	let INFO_PADDING = 10;
-	let INFO_WIDTH = 100;
+	let INFO_WIDTH = 120;
 	let DRAW_QUADTREE = false;
 
 	let lastRender = 0
@@ -71,14 +71,28 @@
 			let distance = Math.sqrt(catX * catX + catY * catY);
 
 			if (distance < LINE_TRANSFER_MAX_DISTANCE) {
-				ctx.strokeStyle = "#FFF";
-				ctx.lineWidth = 5;
+				Station.drawTransferLine(ctx, station1.x, station1.y, station2.x, station2.y, true);
+			}
+		}
+
+		static drawTransferLine = (ctx, x1, y1, x2, y2, blackBorder = false) => {
+			if (blackBorder) {
+				ctx.strokeStyle = "#000";
+				ctx.lineWidth = 6;
 				ctx.lineCap = "round";
 				ctx.beginPath();
-				ctx.moveTo(station1.x, station1.y);
-				ctx.lineTo(station2.x, station2.y);
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
 				ctx.stroke();
 			}
+
+			ctx.strokeStyle = "#FFF";
+			ctx.lineWidth = 5;
+			ctx.lineCap = "round";
+			ctx.beginPath();
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			ctx.stroke();
 		}
 
 		getTop = () => this.y;
@@ -432,7 +446,10 @@
 		ctx.fillText(`Stations: ${getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
 		ctx.fillText(`Lines: ${getNumberOfLines()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
 		ctx.fillText(`Length: ${getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
+		ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
+		Station.drawTransferLine(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5,  INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5, true);
 
+		ctx.lineWidth = 1;
 		for (let i = 0; i < LINES_COUNT; i++) {
 			drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', objects[i].colorBase());
 			ctx.fillStyle = "#000";
