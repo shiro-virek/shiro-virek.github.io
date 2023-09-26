@@ -2,7 +2,6 @@
 	let width = 0;
 	let height = 0;
 	let CANVAS_ID = "myCanvas"
-	let LINES_COUNT = 0;
 	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
 	let ALPHABETIC_SYMBOL = false;
@@ -20,7 +19,7 @@
 
 	let lastRender = 0
 
-	let objects = [];
+	let lines = [];
 
 	let quad;
 
@@ -48,8 +47,8 @@
 
 			quad.retrieve(returnObjects, this);
 
-			for (let x = 0; x < returnObjects.length; x++) {
-				let otherStation = returnObjects[x];
+			for (const element of returnObjects) {
+				let otherStation = element;
 
 				if (otherStation == this || otherStation.lineSymbol == this.lineSymbol)
 					continue;
@@ -111,11 +110,11 @@
 			this.saturation = 100;
 			this.light = getRandomInt(20, 50);
 
-			if (objects.length > 0)
+			if (lines.length > 0)
 				if (ALPHABETIC_SYMBOL)
-					this.symbol = nextCharacter(objects[objects.length - 1].symbol)
+					this.symbol = nextCharacter(lines[lines.length - 1].symbol)
 				else
-					this.symbol = objects[objects.length - 1].symbol + 1;
+					this.symbol = lines[lines.length - 1].symbol + 1;
 
 			let lastX = this.x;
 			let lastY = this.y;
@@ -205,10 +204,8 @@
 		}
 
 		drawStations = (ctx) => {
-			//ctx.isPointInPath(20, 50)
-
-			for (let index = 0; index < this.stations.length; index++) {
-				const currentStation = this.stations[index];
+			for (const element of this.stations) {
+				const currentStation = element;
 				currentStation.drawStation(ctx);
 			}
 		}
@@ -222,7 +219,7 @@
 			this.MAX_OBJECTS = 5;
 			this.MAX_LEVELS = 6;
 
-			this.objects = [];
+			this.lines = [];
 
 			this.level = pLevel;
 			this.bounds = pBounds;
@@ -230,11 +227,10 @@
 		}
 
 		clear = () => {
-			this.objects = [];
+			this.lines = [];
 
 			for (let i = 0; i < this.nodes.length; i++) {
 				if (this.nodes[i] != null) {
-					//nodes[i].clear();
 					this.nodes[i] = null;
 				}
 			}
@@ -292,19 +288,19 @@
 				}
 			}
 
-			this.objects.push(pRect);
+			this.lines.push(pRect);
 
-			if (this.objects.length > this.MAX_OBJECTS && this.level < this.MAX_LEVELS) {
+			if (this.lines.length > this.MAX_OBJECTS && this.level < this.MAX_LEVELS) {
 				if (this.nodes[0] == null) {
 					this.split();
 				}
 
 				let i = 0;
-				while (i < this.objects.length) {
-					let index = this.getIndex(this.objects[i]);
+				while (i < this.lines.length) {
+					let index = this.getIndex(this.lines[i]);
 					if (index != -1) {
-						let removedItem = this.objects[i];
-						this.objects.splice(i, 1);
+						let removedItem = this.lines[i];
+						this.lines.splice(i, 1);
 						this.nodes[index].insert(removedItem);
 					}
 					else {
@@ -320,7 +316,7 @@
 				this.nodes[index].retrieve(returnObjects, pRect);
 			}
 
-			returnObjects.push(...this.objects);
+			returnObjects.push(...this.lines);
 
 			return returnObjects;
 		}
@@ -373,9 +369,9 @@
 
 	let populateQuadTree = (quad) => {
 		quad.clear();
-		for (let i = 0; i < LINES_COUNT; i++) {
-			for (let j = 0; j < objects[i].stations.length; j++) {
-				quad.insert(objects[i].stations[j]);
+		for (let i = 0; i < lines.length; i++) {
+			for (const element of lines[i].stations) {
+				quad.insert(element);
 			}
 		}
 	}
@@ -410,19 +406,19 @@
 
 	let getNumberOfStations = () => {
 		let numberOfStations = 0;
-		objects.forEach((element) => numberOfStations += element.stations.length);
+		lines.forEach((element) => numberOfStations += element.stations.length);
 		return numberOfStations;
 	}
 
 	let getNumberOfLines = () => {
-		return objects.length;
+		return lines.length;
 	}
 
 	let getLinesLength = () => {
 		let linesLength = 0;
-		for (let i = 0; i < LINES_COUNT; i++) {
-			for (let j = 1; j < objects[i].points.length; j++) {
-				linesLength += Math.floor(Math.sqrt(Math.pow(objects[i].points[j].x - objects[i].points[j - 1].x, 2) + Math.pow(objects[i].points[j].y - objects[i].points[j - 1].y, 2)));
+		for (const element of lines) {
+			for (let j = 1; j < element.points.length; j++) {
+				linesLength += Math.floor(Math.sqrt(Math.pow(element.points[j].x - element.points[j - 1].x, 2) + Math.pow(element.points[j].y - element.points[j - 1].y, 2)));
 			}
 		}
 		return Math.floor(linesLength / 100);
@@ -431,7 +427,7 @@
 	let drawLinesInfo = (ctx) => {
 		ctx.fillStyle = "#FFF";
 		let infoWidth = INFO_WIDTH;
-		let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + LINES_COUNT * INFO_LINE_HEIGHT;
+		let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + lines.length * INFO_LINE_HEIGHT;
 		ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = '#000000';
@@ -448,10 +444,10 @@
 		drawTransferIcon(ctx);
 
 		ctx.lineWidth = 1;
-		for (let i = 0; i < LINES_COUNT; i++) {
-			drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', objects[i].colorBase());
+		for (let i = 0; i < lines.length; i++) {
+			drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', lines[i].colorBase());
 			ctx.fillStyle = "#000";
-			ctx.fillText(`Line ${objects[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
+			ctx.fillText(`Line ${lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
 		}
 	}
 	
@@ -492,12 +488,12 @@
 	}
 
 	let drawLines = (ctx) => {
-		for (let i = 0; i < LINES_COUNT; i++) {
-			objects[i].drawMetroLine(ctx);
+		for (const element of lines) {
+			element.drawMetroLine(ctx);
 		}
 
-		for (let i = 0; i < LINES_COUNT; i++) {
-			for (const station of objects[i].stations) {
+		for (const element of lines) {
+			for (const station of element.stations) {
 				station.drawTransferLine(ctx, true);
 			}
 		}
@@ -508,18 +504,16 @@
 	}
 
 	let addMetroLine = (x, y) => {
-		if (LINES_COUNT < MAX_LINES) {
+		if (lines.length < MAX_LINES) {
 			let line = new Line(x, y);
 			line.randomize();
-			objects.push(line);
-			LINES_COUNT++;
+			lines.push(line);
 			
-			for (let i = 0; i < LINES_COUNT; i++) {
-				for (let j = 0; j < objects[i].stations.length; j++) {
-					objects[i].stations[j].addTransfers();
+			for (let i = 0; i < lines.length; i++) {
+				for (const element of lines[i].stations) {
+					element.addTransfers();
 				}
-			}
-			
+			}			
 		}
 	}
 
@@ -528,14 +522,14 @@
 		if (canvas.getContext) {
 			let ctx = canvas.getContext('2d')
 			drawFrame(ctx, canvas);
-			if (LINES_COUNT > 0) {
-				if (DRAW_QUADTREE) drawQuadtree(ctx, quad);
-					drawLines(ctx);
-					drawLinesInfo(ctx);
-					populateQuadTree(quad);			
-				}
+			if (lines.length > 0) {
+				if (DRAW_QUADTREE) 
+					drawQuadtree(ctx, quad);
+				drawLines(ctx);
+				drawLinesInfo(ctx);
+				populateQuadTree(quad);			
+			}
 		}
-
 	}
 
 	let loop = (timestamp) => {
