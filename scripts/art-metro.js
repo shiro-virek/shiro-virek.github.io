@@ -171,7 +171,6 @@
 				lastDirection = direction;
 			}
 
-
 			let lastAddedStation = this.stations[this.stations.length - 1];
 
 			if (lastAddedStation.x != lastX && lastAddedStation.y != lastY) {
@@ -196,9 +195,8 @@
 		}
 
 		drawSegments = (ctx) => {
-			for (let index = 0; index < this.points.length; index++) {
-				const element = this.points[index];
-				ctx.lineTo(element.x, element.y);
+			for (const point of this.points) {;
+				ctx.lineTo(point.x, point.y);
 			}
 			ctx.stroke();
 		}
@@ -320,6 +318,26 @@
 
 			return returnObjects;
 		}
+
+		
+		static generateQuadtree = () => {
+			quad = new Quadtree(0, new Rectangle(0, 0, width, height));
+		}
+
+		static drawQuadtree = (ctx, quad) => {
+			if (quad != null) {
+				if (quad.bounds != null) {
+					ctx.strokeStyle = "#333";
+					ctx.lineWidth = 1;
+					ctx.strokeRect(quad.bounds.x, quad.bounds.y, quad.bounds.width, quad.bounds.height);
+				}
+				if (quad.nodes != null) {
+					quad.nodes.forEach(function (node) {
+						drawQuadtree(ctx, node);
+					});
+				}
+			}
+		}
 	}
 
 	class Rectangle {
@@ -343,35 +361,16 @@
 	let init = () => {
 		width = window.innerWidth;
 		height = window.innerHeight;
-		generateQuadtree();
+		Quadtree.generateQuadtree();
 		randomize();
 		addEvents();
 	}
 
-	let generateQuadtree = () => {
-		quad = new Quadtree(0, new Rectangle(0, 0, width, height));
-	}
-
-	let drawQuadtree = (ctx, quad) => {
-		if (quad != null) {
-			if (quad.bounds != null) {
-				ctx.strokeStyle = "#333";
-				ctx.lineWidth = 1;
-				ctx.strokeRect(quad.bounds.x, quad.bounds.y, quad.bounds.width, quad.bounds.height);
-			}
-			if (quad.nodes != null) {
-				quad.nodes.forEach(function (node) {
-					drawQuadtree(ctx, node);
-				});
-			}
-		}
-	}
-
 	let populateQuadTree = (quad) => {
 		quad.clear();
-		for (let i = 0; i < lines.length; i++) {
-			for (const element of lines[i].stations) {
-				quad.insert(element);
+		for (const line of lines) {
+			for (const station of line.stations) {
+				quad.insert(station);
 			}
 		}
 	}
@@ -410,15 +409,11 @@
 		return numberOfStations;
 	}
 
-	let getNumberOfLines = () => {
-		return lines.length;
-	}
-
 	let getLinesLength = () => {
 		let linesLength = 0;
-		for (const element of lines) {
-			for (let j = 1; j < element.points.length; j++) {
-				linesLength += Math.floor(Math.sqrt(Math.pow(element.points[j].x - element.points[j - 1].x, 2) + Math.pow(element.points[j].y - element.points[j - 1].y, 2)));
+		for (const line of lines) {
+			for (let j = 1; j < line.points.length; j++) {
+				linesLength += Math.floor(Math.sqrt(Math.pow(line.points[j].x - line.points[j - 1].x, 2) + Math.pow(line.points[j].y - line.points[j - 1].y, 2)));
 			}
 		}
 		return Math.floor(linesLength / 100);
@@ -437,7 +432,7 @@
 		ctx.fillStyle = "#000";
 		ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
 		ctx.fillText(`Stations: ${getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
-		ctx.fillText(`Lines: ${getNumberOfLines()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
+		ctx.fillText(`Lines: ${lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
 		ctx.fillText(`Length: ${getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
 		ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
 		
@@ -488,12 +483,12 @@
 	}
 
 	let drawLines = (ctx) => {
-		for (const element of lines) {
-			element.drawMetroLine(ctx);
+		for (const line of lines) {
+			line.drawMetroLine(ctx);
 		}
 
-		for (const element of lines) {
-			for (const station of element.stations) {
+		for (const line of lines) {
+			for (const station of line.stations) {
 				station.drawTransferLine(ctx, true);
 			}
 		}
@@ -509,9 +504,9 @@
 			line.randomize();
 			lines.push(line);
 			
-			for (let i = 0; i < lines.length; i++) {
-				for (const element of lines[i].stations) {
-					element.addTransfers();
+			for (const line of lines) {
+				for (const station of line.stations) {
+					station.addTransfers();
 				}
 			}			
 		}
@@ -524,7 +519,7 @@
 			drawFrame(ctx, canvas);
 			if (lines.length > 0) {
 				if (DRAW_QUADTREE) 
-					drawQuadtree(ctx, quad);
+					Quadtree.drawQuadtree(ctx, quad);
 				drawLines(ctx);
 				drawLinesInfo(ctx);
 				populateQuadTree(quad);			
