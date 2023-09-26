@@ -19,12 +19,101 @@
 	let width = 0;
 	let height = 0;
 	let metroNetwork;	
-	let quad;
 	let lastRender = 0
 
 	class MetroNetwork {
 		constructor(){
 			this.lines = [];
+			this.quad = Quadtree.generateQuadtree(width, height);
+		}
+			
+		randomize = () => {
+			ALPHABETIC_SYMBOL = Utils.getRandomBool();
+		}
+
+		getNumberOfStations = () => {
+			let numberOfStations = 0;
+			this.lines.forEach((element) => numberOfStations += element.stations.length);
+			return numberOfStations;
+		}
+
+		getLinesLength = () => {
+			let linesLength = 0;
+			for (const line of metroNetwork.lines) {
+				for (let j = 1; j < line.points.length; j++) {
+					linesLength += Math.floor(Math.sqrt(Math.pow(line.points[j].x - line.points[j - 1].x, 2) + Math.pow(line.points[j].y - line.points[j - 1].y, 2)));
+				}
+			}
+			return Math.floor(linesLength / 100);
+		}
+
+		drawLinesInfo = (ctx) => {
+			ctx.fillStyle = "#FFF";
+			let infoWidth = INFO_WIDTH;
+			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + metroNetwork.lines.length * INFO_LINE_HEIGHT;
+			ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = '#000000';
+			ctx.strokeRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
+
+			ctx.font = "10px Arial";
+			ctx.fillStyle = "#000";
+			ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
+			ctx.fillText(`Stations: ${metroNetwork.getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
+			ctx.fillText(`Lines: ${metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
+			ctx.fillText(`Length: ${metroNetwork.getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
+			ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
+			
+			MetroNetwork.drawTransferIcon(ctx);
+
+			ctx.lineWidth = 1;
+			for (let i = 0; i < metroNetwork.lines.length; i++) {
+				Utils.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', metroNetwork.lines[i].colorBase());
+				ctx.fillStyle = "#000";
+				ctx.fillText(`Line ${metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
+			}
+		}
+		
+		static drawTransferIcon = (ctx) => {			 
+			let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);		
+			let station2 = new Station(INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
+			station1.transfer = station2;
+			station1.drawTransferLine(ctx, true);
+		}
+		
+		drawLines = (ctx) => {
+			for (const line of metroNetwork.lines) {
+				line.drawMetroLine(ctx);
+			}
+
+			for (const line of metroNetwork.lines) {
+				for (const station of line.stations) {
+					station.drawTransferLine(ctx, true);
+				}
+			}
+		}
+		
+		addMetroLine = (x, y) => {
+			if (metroNetwork.lines.length < MAX_LINES) {
+				let line = new Line(x, y);
+				line.randomize();
+				metroNetwork.lines.push(line);
+				
+				for (const line of metroNetwork.lines) {
+					for (const station of line.stations) {
+						station.addTransfers(this);
+					}
+				}			
+			}
+		}
+
+		populateQuadTree = () => {
+			this.quad.clear();
+			for (const line of metroNetwork.lines) {
+				for (const station of line.stations) {
+					this.quad.insert(station);
+				}
+			}
 		}
 	}
 
@@ -47,10 +136,10 @@
 			Utils.drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
 		}
 
-		addTransfers = () => {
+		addTransfers = (metroNetwork) => {
 			let returnObjects = [];
 
-			quad.retrieve(returnObjects, this);
+			metroNetwork.quad.retrieve(returnObjects, this);
 
 			for (const element of returnObjects) {
 				let otherStation = element;
@@ -338,10 +427,9 @@
 
 			return returnObjects;
 		}
-
 		
-		static generateQuadtree = () => {
-			quad = new Quadtree(0, new Rectangle(0, 0, width, height));
+		static generateQuadtree = (width, height) => {
+			return new Quadtree(0, new Rectangle(0, 0, width, height));
 		}
 
 		static drawQuadtree = (ctx, quad) => {
@@ -423,108 +511,17 @@
 	let init = () => {
 		metroNetwork = new MetroNetwork()
 		width = window.innerWidth;
-		height = window.innerHeight;
-		Quadtree.generateQuadtree();
-		randomize();
+		height = window.innerHeight;		
+		metroNetwork.randomize();
 		addEvents();
 	}
-
-	let populateQuadTree = (quad) => {
-		quad.clear();
-		for (const line of metroNetwork.lines) {
-			for (const station of line.stations) {
-				quad.insert(station);
-			}
-		}
-	}
-
 
 	let addEvents = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 
 		canvas.addEventListener('click', e => {
-			addMetroLine(e.offsetX, e.offsetY);
+			metroNetwork.addMetroLine(e.offsetX, e.offsetY);
 		}, false);
-	}
-
-	let randomize = () => {
-		ALPHABETIC_SYMBOL = Utils.getRandomBool();
-	}
-
-	let getNumberOfStations = () => {
-		let numberOfStations = 0;
-		metroNetwork.lines.forEach((element) => numberOfStations += element.stations.length);
-		return numberOfStations;
-	}
-
-	let getLinesLength = () => {
-		let linesLength = 0;
-		for (const line of metroNetwork.lines) {
-			for (let j = 1; j < line.points.length; j++) {
-				linesLength += Math.floor(Math.sqrt(Math.pow(line.points[j].x - line.points[j - 1].x, 2) + Math.pow(line.points[j].y - line.points[j - 1].y, 2)));
-			}
-		}
-		return Math.floor(linesLength / 100);
-	}
-
-	let drawLinesInfo = (ctx) => {
-		ctx.fillStyle = "#FFF";
-		let infoWidth = INFO_WIDTH;
-		let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + metroNetwork.lines.length * INFO_LINE_HEIGHT;
-		ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
-		ctx.lineWidth = 1;
-		ctx.strokeStyle = '#000000';
-		ctx.strokeRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
-
-		ctx.font = "10px Arial";
-		ctx.fillStyle = "#000";
-		ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
-		ctx.fillText(`Stations: ${getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
-		ctx.fillText(`Lines: ${metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
-		ctx.fillText(`Length: ${getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
-		ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
-		
-		drawTransferIcon(ctx);
-
-		ctx.lineWidth = 1;
-		for (let i = 0; i < metroNetwork.lines.length; i++) {
-			Utils.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', metroNetwork.lines[i].colorBase());
-			ctx.fillStyle = "#000";
-			ctx.fillText(`Line ${metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
-		}
-	}
-	
-	let drawTransferIcon = (ctx) => {			 
-		let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);		
-		let station2 = new Station(INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
-		station1.transfer = station2;
-		station1.drawTransferLine(ctx, true);
-	}
-	
-	let drawLines = (ctx) => {
-		for (const line of metroNetwork.lines) {
-			line.drawMetroLine(ctx);
-		}
-
-		for (const line of metroNetwork.lines) {
-			for (const station of line.stations) {
-				station.drawTransferLine(ctx, true);
-			}
-		}
-	}
-	
-	let addMetroLine = (x, y) => {
-		if (metroNetwork.lines.length < MAX_LINES) {
-			let line = new Line(x, y);
-			line.randomize();
-			metroNetwork.lines.push(line);
-			
-			for (const line of metroNetwork.lines) {
-				for (const station of line.stations) {
-					station.addTransfers();
-				}
-			}			
-		}
 	}
 	
 	let drawFrame = (ctx, canvas) => {
@@ -545,10 +542,10 @@
 			drawFrame(ctx, canvas);
 			if (metroNetwork.lines.length > 0) {
 				if (DRAW_QUADTREE) 
-					Quadtree.drawQuadtree(ctx, quad);
-				drawLines(ctx);
-				drawLinesInfo(ctx);
-				populateQuadTree(quad);			
+					Quadtree.drawQuadtree(ctx, metroNetwork.quad);
+				metroNetwork.drawLines(ctx);
+				metroNetwork.drawLinesInfo(ctx);
+				metroNetwork.populateQuadTree();			
 			}
 		}
 	}
