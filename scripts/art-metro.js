@@ -1,8 +1,6 @@
 {
 	let width = 0;
 	let height = 0;
-	let lastPosY = 0;
-	let lastPosX = 0;
 	let CANVAS_ID = "myCanvas"
 	let LINES_COUNT = 0;
 	let RAD_CONST = 0.0175;
@@ -26,10 +24,6 @@
 
 	let quad;
 
-	const LineTypes = Object.freeze({
-		Regular: Symbol("regular")
-	});
-
 	class Point {
 		constructor(x, y) {
 			this.x = x;
@@ -42,15 +36,14 @@
 			this.x = x;
 			this.y = y;
 			this.lineSymbol = lineSymbol;
+			this.transfer = null;
 		}
 
 		drawStation = (ctx) => {
 			drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
-
-			this.drawTransfers(ctx);
 		}
 
-		drawTransfers = (ctx) => {
+		addTransfers = () => {
 			let returnObjects = [];
 
 			quad.retrieve(returnObjects, this);
@@ -61,28 +54,30 @@
 				if (otherStation == this || otherStation.lineSymbol == this.lineSymbol)
 					continue;
 
-				this.drawTransfer(ctx, otherStation, this);
+				this.addTransfer(otherStation, this);
 			}
 		}
 
-		drawTransfer = (ctx, station1, station2) => {
+		addTransfer = (station1, station2) => {
 			let catX = Math.abs(station2.x - station1.x);
 			let catY = Math.abs(station2.y - station1.y);
 			let distance = Math.sqrt(catX * catX + catY * catY);
 
-			if (distance < LINE_TRANSFER_MAX_DISTANCE) {
-				Station.drawTransferLine(ctx, station1.x, station1.y, station2.x, station2.y, true);
+			if (distance < LINE_TRANSFER_MAX_DISTANCE && station1.transfer == null && station2.transfer == null)  {
+				station1.transfer = station2;
+				station2.transfer = station1;
 			}
 		}
 
-		static drawTransferLine = (ctx, x1, y1, x2, y2, blackBorder = false) => {
+		static drawTransferLine = (ctx, station, blackBorder = false) => {
+			if (station.transfer == null) return;
 			if (blackBorder) {
 				ctx.strokeStyle = "#000";
 				ctx.lineWidth = 6;
 				ctx.lineCap = "round";
 				ctx.beginPath();
-				ctx.moveTo(x1, y1);
-				ctx.lineTo(x2, y2);
+				ctx.moveTo(station.x, station.y);
+				ctx.lineTo(station.transfer.x, station.transfer.y);
 				ctx.stroke();
 			}
 
@@ -90,8 +85,8 @@
 			ctx.lineWidth = 5;
 			ctx.lineCap = "round";
 			ctx.beginPath();
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
+			ctx.moveTo(station.x, station.y);
+			ctx.lineTo(station.transfer.x, station.transfer.y);
 			ctx.stroke();
 		}
 
@@ -198,6 +193,7 @@
 			ctx.moveTo(this.x, this.y);
 
 			this.drawSegments(ctx);
+			this.drawStations(ctx);
 		}
 
 		drawSegments = (ctx) => {
@@ -348,18 +344,18 @@
 		getRight = () => this.x + this.width;
 	}
 
-	init = () => {
+	let init = () => {
 		generateQuadtree();
 		randomize();
 		addEvents();
 		drawFrame();
 	}
 
-	generateQuadtree = () => {
+	let generateQuadtree = () => {
 		quad = new Quadtree(0, new Rectangle(0, 0, width, height));
 	}
 
-	drawQuadtree = (ctx, quad) => {
+	let drawQuadtree = (ctx, quad) => {
 		if (quad != null) {
 			if (quad.bounds != null) {
 				ctx.strokeStyle = "#333";
@@ -374,7 +370,7 @@
 		}
 	}
 
-	populateQuadTree = (quad) => {
+	let populateQuadTree = (quad) => {
 		quad.clear();
 		for (let i = 0; i < LINES_COUNT; i++) {
 			for (let j = 0; j < objects[i].stations.length; j++) {
@@ -383,15 +379,15 @@
 		}
 	}
 
-	randomize = () => {
+	let randomize = () => {
 		ALPHABETIC_SYMBOL = getRandomBool();
 	}
 
-	getRandomInt = (min, max) => {
+	let getRandomInt = (min, max) => {
 		return Math.floor(Math.random() * max) + min;
 	}
 
-	getRandomFloat = (min, max, decimals) => {
+	let getRandomFloat = (min, max, decimals) => {
 		const str = (Math.random() * (max - min) + min).toFixed(
 			decimals,
 		);
@@ -399,11 +395,11 @@
 		return parseFloat(str);
 	}
 
-	getRandomBool = () => {
+	let getRandomBool = () => {
 		return Math.random() < 0.5;
 	}
 
-	addEvents = () => {
+	let addEvents = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 
 		canvas.addEventListener('click', e => {
@@ -411,17 +407,17 @@
 		}, false);
 	}
 
-	getNumberOfStations = () => {
+	let getNumberOfStations = () => {
 		let numberOfStations = 0;
 		objects.forEach((element) => numberOfStations += element.stations.length);
 		return numberOfStations;
 	}
 
-	getNumberOfLines = () => {
+	let getNumberOfLines = () => {
 		return objects.length;
 	}
 
-	getLinesLength = () => {
+	let getLinesLength = () => {
 		let linesLength = 0;
 		for (let i = 0; i < LINES_COUNT; i++) {
 			for (let j = 1; j < objects[i].points.length; j++) {
@@ -431,7 +427,7 @@
 		return Math.floor(linesLength / 100);
 	}
 
-	drawLinesInfo = (ctx, canvas) => {
+	let drawLinesInfo = (ctx, canvas) => {
 		ctx.fillStyle = "#FFF";
 		let infoWidth = INFO_WIDTH;
 		let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + LINES_COUNT * INFO_LINE_HEIGHT;
@@ -447,7 +443,7 @@
 		ctx.fillText(`Lines: ${getNumberOfLines()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
 		ctx.fillText(`Length: ${getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
 		ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
-		Station.drawTransferLine(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5,  INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5, true);
+		//Station.drawTransferLine(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5,  INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5, true);
 
 		ctx.lineWidth = 1;
 		for (let i = 0; i < LINES_COUNT; i++) {
@@ -457,7 +453,7 @@
 		}
 	}
 
-	drawFrame = () => {
+	let drawFrame = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 		if (canvas.getContext) {
 			canvas.width = width;
@@ -471,7 +467,7 @@
 		}
 	}
 
-	drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
+	let drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
 		ctx.strokeStyle = color;
 		ctx.fillStyle = fillColor;
 		ctx.lineWidth = 1;
@@ -481,7 +477,7 @@
 		ctx.stroke();
 	}
 
-	drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
+	let drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
 		ctx.strokeStyle = color;
 		ctx.fillStyle = fillColor;
 		ctx.beginPath();
@@ -490,29 +486,39 @@
 		ctx.stroke();
 	}
 
-	drawLines = () => {
+	let drawLines = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 		if (canvas.getContext) {			
 			let ctx = canvas.getContext('2d');			
 			for (let i = 0; i < LINES_COUNT; i++) {
 				objects[i].drawMetroLine(ctx);
 			}
+
 			for (let i = 0; i < LINES_COUNT; i++) {
-				objects[i].drawStations(ctx);
+				for (const station of objects[i].stations) {
+					Station.drawTransferLine(ctx, station, true);
+				}
 			}
 		}
 	}
 	
-	nextCharacter = (c) => {
+	let nextCharacter = (c) => {
 		return String.fromCharCode(c.charCodeAt(0) + 1);
 	}
 
-	addMetroLine = (x, y) => {
+	let addMetroLine = (x, y) => {
 		if (LINES_COUNT < MAX_LINES) {
 			let line = new Line(x, y);
 			line.randomize();
 			objects.push(line);
 			LINES_COUNT++;
+			
+			for (let i = 0; i < LINES_COUNT; i++) {
+				for (let j = 0; j < objects[i].stations.length; j++) {
+					objects[i].stations[j].addTransfers();
+				}
+			}
+			
 		}
 	}
 
@@ -534,10 +540,8 @@
 
 	width = window.innerWidth;
 	height = window.innerHeight;
-	lastPosY = 0;
-	lastPosX = 0;
 
-	loop = (timestamp) => {
+	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
 		draw();
