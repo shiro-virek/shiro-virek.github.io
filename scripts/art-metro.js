@@ -39,7 +39,7 @@
 		}
 
 		drawStation = (ctx) => {
-			drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
+			Utils.drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
 		}
 
 		addTransfers = () => {
@@ -104,23 +104,27 @@
 			this.symbol = ALPHABETIC_SYMBOL ? "A" : 1;
 		}
 
-		randomize = () => {
-			this.lineThickness = LINE_THICKNESS;
-			this.hue = getRandomInt(1, 360);
-			this.saturation = 100;
-			this.light = getRandomInt(20, 50);
-
+		randomizeSymbol = () => {
 			if (lines.length > 0)
 				if (ALPHABETIC_SYMBOL)
-					this.symbol = nextCharacter(lines[lines.length - 1].symbol)
+					this.symbol = Utils.nextCharacter(lines[lines.length - 1].symbol)
 				else
 					this.symbol = lines[lines.length - 1].symbol + 1;
+		}
 
+		randomizeColor = () => {
+			this.hue = Utils.getRandomInt(1, 360);
+			this.saturation = 100;
+			this.light = Utils.getRandomInt(20, 50);
+		}
+
+		randomizePoints = () => {
+			
 			let lastX = this.x;
 			let lastY = this.y;
 			let lastDirection = 0;
-			let baseDirection = 45 * getRandomInt(0, 7);
-			let numberOfPoints = getRandomInt(3, 12);
+			let baseDirection = 45 * Utils.getRandomInt(0, 7);
+			let numberOfPoints = Utils.getRandomInt(3, 12);
 			let stationThresholdMax = 100;
 			let stationThresholdMin = 50;
 
@@ -130,7 +134,7 @@
 			this.stations.push(firstStation);
 
 			for (let index = 0; index < numberOfPoints; index++) {
-				let length = getRandomInt(20, 200);
+				let length = Utils.getRandomInt(20, 200);
 				let direction = baseDirection + this.getDirection(lastDirection);
 
 				let deltaX = Math.cos(direction * RAD_CONST) * length;
@@ -179,8 +183,19 @@
 			}
 		}
 
+		randomize = () => {
+			this.lineThickness = LINE_THICKNESS;
+
+			this.randomizeColor();
+
+			this.randomizeSymbol();
+
+			this.randomizePoints();
+
+		}
+
 		getDirection = (lastDirection) => {
-			return 45 * getRandomInt(0, 3);
+			return 45 * Utils.getRandomInt(0, 3);
 		}
 
 		drawMetroLine = (ctx) => {
@@ -358,6 +373,48 @@
 		getRight = () => this.x + this.width;
 	}
 
+	class Utils {
+		
+		static getRandomInt = (min, max) => {
+			return Math.floor(Math.random() * max) + min;
+		}
+
+		static getRandomFloat = (min, max, decimals) => {
+			const str = (Math.random() * (max - min) + min).toFixed(
+				decimals,
+			);
+
+			return parseFloat(str);
+		}
+
+		static getRandomBool = () => {
+			return Math.random() < 0.5;
+		}
+		
+		static nextCharacter = (c) => {
+			return String.fromCharCode(c.charCodeAt(0) + 1);
+		}
+		
+		static drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
+			ctx.strokeStyle = color;
+			ctx.fillStyle = fillColor;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.arc(x, y, radio, 0, 2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+		}
+
+		static drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
+			ctx.strokeStyle = color;
+			ctx.fillStyle = fillColor;
+			ctx.beginPath();
+			ctx.rect(x, y, width, height);
+			ctx.fill();
+			ctx.stroke();
+		}
+	}
+
 	let init = () => {
 		width = window.innerWidth;
 		height = window.innerHeight;
@@ -376,23 +433,7 @@
 	}
 
 	let randomize = () => {
-		ALPHABETIC_SYMBOL = getRandomBool();
-	}
-
-	let getRandomInt = (min, max) => {
-		return Math.floor(Math.random() * max) + min;
-	}
-
-	let getRandomFloat = (min, max, decimals) => {
-		const str = (Math.random() * (max - min) + min).toFixed(
-			decimals,
-		);
-
-		return parseFloat(str);
-	}
-
-	let getRandomBool = () => {
-		return Math.random() < 0.5;
+		ALPHABETIC_SYMBOL = Utils.getRandomBool();
 	}
 
 	let addEvents = () => {
@@ -440,7 +481,7 @@
 
 		ctx.lineWidth = 1;
 		for (let i = 0; i < lines.length; i++) {
-			drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', lines[i].colorBase());
+			Utils.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', lines[i].colorBase());
 			ctx.fillStyle = "#000";
 			ctx.fillText(`Line ${lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
 		}
@@ -452,7 +493,7 @@
 		station1.transfer = station2;
 		station1.drawTransferLine(ctx, true);
 	}
-
+	
 	let drawFrame = (ctx, canvas) => {
 		canvas.width = width;
 		canvas.height = height;
@@ -461,25 +502,6 @@
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = '#000000';
 		ctx.strokeRect(0, 0, width, height);
-	}
-
-	let drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
-		ctx.strokeStyle = color;
-		ctx.fillStyle = fillColor;
-		ctx.lineWidth = 1;
-		ctx.beginPath();
-		ctx.arc(x, y, radio, 0, 2 * Math.PI);
-		ctx.fill();
-		ctx.stroke();
-	}
-
-	let drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
-		ctx.strokeStyle = color;
-		ctx.fillStyle = fillColor;
-		ctx.beginPath();
-		ctx.rect(x, y, width, height);
-		ctx.fill();
-		ctx.stroke();
 	}
 
 	let drawLines = (ctx) => {
@@ -494,10 +516,6 @@
 		}
 	}
 	
-	let nextCharacter = (c) => {
-		return String.fromCharCode(c.charCodeAt(0) + 1);
-	}
-
 	let addMetroLine = (x, y) => {
 		if (lines.length < MAX_LINES) {
 			let line = new Line(x, y);
