@@ -69,15 +69,15 @@
 			}
 		}
 
-		static drawTransferLine = (ctx, station, blackBorder = false) => {
-			if (station.transfer == null) return;
+		drawTransferLine = (ctx, blackBorder = false) => {
+			if (this.transfer == null) return;
 			if (blackBorder) {
 				ctx.strokeStyle = "#000";
 				ctx.lineWidth = 6;
 				ctx.lineCap = "round";
 				ctx.beginPath();
-				ctx.moveTo(station.x, station.y);
-				ctx.lineTo(station.transfer.x, station.transfer.y);
+				ctx.moveTo(this.x, this.y);
+				ctx.lineTo(this.transfer.x, this.transfer.y);
 				ctx.stroke();
 			}
 
@@ -85,8 +85,8 @@
 			ctx.lineWidth = 5;
 			ctx.lineCap = "round";
 			ctx.beginPath();
-			ctx.moveTo(station.x, station.y);
-			ctx.lineTo(station.transfer.x, station.transfer.y);
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.transfer.x, this.transfer.y);
 			ctx.stroke();
 		}
 
@@ -345,10 +345,11 @@
 	}
 
 	let init = () => {
+		width = window.innerWidth;
+		height = window.innerHeight;
 		generateQuadtree();
 		randomize();
 		addEvents();
-		drawFrame();
 	}
 
 	let generateQuadtree = () => {
@@ -427,7 +428,7 @@
 		return Math.floor(linesLength / 100);
 	}
 
-	let drawLinesInfo = (ctx, canvas) => {
+	let drawLinesInfo = (ctx) => {
 		ctx.fillStyle = "#FFF";
 		let infoWidth = INFO_WIDTH;
 		let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + LINES_COUNT * INFO_LINE_HEIGHT;
@@ -443,7 +444,8 @@
 		ctx.fillText(`Lines: ${getNumberOfLines()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
 		ctx.fillText(`Length: ${getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
 		ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
-		//Station.drawTransferLine(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5,  INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5, true);
+		
+		drawTransferIcon(ctx);
 
 		ctx.lineWidth = 1;
 		for (let i = 0; i < LINES_COUNT; i++) {
@@ -452,19 +454,22 @@
 			ctx.fillText(`Line ${objects[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
 		}
 	}
+	
+	let drawTransferIcon = (ctx) => {			 
+		let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);		
+		let station2 = new Station(INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
+		station1.transfer = station2;
+		station1.drawTransferLine(ctx, true);
+	}
 
-	let drawFrame = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext) {
-			canvas.width = width;
-			canvas.height = height;
-			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#000";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			ctx.lineWidth = 1;
-			ctx.strokeStyle = '#000000';
-			ctx.strokeRect(0, 0, width, height);
-		}
+	let drawFrame = (ctx, canvas) => {
+		canvas.width = width;
+		canvas.height = height;
+		ctx.fillStyle = "#000";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = '#000000';
+		ctx.strokeRect(0, 0, width, height);
 	}
 
 	let drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
@@ -486,18 +491,14 @@
 		ctx.stroke();
 	}
 
-	let drawLines = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext) {			
-			let ctx = canvas.getContext('2d');			
-			for (let i = 0; i < LINES_COUNT; i++) {
-				objects[i].drawMetroLine(ctx);
-			}
+	let drawLines = (ctx) => {
+		for (let i = 0; i < LINES_COUNT; i++) {
+			objects[i].drawMetroLine(ctx);
+		}
 
-			for (let i = 0; i < LINES_COUNT; i++) {
-				for (const station of objects[i].stations) {
-					Station.drawTransferLine(ctx, station, true);
-				}
+		for (let i = 0; i < LINES_COUNT; i++) {
+			for (const station of objects[i].stations) {
+				station.drawTransferLine(ctx, true);
 			}
 		}
 	}
@@ -522,24 +523,20 @@
 		}
 	}
 
-	draw = () => {
-		drawFrame();
-
-		if (LINES_COUNT > 0) {
-			let canvas = document.getElementById(CANVAS_ID);
-			if (canvas.getContext) {
-				let ctx = canvas.getContext('2d')
+	let draw = () => {	
+		let canvas = document.getElementById(CANVAS_ID);
+		if (canvas.getContext) {
+			let ctx = canvas.getContext('2d')
+			drawFrame(ctx, canvas);
+			if (LINES_COUNT > 0) {
 				if (DRAW_QUADTREE) drawQuadtree(ctx, quad);
-				drawLines(ctx);
-				drawLinesInfo(ctx, canvas);
-				populateQuadTree(quad);
-			}
+					drawLines(ctx);
+					drawLinesInfo(ctx);
+					populateQuadTree(quad);			
+				}
 		}
 
 	}
-
-	width = window.innerWidth;
-	height = window.innerHeight;
 
 	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
