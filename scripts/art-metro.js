@@ -218,15 +218,12 @@
 			this.light = Utils.getRandomInt(20, 50);
 		}
 
-		randomizePoints = () => {
-			
+		randomizePoints = () => {			
 			let lastX = this.x;
 			let lastY = this.y;
 			let lastDirection = 0;
 			let baseDirection = 45 * Utils.getRandomInt(0, 7);
-			let numberOfPoints = Utils.getRandomInt(3, 12);
-			let stationThresholdMax = 100;
-			let stationThresholdMin = 50;
+			let numberOfPoints = Utils.getRandomInt(3, 12);		
 
 			let firstPoint = new Point(this.x, this.y);
 			this.points.push(firstPoint);
@@ -251,22 +248,8 @@
 				if (newX < 0 || newX > width || newY < 0 || newY > height)
 					continue;
 
-				let newStationX = 0;
-				let newStationY = 0;
-
-				if (length > stationThresholdMin) {
-					if (length < stationThresholdMax) {
-						newStationX = newX;
-						newStationY = newY;
-					} else {
-						newStationX = lastX + Math.cos(direction * RAD_CONST) * (length / 2);
-						newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);
-					}
-
-					let newStation = new Station(newStationX, newStationY, this.symbol);
-					this.stations.push(newStation);
-				}
-
+				this.addStation(length, direction, newX, newY, lastX, lastY);
+			
 				this.points.push(point);
 
 				lastX = newX;
@@ -275,12 +258,41 @@
 				lastDirection = direction;
 			}
 
+			this.addEndStation(lastX, lastY);
+		}
+
+		addStation = (segmentLength, segmentAngle, newX, newY, lastX, lastY) => {
+			let newStationX = 0;
+			let newStationY = 0;
+
+			let stationThresholdMax = 100;
+			let stationThresholdMin = 50;
+
+			if (segmentLength > stationThresholdMin) {
+				if (segmentLength < stationThresholdMax) {
+					newStationX = newX;
+					newStationY = newY;
+				} else {
+					newStationX = lastX + Math.cos(segmentAngle * RAD_CONST) * (segmentLength / 2);
+					newStationY = lastY + Math.sin(segmentAngle * RAD_CONST) * (segmentLength / 2);
+				}
+
+				let newStation = new Station(newStationX, newStationY, this.symbol);
+				this.stations.push(newStation);
+			}
+		}
+
+		addEndStation = (lastX, lastY) => {
 			let lastAddedStation = this.stations[this.stations.length - 1];
 
 			if (lastAddedStation.x != lastX && lastAddedStation.y != lastY) {
 				let endStation = new Station(lastX, lastY, this.symbol);
 				this.stations.push(endStation);
 			}
+		}
+
+		addStreet = () => {
+
 		}
 
 		randomize = () => {
@@ -543,7 +555,6 @@
 		ctx.strokeStyle = '#000000';
 		ctx.strokeRect(0, 0, width, height);
 	}
-
 
 	let draw = () => {	
 		let canvas = document.getElementById(CANVAS_ID);
