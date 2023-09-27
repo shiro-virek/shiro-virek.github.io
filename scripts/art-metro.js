@@ -212,8 +212,8 @@
 		}
 
 		drawStreet = (ctx) => {
-			ctx.strokeStyle = "#111";
-			ctx.lineWidth = 6;
+			ctx.strokeStyle = "#222";
+			ctx.lineWidth = 14;
 			ctx.lineCap = "round";
 			ctx.beginPath();
 			let newStartX = this.x - Math.cos(this.angle * RAD_CONST) * (1000);
@@ -344,7 +344,7 @@
 		}
 
 		addStreet = (startX, startY, angle) => {
-			if (Utils.getRandomInt(1, 3) == 3){
+			if (Utils.getRandomInt(1, 5) == 1){
 				let street = new Street(startX, startY, angle);
 				this.streets.push(street);
 			}
