@@ -214,7 +214,7 @@
 		drawStreet = (ctx) => {
 			ctx.strokeStyle = "#222";
 			ctx.lineWidth = 14;
-			ctx.lineCap = "round";
+			ctx.lineCap = "square";
 			ctx.beginPath();
 			let newStartX = this.x - Math.cos(this.angle * RAD_CONST) * (1000);
 			let newStartY = this.y - Math.sin(this.angle * RAD_CONST) * (1000);	
