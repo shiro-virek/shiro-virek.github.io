@@ -2,10 +2,9 @@
 	let CANVAS_ID = "myCanvas"
 	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
-	let ALPHABETIC_SYMBOL = false;
-	let MAX_LINES = 15;
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
-
+	let HSL_MAX_HUE = 360;
+	let MIN_LINE_LENGTH = 50;
 	let INFO_MARGIN_TOP = 10;
 	let INFO_MARGIN_LEFT = 10;
 	let INFO_SYMBOL_SIDE = 15;
@@ -14,11 +13,15 @@
 	let INFO_PADDING = 10;
 	let INFO_WIDTH = 120;
 	let DRAW_QUADTREE = false;
-
+	
+	let maxNumberOfLines = 15;
+	let angleSegmentRange = 2;
+	let alphabeticLineSymbol = false;
 	let width = 0;
 	let height = 0;
 	let metroNetwork;	
 	let lastRender = 0
+	let palette = [];
 
 	class MetroNetwork {
 		constructor(){
@@ -34,12 +37,10 @@
 
 		getLinesLength = () => {
 			let linesLength = 0;
-			for (const line of metroNetwork.lines) {
-				for (let j = 1; j < line.points.length; j++) {
-					linesLength += Math.floor(Math.sqrt(Math.pow(line.points[j].x - line.points[j - 1].x, 2) + Math.pow(line.points[j].y - line.points[j - 1].y, 2)));
-				}
+			for (const line of metroNetwork.lines) {				
+				linesLength += line.getLength();
 			}
-			return Math.floor(linesLength / 100);
+			return linesLength;
 		}
 
 		drawLinesInfo = (ctx) => {
@@ -56,7 +57,7 @@
 			ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
 			ctx.fillText(`Stations: ${metroNetwork.getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
 			ctx.fillText(`Lines: ${metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
-			ctx.fillText(`Length: ${metroNetwork.getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
+			ctx.fillText(`Length: ${Math.floor(metroNetwork.getLinesLength() / 100)} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
 			ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
 			
 			MetroNetwork.drawTransferIcon(ctx);
@@ -93,10 +94,14 @@
 		}
 		
 		addMetroLine = (x, y) => {
-			if (metroNetwork.lines.length < MAX_LINES) {
+			if (metroNetwork.lines.length < maxNumberOfLines) {
 				let line = new Line(x, y);
 				line.randomize();
-				metroNetwork.lines.push(line);
+				
+				if (line.getLength() > MIN_LINE_LENGTH)
+					metroNetwork.lines.push(line);
+				else
+					palette.push(line.hue);
 				
 				for (const line of metroNetwork.lines) {
 					for (const station of line.stations) {
@@ -126,10 +131,11 @@
 		}
 	}
 
-	class Point {
-		constructor(x, y) {
+	class Segment {
+		constructor(x, y, length) {
 			this.x = x;
 			this.y = y;
+			this.segmentLength = length;
 		}
 	}
 
@@ -206,7 +212,7 @@
 		}
 
 		drawStreet = (ctx) => {
-			ctx.strokeStyle = "#222";
+			ctx.strokeStyle = "#111";
 			ctx.lineWidth = 6;
 			ctx.lineCap = "round";
 			ctx.beginPath();
@@ -224,69 +230,86 @@
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
-			this.points = [];
+			this.segments = [];
 			this.stations = [];
 			this.streets = [];
-			this.symbol = ALPHABETIC_SYMBOL ? "A" : 1;
+			this.symbol = alphabeticLineSymbol ? "A" : 1;
+		}
+
+		getLength = () => {
+			let length = 0;
+			for(const segment of this.segments) {
+				length += segment.segmentLength;
+			}
+			return length;
 		}
 
 		randomizeSymbol = () => {
 			if (metroNetwork.lines.length > 0)
-				if (ALPHABETIC_SYMBOL)
-					this.symbol = Utils.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol)
-				else
+				if (alphabeticLineSymbol){
+					let nextSymbol = Utils.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol);
+					if (nextSymbol == '['){
+						this.symbol = 1;
+						alphabeticLineSymbol = false;
+					}else{
+						this.symbol = nextSymbol;
+					}
+				}else
 					this.symbol = metroNetwork.lines[metroNetwork.lines.length - 1].symbol + 1;
 		}
 
 		randomizeColor = () => {
-			this.hue = Utils.getRandomInt(1, 360);
+			this.hue = palette.pop();
 			this.saturation = 100;
 			this.light = Utils.getRandomInt(20, 50);
 		}
 
-		randomizePoints = () => {			
+		randomizeSegments = () => {			
 			let lastX = this.x;
 			let lastY = this.y;
 			let lastDirection = 0;
 			let baseDirection = 45 * Utils.getRandomInt(0, 7);
-			let numberOfPoints = Utils.getRandomInt(3, 12);		
+			let numberOfSegments = Utils.getRandomInt(3, 12);		
 
-			let firstPoint = new Point(this.x, this.y);
-			this.points.push(firstPoint);
+			let firstSegment = new Segment(this.x, this.y, 0);
+			this.segments.push(firstSegment);
 			let firstStation = new Station(this.x, this.y, this.symbol);
 			this.stations.push(firstStation);
+			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + maxNumberOfLines * INFO_LINE_HEIGHT;
+			let margin = 10;
 
-			for (let index = 0; index < numberOfPoints; index++) {
-				let length = Utils.getRandomInt(20, 200);
-				let direction = baseDirection + this.getDirection(lastDirection);
+			for (let index = 0; index < numberOfSegments; index++) {
+				let length;
+				let direction; 
+				let newX;
+				let newY;
+				let segment;	
+
+				length = Utils.getRandomInt(20, 200);
+				direction = baseDirection + this.getDirection(lastDirection);
 
 				let deltaX = Math.cos(direction * RAD_CONST) * length;
 				let deltaY = Math.sin(direction * RAD_CONST) * length;
 
-				let newX = lastX + deltaX;
-				let newY = lastY + deltaY;
-				let point = new Point(newX, newY);
-
-				let margin = 10;
-
-				let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + MAX_LINES * INFO_LINE_HEIGHT;
-				if (newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
+				newX = lastX + deltaX;
+				newY = lastY + deltaY;
+				segment = new Segment(newX, newY, length);	
+				
+				if ((newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin) 
+					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin))
 					continue;
-
-				if (newX < margin || newX > width - margin|| newY < margin || newY > height - margin)
-					continue;
-
+	
 				this.addStation(length, direction, newX, newY, lastX, lastY);
 				this.addStreet(lastX, lastY, direction);
 			
-				this.points.push(point);
+				this.segments.push(segment);
 
 				lastX = newX;
 				lastY = newY;
 
 				lastDirection = direction;
 			}
-
+			
 			this.addEndStation(lastX, lastY);
 		}
 
@@ -329,17 +352,13 @@
 
 		randomize = () => {
 			this.lineThickness = LINE_THICKNESS;
-
 			this.randomizeColor();
-
 			this.randomizeSymbol();
-
-			this.randomizePoints();
-
+			this.randomizeSegments();
 		}
 
 		getDirection = (lastDirection) => {
-			return 45 * Utils.getRandomInt(0, 3);
+			return 45 * Utils.getRandomInt(-angleSegmentRange, angleSegmentRange);
 		}
 
 		drawMetroLine = (ctx) => {
@@ -353,8 +372,8 @@
 			ctx.strokeStyle = this.colorBase();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y);	
-			for (const point of this.points) {;
-				ctx.lineTo(point.x, point.y);
+			for (const segment of this.segments) {;
+				ctx.lineTo(segment.x, segment.y);
 			}
 			ctx.stroke();
 		}
@@ -411,13 +430,13 @@
 
 		getIndex = (rectangle) => {
 			let index = -1;
-			let verticalMidpoint = this.bounds.getX() + (this.bounds.getWidth() / 2);
-			let horizontalMidpoint = this.bounds.getY() + (this.bounds.getHeight() / 2);
+			let verticalMidsegment = this.bounds.getX() + (this.bounds.getWidth() / 2);
+			let horizontalMidsegment = this.bounds.getY() + (this.bounds.getHeight() / 2);
 
-			let topQuadrant = (rectangle.getTop() < horizontalMidpoint && rectangle.getBottom() < horizontalMidpoint);
-			let bottomQuadrant = (rectangle.getTop() > horizontalMidpoint);
+			let topQuadrant = (rectangle.getTop() < horizontalMidsegment && rectangle.getBottom() < horizontalMidsegment);
+			let bottomQuadrant = (rectangle.getTop() > horizontalMidsegment);
 
-			if (rectangle.getLeft() < verticalMidpoint && rectangle.getRight() < verticalMidpoint) {
+			if (rectangle.getLeft() < verticalMidsegment && rectangle.getRight() < verticalMidsegment) {
 				if (topQuadrant) {
 					index = 1;
 				}
@@ -426,7 +445,7 @@
 				}
 			}
 
-			else if (rectangle.getLeft() > verticalMidpoint) {
+			else if (rectangle.getLeft() > verticalMidsegment) {
 				if (topQuadrant) {
 					index = 0;
 				}
@@ -521,6 +540,15 @@
 	}
 
 	class Utils {
+
+		static shuffleArray = (array) => {
+			for (let i = array.length - 1; i > 0; i--) {
+			  const j = Math.floor(Math.random() * (i + 1));
+			  const temp = array[i];
+			  array[i] = array[j];
+			  array[j] = temp;
+			}
+		}		  
 		
 		static getRandomInt = (min, max) => {
 			return Math.floor(Math.random() * max) + min;
@@ -577,11 +605,27 @@
 			metroNetwork.addMetroLine(e.offsetX, e.offsetY);
 		}, false);
 	}
-	
-	let randomize = () => {
-		ALPHABETIC_SYMBOL = Utils.getRandomBool();
+
+	let generatePalette = () => {
+		let seed = Utils.getRandomInt(0, HSL_MAX_HUE);
+		let increment = Math.floor(HSL_MAX_HUE / maxNumberOfLines);
+		for (let i = 1; i <= maxNumberOfLines; i++) {
+            let color = seed + i * increment;
+			if (color > HSL_MAX_HUE) 
+				color = color - HSL_MAX_HUE;
+            palette.push(color);
+        }
+
+		Utils.shuffleArray(palette);
 	}
 	
+	let randomize = () => {	
+		maxNumberOfLines = Math.floor(width * height / 25000);
+		generatePalette();
+		alphabeticLineSymbol = Utils.getRandomBool();
+		angleSegmentRange = Utils.getRandomInt(1, 3);	
+	}
+		
 	let drawFrame = (ctx, canvas) => {
 		canvas.width = width;
 		canvas.height = height;
