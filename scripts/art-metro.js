@@ -1,5 +1,4 @@
 {
-
 	let CANVAS_ID = "myCanvas"
 	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
@@ -78,6 +77,10 @@
 		}
 		
 		drawLines = (ctx) => {
+			for (const line of metroNetwork.lines) {
+				line.drawStreets(ctx);
+			}
+			
 			for (const line of metroNetwork.lines) {
 				line.drawMetroLine(ctx);
 			}
@@ -195,12 +198,35 @@
 		getRight = () => this.x;
 	}
 
+	class Street {
+		constructor(x, y, angle) {
+			this.x = x;
+			this.y = y;
+			this.angle = angle;
+		}
+
+		drawStreet = (ctx) => {
+			ctx.strokeStyle = "#222";
+			ctx.lineWidth = 6;
+			ctx.lineCap = "round";
+			ctx.beginPath();
+			let newStartX = this.x - Math.cos(this.angle * RAD_CONST) * (1000);
+			let newStartY = this.y - Math.sin(this.angle * RAD_CONST) * (1000);	
+			ctx.moveTo(newStartX, newStartY);
+			let newEndX = newStartX + Math.cos(this.angle * RAD_CONST) * (2000);
+			let newEndY = newStartY +  Math.sin(this.angle * RAD_CONST) * (2000);	
+			ctx.lineTo(newEndX, newEndY);
+			ctx.stroke();
+		}
+	}
+
 	class Line {
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
 			this.points = [];
 			this.stations = [];
+			this.streets = [];
 			this.symbol = ALPHABETIC_SYMBOL ? "A" : 1;
 		}
 
@@ -249,6 +275,7 @@
 					continue;
 
 				this.addStation(length, direction, newX, newY, lastX, lastY);
+				this.addStreet(lastX, lastY, direction);
 			
 				this.points.push(point);
 
@@ -291,8 +318,11 @@
 			}
 		}
 
-		addStreet = () => {
-
+		addStreet = (startX, startY, angle) => {
+			if (Utils.getRandomInt(1, 3) == 3){
+				let street = new Street(startX, startY, angle);
+				this.streets.push(street);
+			}
 		}
 
 		randomize = () => {
@@ -311,17 +341,16 @@
 		}
 
 		drawMetroLine = (ctx) => {
-			ctx.lineCap = "round";
-			ctx.lineWidth = this.lineThickness;
-			ctx.strokeStyle = this.colorBase();
-			ctx.beginPath();
-			ctx.moveTo(this.x, this.y);
-
 			this.drawSegments(ctx);
 			this.drawStations(ctx);
 		}
 
-		drawSegments = (ctx) => {
+		drawSegments = (ctx) => {		
+			ctx.lineCap = "round";
+			ctx.lineWidth = this.lineThickness;
+			ctx.strokeStyle = this.colorBase();
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y);	
 			for (const point of this.points) {;
 				ctx.lineTo(point.x, point.y);
 			}
@@ -329,9 +358,14 @@
 		}
 
 		drawStations = (ctx) => {
-			for (const element of this.stations) {
-				const currentStation = element;
-				currentStation.drawStation(ctx);
+			for (const station of this.stations) {
+				station.drawStation(ctx);
+			}
+		}
+
+		drawStreets = (ctx) => {
+			for (const street of this.streets) {
+				street.drawStreet(ctx);
 			}
 		}
 
@@ -577,5 +611,4 @@
 	init();
 
 	window.requestAnimationFrame(loop);
-
 }
