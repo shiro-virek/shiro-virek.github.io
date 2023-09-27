@@ -7,6 +7,7 @@
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
 	let ANGLE_RANGE = 2;
 
+	let HSL_MAX_HUE = 360;
 	let MIN_LINE_LENGTH = 50;
 	let INFO_MARGIN_TOP = 10;
 	let INFO_MARGIN_LEFT = 10;
@@ -21,6 +22,7 @@
 	let height = 0;
 	let metroNetwork;	
 	let lastRender = 0
+	let palette = [];
 
 	class MetroNetwork {
 		constructor(){
@@ -250,7 +252,7 @@
 		}
 
 		randomizeColor = () => {
-			this.hue = Utils.getRandomInt(1, 360);
+			this.hue = palette.pop();
 			this.saturation = 100;
 			this.light = Utils.getRandomInt(20, 50);
 		}
@@ -531,6 +533,15 @@
 	}
 
 	class Utils {
+
+		static shuffleArray = (array) => {
+			for (let i = array.length - 1; i > 0; i--) {
+			  const j = Math.floor(Math.random() * (i + 1));
+			  const temp = array[i];
+			  array[i] = array[j];
+			  array[j] = temp;
+			}
+		}		  
 		
 		static getRandomInt = (min, max) => {
 			return Math.floor(Math.random() * max) + min;
@@ -587,12 +598,26 @@
 			metroNetwork.addMetroLine(e.offsetX, e.offsetY);
 		}, false);
 	}
+
+	let generatePalette = () => {
+		let seed = Utils.getRandomInt(0, HSL_MAX_HUE);
+		let increment = Math.floor(HSL_MAX_HUE / MAX_LINES);
+		for (let i = 1; i <= MAX_LINES; i++) {
+            let color = seed + i * increment;
+			if (color > HSL_MAX_HUE) 
+				color = color - HSL_MAX_HUE;
+            palette.push(color);
+        }
+
+		Utils.shuffleArray(palette);
+	}
 	
 	let randomize = () => {
+		generatePalette();
 		ALPHABETIC_SYMBOL = Utils.getRandomBool();
 		ANGLE_RANGE = Utils.getRandomInt(1, 3);
 	}
-	
+		
 	let drawFrame = (ctx, canvas) => {
 		canvas.width = width;
 		canvas.height = height;
