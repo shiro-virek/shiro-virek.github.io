@@ -1,10 +1,5 @@
 {
-	let width = 0;
-	let height = 0;
-	let lastPosY = 0;
-	let lastPosX = 0;
 	let CANVAS_ID = "myCanvas"
-	let LINES_COUNT = 0;
 	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
 	let ALPHABETIC_SYMBOL = false;
@@ -20,15 +15,116 @@
 	let INFO_WIDTH = 120;
 	let DRAW_QUADTREE = false;
 
+	let width = 0;
+	let height = 0;
+	let metroNetwork;	
 	let lastRender = 0
 
-	let objects = [];
+	class MetroNetwork {
+		constructor(){
+			this.lines = [];
+			this.quad = Quadtree.generateQuadtree(width, height);
+		}			
 
-	let quad;
+		getNumberOfStations = () => {
+			let numberOfStations = 0;
+			this.lines.forEach((element) => numberOfStations += element.stations.length);
+			return numberOfStations;
+		}
 
-	const LineTypes = Object.freeze({
-		Regular: Symbol("regular")
-	});
+		getLinesLength = () => {
+			let linesLength = 0;
+			for (const line of metroNetwork.lines) {
+				for (let j = 1; j < line.points.length; j++) {
+					linesLength += Math.floor(Math.sqrt(Math.pow(line.points[j].x - line.points[j - 1].x, 2) + Math.pow(line.points[j].y - line.points[j - 1].y, 2)));
+				}
+			}
+			return Math.floor(linesLength / 100);
+		}
+
+		drawLinesInfo = (ctx) => {
+			ctx.fillStyle = "#FFF";
+			let infoWidth = INFO_WIDTH;
+			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + metroNetwork.lines.length * INFO_LINE_HEIGHT;
+			ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = '#000000';
+			ctx.strokeRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
+
+			ctx.font = "10px Arial";
+			ctx.fillStyle = "#000";
+			ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
+			ctx.fillText(`Stations: ${metroNetwork.getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
+			ctx.fillText(`Lines: ${metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
+			ctx.fillText(`Length: ${metroNetwork.getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
+			ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
+			
+			MetroNetwork.drawTransferIcon(ctx);
+
+			ctx.lineWidth = 1;
+			for (let i = 0; i < metroNetwork.lines.length; i++) {
+				Utils.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', metroNetwork.lines[i].colorBase());
+				ctx.fillStyle = "#000";
+				ctx.fillText(`Line ${metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
+			}
+		}
+		
+		static drawTransferIcon = (ctx) => {			 
+			let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);		
+			let station2 = new Station(INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
+			station1.transfer = station2;
+			station1.drawTransferLine(ctx, true);
+		}
+		
+		drawLines = (ctx) => {
+			for (const line of metroNetwork.lines) {
+				line.drawStreets(ctx);
+			}
+			
+			for (const line of metroNetwork.lines) {
+				line.drawMetroLine(ctx);
+			}
+
+			for (const line of metroNetwork.lines) {
+				for (const station of line.stations) {
+					station.drawTransferLine(ctx, true);
+				}
+			}
+		}
+		
+		addMetroLine = (x, y) => {
+			if (metroNetwork.lines.length < MAX_LINES) {
+				let line = new Line(x, y);
+				line.randomize();
+				metroNetwork.lines.push(line);
+				
+				for (const line of metroNetwork.lines) {
+					for (const station of line.stations) {
+						station.addTransfers(this);
+					}
+				}			
+			}
+		}
+
+		populateQuadTree = () => {
+			this.quad.clear();
+			for (const line of metroNetwork.lines) {
+				for (const station of line.stations) {
+					this.quad.insert(station);
+				}
+			}
+		}
+
+		draw = (ctx) => {
+			if (this.lines.length > 0) {
+				if (DRAW_QUADTREE) 
+					this.drawQuadtree(ctx);
+				this.drawLines(ctx);
+				this.drawLinesInfo(ctx);
+				this.populateQuadTree();			
+			}
+		}
+	}
 
 	class Point {
 		constructor(x, y) {
@@ -42,47 +138,48 @@
 			this.x = x;
 			this.y = y;
 			this.lineSymbol = lineSymbol;
+			this.transfer = null;
 		}
 
 		drawStation = (ctx) => {
-			drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
-
-			this.drawTransfers(ctx);
+			Utils.drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
 		}
 
-		drawTransfers = (ctx) => {
+		addTransfers = (metroNetwork) => {
 			let returnObjects = [];
 
-			quad.retrieve(returnObjects, this);
+			metroNetwork.quad.retrieve(returnObjects, this);
 
-			for (let x = 0; x < returnObjects.length; x++) {
-				let otherStation = returnObjects[x];
+			for (const element of returnObjects) {
+				let otherStation = element;
 
 				if (otherStation == this || otherStation.lineSymbol == this.lineSymbol)
 					continue;
 
-				this.drawTransfer(ctx, otherStation, this);
+				this.addTransfer(otherStation, this);
 			}
 		}
 
-		drawTransfer = (ctx, station1, station2) => {
+		addTransfer = (station1, station2) => {
 			let catX = Math.abs(station2.x - station1.x);
 			let catY = Math.abs(station2.y - station1.y);
 			let distance = Math.sqrt(catX * catX + catY * catY);
 
-			if (distance < LINE_TRANSFER_MAX_DISTANCE) {
-				Station.drawTransferLine(ctx, station1.x, station1.y, station2.x, station2.y, true);
+			if (distance < LINE_TRANSFER_MAX_DISTANCE && station1.transfer == null && station2.transfer == null)  {
+				station1.transfer = station2;
+				station2.transfer = station1;
 			}
 		}
 
-		static drawTransferLine = (ctx, x1, y1, x2, y2, blackBorder = false) => {
+		drawTransferLine = (ctx, blackBorder = false) => {
+			if (this.transfer == null) return;
 			if (blackBorder) {
 				ctx.strokeStyle = "#000";
 				ctx.lineWidth = 6;
 				ctx.lineCap = "round";
 				ctx.beginPath();
-				ctx.moveTo(x1, y1);
-				ctx.lineTo(x2, y2);
+				ctx.moveTo(this.x, this.y);
+				ctx.lineTo(this.transfer.x, this.transfer.y);
 				ctx.stroke();
 			}
 
@@ -90,8 +187,8 @@
 			ctx.lineWidth = 5;
 			ctx.lineCap = "round";
 			ctx.beginPath();
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.transfer.x, this.transfer.y);
 			ctx.stroke();
 		}
 
@@ -101,34 +198,58 @@
 		getRight = () => this.x;
 	}
 
+	class Street {
+		constructor(x, y, angle) {
+			this.x = x;
+			this.y = y;
+			this.angle = angle;
+		}
+
+		drawStreet = (ctx) => {
+			ctx.strokeStyle = "#222";
+			ctx.lineWidth = 6;
+			ctx.lineCap = "round";
+			ctx.beginPath();
+			let newStartX = this.x - Math.cos(this.angle * RAD_CONST) * (1000);
+			let newStartY = this.y - Math.sin(this.angle * RAD_CONST) * (1000);	
+			ctx.moveTo(newStartX, newStartY);
+			let newEndX = newStartX + Math.cos(this.angle * RAD_CONST) * (2000);
+			let newEndY = newStartY +  Math.sin(this.angle * RAD_CONST) * (2000);	
+			ctx.lineTo(newEndX, newEndY);
+			ctx.stroke();
+		}
+	}
+
 	class Line {
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
 			this.points = [];
 			this.stations = [];
+			this.streets = [];
 			this.symbol = ALPHABETIC_SYMBOL ? "A" : 1;
 		}
 
-		randomize = () => {
-			this.lineThickness = LINE_THICKNESS;
-			this.hue = getRandomInt(1, 360);
-			this.saturation = 100;
-			this.light = getRandomInt(20, 50);
-
-			if (objects.length > 0)
+		randomizeSymbol = () => {
+			if (metroNetwork.lines.length > 0)
 				if (ALPHABETIC_SYMBOL)
-					this.symbol = nextCharacter(objects[objects.length - 1].symbol)
+					this.symbol = Utils.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol)
 				else
-					this.symbol = objects[objects.length - 1].symbol + 1;
+					this.symbol = metroNetwork.lines[metroNetwork.lines.length - 1].symbol + 1;
+		}
 
+		randomizeColor = () => {
+			this.hue = Utils.getRandomInt(1, 360);
+			this.saturation = 100;
+			this.light = Utils.getRandomInt(20, 50);
+		}
+
+		randomizePoints = () => {			
 			let lastX = this.x;
 			let lastY = this.y;
 			let lastDirection = 0;
-			let baseDirection = 45 * getRandomInt(0, 7);
-			let numberOfPoints = getRandomInt(3, 12);
-			let stationThresholdMax = 100;
-			let stationThresholdMin = 50;
+			let baseDirection = 45 * Utils.getRandomInt(0, 7);
+			let numberOfPoints = Utils.getRandomInt(3, 12);		
 
 			let firstPoint = new Point(this.x, this.y);
 			this.points.push(firstPoint);
@@ -136,7 +257,7 @@
 			this.stations.push(firstStation);
 
 			for (let index = 0; index < numberOfPoints; index++) {
-				let length = getRandomInt(20, 200);
+				let length = Utils.getRandomInt(20, 200);
 				let direction = baseDirection + this.getDirection(lastDirection);
 
 				let deltaX = Math.cos(direction * RAD_CONST) * length;
@@ -153,22 +274,9 @@
 				if (newX < 0 || newX > width || newY < 0 || newY > height)
 					continue;
 
-				let newStationX = 0;
-				let newStationY = 0;
-
-				if (length > stationThresholdMin) {
-					if (length < stationThresholdMax) {
-						newStationX = newX;
-						newStationY = newY;
-					} else {
-						newStationX = lastX + Math.cos(direction * RAD_CONST) * (length / 2);
-						newStationY = lastY + Math.sin(direction * RAD_CONST) * (length / 2);
-					}
-
-					let newStation = new Station(newStationX, newStationY, this.symbol);
-					this.stations.push(newStation);
-				}
-
+				this.addStation(length, direction, newX, newY, lastX, lastY);
+				this.addStreet(lastX, lastY, direction);
+			
 				this.points.push(point);
 
 				lastX = newX;
@@ -177,7 +285,31 @@
 				lastDirection = direction;
 			}
 
+			this.addEndStation(lastX, lastY);
+		}
 
+		addStation = (segmentLength, segmentAngle, newX, newY, lastX, lastY) => {
+			let newStationX = 0;
+			let newStationY = 0;
+
+			let stationThresholdMax = 100;
+			let stationThresholdMin = 50;
+
+			if (segmentLength > stationThresholdMin) {
+				if (segmentLength < stationThresholdMax) {
+					newStationX = newX;
+					newStationY = newY;
+				} else {
+					newStationX = lastX + Math.cos(segmentAngle * RAD_CONST) * (segmentLength / 2);
+					newStationY = lastY + Math.sin(segmentAngle * RAD_CONST) * (segmentLength / 2);
+				}
+
+				let newStation = new Station(newStationX, newStationY, this.symbol);
+				this.stations.push(newStation);
+			}
+		}
+
+		addEndStation = (lastX, lastY) => {
 			let lastAddedStation = this.stations[this.stations.length - 1];
 
 			if (lastAddedStation.x != lastX && lastAddedStation.y != lastY) {
@@ -186,34 +318,54 @@
 			}
 		}
 
+		addStreet = (startX, startY, angle) => {
+			if (Utils.getRandomInt(1, 3) == 3){
+				let street = new Street(startX, startY, angle);
+				this.streets.push(street);
+			}
+		}
+
+		randomize = () => {
+			this.lineThickness = LINE_THICKNESS;
+
+			this.randomizeColor();
+
+			this.randomizeSymbol();
+
+			this.randomizePoints();
+
+		}
+
 		getDirection = (lastDirection) => {
-			return 45 * getRandomInt(0, 3);
+			return 45 * Utils.getRandomInt(0, 3);
 		}
 
 		drawMetroLine = (ctx) => {
+			this.drawSegments(ctx);
+			this.drawStations(ctx);
+		}
+
+		drawSegments = (ctx) => {		
 			ctx.lineCap = "round";
 			ctx.lineWidth = this.lineThickness;
 			ctx.strokeStyle = this.colorBase();
 			ctx.beginPath();
-			ctx.moveTo(this.x, this.y);
-
-			this.drawSegments(ctx);
-		}
-
-		drawSegments = (ctx) => {
-			for (let index = 0; index < this.points.length; index++) {
-				const element = this.points[index];
-				ctx.lineTo(element.x, element.y);
+			ctx.moveTo(this.x, this.y);	
+			for (const point of this.points) {;
+				ctx.lineTo(point.x, point.y);
 			}
 			ctx.stroke();
 		}
 
 		drawStations = (ctx) => {
-			//ctx.isPointInPath(20, 50)
+			for (const station of this.stations) {
+				station.drawStation(ctx);
+			}
+		}
 
-			for (let index = 0; index < this.stations.length; index++) {
-				const currentStation = this.stations[index];
-				currentStation.drawStation(ctx);
+		drawStreets = (ctx) => {
+			for (const street of this.streets) {
+				street.drawStreet(ctx);
 			}
 		}
 
@@ -221,24 +373,23 @@
 	}
 
 	class Quadtree {
-		constructor(pLevel, pBounds) {
+		constructor(level, bounds) {
 
 			this.MAX_OBJECTS = 5;
 			this.MAX_LEVELS = 6;
 
-			this.objects = [];
+			this.lines = [];
 
-			this.level = pLevel;
-			this.bounds = pBounds;
+			this.level = level;
+			this.bounds = bounds;
 			this.nodes = new Array(4);
 		}
 
 		clear = () => {
-			this.objects = [];
+			this.lines = [];
 
 			for (let i = 0; i < this.nodes.length; i++) {
 				if (this.nodes[i] != null) {
-					//nodes[i].clear();
 					this.nodes[i] = null;
 				}
 			}
@@ -256,15 +407,15 @@
 			this.nodes[3] = new Quadtree(this.level + 1, new Rectangle(x + subWidth, y + subHeight, subWidth, subHeight));
 		}
 
-		getIndex = (pRect) => {
+		getIndex = (rectangle) => {
 			let index = -1;
 			let verticalMidpoint = this.bounds.getX() + (this.bounds.getWidth() / 2);
 			let horizontalMidpoint = this.bounds.getY() + (this.bounds.getHeight() / 2);
 
-			let topQuadrant = (pRect.getTop() < horizontalMidpoint && pRect.getBottom() < horizontalMidpoint);
-			let bottomQuadrant = (pRect.getTop() > horizontalMidpoint);
+			let topQuadrant = (rectangle.getTop() < horizontalMidpoint && rectangle.getBottom() < horizontalMidpoint);
+			let bottomQuadrant = (rectangle.getTop() > horizontalMidpoint);
 
-			if (pRect.getLeft() < verticalMidpoint && pRect.getRight() < verticalMidpoint) {
+			if (rectangle.getLeft() < verticalMidpoint && rectangle.getRight() < verticalMidpoint) {
 				if (topQuadrant) {
 					index = 1;
 				}
@@ -273,7 +424,7 @@
 				}
 			}
 
-			else if (pRect.getLeft() > verticalMidpoint) {
+			else if (rectangle.getLeft() > verticalMidpoint) {
 				if (topQuadrant) {
 					index = 0;
 				}
@@ -285,30 +436,30 @@
 			return index;
 		}
 
-		insert = (pRect) => {
+		insert = (rectangle) => {
 			if (this.nodes[0] != null) {
-				let index = this.getIndex(pRect);
+				let index = this.getIndex(rectangle);
 
 				if (index != -1) {
-					this.nodes[index].insert(pRect);
+					this.nodes[index].insert(rectangle);
 
 					return;
 				}
 			}
 
-			this.objects.push(pRect);
+			this.lines.push(rectangle);
 
-			if (this.objects.length > this.MAX_OBJECTS && this.level < this.MAX_LEVELS) {
+			if (this.lines.length > this.MAX_OBJECTS && this.level < this.MAX_LEVELS) {
 				if (this.nodes[0] == null) {
 					this.split();
 				}
 
 				let i = 0;
-				while (i < this.objects.length) {
-					let index = this.getIndex(this.objects[i]);
+				while (i < this.lines.length) {
+					let index = this.getIndex(this.lines[i]);
 					if (index != -1) {
-						let removedItem = this.objects[i];
-						this.objects.splice(i, 1);
+						let removedItem = this.lines[i];
+						this.lines.splice(i, 1);
 						this.nodes[index].insert(removedItem);
 					}
 					else {
@@ -318,15 +469,34 @@
 			}
 		}
 
-		retrieve = (returnObjects, pRect) => {
-			let index = this.getIndex(pRect);
+		retrieve = (returnObjects, rectangle) => {
+			let index = this.getIndex(rectangle);
 			if (index != -1 && this.nodes[0] != null) {
-				this.nodes[index].retrieve(returnObjects, pRect);
+				this.nodes[index].retrieve(returnObjects, rectangle);
 			}
 
-			returnObjects.push(...this.objects);
+			returnObjects.push(...this.lines);
 
 			return returnObjects;
+		}
+		
+		static generateQuadtree = (width, height) => {
+			return new Quadtree(0, new Rectangle(0, 0, width, height));
+		}
+
+		drawQuadtree = (ctx) => {
+			if (this.quad != null) {
+				if (this.quad.bounds != null) {
+					ctx.strokeStyle = "#333";
+					ctx.lineWidth = 1;
+					ctx.strokeRect(this.quad.bounds.x, this.quad.bounds.y, this.quad.bounds.width, this.quad.bounds.height);
+				}
+				if (this.quad.nodes != null) {
+					this.quad.nodes.forEach(function (node) {
+						drawQuadtree(ctx, node);
+					});
+				}
+			}
 		}
 	}
 
@@ -348,196 +518,88 @@
 		getRight = () => this.x + this.width;
 	}
 
-	init = () => {
-		generateQuadtree();
+	class Utils {
+		
+		static getRandomInt = (min, max) => {
+			return Math.floor(Math.random() * max) + min;
+		}
+
+		static getRandomFloat = (min, max, decimals) => {
+			const str = (Math.random() * (max - min) + min).toFixed(
+				decimals,
+			);
+
+			return parseFloat(str);
+		}
+
+		static getRandomBool = () => {
+			return Math.random() < 0.5;
+		}
+		
+		static nextCharacter = (c) => {
+			return String.fromCharCode(c.charCodeAt(0) + 1);
+		}
+		
+		static drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
+			ctx.strokeStyle = color;
+			ctx.fillStyle = fillColor;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.arc(x, y, radio, 0, 2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+		}
+
+		static drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
+			ctx.strokeStyle = color;
+			ctx.fillStyle = fillColor;
+			ctx.beginPath();
+			ctx.rect(x, y, width, height);
+			ctx.fill();
+			ctx.stroke();
+		}
+	}
+
+	let init = () => {
+		width = window.innerWidth;
+		height = window.innerHeight;
+		metroNetwork = new MetroNetwork()		
 		randomize();
 		addEvents();
-		drawFrame();
 	}
 
-	generateQuadtree = () => {
-		quad = new Quadtree(0, new Rectangle(0, 0, width, height));
-	}
-
-	drawQuadtree = (ctx, quad) => {
-		if (quad != null) {
-			if (quad.bounds != null) {
-				ctx.strokeStyle = "#333";
-				ctx.lineWidth = 1;
-				ctx.strokeRect(quad.bounds.x, quad.bounds.y, quad.bounds.width, quad.bounds.height);
-			}
-			if (quad.nodes != null) {
-				quad.nodes.forEach(function (node) {
-					drawQuadtree(ctx, node);
-				});
-			}
-		}
-	}
-
-	populateQuadTree = (quad) => {
-		quad.clear();
-		for (let i = 0; i < LINES_COUNT; i++) {
-			for (let j = 0; j < objects[i].stations.length; j++) {
-				quad.insert(objects[i].stations[j]);
-			}
-		}
-	}
-
-	randomize = () => {
-		ALPHABETIC_SYMBOL = getRandomBool();
-	}
-
-	getRandomInt = (min, max) => {
-		return Math.floor(Math.random() * max) + min;
-	}
-
-	getRandomFloat = (min, max, decimals) => {
-		const str = (Math.random() * (max - min) + min).toFixed(
-			decimals,
-		);
-
-		return parseFloat(str);
-	}
-
-	getRandomBool = () => {
-		return Math.random() < 0.5;
-	}
-
-	addEvents = () => {
+	let addEvents = () => {
 		let canvas = document.getElementById(CANVAS_ID);
 
 		canvas.addEventListener('click', e => {
-			addMetroLine(e.offsetX, e.offsetY);
+			metroNetwork.addMetroLine(e.offsetX, e.offsetY);
 		}, false);
 	}
-
-	getNumberOfStations = () => {
-		let numberOfStations = 0;
-		objects.forEach((element) => numberOfStations += element.stations.length);
-		return numberOfStations;
-	}
-
-	getNumberOfLines = () => {
-		return objects.length;
-	}
-
-	getLinesLength = () => {
-		let linesLength = 0;
-		for (let i = 0; i < LINES_COUNT; i++) {
-			for (let j = 1; j < objects[i].points.length; j++) {
-				linesLength += Math.floor(Math.sqrt(Math.pow(objects[i].points[j].x - objects[i].points[j - 1].x, 2) + Math.pow(objects[i].points[j].y - objects[i].points[j - 1].y, 2)));
-			}
-		}
-		return Math.floor(linesLength / 100);
-	}
-
-	drawLinesInfo = (ctx, canvas) => {
-		ctx.fillStyle = "#FFF";
-		let infoWidth = INFO_WIDTH;
-		let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + LINES_COUNT * INFO_LINE_HEIGHT;
-		ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
-		ctx.lineWidth = 1;
-		ctx.strokeStyle = '#000000';
-		ctx.strokeRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
-
-		ctx.font = "10px Arial";
-		ctx.fillStyle = "#000";
-		ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
-		ctx.fillText(`Stations: ${getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
-		ctx.fillText(`Lines: ${getNumberOfLines()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
-		ctx.fillText(`Length: ${getLinesLength()} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
-		ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
-		Station.drawTransferLine(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5,  INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5, true);
-
-		ctx.lineWidth = 1;
-		for (let i = 0; i < LINES_COUNT; i++) {
-			drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', objects[i].colorBase());
-			ctx.fillStyle = "#000";
-			ctx.fillText(`Line ${objects[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
-		}
-	}
-
-	drawFrame = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext) {
-			canvas.width = width;
-			canvas.height = height;
-			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#000";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			ctx.lineWidth = 1;
-			ctx.strokeStyle = '#000000';
-			ctx.strokeRect(0, 0, width, height);
-		}
-	}
-
-	drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
-		ctx.strokeStyle = color;
-		ctx.fillStyle = fillColor;
-		ctx.lineWidth = 1;
-		ctx.beginPath();
-		ctx.arc(x, y, radio, 0, 2 * Math.PI);
-		ctx.fill();
-		ctx.stroke();
-	}
-
-	drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
-		ctx.strokeStyle = color;
-		ctx.fillStyle = fillColor;
-		ctx.beginPath();
-		ctx.rect(x, y, width, height);
-		ctx.fill();
-		ctx.stroke();
-	}
-
-	drawLines = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext) {			
-			let ctx = canvas.getContext('2d');			
-			for (let i = 0; i < LINES_COUNT; i++) {
-				objects[i].drawMetroLine(ctx);
-			}
-			for (let i = 0; i < LINES_COUNT; i++) {
-				objects[i].drawStations(ctx);
-			}
-		}
+	
+	let randomize = () => {
+		ALPHABETIC_SYMBOL = Utils.getRandomBool();
 	}
 	
-	nextCharacter = (c) => {
-		return String.fromCharCode(c.charCodeAt(0) + 1);
+	let drawFrame = (ctx, canvas) => {
+		canvas.width = width;
+		canvas.height = height;
+		ctx.fillStyle = "#000";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = '#000000';
+		ctx.strokeRect(0, 0, width, height);
 	}
 
-	addMetroLine = (x, y) => {
-		if (LINES_COUNT < MAX_LINES) {
-			let line = new Line(x, y);
-			line.randomize();
-			objects.push(line);
-			LINES_COUNT++;
+	let draw = () => {	
+		let canvas = document.getElementById(CANVAS_ID);
+		if (canvas.getContext) {
+			let ctx = canvas.getContext('2d')
+			drawFrame(ctx, canvas);
+			metroNetwork.draw(ctx);
 		}
 	}
 
-	draw = () => {
-		drawFrame();
-
-		if (LINES_COUNT > 0) {
-			let canvas = document.getElementById(CANVAS_ID);
-			if (canvas.getContext) {
-				let ctx = canvas.getContext('2d')
-				if (DRAW_QUADTREE) drawQuadtree(ctx, quad);
-				drawLines(ctx);
-				drawLinesInfo(ctx, canvas);
-				populateQuadTree(quad);
-			}
-		}
-
-	}
-
-	width = window.innerWidth;
-	height = window.innerHeight;
-	lastPosY = 0;
-	lastPosX = 0;
-
-	loop = (timestamp) => {
+	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
 		draw();
@@ -549,5 +611,4 @@
 	init();
 
 	window.requestAnimationFrame(loop);
-
 }
