@@ -2,11 +2,7 @@
 	let CANVAS_ID = "myCanvas"
 	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
-	let ALPHABETIC_SYMBOL = false;
-	let MAX_LINES = 15;
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
-	let ANGLE_RANGE = 2;
-
 	let HSL_MAX_HUE = 360;
 	let MIN_LINE_LENGTH = 50;
 	let INFO_MARGIN_TOP = 10;
@@ -17,7 +13,10 @@
 	let INFO_PADDING = 10;
 	let INFO_WIDTH = 120;
 	let DRAW_QUADTREE = false;
-
+	
+	let maxNumberOfLines = 15;
+	let angleSegmentRange = 2;
+	let alphabeticLineSymbol = false;
 	let width = 0;
 	let height = 0;
 	let metroNetwork;	
@@ -58,7 +57,7 @@
 			ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
 			ctx.fillText(`Stations: ${metroNetwork.getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
 			ctx.fillText(`Lines: ${metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
-			ctx.fillText(`Length: ${Math.floor(metroNetwork.getLinesLength())} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
+			ctx.fillText(`Length: ${Math.floor(metroNetwork.getLinesLength() / 100)} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
 			ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
 			
 			MetroNetwork.drawTransferIcon(ctx);
@@ -95,12 +94,14 @@
 		}
 		
 		addMetroLine = (x, y) => {
-			if (metroNetwork.lines.length < MAX_LINES) {
+			if (metroNetwork.lines.length < maxNumberOfLines) {
 				let line = new Line(x, y);
 				line.randomize();
 				
 				if (line.getLength() > MIN_LINE_LENGTH)
 					metroNetwork.lines.push(line);
+				else
+					palette.push(line.hue);
 				
 				for (const line of metroNetwork.lines) {
 					for (const station of line.stations) {
@@ -211,7 +212,7 @@
 		}
 
 		drawStreet = (ctx) => {
-			ctx.strokeStyle = "#222";
+			ctx.strokeStyle = "#111";
 			ctx.lineWidth = 6;
 			ctx.lineCap = "round";
 			ctx.beginPath();
@@ -232,7 +233,7 @@
 			this.segments = [];
 			this.stations = [];
 			this.streets = [];
-			this.symbol = ALPHABETIC_SYMBOL ? "A" : 1;
+			this.symbol = alphabeticLineSymbol ? "A" : 1;
 		}
 
 		getLength = () => {
@@ -245,9 +246,15 @@
 
 		randomizeSymbol = () => {
 			if (metroNetwork.lines.length > 0)
-				if (ALPHABETIC_SYMBOL)
-					this.symbol = Utils.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol)
-				else
+				if (alphabeticLineSymbol){
+					let nextSymbol = Utils.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol);
+					if (nextSymbol == '['){
+						this.symbol = 1;
+						alphabeticLineSymbol = false;
+					}else{
+						this.symbol = nextSymbol;
+					}
+				}else
 					this.symbol = metroNetwork.lines[metroNetwork.lines.length - 1].symbol + 1;
 		}
 
@@ -268,7 +275,7 @@
 			this.segments.push(firstSegment);
 			let firstStation = new Station(this.x, this.y, this.symbol);
 			this.stations.push(firstStation);
-			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + MAX_LINES * INFO_LINE_HEIGHT;
+			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + maxNumberOfLines * INFO_LINE_HEIGHT;
 			let margin = 10;
 
 			for (let index = 0; index < numberOfSegments; index++) {
@@ -351,7 +358,7 @@
 		}
 
 		getDirection = (lastDirection) => {
-			return 45 * Utils.getRandomInt(-ANGLE_RANGE, ANGLE_RANGE);
+			return 45 * Utils.getRandomInt(-angleSegmentRange, angleSegmentRange);
 		}
 
 		drawMetroLine = (ctx) => {
@@ -601,8 +608,8 @@
 
 	let generatePalette = () => {
 		let seed = Utils.getRandomInt(0, HSL_MAX_HUE);
-		let increment = Math.floor(HSL_MAX_HUE / MAX_LINES);
-		for (let i = 1; i <= MAX_LINES; i++) {
+		let increment = Math.floor(HSL_MAX_HUE / maxNumberOfLines);
+		for (let i = 1; i <= maxNumberOfLines; i++) {
             let color = seed + i * increment;
 			if (color > HSL_MAX_HUE) 
 				color = color - HSL_MAX_HUE;
@@ -612,10 +619,11 @@
 		Utils.shuffleArray(palette);
 	}
 	
-	let randomize = () => {
+	let randomize = () => {	
+		maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
-		ALPHABETIC_SYMBOL = Utils.getRandomBool();
-		ANGLE_RANGE = Utils.getRandomInt(1, 3);
+		alphabeticLineSymbol = Utils.getRandomBool();
+		angleSegmentRange = Utils.getRandomInt(1, 3);	
 	}
 		
 	let drawFrame = (ctx, canvas) => {
