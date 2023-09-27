@@ -267,11 +267,13 @@
 				let newY = lastY + deltaY;
 				let point = new Point(newX, newY);
 
+				let margin = 10;
+
 				let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + MAX_LINES * INFO_LINE_HEIGHT;
-				if (newX < INFO_MARGIN_LEFT + INFO_WIDTH && newY < INFO_MARGIN_TOP + infoHeight)
+				if (newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
 					continue;
 
-				if (newX < 0 || newX > width || newY < 0 || newY > height)
+				if (newX < margin || newX > width - margin|| newY < margin || newY > height - margin)
 					continue;
 
 				this.addStation(length, direction, newX, newY, lastX, lastY);
