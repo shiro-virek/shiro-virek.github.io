@@ -25,11 +25,7 @@
 		constructor(){
 			this.lines = [];
 			this.quad = Quadtree.generateQuadtree(width, height);
-		}
-			
-		randomize = () => {
-			ALPHABETIC_SYMBOL = Utils.getRandomBool();
-		}
+		}			
 
 		getNumberOfStations = () => {
 			let numberOfStations = 0;
@@ -113,6 +109,16 @@
 				for (const station of line.stations) {
 					this.quad.insert(station);
 				}
+			}
+		}
+
+		draw = (ctx) => {
+			if (this.lines.length > 0) {
+				if (DRAW_QUADTREE) 
+					this.drawQuadtree(ctx);
+				this.drawLines(ctx);
+				this.drawLinesInfo(ctx);
+				this.populateQuadTree();			
 			}
 		}
 	}
@@ -321,15 +327,15 @@
 	}
 
 	class Quadtree {
-		constructor(pLevel, pBounds) {
+		constructor(level, bounds) {
 
 			this.MAX_OBJECTS = 5;
 			this.MAX_LEVELS = 6;
 
 			this.lines = [];
 
-			this.level = pLevel;
-			this.bounds = pBounds;
+			this.level = level;
+			this.bounds = bounds;
 			this.nodes = new Array(4);
 		}
 
@@ -355,15 +361,15 @@
 			this.nodes[3] = new Quadtree(this.level + 1, new Rectangle(x + subWidth, y + subHeight, subWidth, subHeight));
 		}
 
-		getIndex = (pRect) => {
+		getIndex = (rectangle) => {
 			let index = -1;
 			let verticalMidpoint = this.bounds.getX() + (this.bounds.getWidth() / 2);
 			let horizontalMidpoint = this.bounds.getY() + (this.bounds.getHeight() / 2);
 
-			let topQuadrant = (pRect.getTop() < horizontalMidpoint && pRect.getBottom() < horizontalMidpoint);
-			let bottomQuadrant = (pRect.getTop() > horizontalMidpoint);
+			let topQuadrant = (rectangle.getTop() < horizontalMidpoint && rectangle.getBottom() < horizontalMidpoint);
+			let bottomQuadrant = (rectangle.getTop() > horizontalMidpoint);
 
-			if (pRect.getLeft() < verticalMidpoint && pRect.getRight() < verticalMidpoint) {
+			if (rectangle.getLeft() < verticalMidpoint && rectangle.getRight() < verticalMidpoint) {
 				if (topQuadrant) {
 					index = 1;
 				}
@@ -372,7 +378,7 @@
 				}
 			}
 
-			else if (pRect.getLeft() > verticalMidpoint) {
+			else if (rectangle.getLeft() > verticalMidpoint) {
 				if (topQuadrant) {
 					index = 0;
 				}
@@ -384,18 +390,18 @@
 			return index;
 		}
 
-		insert = (pRect) => {
+		insert = (rectangle) => {
 			if (this.nodes[0] != null) {
-				let index = this.getIndex(pRect);
+				let index = this.getIndex(rectangle);
 
 				if (index != -1) {
-					this.nodes[index].insert(pRect);
+					this.nodes[index].insert(rectangle);
 
 					return;
 				}
 			}
 
-			this.lines.push(pRect);
+			this.lines.push(rectangle);
 
 			if (this.lines.length > this.MAX_OBJECTS && this.level < this.MAX_LEVELS) {
 				if (this.nodes[0] == null) {
@@ -417,10 +423,10 @@
 			}
 		}
 
-		retrieve = (returnObjects, pRect) => {
-			let index = this.getIndex(pRect);
+		retrieve = (returnObjects, rectangle) => {
+			let index = this.getIndex(rectangle);
 			if (index != -1 && this.nodes[0] != null) {
-				this.nodes[index].retrieve(returnObjects, pRect);
+				this.nodes[index].retrieve(returnObjects, rectangle);
 			}
 
 			returnObjects.push(...this.lines);
@@ -432,15 +438,15 @@
 			return new Quadtree(0, new Rectangle(0, 0, width, height));
 		}
 
-		static drawQuadtree = (ctx, quad) => {
-			if (quad != null) {
-				if (quad.bounds != null) {
+		drawQuadtree = (ctx) => {
+			if (this.quad != null) {
+				if (this.quad.bounds != null) {
 					ctx.strokeStyle = "#333";
 					ctx.lineWidth = 1;
-					ctx.strokeRect(quad.bounds.x, quad.bounds.y, quad.bounds.width, quad.bounds.height);
+					ctx.strokeRect(this.quad.bounds.x, this.quad.bounds.y, this.quad.bounds.width, this.quad.bounds.height);
 				}
-				if (quad.nodes != null) {
-					quad.nodes.forEach(function (node) {
+				if (this.quad.nodes != null) {
+					this.quad.nodes.forEach(function (node) {
 						drawQuadtree(ctx, node);
 					});
 				}
@@ -509,10 +515,10 @@
 	}
 
 	let init = () => {
-		metroNetwork = new MetroNetwork()
 		width = window.innerWidth;
-		height = window.innerHeight;		
-		metroNetwork.randomize();
+		height = window.innerHeight;
+		metroNetwork = new MetroNetwork()		
+		randomize();
 		addEvents();
 	}
 
@@ -522,6 +528,10 @@
 		canvas.addEventListener('click', e => {
 			metroNetwork.addMetroLine(e.offsetX, e.offsetY);
 		}, false);
+	}
+	
+	let randomize = () => {
+		ALPHABETIC_SYMBOL = Utils.getRandomBool();
 	}
 	
 	let drawFrame = (ctx, canvas) => {
@@ -540,13 +550,7 @@
 		if (canvas.getContext) {
 			let ctx = canvas.getContext('2d')
 			drawFrame(ctx, canvas);
-			if (metroNetwork.lines.length > 0) {
-				if (DRAW_QUADTREE) 
-					Quadtree.drawQuadtree(ctx, metroNetwork.quad);
-				metroNetwork.drawLines(ctx);
-				metroNetwork.drawLinesInfo(ctx);
-				metroNetwork.populateQuadTree();			
-			}
+			metroNetwork.draw(ctx);
 		}
 	}
 
