@@ -317,6 +317,15 @@
 		canvas.addEventListener('mousemove', e => {
 			trackMouse(e.offsetX, e.offsetY);
 		}, false);
+        
+		canvas.addEventListener('touchstart', function(e){
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		});
+
+		canvas.addEventListener('touchmove', function(e){
+			e.preventDefault();
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		});	
     }
 
     let trackMouse = (x, y) => {		
