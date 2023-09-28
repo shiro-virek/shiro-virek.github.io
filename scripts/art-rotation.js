@@ -6,6 +6,9 @@
     let height = 0;    
 
 	let lastRender = 0;
+    
+	let lastPosY = null;
+	let lastPosX = null;
 
     let canvas;
     let ctx;
@@ -13,7 +16,7 @@
     class ThreeDWorld {
         constructor(){
             this.figures = [];
-            this.FOV = 1000; 
+            this.FOV = 3000; 
             this.drawEdges = true;
         }
 
@@ -103,7 +106,7 @@
         }
         
         rotateZ = (angle) => {
-            angle = sexagesimalToRadian(angle);
+            angle = ThreeDWorld.sexagesimalToRadian(angle);
     
             for (var i = this.vertices.length - 1; i >= 0; i--) {
                 var x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle)); 
@@ -113,7 +116,7 @@
         }
     
         rotateY = (angle) => {
-            angle = sexagesimalToRadian(angle);
+            angle = ThreeDWorld.sexagesimalToRadian(angle);
     
             for (var i = this.vertices.length - 1; i >= 0; i--) {
                 var x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle); 
@@ -123,7 +126,7 @@
         }
     
         rotateX = (angle) => {
-            angle = sexagesimalToRadian(angle);
+            angle = ThreeDWorld.sexagesimalToRadian(angle);
     
             for (var i = this.vertices.length - 1; i >= 0; i--) {
                 var y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle)); 
@@ -224,7 +227,6 @@
                 this.drawVertex(this.vertices[i]);
             }
         }
-
     }
     
 	class Utils {
@@ -311,6 +313,26 @@
         canvas.addEventListener('click', e => {
             world.addCube(e.offsetX, e.offsetY);            
         }, false);
+
+		canvas.addEventListener('mousemove', e => {
+			trackMouse(e.offsetX, e.offsetY);
+		}, false);
+    }
+
+    let trackMouse = (x, y) => {		
+        if (lastPosX == 0) lastPosX = x;
+		if (lastPosY == 0) lastPosY = y;
+
+        let movX = lastPosX - x;
+        let movY = lastPosY - y;
+
+        world.figures.forEach(figure => {
+            figure.rotateX(movX);
+            figure.rotateY(movY);
+        });
+        
+		lastPosX = x;
+		lastPosY = y;
     }
 
     let randomize = () => {	
@@ -329,7 +351,7 @@
 
     let draw = () => {	
         drawBackground(ctx, canvas);
-        world.draw();
+        world.draw();        				 	
     }
 
     let loop = (timestamp) => {
