@@ -13,7 +13,15 @@
     class ThreeDWorld {
         constructor(){
             this.figures = [];
-            this.FOV = 500; 
+            this.FOV = 1000; 
+            this.drawEdges = true;
+        }
+
+        draw = () => {
+            if (this.drawEdges) 
+                world.drawFigures();
+            else
+                world.drawFiguresVertices();
         }
 
         worldToScreen = (p) => { 
@@ -40,6 +48,12 @@
                 world.figures[i].drawFigure(ctx);
             }
         }
+        
+        drawFiguresVertices = () => {    
+            for (let i = world.figures.length - 1; i >= 0; i--) {
+                world.figures[i].drawVertices(ctx);
+            } 
+        }         
     
         addCube(x, y){
             let cube = new Figure();
@@ -192,11 +206,25 @@
             Utils.drawLine(ctx, point2d0.x, point2d0.y, point2d1.x, point2d1.y, color);
         }
 
+        
+        drawVertex = (point, color) => { 
+            let vertex = world.worldToScreen(point);
+    
+            Utils.drawDot(ctx, vertex.x, vertex.y, color);
+        }
+
         drawFigure = () => {     
             for (let i = this.edges.length - 1; i >= 0; i--) {
                 this.drawEdge(this.vertices[this.edges[i][0]], this.vertices[this.edges[i][1]], this.edges[i][2]);
             }
-        }         
+        }     
+        
+        drawVertices = () => {
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
+                this.drawVertex(this.vertices[i]);
+            }
+        }
+
     }
     
 	class Utils {
@@ -257,6 +285,13 @@
             ctx.strokeStyle = color;
             ctx.stroke();
         }
+
+        static drawDot = (ctx, x, y, color = '#FFF') => {
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.rect(x, y, 1, 1);
+			ctx.fill();
+		}
 	}
 
     let init = () => {
@@ -279,6 +314,7 @@
     }
 
     let randomize = () => {	
+        world.drawEdges = Utils.getRandomBool();
     }
         
     let drawBackground = (ctx, canvas) => {
@@ -293,7 +329,7 @@
 
     let draw = () => {	
         drawBackground(ctx, canvas);
-        world.drawFigures();
+        world.draw();
     }
 
     let loop = (timestamp) => {
