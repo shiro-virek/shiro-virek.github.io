@@ -6,7 +6,7 @@ By default, a random scene is triggered 🎲
 
 To select a particular scene, pass the scene name into the "art" parameter.
 
-Example: index.html?art=city
+Example: index.html/?art=city
 
 Scenes currently available:
 
@@ -18,4 +18,4 @@ Scenes currently available:
 - rotators
 - tentacle
 
-You can see it in action at https://eapelroso.com 🙃
+You can see them in action at https://eapelroso.com 🙃
