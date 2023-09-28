@@ -1,8 +1,8 @@
 # eapelroso-lab
 
-Here I put most of my creative coding experiments.
+Here I put most of my creative coding experiments 🧪⚗️
 
-By default, a random scene is triggered 🎲 
+By default, a random scene is selected 🎲 
 
 To select a particular scene, pass the scene name into the "art" parameter.
 
