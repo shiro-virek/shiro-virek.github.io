@@ -15,6 +15,7 @@ Scenes currently available:
 - confetti
 - fire
 - metro
+- rotation
 - rotators
 - tentacle
 
