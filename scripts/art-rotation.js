@@ -218,7 +218,7 @@
 
         drawFigure = () => {     
             for (let i = this.edges.length - 1; i >= 0; i--) {
-                this.drawEdge(this.vertices[this.edges[i][0]], this.vertices[this.edges[i][1]], this.edges[i][2]);
+                this.drawEdge(this.vertices[this.edges[i][0]], this.vertices[this.edges[i][1]]);
             }
         }     
         
@@ -318,8 +318,8 @@
 			trackMouse(e.offsetX, e.offsetY);
 		}, false);
         
-		canvas.addEventListener('touchstart', function(e){
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		canvas.addEventListener('touchstart', function(e){            
+            world.addCube(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function(e){
