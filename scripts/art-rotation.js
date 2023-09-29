@@ -27,13 +27,15 @@
                 world.drawFiguresVertices();
         }
 
-        worldToScreen = (p) => { 
-            let scale = this.FOV / (this.FOV + p[2]);
-    
+        worldToScreen = (point) => { 
+            const scaleFactor = this.FOV / (this.FOV + point[2]);
+            const projectedX = point[0] * scaleFactor;
+            const projectedY = point[1] * scaleFactor;
             let p1 = {
-                'x': p[0] * scale + width/2,
-                'y': p[1] * scale + height/2
+                'x': projectedX,
+                'y': projectedY
             };
+
             return p1;
         }
     
@@ -336,8 +338,8 @@
         let movY = lastPosY - y;
 
         world.figures.forEach(figure => {
-            figure.rotateX(movX);
-            figure.rotateY(movY);
+            figure.rotateX(movY);
+            figure.rotateY(movX);
         });
         
 		lastPosX = x;
