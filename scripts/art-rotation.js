@@ -16,7 +16,7 @@
     class ThreeDWorld {
         constructor(){
             this.figures = [];
-            this.FOV = 3000; 
+            this.FOV = 2000; 
             this.drawEdges = true;
         }
 
@@ -38,7 +38,41 @@
 
             return p1;
         }
-    
+
+        worldToScreenOblique = (point, angleX, angleY) => {
+            const radianX = (angleX * Math.PI) / 180;
+            const radianY = (angleY * Math.PI) / 180;
+
+            const projectedX = point[0] + point[2] * Math.tan(radianY);
+            const projectedY = point[1] + point[2] * Math.tan(radianX);
+
+            let p1 = {
+                'x': projectedX,
+                'y': projectedY
+            };
+
+            return p1;
+        }    
+
+        worldToScreenIsometric = (point) => {
+            const isoMatrix = [
+                Math.sqrt(3) / 2, -1 / 2, 0,
+                Math.sqrt(3) / 2, 1 / 2, 0,
+                0, 0, 1
+            ];
+        
+            const projectedX = isoMatrix[0] * point[0] + isoMatrix[1] * point[1] + isoMatrix[2] * point[2];
+            const projectedY = isoMatrix[3] * point[0] + isoMatrix[4] * point[1] + isoMatrix[5] * point[2];
+            const projectedZ = isoMatrix[6] * point[0] + isoMatrix[7] * point[1] + isoMatrix[8] * point[2];
+            
+            let p1 = {
+                'x': projectedX,
+                'y': projectedY
+            };
+
+            return p1;
+        }
+
         static sexagesimalToRadian = (degrees) => {
             return degrees * (Math.PI / 180);
         }
@@ -110,8 +144,8 @@
         rotateZ = (angle) => {
             angle = ThreeDWorld.sexagesimalToRadian(angle);
     
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
-                var x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle)); 
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
+                let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle)); 
                 this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); //Y
                 this.vertices[i][0] = x;
             }
@@ -120,8 +154,8 @@
         rotateY = (angle) => {
             angle = ThreeDWorld.sexagesimalToRadian(angle);
     
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
-                var x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle); 
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
+                let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle); 
                 this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); //Z
                 this.vertices[i][0] = x; 
             }
@@ -130,34 +164,34 @@
         rotateX = (angle) => {
             angle = ThreeDWorld.sexagesimalToRadian(angle);
     
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
-                var y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle)); 
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
+                let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle)); 
                 this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); //Z
                 this.vertices[i][1] = y; 
             }
         }
     
         translateX = (distance) => {               
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
                 this.vertices[i][0] += distance; 
             }
         }
     
         translateY = (distance) => {               
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
                 this.vertices[i][1] += distance; 
             }
         }
         
         translateZ = (distance) => {               
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
                 this.vertices[i][2] += distance; 
             }    
         }
 
         
         scale = (factor) => {               
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
                 this.vertices[i][0] *= factor; 
                 this.vertices[i][1] *= factor; 
                 this.vertices[i][2] *= factor; 
@@ -166,7 +200,7 @@
         }                
         
         scaleX = (factor) => {               
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
+            for (let i = this.vertices.length - 1; i >= 0; i--) {
                 this.vertices[i][0] *= factor; 
             }    
         }          
@@ -210,12 +244,13 @@
     
             Utils.drawLine(ctx, point2d0.x, point2d0.y, point2d1.x, point2d1.y, color);
         }
-
         
         drawVertex = (point, color) => { 
             let vertex = world.worldToScreen(point);
+
+            let newColor = `hsl(${Utils.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;           
     
-            Utils.drawDot(ctx, vertex.x, vertex.y, color);
+            Utils.drawDot(ctx, vertex.x, vertex.y, newColor);
         }
 
         drawFigure = () => {     
@@ -232,6 +267,10 @@
     }
     
 	class Utils {
+        static scale = (number, inMin, inMax, outMin, outMax) => {
+            return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        }
+    
 
 		static shuffleArray = (array) => {
 			for (let i = array.length - 1; i > 0; i--) {
@@ -292,9 +331,9 @@
 
         static drawDot = (ctx, x, y, color = '#FFF') => {
 			ctx.fillStyle = color;
-			ctx.beginPath();
-			ctx.rect(x, y, 1, 1);
-			ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, 2 * Math.PI, false);
+            ctx.fill();
 		}
 	}
 
