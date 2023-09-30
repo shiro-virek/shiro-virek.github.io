@@ -14,7 +14,7 @@
 	let RAD_CONST = 0.0175;
 
 	let OPACITY = 0.5;
-	let THICKNESS = 5;
+	let THICKNESS = 1;
 
  	let ANGLE_ROTATION = 10;
 
@@ -35,7 +35,7 @@
 
 	randomize = () => {
 		OPACITY = getRandomInt(1, 6) / 10;
-		THICKNESS = getRandomInt(1, 30);
+		THICKNESS = getRandomInt(1, 5);
 	 	ANGLE_ROTATION = getRandomInt(0, 20);
 	 	COLOR_MAP_MAX = getRandomInt(1, 5000);
 
@@ -45,8 +45,8 @@
 	 	let rotatorsAngle = 0;
 
 	 	for (let i = 0; i < ROTATORS - 1; i++){
-	 		rotatorsLength += getRandomInt(1, 1000)
-	 		rotatorsAngle += getRandomInt(1, 180)
+	 		rotatorsLength += getRandomInt(300, 1000)
+	 		rotatorsAngle += getRandomInt(0, 180)
 	 		rotatorsLengths.push(rotatorsLength);
 	 		rotatorsAngles.push(rotatorsAngle);
 	 	}
@@ -113,7 +113,7 @@
 
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
 
-		let lineWidth = scale(distance, 1, 100, 0, THICKNESS);			
+		let lineWidth = scale(distance, 1, 400, 1, THICKNESS);			
 		
 		this.drawLine(lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);	
 	
