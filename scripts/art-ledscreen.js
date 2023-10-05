@@ -5,6 +5,10 @@
     let ledRows = 10;
     let ledColumns = 50;
 
+    let ledMargin = 30;
+    let ledPadding = 20;
+    let ledRadio = 10;
+
     let width = 0;
     let height = 0;    
 
@@ -55,7 +59,7 @@
         }       
 
         draw = (ctx) => {
-            if (this.on) Utils.drawCircle(ctx, 30 + this.x * 20 + this.x * 10, 30 + this.y * 20 + this.y * 10, 10, this.color, this.color)    
+            if (this.on) Utils.drawCircle(ctx, ledMargin + this.x * ledPadding + this.x * ledRadio, ledMargin + this.y * ledPadding + this.y * ledRadio, ledRadio, this.color, this.color)    
         }
     }
     
