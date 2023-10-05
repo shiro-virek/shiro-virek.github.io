@@ -22,9 +22,9 @@
 
         draw = () => {
             if (this.drawEdges) 
-                world.drawFigures();
+                this.drawFigures();
             else
-                world.drawFiguresVertices();
+                this.drawFiguresVertices();
         }
 
         worldToScreen = (point) => { 
@@ -83,14 +83,14 @@
         }    
     
         drawFigures = () => {
-            for (let i = world.figures.length - 1; i >= 0; i--) {
-                world.figures[i].drawFigure(ctx);
+            for (let i = this.figures.length - 1; i >= 0; i--) {
+                this.figures[i].drawFigure(ctx);
             }
         }
         
         drawFiguresVertices = () => {    
-            for (let i = world.figures.length - 1; i >= 0; i--) {
-                world.figures[i].drawVertices(ctx);
+            for (let i = this.figures.length - 1; i >= 0; i--) {
+                this.figures[i].drawVertices(ctx);
             } 
         }         
     
