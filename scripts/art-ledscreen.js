@@ -91,6 +91,14 @@
         static getYPosition2 = (dist, x, y, angle) => {
             return y + Math.sin((angle + 180) * RAD_CONST) * 50;
         }
+        
+        static getXPosition3 = (dist, x, y, angle) => {
+            return x;
+        }
+
+        static getYPosition3 = (dist, x, y, angle) => {
+            return y;
+        }
     }
     
     class Led {
@@ -122,11 +130,11 @@
             let dist = Math.sqrt(Math.pow(xLed - xMouse, 2) + Math.pow(yLed - yMouse, 2));
             let angle = Utils.angleBetweenTwoPoints(xLed, yLed, xMouse, yMouse);
          
-            this.radio = radioFunctions[1](dist);
-            this.color = colorFunctions[1](dist); 
+            this.radio = ledScreen.radioFunction(dist);
+            this.color = ledScreen.colorFunction(dist); 
    
-            this.x = xPositionFunctions[1](dist, xLed, yLed, angle);                   
-            this.y = yPositionFunctions[1](dist, xLed, yLed, angle);
+            this.x = ledScreen.xPositionFunction(dist, xLed, yLed, angle);                   
+            this.y = ledScreen.yPositionFunction(dist, xLed, yLed, angle);
         }
     }
     
@@ -140,6 +148,10 @@
             angle *= 180 / Math.PI; 
             if (angle < 0) angle = 360 + angle;
             return angle;
+        }
+
+        static getRandomFromArray = (array) => {
+            return array[(Math.floor(Math.random() * array.length))];
         }
 
 		static shuffleArray = (array) => {
@@ -233,11 +245,13 @@
         ];        
         xPositionFunctions = [
             ModifierFunctions.getXPosition1,
-            ModifierFunctions.getXPosition2
+            ModifierFunctions.getXPosition2,
+            ModifierFunctions.getXPosition3
         ];  
         yPositionFunctions = [            
             ModifierFunctions.getYPosition1,
-            ModifierFunctions.getYPosition2
+            ModifierFunctions.getYPosition2,            
+            ModifierFunctions.getYPosition3
         ];
     }
 
@@ -271,8 +285,7 @@
             for (let y = 0; y < ledRows; y++) {                
                 ledScreen.leds[x][y].update(xMouse, yMouse);                
             }                         
-        }
-        
+        }        
 
 		lastPosX = xMouse;
 		lastPosY = yMouse;
@@ -282,6 +295,10 @@
         hue = Utils.getRandomInt(0, 360);
         ledRows = height / (ledRadio * 2 + ledPadding);
         ledColumns = width / (ledRadio * 2 + ledPadding);
+        ledScreen.radioFunction = Utils.getRandomFromArray(radioFunctions);
+        ledScreen.colorFunction = Utils.getRandomFromArray(colorFunctions);
+        ledScreen.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);
+        ledScreen.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);
     }
         
     let drawBackground = (ctx, canvas) => {
