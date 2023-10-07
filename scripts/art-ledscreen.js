@@ -2,7 +2,7 @@
     let CANVAS_ID = "myCanvas"
     let RAD_CONST = 0.0175;
     
-    let ledRows = 10;
+    let ledRows = 50;
     let ledColumns = 50;
 
     let ledMargin = 30;
@@ -13,6 +13,8 @@
     let height = 0;    
 
 	let lastRender = 0;
+
+    let hue = 150;
     
 	let lastPosY = null;
 	let lastPosX = null;
@@ -20,7 +22,13 @@
     let canvas;
     let ctx;
 
-    let ledSreen;
+    let ledScreen;
+
+    let radioFunctions = [];
+    let colorFunctions = [];
+    let xPositionFunctions = [];
+    let yPositionFunctions = [];
+
 
     class LedScreen {
         constructor(){
@@ -49,17 +57,76 @@
             }
         }
     }
+
+    class ModifierFunctions {
+        static getRadio1 = (dist) => {
+            return Utils.scale(dist, 0, 500, 5, 15);
+        }
+
+        static getRadio2 = (dist) => {
+            let decrement = Utils.scale(dist, 0, 500, 5, 15);
+            return decrement < 20 ? 20 - decrement : 1;
+        }
+
+        static getColor1 = (dist) => {   
+            return `hsl(${hue}, ${Utils.scale(dist, 0, 500, 0, 100)}%, 50%)`;       
+        }
+
+        static getColor2 = (dist) => {   
+            return `hsl(${hue}, 100%, ${Utils.scale(dist, 0, 500, 0, 100)}%)`;       
+        }
+
+        static getXPosition1 = (dist, x, y, angle) => {
+            return x - Utils.scale(dist, 0, 500, -50, 50); 
+        }
+        
+        static getXPosition2 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + 180) * RAD_CONST) * 50;
+        }
+        
+        static getYPosition1 = (dist, x, y, angle) => {
+            return y - Utils.scale(dist, 0, 500, -50, 50);
+        }
+        
+        static getYPosition2 = (dist, x, y, angle) => {
+            return y + Math.sin((angle + 180) * RAD_CONST) * 50;
+        }
+    }
     
     class Led {
-        constructor(x, y){
-            this.x = x;
-            this.y = y;
+        constructor(column, row){
+            this.radio = ledRadio;
+            this.row = row;
+            this.column = column;
+            this.x = ledMargin + column * ledPadding + column * this.radio;
+            this.y = ledMargin + row * ledPadding + row * this.radio;
             this.on = true;
-            this.color = "#ff8000";
+            this.color = `hsl(${hue}, 100%, 50%)`;
         }       
 
         draw = (ctx) => {
-            if (this.on) Utils.drawCircle(ctx, ledMargin + this.x * ledPadding + this.x * ledRadio, ledMargin + this.y * ledPadding + this.y * ledRadio, ledRadio, this.color, this.color)    
+            if (this.on) 
+                Utils.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color)    
+        }
+        
+        update = (xMouse, yMouse) => {
+            if (xMouse >= this.x - this.radio && xMouse <= this.x + this.radio && yMouse >= this.y - this.radio && yMouse <= this.y + this.radio) {
+                this.color = "#ffff00";
+            }else{
+                this.color = "#ff8000";
+            }
+
+            let xLed = ledMargin + this.column * ledPadding + this.column * ledRadio
+            let yLed = ledMargin + this.row * ledPadding + this.row * ledRadio;
+                        
+            let dist = Math.sqrt(Math.pow(xLed - xMouse, 2) + Math.pow(yLed - yMouse, 2));
+            let angle = Utils.angleBetweenTwoPoints(xLed, yLed, xMouse, yMouse);
+         
+            this.radio = radioFunctions[1](dist);
+            this.color = colorFunctions[1](dist); 
+   
+            this.x = xPositionFunctions[1](dist, xLed, yLed, angle);                   
+            this.y = yPositionFunctions[1](dist, xLed, yLed, angle);
         }
     }
     
@@ -68,6 +135,12 @@
             return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
     
+        static angleBetweenTwoPoints(x1, y1, x2, y2) {
+            var angle = Math.atan2(y2 - y1, x2 - x1); 
+            angle *= 180 / Math.PI; 
+            if (angle < 0) angle = 360 + angle;
+            return angle;
+        }
 
 		static shuffleArray = (array) => {
 			for (let i = array.length - 1; i > 0; i--) {
@@ -143,8 +216,29 @@
 			ctx = canvas.getContext('2d');
 
         ledScreen = new LedScreen();
-        randomize();
+        addModifierFunctions();
+        randomize();        
         addEvents();
+    }
+
+    let addModifierFunctions = () => {
+        radioFunctions = [
+            ModifierFunctions.getRadio1,
+            ModifierFunctions.getRadio2
+        ];    
+
+        colorFunctions = [
+            ModifierFunctions.getColor1,
+            ModifierFunctions.getColor2
+        ];        
+        xPositionFunctions = [
+            ModifierFunctions.getXPosition1,
+            ModifierFunctions.getXPosition2
+        ];  
+        yPositionFunctions = [            
+            ModifierFunctions.getYPosition1,
+            ModifierFunctions.getYPosition2
+        ];
     }
 
     let addEvents = () => {
@@ -166,25 +260,28 @@
 		});	
     }
 
-    let trackMouse = (x, y) => {		
-        if (lastPosX == 0) lastPosX = x;
-		if (lastPosY == 0) lastPosY = y;
+    let trackMouse = (xMouse, yMouse) => {		
+        if (lastPosX == 0) lastPosX = xMouse;
+		if (lastPosY == 0) lastPosY = yMouse;
 
-        let movX = lastPosX - x;
-        let movY = lastPosY - y;
+        let movX = lastPosX - xMouse;
+        let movY = lastPosY - yMouse;
 
-        /*
-        world.figures.forEach(figure => {
-            figure.rotateX(movY);
-            figure.rotateY(movX);
-        });
-        */
+        for (let x = 0; x < ledColumns; x++) {
+            for (let y = 0; y < ledRows; y++) {                
+                ledScreen.leds[x][y].update(xMouse, yMouse);                
+            }                         
+        }
         
-		lastPosX = x;
-		lastPosY = y;
+
+		lastPosX = xMouse;
+		lastPosY = yMouse;
     }
 
     let randomize = () => {	
+        hue = Utils.getRandomInt(0, 360);
+        ledRows = height / (ledRadio * 2 + ledPadding);
+        ledColumns = width / (ledRadio * 2 + ledPadding);
     }
         
     let drawBackground = (ctx, canvas) => {
