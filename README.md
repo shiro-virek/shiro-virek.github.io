@@ -18,5 +18,6 @@ Scenes currently available:
 - rotation
 - rotators
 - tentacle
+- semitone
 
 You can see them in action at https://eapelroso.com 🙃
