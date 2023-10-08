@@ -77,7 +77,7 @@
 				let artItemIndex = art.indexOf(artItem);
 				if (artItemIndex >= 0){						
 					let randomButton = document.getElementById("randomButton");
-					randomButton.style.display = "none";
+					randomButton.innerHTML = '🔄';
 					currentScript = artItemIndex;
 				} else {					
 					randomScriptIndex();
