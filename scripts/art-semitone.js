@@ -79,12 +79,12 @@
             return x - Utils.scale(dist, 0, 500, -50, 50);
         }
 
-        static getXPosition2 = (dist, x, y, angle) => {
-            return x + Math.cos((angle + 180) * RAD_CONST) * 50;
-        }
-
         static getYPosition1 = (dist, x, y, angle) => {
             return y - Utils.scale(dist, 0, 500, -50, 50);
+        }
+
+        static getXPosition2 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + 180) * RAD_CONST) * 50;
         }
 
         static getYPosition2 = (dist, x, y, angle) => {
@@ -97,6 +97,54 @@
 
         static getYPosition3 = (dist, x, y, angle) => {
             return y;
+        }
+        
+        static getXPosition4 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + 90) * RAD_CONST) * 100;
+        }
+
+        static getYPosition4 = (dist, x, y, angle) => {
+            return y + Math.sin((angle + 90) * RAD_CONST) * 100;
+        }
+
+        static getXPosition5 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + dist) * RAD_CONST) * 100;
+        }
+
+        static getYPosition5 = (dist, x, y, angle) => {
+            return y + Math.sin((angle + dist) * RAD_CONST) * 100;
+        }
+            
+        static getXPosition6 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + dist) * RAD_CONST) * dist;
+        }
+
+        static getYPosition6 = (dist, x, y, angle) => {
+            return y + Math.sin((angle + dist) * RAD_CONST) * dist;
+        }
+                    
+        static getXPosition7 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + dist) * RAD_CONST) * (angle + dist);
+        }
+
+        static getYPosition7 = (dist, x, y, angle) => {
+            return y + Math.sin((angle + dist) * RAD_CONST) * (angle + dist);
+        }
+                            
+        static getXPosition8 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + dist) * RAD_CONST) * (y);
+        }
+
+        static getYPosition8 = (dist, x, y, angle) => {
+            return y + Math.sin((angle + dist) * RAD_CONST) * (x);
+        }
+                                    
+        static getXPosition9 = (dist, x, y, angle) => {
+            return x + Math.cos((angle) * RAD_CONST) * (y);
+        }
+
+        static getYPosition9 = (dist, x, y, angle) => {
+            return y + Math.sin((angle) * RAD_CONST) * (x);
         }
     }
 
@@ -243,12 +291,24 @@
         xPositionFunctions = [
             ModifierFunctions.getXPosition1,
             ModifierFunctions.getXPosition2,
-            ModifierFunctions.getXPosition3
+            ModifierFunctions.getXPosition3,
+            ModifierFunctions.getXPosition4,
+            ModifierFunctions.getXPosition5,
+            ModifierFunctions.getXPosition6,
+            ModifierFunctions.getXPosition7,
+            ModifierFunctions.getXPosition8,            
+            ModifierFunctions.getXPosition9,
         ];
         yPositionFunctions = [
             ModifierFunctions.getYPosition1,
             ModifierFunctions.getYPosition2,
-            ModifierFunctions.getYPosition3
+            ModifierFunctions.getYPosition3,
+            ModifierFunctions.getYPosition4,
+            ModifierFunctions.getYPosition5,
+            ModifierFunctions.getYPosition6,
+            ModifierFunctions.getYPosition7,
+            ModifierFunctions.getYPosition8,
+            ModifierFunctions.getYPosition9,
         ];
     }
 
@@ -284,7 +344,7 @@
         hue = Utils.getRandomInt(0, 360);
         semitone.radioFunction = Utils.getRandomFromArray(radioFunctions);
         semitone.colorFunction = Utils.getRandomFromArray(colorFunctions);
-        semitone.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);
+        semitone.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);  
         semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);
     }
 
