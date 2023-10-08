@@ -2,12 +2,12 @@
     let CANVAS_ID = "myCanvas"
     let RAD_CONST = 0.0175;
 
-    let ledRows = 50;
-    let ledColumns = 50;
+    let dotsRows = 50;
+    let dotsColumns = 50;
 
-    let ledMargin = 30;
-    let ledPadding = 20;
-    let ledRadio = 10;
+    let dotMargin = 30;
+    let dotPadding = 20;
+    let dotRadio = 10;
 
     let width = 0;
     let height = 0;
@@ -22,36 +22,36 @@
     let canvas;
     let ctx;
 
-    let ledScreen;
+    let semitone;
 
     let radioFunctions = [];
     let colorFunctions = [];
     let xPositionFunctions = [];
     let yPositionFunctions = [];
 
-    class LedScreen {
+    class Semitone {
         constructor() {
-            this.leds = [];
-            this.generateLeds();
+            this.dots = [];
+            this.generateDots();
         }
 
-        generateLeds = () => {
-            for (let x = 0; x < ledColumns; x++) {
-                this.leds[x] = new Array(ledRows);
+        generateDots = () => {
+            for (let x = 0; x < dotsColumns; x++) {
+                this.dots[x] = new Array(dotsRows);
             }
 
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    let led = new Led(x, y);
-                    this.leds[x][y] = led;
+            for (let x = 0; x < dotsColumns; x++) {
+                for (let y = 0; y < dotsRows; y++) {
+                    let dot = new Dot(x, y);
+                    this.dots[x][y] = dot;
                 }
             }
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    this.leds[x][y].draw(ctx);
+            for (let x = 0; x < dotsColumns; x++) {
+                for (let y = 0; y < dotsRows; y++) {
+                    this.dots[x][y].draw(ctx);
                 }
             }
         }
@@ -100,13 +100,13 @@
         }
     }
 
-    class Led {
+    class Dot {
         constructor(column, row) {
-            this.radio = ledRadio;
+            this.radio = dotRadio;
             this.row = row;
             this.column = column;
-            this.x = ledMargin + column * ledPadding + column * this.radio;
-            this.y = ledMargin + row * ledPadding + row * this.radio;
+            this.x = dotMargin + column * dotPadding + column * this.radio;
+            this.y = dotMargin + row * dotPadding + row * this.radio;
             this.on = true;
             this.color = `hsl(${0}, 0%, 50%)`;
         }
@@ -117,17 +117,17 @@
         }
 
         update = (xMouse, yMouse) => {
-            let xLed = ledMargin + this.column * ledPadding + this.column * ledRadio
-            let yLed = ledMargin + this.row * ledPadding + this.row * ledRadio;
+            let xDot = dotMargin + this.column * dotPadding + this.column * dotRadio
+            let yDot = dotMargin + this.row * dotPadding + this.row * dotRadio;
 
-            let dist = Math.sqrt(Math.pow(xLed - xMouse, 2) + Math.pow(yLed - yMouse, 2));
-            let angle = Utils.angleBetweenTwoPoints(xLed, yLed, xMouse, yMouse);
+            let dist = Math.sqrt(Math.pow(xDot - xMouse, 2) + Math.pow(yDot - yMouse, 2));
+            let angle = Utils.angleBetweenTwoPoints(xDot, yDot, xMouse, yMouse);
 
-            this.radio = ledScreen.radioFunction(dist);
-            this.color = ledScreen.colorFunction(dist);
+            this.radio = semitone.radioFunction(dist);
+            this.color = semitone.colorFunction(dist);
 
-            this.x = ledScreen.xPositionFunction(dist, xLed, yLed, angle);
-            this.y = ledScreen.yPositionFunction(dist, xLed, yLed, angle);
+            this.x = semitone.xPositionFunction(dist, xDot, yDot, angle);
+            this.y = semitone.yPositionFunction(dist, xDot, yDot, angle);
         }
     }
 
@@ -220,9 +220,9 @@
         if (canvas.getContext)
             ctx = canvas.getContext('2d');
 
-        ledRows = Math.floor(height / (ledRadio + ledPadding));
-        ledColumns = Math.floor(width / (ledRadio + ledPadding));
-        ledScreen = new LedScreen();
+        dotsRows = Math.floor(height / (dotRadio + dotPadding));
+        dotsColumns = Math.floor(width / (dotRadio + dotPadding));
+        semitone = new Semitone();
         addModifierFunctions();
         randomize();
         addEvents();
@@ -270,9 +270,9 @@
         let movX = lastPosX - xMouse;
         let movY = lastPosY - yMouse;
 
-        for (let x = 0; x < ledColumns; x++) {
-            for (let y = 0; y < ledRows; y++) {
-                ledScreen.leds[x][y].update(xMouse, yMouse);
+        for (let x = 0; x < dotsColumns; x++) {
+            for (let y = 0; y < dotsRows; y++) {
+                semitone.dots[x][y].update(xMouse, yMouse);
             }
         }
 
@@ -282,10 +282,10 @@
 
     let randomize = () => {
         hue = Utils.getRandomInt(0, 360);
-        ledScreen.radioFunction = Utils.getRandomFromArray(radioFunctions);
-        ledScreen.colorFunction = Utils.getRandomFromArray(colorFunctions);
-        ledScreen.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);
-        ledScreen.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);
+        semitone.radioFunction = Utils.getRandomFromArray(radioFunctions);
+        semitone.colorFunction = Utils.getRandomFromArray(colorFunctions);
+        semitone.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);
+        semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);
     }
 
     let drawBackground = (ctx, canvas) => {
@@ -300,7 +300,7 @@
 
     let draw = () => {
         drawBackground(ctx, canvas);
-        ledScreen.draw(ctx);
+        semitone.draw(ctx);
     }
 
     let loop = (timestamp) => {
