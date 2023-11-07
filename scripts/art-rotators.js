@@ -25,6 +25,14 @@
 		return Math.random() < 0.5;
 	}
 
+	getRandomFloat = (min, max, decimals) => {
+		const str = (Math.random() * (max - min) + min).toFixed(
+			decimals,
+		);
+
+		return parseFloat(str);
+	}
+
 	getRandomInt = (min, max) => {
 		return Math.floor(Math.random() * max) + min;
 	}
@@ -34,19 +42,19 @@
 	}
 
 	randomize = () => {
-		OPACITY = getRandomInt(1, 6) / 10;
-		THICKNESS = getRandomInt(1, 5);
+		OPACITY = getRandomFloat(0.03, 0.1, 2);
+		THICKNESS = getRandomInt(1, 20);
 	 	ANGLE_ROTATION = getRandomInt(0, 20);
-	 	COLOR_MAP_MAX = getRandomInt(1, 5000);
+	 	COLOR_MAP_MAX = getRandomInt(1, 10000);
 
-	 	ROTATORS = getRandomInt(0, 7);
+	 	ROTATORS = getRandomInt(0, 100);
 
 	 	let rotatorsLength = 0
 	 	let rotatorsAngle = 0;
 
 	 	for (let i = 0; i < ROTATORS - 1; i++){
 	 		rotatorsLength += getRandomInt(300, 1000)
-	 		rotatorsAngle += getRandomInt(0, 180)
+	 		rotatorsAngle += getRandomInt(0, 180);
 	 		rotatorsLengths.push(rotatorsLength);
 	 		rotatorsAngles.push(rotatorsAngle);
 	 	}
