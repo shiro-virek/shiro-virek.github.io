@@ -8,8 +8,8 @@
     let ledColumns = 50;
 
     let ledMargin = 30;
-    let ledPadding = 20;
-    let ledRadio = 10;
+    let ledPadding = 30;
+    let ledRadio = 20;
 
     let width = 0;
     let height = 0;
