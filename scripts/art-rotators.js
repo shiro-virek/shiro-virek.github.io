@@ -7,6 +7,8 @@
 	let lastPosY = null;
 	let lastPosX = null;
 
+	let colorShift = 0;
+
 	let rotatorsLengths = [];
 	let rotatorsAngles = [];
 
@@ -46,6 +48,8 @@
 		THICKNESS = getRandomInt(1, 20);
 	 	ANGLE_ROTATION = getRandomInt(0, 20);
 	 	COLOR_MAP_MAX = getRandomInt(1, 10000);
+
+		colorShift = getRandomInt(0, 359);
 
 	 	ROTATORS = getRandomInt(0, 100);
 
@@ -118,6 +122,8 @@
 
 		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))		
 		let hue =  scale(distance, 0, 360, 0, COLOR_MAP_MAX);
+
+		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
 
