@@ -9,6 +9,12 @@
 	let CANVAS_ID = "myCanvas"
 	let ENTROPY_1 = 2;
 	let CIRCLES = 5;
+	let colorShift = 0;
+	let colorMapMax = 0;
+	let size = 5;
+	let saturation = 0;
+	let lightness = 0;
+	let opacity = 0.001;
 
 	init = () => {
 		randomize();
@@ -18,6 +24,14 @@
 
 	getRandomInt = (min, max) => {
 		return Math.floor(Math.random() * max) + min;
+	}
+
+	getRandomFloat = (min, max, decimals) => {
+		const str = (Math.random() * (max - min) + min).toFixed(
+			decimals,
+		);
+
+		return parseFloat(str);
 	}
 
 	addEvents = () => {
@@ -37,9 +51,15 @@
 		});
 	}
 
-	randomize = () => {	
-		ENTROPY_1 = getRandomInt(1, 10);
-		CIRCLES = getRandomInt(3, 10);
+	randomize = () => {			
+		saturation = getRandomInt(20, 100);
+		lightness = getRandomInt(20, 100);
+		size = getRandomInt(5, 15);
+		CIRCLES = getRandomInt(5, 15);
+		colorShift = getRandomInt(0, 359);
+		ENTROPY_1 = getRandomInt(5, 500);	
+		colorMapMax = getRandomInt(1, 10000);
+		opacity = getRandomFloat(0.003, 0.03, 3);
 	}
 
 	drawFrame = () => {
@@ -67,15 +87,23 @@
 			ctx.fill();
 		}
 	}
+	
+	scale = (number, inMin, inMax, outMin, outMax) => {
+	    return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+	}
 			
 	paint = (xPointer, yPointer) => {	
 		if (lastPosX == 0) lastPosX = xPointer;
 		if (lastPosY == 0) lastPosY = yPointer;
 
-		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))		
-		let color = `hsl(${parseInt(distance)}, 100%, 50%, 0.01)`;
-		let size = 5;
-		
+		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))	
+	
+		let hue =  scale(parseInt(distance), 0, 360, 0, colorMapMax);
+
+		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
+
+		let color = `hsl(${hue}, ${saturation}%, ${lightness}%, ${opacity})`;
+				
 		let steps = parseInt(distance / size)
 		let xMod = 0;
 		let yMod = 0;
@@ -104,13 +132,14 @@
 				yMod = parseInt((size * i) * Math.sin(angleCart));
 			}	
 
-			let entropy = ((Math.random() * ENTROPY_1) + 9) / 10;
+			let entropyX = Math.random() * ENTROPY_1;
+			let entropyY = Math.random() * ENTROPY_1;
 
-			x = (lastPosX + xMod) * entropy;
-			y = (lastPosY + yMod) * entropy;
+			x = (lastPosX + xMod) + entropyX ;
+			y = (lastPosY + yMod) + entropyY;
 
 			for (let i = 0; i <= CIRCLES; i++){
-				this.drawCircle(x, y, size * i, color, color);
+				this.drawCircle(x, y, size * (CIRCLES / i), color, color);
 			}
 		}
 
@@ -120,7 +149,6 @@
 
 	width = window.innerWidth;
 	height = window.innerHeight;
-	angle = 0;	
 	lastPosY = 0;
 	lastPosX = 0;			
 
