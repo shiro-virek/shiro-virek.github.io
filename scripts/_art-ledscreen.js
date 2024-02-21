@@ -9,7 +9,7 @@
 
     let ledMargin = 30;
     let ledPadding = 30;
-    let ledDiameter = 20;
+    let ledRadio = 20;
 
     let width = 0;
     let height = 0;
@@ -26,104 +26,120 @@
 
     let ledScreen;
 
+    let radioFunctions = [];
+    let colorFunctions = [];
+    let xPositionFunctions = [];
+    let yPositionFunctions = [];
+
     class LedScreen {
         constructor() {
             this.leds = [];
-            this.ledsBuffer = [];            
             this.generateLeds();
         }
 
         generateLeds = () => {
             for (let x = 0; x < ledColumns; x++) {
                 this.leds[x] = new Array(ledRows);
-                this.ledsBuffer[x] = new Array(ledRows);
             }
 
             for (let x = 0; x < ledColumns; x++) {
                 for (let y = 0; y < ledRows; y++) {
                     let led = new Led(x, y);
                     this.leds[x][y] = led;
-                    let ledBuffer = new Led(x, y);
-                    this.ledsBuffer[x][y] = ledBuffer;
                 }
             }
         }
 
+
         setPixel = (x, y) => {            
-            let col = Math.round((x - ledMargin) / ((ledDiameter) + ledPadding));
-            let row = Math.round((y - ledMargin) / ((ledDiameter) + ledPadding));
+            let col = Math.round((x - ledMargin) / ((ledRadio) + ledPadding));
+            let row = Math.round((y - ledMargin) / ((ledRadio) + ledPadding));
             this.leds[col][row].on = true;
-            this.ledsBuffer[col][row].on = true;
         }
 
         draw = (ctx) => {
             for (let x = 0; x < ledColumns; x++) {
                 for (let y = 0; y < ledRows; y++) {
-                    this.ledsBuffer[x][y].draw(ctx);
+                    this.leds[x][y].draw(ctx);
                 }
             }
         }
+    }
 
-        copyBuffer = () => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    this.leds[x][y].on =  this.ledsBuffer[x][y].on;
-                }
-            }    
+    class ModifierFunctions {
+        static getRadio1 = (dist) => {
+            return Utils.scale(dist, 0, 500, 5, 15);
         }
 
-        getLedValueSafe = (x, y) => {
-            if (x < 0 || y < 0 || x >= ledColumns || y >= ledRows)
-                return false
-            else
-                return this.leds[x][y];
+        static getRadio2 = (dist) => {
+            let decrement = Utils.scale(dist, 0, 500, 5, 15);
+            return decrement < 20 ? 20 - decrement : 1;
         }
 
-        calculateLedStatus = (x, y) => {
-            let value = false;
-            let sum = 0;
-
-            if (this.getLedValueSafe(x, y-1).on) sum++;
-            if (this.getLedValueSafe(x, y+1).on) sum++;
-            if (this.getLedValueSafe(x-1, y-1).on) sum++;
-            if (this.getLedValueSafe(x+1, y-1).on) sum++;
-            if (this.getLedValueSafe(x-1, y).on) sum++;
-            if (this.getLedValueSafe(x+1, y).on) sum++;
-            if (this.getLedValueSafe(x-1, y+1).on) sum++;
-            if (this.getLedValueSafe(x+1, y+1).on) sum++;
-
-            if (this.leds[x][y].on && (sum < 2 || sum > 3)) value = false;
-            if (this.leds[x][y].on && sum >= 2 && sum <= 3) value = true;
-            if (!this.leds[x][y].on && sum == 3) value = true;
-
-            return value;
+        static getColor1 = (dist) => {
+            return `hsl(${hue}, ${Utils.scale(dist, 0, 500, 0, 100)}%, 50%)`;
         }
 
-        update = () => {            
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    this.ledsBuffer[x][y].on =  this.calculateLedStatus(x, y);
-                }
-            }                  
+        static getColor2 = (dist) => {
+            return `hsl(${hue}, 100%, ${Utils.scale(dist, 0, 500, 0, 100)}%)`;
+        }
+
+        static getXPosition1 = (dist, x, y, angle) => {
+            return x - Utils.scale(dist, 0, 500, -50, 50);
+        }
+
+        static getXPosition2 = (dist, x, y, angle) => {
+            return x + Math.cos((angle + 180) * RAD_CONST) * 50;
+        }
+
+        static getYPosition1 = (dist, x, y, angle) => {
+            return y - Utils.scale(dist, 0, 500, -50, 50);
+        }
+
+        static getYPosition2 = (dist, x, y, angle) => {
+            return y + Math.sin((angle + 180) * RAD_CONST) * 50;
+        }
+
+        static getXPosition3 = (dist, x, y, angle) => {
+            return x;
+        }
+
+        static getYPosition3 = (dist, x, y, angle) => {
+            return y;
         }
     }
 
     class Led {
         constructor(column, row) {
-            this.diameter = ledDiameter;
+            this.radio = ledRadio;
             this.row = row;
             this.column = column;
-            this.x = ledMargin + column * ledPadding + column * this.diameter;
-            this.y = ledMargin + row * ledPadding + row * this.diameter;
+            this.x = ledMargin + column * ledPadding + column * this.radio;
+            this.y = ledMargin + row * ledPadding + row * this.radio;
             this.on = false;
             this.color = `hsl(${hue}, 100%, 50%)`;
         }
 
         draw = (ctx) => {
             if (this.on)
-                Utils.drawCircle(ctx, this.x, this.y, this.diameter / 2, this.color, this.color)
+                Utils.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color)
             else            
-                Utils.drawCircle(ctx, this.x, this.y, this.diameter / 2, COLOR_OFF, COLOR_OFF)
+                Utils.drawCircle(ctx, this.x, this.y, this.radio, COLOR_OFF, COLOR_OFF)
+
+        }
+
+        update = (xMouse, yMouse) => {
+            let xLed = ledMargin + this.column * ledPadding + this.column * ledRadio
+            let yLed = ledMargin + this.row * ledPadding + this.row * ledRadio;
+
+            let dist = Math.sqrt(Math.pow(xLed - xMouse, 2) + Math.pow(yLed - yMouse, 2));
+            let angle = Utils.angleBetweenTwoPoints(xLed, yLed, xMouse, yMouse);
+
+            this.radio = ledScreen.radioFunction(dist);
+            this.color = ledScreen.colorFunction(dist);
+
+            this.x = ledScreen.xPositionFunction(dist, xLed, yLed, angle);
+            this.y = ledScreen.yPositionFunction(dist, xLed, yLed, angle);
         }
     }
 
@@ -132,13 +148,8 @@
             return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
 
-        static sleep(ms){
-            let waitUntil = new Date().getTime() + ms;
-            while(new Date().getTime() < waitUntil) continue;
-        };
-
         static angleBetweenTwoPoints(x1, y1, x2, y2) {
-            let angle = Math.atan2(y2 - y1, x2 - x1);
+            var angle = Math.atan2(y2 - y1, x2 - x1);
             angle *= 180 / Math.PI;
             if (angle < 0) angle = 360 + angle;
             return angle;
@@ -173,12 +184,16 @@
             return Math.random() < 0.5;
         }
 
-        static drawCircle = (ctx, x, y, radius, color = '#00FF00', fillColor = '#00FF00') => {
+        static nextCharacter = (c) => {
+            return String.fromCharCode(c.charCodeAt(0) + 1);
+        }
+
+        static drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
             ctx.strokeStyle = color;
             ctx.fillStyle = fillColor;
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.arc(x, y, radio, 0, 2 * Math.PI);
             ctx.fill();
             ctx.stroke();
         }
@@ -217,31 +232,77 @@
         if (canvas.getContext)
             ctx = canvas.getContext('2d');
 
-        ledDiameter = Utils.getRandomInt(5, 20);        
-        ledPadding = Utils.getRandomInt(0, 20);
-        ledMargin = ledPadding;
-
-        ledRows = Math.floor((height - ledMargin)/ (ledDiameter + ledPadding));
-        ledColumns = Math.floor((width - ledMargin)/ (ledDiameter + ledPadding));
-        ledScreen = new LedScreen();
-        
-        addEvents();
-
         randomize();
+
+        ledRows = Math.floor(height / (ledRadio + ledPadding));
+        ledColumns = Math.floor(width / (ledRadio + ledPadding));
+        ledScreen = new LedScreen();
+        addModifierFunctions();
+        addEvents();
     }
 
-    let addEvents = () => {        
+    let addModifierFunctions = () => {
+        radioFunctions = [
+            ModifierFunctions.getRadio1,
+            ModifierFunctions.getRadio2
+        ];
+
+        colorFunctions = [
+            ModifierFunctions.getColor1,
+            ModifierFunctions.getColor2
+        ];
+        xPositionFunctions = [
+            ModifierFunctions.getXPosition1,
+            ModifierFunctions.getXPosition2,
+            ModifierFunctions.getXPosition3
+        ];
+        yPositionFunctions = [
+            ModifierFunctions.getYPosition1,
+            ModifierFunctions.getYPosition2,
+            ModifierFunctions.getYPosition3
+        ];
+    }
+
+    let addEvents = () => {
+        /*
+        canvas.addEventListener('mousemove', e => {
+            trackMouse(e.offsetX, e.offsetY);
+        }, false);
+
+        canvas.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+            trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+        });
+        */
+        
 		canvas.addEventListener('click', e => {
 			ledScreen.setPixel(e.offsetX, e.offsetY);
 		}, false);
     }
 
-    let randomize = () => {
+    let trackMouse = (xMouse, yMouse) => {
+        if (lastPosX == 0) lastPosX = xMouse;
+        if (lastPosY == 0) lastPosY = yMouse;
+
+        let movX = lastPosX - xMouse;
+        let movY = lastPosY - yMouse;
+
         for (let x = 0; x < ledColumns; x++) {
             for (let y = 0; y < ledRows; y++) {
-                ledScreen.leds[x][y].on =  Utils.getRandomBool();
+                ledScreen.leds[x][y].update(xMouse, yMouse);
             }
-        }    
+        }
+
+        lastPosX = xMouse;
+        lastPosY = yMouse;
+    }
+
+    let randomize = () => {
+        //hue = Utils.getRandomInt(0, 360);
+        //ledScreen.radioFunction = Utils.getRandomFromArray(radioFunctions);
+        //ledScreen.colorFunction = Utils.getRandomFromArray(colorFunctions);
+        //ledScreen.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);
+        //ledScreen.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);
     }
 
     let drawBackground = (ctx, canvas) => {
@@ -257,17 +318,12 @@
     let draw = () => {
         drawBackground(ctx, canvas);
         ledScreen.draw(ctx);
-        ledScreen.copyBuffer();
     }
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
-        ledScreen.update();
-
         draw();
-
-        Utils.sleep(200);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
