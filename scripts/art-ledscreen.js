@@ -66,6 +66,7 @@
     class Led {
         constructor(column, row) {
             this.diameter = ledDiameter;
+            this.radius = ledDiameter / 2;
             this.row = row;
             this.column = column;
             this.x = ledMargin + column * ledPadding + column * this.diameter;
@@ -76,9 +77,9 @@
 
         draw = (ctx) => {
             if (this.on)
-                Utils.drawCircle(ctx, this.x, this.y, this.diameter / 2, this.color, this.color)
+                Utils.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, this.color, this.color)
             else            
-                Utils.drawCircle(ctx, this.x, this.y, this.diameter / 2, COLOR_OFF, COLOR_OFF)
+                Utils.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, COLOR_OFF, COLOR_OFF)
 
         }
     }
