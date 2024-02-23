@@ -26,11 +26,18 @@
 
     let ledScreen;
 
+    const Figures = Object.freeze({
+		Square: Symbol("square"),
+		Circle: Symbol("circle")
+	});
+
     class LedScreen {
         constructor() {
             this.leds = [];
             this.ledsBuffer = [];            
-            this.generateLeds();
+            this.generateLeds();     
+			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);
+			this.shape = Figures[Object.keys(Figures)[rand]];     
         }
 
         generateLeds = () => {
@@ -121,11 +128,16 @@
         }
 
         draw = (ctx) => {
-            if (this.on)
-                Utils.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, this.color, this.color)
-            else            
-                Utils.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, COLOR_OFF, COLOR_OFF)
+            let color = this.on ? this.color : COLOR_OFF;
 
+            switch(ledScreen.shape){
+                case Figures.Circle:
+                    Utils.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, color, color)
+                    break;
+                case Figures.Square:                    
+                    Utils.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color, color);
+                    break;
+            }
         }
     }
 
@@ -214,6 +226,7 @@
     let init = () => {
         width = window.innerWidth;
         height = window.innerHeight;
+        
 
         canvas = document.getElementById(CANVAS_ID);
         if (canvas.getContext)
@@ -224,12 +237,12 @@
         ledMargin = ledPadding;
 
         ledRows = Math.floor((height - ledMargin)/ (ledDiameter + ledPadding));
-        ledColumns = Math.floor((width - ledMargin)/ (ledDiameter + ledPadding));
-        ledScreen = new LedScreen();
+        ledColumns = Math.floor((width - ledMargin)/ (ledDiameter + ledPadding));        
         
+        randomize();
+
         addEvents();
 
-        randomize();
     }
 
     let addEvents = () => {        
@@ -238,7 +251,11 @@
 		}, false);
     }
 
-    let randomize = () => {
+    let randomize = () => {        
+        hue = Utils.getRandomInt(0, 255);
+
+        ledScreen = new LedScreen();
+
         for (let x = 0; x < ledColumns; x++) {
             for (let y = 0; y < ledRows; y++) {
                 ledScreen.leds[x][y].on =  Utils.getRandomBool();
