@@ -94,8 +94,8 @@
             } 
         }         
     
-        addCube(x, y){
-            let cube = new Figure();
+        addFigure(x, y){
+            let figure = new Figure();
     
             let vertices = [
                     [0, 0, 0],
@@ -125,13 +125,13 @@
                     [2, 6, "#FF0000"]
                 ];
     
-            cube.vertices = vertices;
-            cube.edges = edges;
+            figure.vertices = vertices;
+            figure.edges = edges;
                 
-            cube.translateX(x);
-            cube.translateY(y);
+            figure.translateX(x);
+            figure.translateY(y);
     
-            this.figures.push(cube);
+            this.figures.push(figure);
         }
     }
     
@@ -352,7 +352,7 @@
 
     let addEvents = () => {
         canvas.addEventListener('click', e => {
-            world.addCube(e.offsetX, e.offsetY);            
+            world.addFigure(e.offsetX, e.offsetY);            
         }, false);
 
 		canvas.addEventListener('mousemove', e => {
@@ -360,7 +360,7 @@
 		}, false);
         
 		canvas.addEventListener('touchstart', function(e){            
-            world.addCube(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+            world.addFigure(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function(e){
