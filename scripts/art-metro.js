@@ -12,7 +12,8 @@
 	let INFO_HEADER_HEIGHT = 100;
 	let INFO_PADDING = 10;
 	let INFO_WIDTH = 120;
-	let DRAW_QUADTREE = false;
+	let DRAW_QUADTREE = true;
+	let LINES_LIMIT = true;
 	
 	let maxNumberOfLines = 15;
 	let angleSegmentRange = 2;
@@ -94,7 +95,7 @@
 		}
 		
 		addMetroLine = (x, y) => {
-			if (metroNetwork.lines.length < maxNumberOfLines) {
+			if ((metroNetwork.lines.length < maxNumberOfLines && LINES_LIMIT) || !LINES_LIMIT) {
 				let line = new Line(x, y);
 				line.randomize();
 				
@@ -123,7 +124,7 @@
 		draw = (ctx) => {
 			if (this.lines.length > 0) {
 				if (DRAW_QUADTREE) 
-					this.drawQuadtree(ctx);
+					this.quad.drawQuadtree(ctx);
 				this.drawLines(ctx);
 				this.drawLinesInfo(ctx);
 				this.populateQuadTree();			

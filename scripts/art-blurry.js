@@ -57,7 +57,7 @@
 		size = getRandomInt(5, 15);
 		CIRCLES = getRandomInt(5, 15);
 		colorShift = getRandomInt(0, 359);
-		ENTROPY_1 = getRandomInt(5, 500);	
+		ENTROPY_1 = getRandomInt(1, 250);	
 		colorMapMax = getRandomInt(1, 10000);
 		opacity = getRandomFloat(0.003, 0.03, 3);
 	}
@@ -132,8 +132,8 @@
 				yMod = parseInt((size * i) * Math.sin(angleCart));
 			}	
 
-			let entropyX = Math.random() * ENTROPY_1;
-			let entropyY = Math.random() * ENTROPY_1;
+			let entropyX = getRandomFloat(-1, 1, 3) * ENTROPY_1;
+			let entropyY = getRandomFloat(-1, 1, 3) * ENTROPY_1;
 
 			x = (lastPosX + xMod) + entropyX ;
 			y = (lastPosY + yMod) + entropyY;
