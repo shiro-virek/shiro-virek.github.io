@@ -25,7 +25,7 @@
     let ctx;
 
     let ledScreen;
-    
+
     const Figures = Object.freeze({
 		Square: Symbol("square"),
 		Circle: Symbol("circle")
@@ -33,21 +33,25 @@
 
     class LedScreen {
         constructor() {
-            this.leds = [];       
-            this.generateLeds();          
-			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);  
-			this.shape = Figures[Object.keys(Figures)[rand]];
+            this.leds = [];
+            this.ledsBuffer = [];            
+            this.generateLeds();     
+			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);
+			this.shape = Figures[Object.keys(Figures)[rand]];     
         }
 
         generateLeds = () => {
             for (let x = 0; x < ledColumns; x++) {
                 this.leds[x] = new Array(ledRows);
+                this.ledsBuffer[x] = new Array(ledRows);
             }
 
             for (let x = 0; x < ledColumns; x++) {
                 for (let y = 0; y < ledRows; y++) {
                     let led = new Led(x, y);
                     this.leds[x][y] = led;
+                    let ledBuffer = new Led(x, y);
+                    this.ledsBuffer[x][y] = ledBuffer;
                 }
             }
         }
@@ -56,17 +60,58 @@
             let col = Math.round((x - ledMargin) / ((ledDiameter) + ledPadding));
             let row = Math.round((y - ledMargin) / ((ledDiameter) + ledPadding));
             this.leds[col][row].on = true;
+            this.ledsBuffer[col][row].on = true;
         }
 
         draw = (ctx) => {
             for (let x = 0; x < ledColumns; x++) {
                 for (let y = 0; y < ledRows; y++) {
-                    this.leds[x][y].draw(ctx);
+                    this.ledsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
-        update = () => {                           
+        copyBuffer = () => {
+            for (let x = 0; x < ledColumns; x++) {
+                for (let y = 0; y < ledRows; y++) {
+                    this.leds[x][y].on =  this.ledsBuffer[x][y].on;
+                }
+            }    
+        }
+
+        getLedValueSafe = (x, y) => {
+            if (x < 0 || y < 0 || x >= ledColumns || y >= ledRows)
+                return false
+            else
+                return this.leds[x][y];
+        }
+
+        calculateLedStatus = (x, y) => {
+            let value = false;
+            let sum = 0;
+
+            if (this.getLedValueSafe(x, y-1).on) sum++;
+            if (this.getLedValueSafe(x, y+1).on) sum++;
+            if (this.getLedValueSafe(x-1, y-1).on) sum++;
+            if (this.getLedValueSafe(x+1, y-1).on) sum++;
+            if (this.getLedValueSafe(x-1, y).on) sum++;
+            if (this.getLedValueSafe(x+1, y).on) sum++;
+            if (this.getLedValueSafe(x-1, y+1).on) sum++;
+            if (this.getLedValueSafe(x+1, y+1).on) sum++;
+
+            if (this.leds[x][y].on && (sum < 2 || sum > 3)) value = false;
+            if (this.leds[x][y].on && sum >= 2 && sum <= 3) value = true;
+            if (!this.leds[x][y].on && sum == 3) value = true;
+
+            return value;
+        }
+
+        update = () => {            
+            for (let x = 0; x < ledColumns; x++) {
+                for (let y = 0; y < ledRows; y++) {
+                    this.ledsBuffer[x][y].on =  this.calculateLedStatus(x, y);
+                }
+            }                  
         }
     }
 
@@ -181,6 +226,7 @@
     let init = () => {
         width = window.innerWidth;
         height = window.innerHeight;
+        
 
         canvas = document.getElementById(CANVAS_ID);
         if (canvas.getContext)
@@ -190,39 +236,31 @@
         ledPadding = Utils.getRandomInt(0, 20);
         ledMargin = ledPadding;
 
+        ledRows = Math.floor((height - ledMargin)/ (ledDiameter + ledPadding));
+        ledColumns = Math.floor((width - ledMargin)/ (ledDiameter + ledPadding));        
+        
         randomize();
 
-        ledRows = Math.floor((height - ledMargin)/ (ledDiameter + ledPadding));
-        ledColumns = Math.floor((width - ledMargin)/ (ledDiameter + ledPadding));
-        ledScreen = new LedScreen();
-        
         addEvents();
 
     }
-
 
     let addEvents = () => {        
 		canvas.addEventListener('click', e => {
 			ledScreen.setPixel(e.offsetX, e.offsetY);
 		}, false);
-        
-		canvas.addEventListener('mousemove', e => {
-			ledScreen.setPixel(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function(e){
-			ledScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function(e){
-			e.preventDefault();
-			ledScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});	
     }
-
 
     let randomize = () => {        
         hue = Utils.getRandomInt(0, 255);
+
+        ledScreen = new LedScreen();
+
+        for (let x = 0; x < ledColumns; x++) {
+            for (let y = 0; y < ledRows; y++) {
+                ledScreen.leds[x][y].on =  Utils.getRandomBool();
+            }
+        }    
     }
 
     let drawBackground = (ctx, canvas) => {
@@ -238,6 +276,7 @@
     let draw = () => {
         drawBackground(ctx, canvas);
         ledScreen.draw(ctx);
+        ledScreen.copyBuffer();
     }
 
     let loop = (timestamp) => {
@@ -246,6 +285,8 @@
         ledScreen.update();
 
         draw();
+
+        Utils.sleep(200);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);

@@ -18,6 +18,9 @@
             this.figures = [];
             this.FOV = 2000; 
             this.drawEdges = true;
+            this.figureTypes = [];
+            this.setFigureTypes();            
+            this.figureInfo = {};
         }
 
         draw = () => {
@@ -25,6 +28,132 @@
                 this.drawFigures();
             else
                 this.drawFiguresVertices();
+        }
+
+        setFigureTypes = () => {
+            let letterV = { 
+                vertices: [
+                    [0, 0, 0],
+                    [30, 0, 0],
+                    [60, 0, 0],
+                    [90, 0, 0],
+
+                    [45, 35, 0],
+                    [45, 75, 0],
+
+                    [0, 0, 20],
+                    [30, 0, 20],
+                    [60, 0, 20],
+                    [90, 0, 20],
+
+                    [45, 35, 20],
+                    [45, 75, 20]
+                ],
+                edges : [
+                    [6, 7, "#00FF00"],
+                    [7, 10, "#00FF00"],
+                    [10, 8, "#00FF00"],
+                    [8, 9, "#00FF00"],
+                    [6, 11, "#00FF00"],
+                    [11, 9, "#00FF00"],
+
+                    //Z              
+                    [0, 6, "#0000FF"],
+                    [1, 7, "#0000FF"], 
+                    [2, 8, "#0000FF"],
+                    [3, 9, "#0000FF"], 
+                    [4, 10, "#0000FF"],
+                    [5, 11, "#0000FF"],
+            
+                    [0, 1, "#FF0000"],
+                    [1, 4, "#FF0000"],
+                    [4, 2, "#FF0000"],
+                    [2, 3, "#FF0000"],
+                    [0, 5, "#FF0000"],
+                    [5, 3, "#FF0000"]
+                ]
+
+            };
+
+            this.figureTypes.push(letterV);
+
+            let cube = { 
+                vertices: [
+                    [0, 0, 0],
+                    [30, 0, 0],
+                    [0, 30, 0],
+                    [30, 30, 0],
+                    [0, 0, 30],
+                    [30, 0, 30],
+                    [0, 30, 30],
+                    [30, 30, 30],
+                ],
+                edges : [
+
+                    [0, 1, "#0000FF"],
+                    [1, 3, "#0000FF"], 
+                    [2, 3, "#0000FF"],
+                    [0, 2, "#0000FF"], 
+
+                    [4, 5, "#00FF00"],
+                    [5, 7, "#00FF00"],
+                    [7, 6, "#00FF00"],
+                    [4, 6, "#00FF00"],                                          
+            
+                    [0, 4, "#FF0000"],
+                    [1, 5, "#FF0000"],
+                    [3, 7, "#FF0000"],
+                    [2, 6, "#FF0000"]
+                ]
+
+            };
+
+            this.figureTypes.push(cube);
+        
+            let pyramid = { 
+                vertices: [
+                    [10, 0, 10],
+                    [0, 20, 20],
+                    [20, 20, 20],
+                    [0, 20, 0],
+                    [20, 20, 0]
+                ],
+                edges : [
+
+                    [0, 1, "#0000FF"],
+                    [0, 2, "#0000FF"], 
+                    [0, 3, "#0000FF"],
+                    [0, 4, "#0000FF"], 
+                    [1, 2, "#00FF00"],
+                    [2, 4, "#00FF00"],
+                    [3, 4, "#00FF00"],
+                    [3, 1, "#00FF00"]    
+                ]
+
+            };
+
+            this.figureTypes.push(pyramid);
+
+            let pyramid2 = { 
+                vertices: [
+                    [10, 0, 10],
+                    [10, 20, 20],
+                    [0, 20, 0],
+                    [20, 20, 0]
+                ],
+                edges : [
+
+                    [0, 1, "#0000FF"],
+                    [0, 2, "#0000FF"], 
+                    [0, 3, "#0000FF"],
+                    [1, 2, "#00FF00"], 
+                    [2, 3, "#00FF00"],
+                    [1, 3, "#00FF00"]  
+                ]
+
+            };
+
+            this.figureTypes.push(pyramid2);
         }
 
         worldToScreen = (point) => { 
@@ -94,44 +223,16 @@
             } 
         }         
     
-        addCube(x, y){
-            let cube = new Figure();
+        addFigure(x, y){
+            let figure = new Figure();            
     
-            let vertices = [
-                    [0, 0, 0],
-                    [30, 0, 0],
-                    [0, 30, 0],
-                    [30, 30, 0],
-                    [0, 0, 30],
-                    [30, 0, 30],
-                    [0, 30, 30],
-                    [30, 30, 30],
-                ];    
-    
-            let edges = [
-                    [0, 1, "#0000FF"],
-                    [1, 3, "#0000FF"], 
-                    [2, 3, "#0000FF"],
-                    [0, 2, "#0000FF"], 
-    
-                    [4, 5, "#00FF00"],
-                    [5, 7, "#00FF00"],
-                    [7, 6, "#00FF00"],
-                    [4, 6, "#00FF00"],                                          
-
-                    [0, 4, "#FF0000"],
-                    [1, 5, "#FF0000"],
-                    [3, 7, "#FF0000"],
-                    [2, 6, "#FF0000"]
-                ];
-    
-            cube.vertices = vertices;
-            cube.edges = edges;
+            figure.vertices = Utils.clone(this.figureInfo.vertices);
+            figure.edges = Utils.clone(this.figureInfo.edges);
                 
-            cube.translateX(x);
-            cube.translateY(y);
+            figure.translateX(x);
+            figure.translateY(y);
     
-            this.figures.push(cube);
+            this.figures.push(figure);
         }
     }
     
@@ -267,6 +368,10 @@
     }
     
 	class Utils {
+        static clone = (original) => {
+            return JSON.parse(JSON.stringify(original));
+        }
+
         static scale = (number, inMin, inMax, outMin, outMax) => {
             return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
@@ -352,7 +457,7 @@
 
     let addEvents = () => {
         canvas.addEventListener('click', e => {
-            world.addCube(e.offsetX, e.offsetY);            
+            world.addFigure(e.offsetX, e.offsetY);            
         }, false);
 
 		canvas.addEventListener('mousemove', e => {
@@ -360,7 +465,7 @@
 		}, false);
         
 		canvas.addEventListener('touchstart', function(e){            
-            world.addCube(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+            world.addFigure(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function(e){
@@ -387,6 +492,7 @@
 
     let randomize = () => {	
         world.drawEdges = Utils.getRandomBool();
+        world.figureInfo = world.figureTypes[Utils.getRandomInt(0, world.figureTypes.length - 1)];
     }
         
     let drawBackground = (ctx, canvas) => {
