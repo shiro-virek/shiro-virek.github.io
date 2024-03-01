@@ -17,7 +17,9 @@ Scenes currently available:
 - metro
 - rotation
 - rotators
-- tentacle
+- tentacles
 - semitone
+- ledscreen
+- conway
 
 You can see them in action at https://eapelroso.com 🙃
