@@ -245,8 +245,8 @@
         ledPadding = Utils.getRandomInt(0, 20);
         ledMargin = ledPadding;
         hue = Utils.getRandomInt(0, 255);
-        growSpeed = Utils.getRandomFloat(0.1, 0.9, 1);
-        shrinkSpeed = Utils.getRandomFloat(0.1, 0.9, 1);
+        growSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
+        shrinkSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
         maxSize = Utils.getRandomInt(ledDiameter + 1, 255);
     }
 
