@@ -5,17 +5,90 @@
 	let width = 0;
 	let height = 0;
 	let ballCollection;	
-	let lastRender = 0
+	let lastRender = 0;
+
 
 	class Ball {
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
+			this.radius = 20;
+			this.mass = this.radius * 2;			
+			this.speedY =  Utils.getRandomFloat(1, 5, 2);
+			this.speedX = Utils.getRandomFloat(1, 5, 2);
 		}
 
 		draw = (ctx) => {
-			Utils.drawCircle(ctx, this.x, this.y, 20, "#000", "#FFF");
+			Utils.drawCircle(ctx, this.x, this.y, this.radius, "#000", "#FFF");
 		}
+
+		move() {   
+			this.x += this.speedX;
+			this.y += this.speedY;        
+		} 
+
+		checkCollisionsBalls() {    
+			let returnObjects = [];
+			
+			ballCollection.quad.retrieve(returnObjects, this);
+
+			for (const element of returnObjects) {
+				let ball = element;          
+					  
+				if (ball == this)
+				  continue;
+						
+				let newVelX1 = 0;
+				let newVelY1 = 0;
+				let newVelX2 = 0;
+				let newVelY2 = 0;  
+				let catX = Math.abs(ball.x - this.x);
+				let catY = Math.abs(ball.y - this.y);
+				let distance = Math.sqrt(catX * catX + catY * catY);
+					  
+				if (distance < ball.radius + this.radius){             
+				  newVelX1 = (this.speedX * (this.mass - ball.mass) + (2 * ball.mass * ball.speedX)) / (this.mass + ball.mass);
+				  newVelY1 = (this.speedY * (this.mass - ball.mass) + (2 * ball.mass * ball.speedY)) / (this.mass + ball.mass);
+				  
+				  newVelX2 = (ball.speedX * (ball.mass - this.mass) + (2 * this.mass * this.speedX)) / (ball.mass + this.mass);
+				  newVelY2 = (ball.speedY * (ball.mass - this.mass) + (2 * this.mass * this.speedY)) / (ball.mass + this.mass);
+				  
+				  this.x += newVelX1;
+				  this.y += newVelY1;
+				  ball.x += newVelX2;
+				  ball.y += newVelY2;
+				  
+				  this.speedX = newVelX1;
+				  this.speedY = newVelY1;
+				  ball.speedX = newVelX2;
+				  ball.speedY = newVelY2;
+				}
+			}
+			   
+		
+		  } 
+		
+		  checkCollisionsWalls(){       
+			if ((this.getRight() > width)){
+			  this.speedX = -Math.abs(this.speedX);
+			}
+			
+			 if (this.getLeft() < 0){
+			  this.speedX = Math.abs(this.speedX);
+			}
+			
+			if ((this.getBottom() > height)){       
+			  this.speedY = -Math.abs(this.speedY);
+			} 
+			
+			if ((this.getTop() < 0)){ 
+			  this.speedY = Math.abs(this.speedY);
+			} 
+			
+			if (this.speedX > 0 && this.speedX < 1) this.speedX = 1;
+			if (this.speedY > 0 && this.speedY < 1) this.speedY = 1;
+		  }
+	
 
 		getTop = () => this.y;
 		getBottom = () => this.y;
@@ -29,9 +102,11 @@
 			this.quad = Quadtree.generateQuadtree(width, height);
 		}			
 
-		
 		drawBalls = (ctx) => {
 			for (const ball of ballCollection.balls) {
+				ball.move();           
+				ball.checkCollisionsBalls();       
+				ball.checkCollisionsWalls();  
 				ball.draw(ctx);
 			}
 		}
@@ -59,7 +134,6 @@
 		}
 	}
 
-
 	class Rectangle {
 		constructor(x, y, w, h) {
 			this.x = x;
@@ -77,7 +151,6 @@
 		getLeft = () => this.x;
 		getRight = () => this.x + this.width;
 	}
-
 
 	class Quadtree {
 		constructor(level, bounds) {
@@ -308,4 +381,6 @@
 	init();
 
 	window.requestAnimationFrame(loop);
+
 }
+
