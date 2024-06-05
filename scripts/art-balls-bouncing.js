@@ -19,7 +19,9 @@
 		}
 
 		draw = (ctx) => {
-			Utils.drawCircle(ctx, this.x, this.y, this.radius, "#000", "#FFF");
+			let value = Utils.scale(Math.abs(this.speedX)+Math.abs(this.speedY), 0, 10, 0, 100);
+			let color = `hsl(${50}, ${100}%, ${value}%)`;
+			Utils.drawCircle(ctx, this.x, this.y, this.radius, color, color);
 		}
 
 		move() {   
@@ -281,6 +283,9 @@
 	}
 
 	class Utils {
+		static scale = (number, inMin, inMax, outMin, outMax) => {
+            return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        }
 
 		static shuffleArray = (array) => {
 			for (let i = array.length - 1; i > 0; i--) {
