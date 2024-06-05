@@ -90,10 +90,10 @@
 		  }
 	
 
-		getTop = () => this.y;
-		getBottom = () => this.y;
-		getLeft = () => this.x;
-		getRight = () => this.x;
+		getTop = () => this.y - this.radius;
+		getBottom = () => this.y + this.radius;
+		getLeft = () => this.x - this.radius;
+		getRight = () => this.x + this.radius;
 	}
 
 	class BallCollection {
