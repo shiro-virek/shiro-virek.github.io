@@ -1,7 +1,10 @@
 {
 	let CANVAS_ID = "myCanvas"
 	let DRAW_QUADTREE = true;
+	let RAD_CONST = 0.0175;
 
+	let hue = 20;
+	let radius = 20;
 	let width = 0;
 	let height = 0;
 	let ballCollection;	
@@ -12,7 +15,7 @@
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
-			this.radius = 20;
+			this.radius = radius;
 			this.mass = this.radius * 2;			
 			this.speedY =  Utils.getRandomFloat(1, 5, 2);
 			this.speedX = Utils.getRandomFloat(1, 5, 2);
@@ -20,11 +23,21 @@
 
 		draw = (ctx) => {
 			let value = Utils.scale(Math.abs(this.speedX)+Math.abs(this.speedY), 0, 10, 0, 100);
-			let color = `hsl(${50}, ${100}%, ${value}%)`;
+			let color = `hsl(${hue}, ${100}%, ${value}%)`;
+			let color2 = `hsl(${hue}, ${100}%, ${value}%, 0.15)`;
+
+			let angle = Utils.angleBetweenTwoPoints(this.prevX, this.prevY, this.x, this.y);
+			let distance = Utils.distanceBetweenTwoPoints(this.x, this.y, this.prevX, this.prevY);
+			
+			let trailPoint = Utils.polarToCartesian(distance + 10, angle * RAD_CONST) ;
+
+			Utils.drawCircle(ctx, this.x - trailPoint.x, this.y - trailPoint.y, this.radius, color2, color2);
 			Utils.drawCircle(ctx, this.x, this.y, this.radius, color, color);
 		}
 
 		move() {   
+			this.prevX = this.x;
+			this.prevY = this.y;
 			this.x += this.speedX;
 			this.y += this.speedY;        
 		} 
@@ -283,6 +296,24 @@
 	}
 
 	class Utils {
+		static polarToCartesian(r, theta) {
+			let x = r * Math.cos(theta);
+			let y = r * Math.sin(theta);
+			return { x: x, y: y };
+		}
+
+		static cartesianToPolar(x, y) {
+			let r = Math.sqrt(x * x + y * y);
+			let theta = Math.atan2(y, x);
+			return { r: r, theta: theta };
+		}
+
+		static distanceBetweenTwoPoints(x1, y1, x2, y2) {
+			let deltaX = x2 - x1;
+			let deltaY = y2 - y1;
+			return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+		}
+
 		static scale = (number, inMin, inMax, outMin, outMax) => {
             return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
@@ -294,7 +325,15 @@
 			  array[i] = array[j];
 			  array[j] = temp;
 			}
-		}		  
+		}	
+		
+		
+        static angleBetweenTwoPoints(x1, y1, x2, y2) {
+            var angle = Math.atan2(y2 - y1, x2 - x1);
+            angle *= 180 / Math.PI;
+            if (angle < 0) angle = 360 + angle;
+            return angle;
+        }
 		
 		static getRandomInt = (min, max) => {
 			return Math.floor(Math.random() * max) + min;
@@ -353,6 +392,8 @@
 	}
 	
 	let randomize = () => {	
+		hue = Utils.getRandomInt(0, 255);
+		radius = Utils.getRandomInt(5, 25);
 	}
 		
 	let drawFrame = (ctx, canvas) => {
