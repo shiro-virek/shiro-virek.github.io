@@ -24,14 +24,19 @@
 		draw = (ctx) => {
 			let value = Utils.scale(Math.abs(this.speedX)+Math.abs(this.speedY), 0, 10, 0, 100);
 			let color = `hsl(${hue}, ${100}%, ${value}%)`;
-			let color2 = `hsl(${hue}, ${100}%, ${value}%, 0.15)`;
 
 			let angle = Utils.angleBetweenTwoPoints(this.prevX, this.prevY, this.x, this.y);
 			let distance = Utils.distanceBetweenTwoPoints(this.x, this.y, this.prevX, this.prevY);
 			
-			let trailPoint = Utils.polarToCartesian(distance + 10, angle * RAD_CONST) ;
+			for (let index = 1; index < 5; index++) {
 
-			Utils.drawCircle(ctx, this.x - trailPoint.x, this.y - trailPoint.y, this.radius, color2, color2);
+				let color2 = `hsl(${hue}, ${100}%, ${value}%, ${1.0 / index})`;
+					
+				let trailPoint = Utils.polarToCartesian(distance + ((index - 1) * 5), angle * RAD_CONST) ;
+
+				Utils.drawCircle(ctx, this.x - trailPoint.x, this.y - trailPoint.y, this.radius * (1.0 - (index / 30)), color2, color2);
+			}
+
 			Utils.drawCircle(ctx, this.x, this.y, this.radius, color, color);
 		}
 
