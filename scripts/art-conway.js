@@ -125,6 +125,7 @@
     }
 
     let init = () => {
+		initCanvas();
         ledDiameter = Utils.getRandomInt(5, 20);        
         ledPadding = Utils.getRandomInt(0, 20);
         ledMargin = ledPadding;

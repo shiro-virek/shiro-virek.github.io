@@ -29,13 +29,13 @@
 
 		setNewFireObject(notFirstTime) {
 			this.notFirstTime = notFirstTime;
-			this.sin = getRandomBool();
-			this.yCenter = height + 100 - getRandomInt(1, 50);
+			this.sin = Utils.getRandomBool();
+			this.yCenter = height + 100 - Utils.getRandomInt(1, 50);
 			this.diameter = MAXIMUM_DIAMETER;
 			this.radius = this.diameter / 2;
 			this.speed = 5;
-			this.life = getRandomInt(MINIMUM_LIFE, MAXIMUM_LIFE);
-			this.xCenter = getRandomInt(1, width);
+			this.life = Utils.getRandomInt(MINIMUM_LIFE, MAXIMUM_LIFE);
+			this.xCenter = Utils.getRandomInt(1, width);
 		}
 
 		getColor() {
@@ -53,9 +53,9 @@
 			this.yCenter -= this.speed;
 
 			if (this.sin || ALL_SIN)
-				this.xMovement = (AMPLITUDE * (Math.sin(degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.sin(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
 			else
-				this.xMovement = (AMPLITUDE * (Math.cos(degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.cos(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
 
 
 			if (this.life > 0)
@@ -67,13 +67,13 @@
 	}
 
 	let randomize = () => {
-		PARTICLES_COUNT = getRandomInt(50, screen.height * screen.width / 1000);
-		MINIMUM_LIFE = getRandomInt(10, 90)
-		MAXIMUM_LIFE = getRandomInt(100, 200);
-		MINIMUM_DIAMETER = getRandomInt(1, 10);
-		MAXIMUM_DIAMETER = getRandomInt(12, 20);
-		AMPLITUDE = getRandomInt(10, 100);
-		ALL_SIN = getRandomBool();
+		PARTICLES_COUNT = Utils.getRandomInt(50, screen.height * screen.width / 1000);
+		MINIMUM_LIFE = Utils.getRandomInt(10, 90)
+		MAXIMUM_LIFE = Utils.getRandomInt(100, 200);
+		MINIMUM_DIAMETER = Utils.getRandomInt(1, 10);
+		MAXIMUM_DIAMETER = Utils.getRandomInt(12, 20);
+		AMPLITUDE = Utils.getRandomInt(10, 100);
+		ALL_SIN = Utils.getRandomBool();
 	}
 
 	let addFire = (mouseX, mouseY, keepSameSize = false) => {
@@ -108,20 +108,21 @@
 	}
 
 	init = () => {
+		initCanvas();
 		randomize();
 		addParticles();
 		addEvents();
 		drawBackground(ctx, canvas);
 	}
 
-	draw = () => {
-		drawFrame();
+	draw = () => {		
+		drawBackground(ctx, canvas);
 
 		for (i = 0; i < PARTICLES_COUNT; i++) {
 			objects[i].update();
 
 			if (objects[i].notFirstTime)
-				drawCircle(objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor().getRGBA());
+				Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor().getRGBA());
 		}
 	}
 

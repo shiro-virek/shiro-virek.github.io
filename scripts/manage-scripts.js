@@ -103,10 +103,6 @@ let loadScriptByUrl = () => {
     loadScript(setScriptIndexByURL());
 }
 
-let reload = () => {
-    location.reload();
-}
-
 window.addEventListener('load', () => {
     initScripts();			
 

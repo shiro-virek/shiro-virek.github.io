@@ -36,8 +36,6 @@
 	}
 
 	let addEvents = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-
 		canvas.addEventListener('mousemove', e => {
 			draw(e.offsetX, e.offsetY);
 		}, false);
@@ -53,6 +51,7 @@
 	}
 
 	let init = () => {
+		initCanvas();
 		randomize();
 		addEvents();
 		drawBackground(ctx, canvas);
@@ -69,13 +68,13 @@
 
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
 
-		let lineWidth = scale(distance, 1, 400, 1, THICKNESS);
+		let lineWidth = Utils.scale(distance, 1, 400, 1, THICKNESS);
 
-		this.drawLine(lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
+		Utils.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
 
 		let angleRad = angle * RAD_CONST;
 
-		this.drawLine(xPointer, yPointer,
+		Utils.drawLine(ctx, xPointer, yPointer,
 			xPointer + parseInt(distance * Math.cos(angleRad)),
 			yPointer + parseInt(distance * Math.sin(angleRad)),
 			lineWidth, color);
@@ -83,7 +82,7 @@
 		if (ROTATORS > 0)
 			for (let i = 0; i < ROTATORS - 1; i++) {
 				let angleRad2 = (angle + rotatorsAngles[i]) * RAD_CONST;
-				this.drawLine(xPointer, yPointer,
+				Utils.drawLine(ctx, xPointer, yPointer,
 					xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)),
 					yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)),
 					lineWidth, color);

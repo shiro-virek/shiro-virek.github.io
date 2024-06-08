@@ -295,16 +295,13 @@
 	}
 
 	let init = () => {
-		width = window.innerWidth;
-		height = window.innerHeight;
+		initCanvas();
 		ballCollection = new BallCollection()
 		randomize();
 		addEvents();
 	}
 
 	let addEvents = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-
 		canvas.addEventListener('click', e => {
 			ballCollection.addBall(e.offsetX, e.offsetY);
 		}, false);
@@ -316,12 +313,8 @@
 	}
 
 	let draw = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext) {
-			let ctx = canvas.getContext('2d')
-			drawBackground(ctx, canvas);
-			ballCollection.draw(ctx);
-		}
+		drawBackground(ctx, canvas);
+		ballCollection.draw(ctx);
 	}
 
 	let loop = (timestamp) => {

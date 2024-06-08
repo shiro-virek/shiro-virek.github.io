@@ -107,6 +107,7 @@
     }
 
     let init = () => {
+        initCanvas();
         randomize();
 
         ledRows = Math.floor((height - ledMargin) / (ledDiameter + ledPadding));

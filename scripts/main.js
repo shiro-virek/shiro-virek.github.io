@@ -13,7 +13,11 @@ height = window.innerHeight;
 lastPosY = 0;
 lastPosX = 0;
 
-drawBackground = (ctx, canvas) => {
+let reload = () => {
+    location.reload();
+}
+
+let drawBackground = (ctx, canvas) => {
     if (canvas.getContext) {
         canvas.width = width;
         canvas.height = height;
@@ -25,7 +29,7 @@ drawBackground = (ctx, canvas) => {
     }
 }
 
-initCanvas = () => {
+let initCanvas = () => {
     canvas = document.getElementById(CANVAS_ID);
     if (canvas.getContext) {
         ctx = canvas.getContext('2d')

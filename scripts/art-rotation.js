@@ -354,6 +354,7 @@
     }
     
     let init = () => {
+        initCanvas();
         world = new ThreeDWorld();
         randomize();
         addEvents();

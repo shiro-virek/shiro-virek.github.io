@@ -193,13 +193,8 @@
         }
     }
 
-    let init = () => {
-        width = window.innerWidth;
-        height = window.innerHeight;
-
-        canvas = document.getElementById(CANVAS_ID);
-        if (canvas.getContext)
-            ctx = canvas.getContext('2d');
+    let init = () => {       
+		initCanvas();
 
         ledDiameter = Utils.getRandomInt(5, 20);        
         ledPadding = Utils.getRandomInt(0, 20);

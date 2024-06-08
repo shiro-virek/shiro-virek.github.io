@@ -477,9 +477,10 @@
 	}
 
 	let init = () => {
+		initCanvas();
 		randomize();
 		addEvents();
-		drawFrame();
+		drawBackground(ctx, canvas);
 	}
 
 	let addEvents = () => {
@@ -503,13 +504,9 @@
 		drawBackground(ctx, canvas);
 
 		if (BUILDINGS_COUNT > 0)
-			for (let i = 0; i < BUILDINGS_COUNT; i++) {
-				let canvas = document.getElementById(CANVAS_ID);
-				if (canvas.getContext) {
-					let ctx = canvas.getContext('2d');
-					objects[i].drawBuilding(ctx);
-				}
-			}
+		for (let i = 0; i < BUILDINGS_COUNT; i++) {	
+			objects[i].drawBuilding(ctx);
+		}
 	}
 
 	let loop = (timestamp) => {

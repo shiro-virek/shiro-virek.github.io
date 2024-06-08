@@ -147,6 +147,7 @@
 	}
 
 	let init = () => {
+		initCanvas();
 		randomize();
 		addParticles();
 		addEvents();
@@ -178,7 +179,7 @@
 			else
 				color = `hsl(${HUE}, ${SATURATION}%, ${lightness}%)`;
 
-			drawCircle(objects[i].xCenter, objects[i].yCenter, objects[i].diameter, color);
+			Utils.drawCircle(ctx, objects[i].xCenter, objects[i].yCenter, objects[i].diameter, color);
 		}
 
 		updateColorFactor();

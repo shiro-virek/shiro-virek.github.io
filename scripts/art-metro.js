@@ -537,6 +537,7 @@
 	}
 
 	let init = () => {
+		initCanvas();
 		metroNetwork = new MetroNetwork()
 		randomize();
 		addEvents();

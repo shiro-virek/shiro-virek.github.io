@@ -52,9 +52,9 @@
 			this.yCenter -= this.speed;
 
 			if (this.sin || ALL_SIN)
-				this.xMovement = (AMPLITUDE * (Math.sin(degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.sin(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
 			else
-				this.xMovement = (AMPLITUDE * (Math.cos(degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.cos(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
 
 			this.angle++;
 
@@ -110,6 +110,7 @@
 	}
 
 	let init = () => {
+		initCanvas();
 		randomize();
 		addParticles();
 		addEvents();
@@ -125,10 +126,10 @@
 			if (objects[i].notFirstTime) {
 				switch (objects[i].shape) {
 					case Figures.Circle:
-						drawCircle(objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor());
+						Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor());
 						break;
 					case Figures.Square:
-						drawSquare(objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].angle, objects[i].getColor());
+						Utils.drawRectangle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].angle, objects[i].getColor());
 						break;
 				}
 			}

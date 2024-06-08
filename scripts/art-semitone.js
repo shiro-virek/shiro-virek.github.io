@@ -166,6 +166,7 @@
     }
 
     let init = () => {
+        initCanvas();
         dotsRows = Math.floor(height / (dotRadio + dotPadding));
         dotsColumns = Math.floor(width / (dotRadio + dotPadding));
         semitone = new Semitone();
