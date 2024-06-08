@@ -3,24 +3,24 @@ class Utils {
 	    return deg * (Math.PI / 180.0);
 	}
 
-    static polarToCartesian(r, theta) {
+    static polarToCartesian = (r, theta) => {
         let x = r * Math.cos(theta);
         let y = r * Math.sin(theta);
         return { x: x, y: y };
     }
 
-    static cartesianToPolar(x, y) {
+    static cartesianToPolar = (x, y) => {
         let r = Math.sqrt(x * x + y * y);
         let theta = Math.atan2(y, x);
         return { r: r, theta: theta };
     }
 
-    static sleep(ms){
+    static sleep = (ms) => {
         let waitUntil = new Date().getTime() + ms;
         while(new Date().getTime() < waitUntil) continue;
     }
 
-    static angleBetweenTwoPoints(x1, y1, x2, y2) {
+    static angleBetweenTwoPoints = (x1, y1, x2, y2) => {
         let angle = Math.atan2(y2 - y1, x2 - x1);
         angle *= 180 / Math.PI;
         if (angle < 0) angle = 360 + angle;
@@ -35,7 +35,7 @@ class Utils {
         return String.fromCharCode(c.charCodeAt(0) + 1);
     }
 
-    static distanceBetweenTwoPoints(x1, y1, x2, y2) {
+    static distanceBetweenTwoPoints = (x1, y1, x2, y2) => {
         let deltaX = x2 - x1;
         let deltaY = y2 - y1;
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -57,14 +57,7 @@ class Utils {
             array[j] = temp;
         }
     }	
-        
-    static angleBetweenTwoPoints(x1, y1, x2, y2) {
-        var angle = Math.atan2(y2 - y1, x2 - x1);
-        angle *= 180 / Math.PI;
-        if (angle < 0) angle = 360 + angle;
-        return angle;
-    }
-    
+            
     static getRandomInt = (min, max) => {
         return Math.floor(Math.random() * max) + min;
     }
