@@ -21,5 +21,7 @@ Scenes currently available:
 - semitone
 - ledscreen
 - conway
+- motion-matrix
+- balls-bouncing
 
 You can see them in action at https://eapelroso.com 🙃
