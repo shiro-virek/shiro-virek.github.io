@@ -126,10 +126,10 @@
 			if (objects[i].notFirstTime) {
 				switch (objects[i].shape) {
 					case Figures.Circle:
-						Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor());
+						Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor(), objects[i].getColor());
 						break;
 					case Figures.Square:
-						Utils.drawRectangle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].angle, objects[i].getColor());
+						Utils.drawSquare(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].angle, objects[i].getColor());
 						break;
 				}
 			}

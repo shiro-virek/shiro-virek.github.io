@@ -179,7 +179,7 @@
 			else
 				color = `hsl(${HUE}, ${SATURATION}%, ${lightness}%)`;
 
-			Utils.drawCircle(ctx, objects[i].xCenter, objects[i].yCenter, objects[i].diameter, color);
+			Utils.drawCircle(ctx, objects[i].xCenter, objects[i].yCenter, objects[i].diameter, color, color);
 		}
 
 		updateColorFactor();

@@ -26,7 +26,7 @@ class Utils {
         if (angle < 0) angle = 360 + angle;
         return angle;
     }
-    
+
     static clone = (original) => {
         return JSON.parse(JSON.stringify(original));
     }
@@ -83,8 +83,21 @@ class Utils {
     
     static nextCharacter = (c) => {
         return String.fromCharCode(c.charCodeAt(0) + 1);
-    }
-    
+    }    
+
+	static drawSquare = (ctx, x, y, side, angle, color = '#00FF00', fillcolor = '#00FF00') =>{
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;				
+        ctx.beginPath();
+        let halfSide = side / 2;	
+        ctx.translate(x, y);
+        ctx.rotate(angle * Math.PI / 180);
+        ctx.rect(-halfSide, -halfSide, side, side);
+        ctx.fill();
+        ctx.restore();
+	}
+
     static drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
         ctx.strokeStyle = color;
         ctx.fillStyle = fillColor;
@@ -111,11 +124,11 @@ class Utils {
         ctx.fill();
     }
 
-    static drawLine = (ctx, x1, y1, x2, y2, color = '#FFF') => {
+    static drawLine = (ctx, x1, y1, x2, y2, lineWidth, color = '#FFF') => {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
-        ctx.lineWidth = "2"
+        ctx.lineWidth = lineWidth
         ctx.strokeStyle = color;
         ctx.stroke();
     }

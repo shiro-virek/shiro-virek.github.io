@@ -122,7 +122,7 @@
 			objects[i].update();
 
 			if (objects[i].notFirstTime)
-				Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor().getRGBA());
+				Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor().getRGBA(), objects[i].getColor().getRGBA());
 		}
 	}
 

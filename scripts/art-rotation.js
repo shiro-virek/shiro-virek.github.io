@@ -329,7 +329,7 @@
             let point2d0 = world.worldToScreen(p0);
             let point2d1 = world.worldToScreen(p1);
     
-            Utils.drawLine(ctx, point2d0.x, point2d0.y, point2d1.x, point2d1.y, color);
+            Utils.drawLine(ctx, point2d0.x, point2d0.y, point2d1.x, point2d1.y, 1, color);
         }
         
         drawVertex = (point, color) => { 
