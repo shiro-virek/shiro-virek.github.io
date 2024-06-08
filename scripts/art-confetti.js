@@ -24,7 +24,7 @@
 		setNewParticleObject(notFirstTime) {
 			this.notFirstTime = notFirstTime;
 			this.sin = Utils.getRandomBool();
-			this.yCenter = height + 100 - Utils.getRandomInt(1, 50);
+			this.yCenter = -100 + Utils.getRandomInt(1, 50);
 			this.diameter = MAXIMUM_DIAMETER;
 			this.radius = this.diameter / 2;
 			this.speed = Utils.getRandomInt(1, MAXIMUM_SPEED);
@@ -49,7 +49,7 @@
 		}
 
 		update() {
-			this.yCenter -= this.speed;
+			this.yCenter += this.speed;
 
 			if (this.sin || ALL_SIN)
 				this.xMovement = (AMPLITUDE * (Math.sin(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
