@@ -107,7 +107,7 @@
 		});
 	}
 
-	init = () => {
+	let init = () => {
 		initCanvas();
 		randomize();
 		addParticles();
@@ -115,7 +115,7 @@
 		drawBackground(ctx, canvas);
 	}
 
-	draw = () => {		
+	let draw = () => {		
 		drawBackground(ctx, canvas);
 
 		for (i = 0; i < PARTICLES_COUNT; i++) {
@@ -126,11 +126,11 @@
 		}
 	}
 
-	trackMouse = (mouseX, mouseY) => {
+	let trackMouse = (mouseX, mouseY) => {
 		addFire(mouseX, mouseY, true);
 	}
 
-	loop = (timestamp) => {
+	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
 		draw();

@@ -189,12 +189,12 @@
 		globalCounter++;
 	}
 
-	trackMouse = (x, y) => {
+	let trackMouse = (x, y) => {
 		mouseX = x;
 		mouseY = y;
 	}
 
-	loop = (timestamp) => {
+	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
 		draw();
