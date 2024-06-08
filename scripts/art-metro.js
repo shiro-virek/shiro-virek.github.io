@@ -1,6 +1,4 @@
 {
-	let CANVAS_ID = "myCanvas"
-	let RAD_CONST = 0.0175;
 	let LINE_THICKNESS = 10;
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
 	let HSL_MAX_HUE = 360;
@@ -14,21 +12,18 @@
 	let INFO_WIDTH = 120;
 	let DRAW_QUADTREE = true;
 	let LINES_LIMIT = true;
-	
+
 	let maxNumberOfLines = 15;
 	let angleSegmentRange = 2;
 	let alphabeticLineSymbol = false;
-	let width = 0;
-	let height = 0;
-	let metroNetwork;	
-	let lastRender = 0
+	let metroNetwork;
 	let palette = [];
 
 	class MetroNetwork {
-		constructor(){
+		constructor() {
 			this.lines = [];
 			this.quad = Quadtree.generateQuadtree(width, height);
-		}			
+		}
 
 		getNumberOfStations = () => {
 			let numberOfStations = 0;
@@ -38,7 +33,7 @@
 
 		getLinesLength = () => {
 			let linesLength = 0;
-			for (const line of metroNetwork.lines) {				
+			for (const line of metroNetwork.lines) {
 				linesLength += line.getLength();
 			}
 			return linesLength;
@@ -60,7 +55,7 @@
 			ctx.fillText(`Lines: ${metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
 			ctx.fillText(`Length: ${Math.floor(metroNetwork.getLinesLength() / 100)} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
 			ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
-			
+
 			MetroNetwork.drawTransferIcon(ctx);
 
 			ctx.lineWidth = 1;
@@ -70,19 +65,19 @@
 				ctx.fillText(`Line ${metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
 			}
 		}
-		
-		static drawTransferIcon = (ctx) => {			 
-			let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);		
+
+		static drawTransferIcon = (ctx) => {
+			let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
 			let station2 = new Station(INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
 			station1.transfer = station2;
 			station1.drawTransferLine(ctx, true);
 		}
-		
+
 		drawLines = (ctx) => {
 			for (const line of metroNetwork.lines) {
 				line.drawStreets(ctx);
 			}
-			
+
 			for (const line of metroNetwork.lines) {
 				line.drawMetroLine(ctx);
 			}
@@ -93,22 +88,22 @@
 				}
 			}
 		}
-		
+
 		addMetroLine = (x, y) => {
 			if ((metroNetwork.lines.length < maxNumberOfLines && LINES_LIMIT) || !LINES_LIMIT) {
 				let line = new Line(x, y);
 				line.randomize();
-				
+
 				if (line.getLength() > MIN_LINE_LENGTH)
 					metroNetwork.lines.push(line);
 				else
 					palette.push(line.hue);
-				
+
 				for (const line of metroNetwork.lines) {
 					for (const station of line.stations) {
 						station.addTransfers(this);
 					}
-				}			
+				}
 			}
 		}
 
@@ -123,11 +118,11 @@
 
 		draw = (ctx) => {
 			if (this.lines.length > 0) {
-				if (DRAW_QUADTREE) 
+				if (DRAW_QUADTREE)
 					this.quad.drawQuadtree(ctx);
 				this.drawLines(ctx);
 				this.drawLinesInfo(ctx);
-				this.populateQuadTree();			
+				this.populateQuadTree();
 			}
 		}
 	}
@@ -172,7 +167,7 @@
 			let catY = Math.abs(station2.y - station1.y);
 			let distance = Math.sqrt(catX * catX + catY * catY);
 
-			if (distance < LINE_TRANSFER_MAX_DISTANCE && station1.transfer == null && station2.transfer == null)  {
+			if (distance < LINE_TRANSFER_MAX_DISTANCE && station1.transfer == null && station2.transfer == null) {
 				station1.transfer = station2;
 				station2.transfer = station1;
 			}
@@ -218,10 +213,10 @@
 			ctx.lineCap = "square";
 			ctx.beginPath();
 			let newStartX = this.x - Math.cos(this.angle * RAD_CONST) * (1000);
-			let newStartY = this.y - Math.sin(this.angle * RAD_CONST) * (1000);	
+			let newStartY = this.y - Math.sin(this.angle * RAD_CONST) * (1000);
 			ctx.moveTo(newStartX, newStartY);
 			let newEndX = newStartX + Math.cos(this.angle * RAD_CONST) * (2000);
-			let newEndY = newStartY +  Math.sin(this.angle * RAD_CONST) * (2000);	
+			let newEndY = newStartY + Math.sin(this.angle * RAD_CONST) * (2000);
 			ctx.lineTo(newEndX, newEndY);
 			ctx.stroke();
 		}
@@ -239,7 +234,7 @@
 
 		getLength = () => {
 			let length = 0;
-			for(const segment of this.segments) {
+			for (const segment of this.segments) {
 				length += segment.segmentLength;
 			}
 			return length;
@@ -247,15 +242,15 @@
 
 		randomizeSymbol = () => {
 			if (metroNetwork.lines.length > 0)
-				if (alphabeticLineSymbol){
+				if (alphabeticLineSymbol) {
 					let nextSymbol = Utils.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol);
-					if (nextSymbol == '['){
+					if (nextSymbol == '[') {
 						this.symbol = 1;
 						alphabeticLineSymbol = false;
-					}else{
+					} else {
 						this.symbol = nextSymbol;
 					}
-				}else
+				} else
 					this.symbol = metroNetwork.lines[metroNetwork.lines.length - 1].symbol + 1;
 		}
 
@@ -265,12 +260,12 @@
 			this.light = Utils.getRandomInt(20, 50);
 		}
 
-		randomizeSegments = () => {			
+		randomizeSegments = () => {
 			let lastX = this.x;
 			let lastY = this.y;
 			let lastDirection = 0;
 			let baseDirection = 45 * Utils.getRandomInt(0, 7);
-			let numberOfSegments = Utils.getRandomInt(3, 12);		
+			let numberOfSegments = Utils.getRandomInt(3, 12);
 
 			let firstSegment = new Segment(this.x, this.y, 0);
 			this.segments.push(firstSegment);
@@ -281,10 +276,10 @@
 
 			for (let index = 0; index < numberOfSegments; index++) {
 				let length;
-				let direction; 
+				let direction;
 				let newX;
 				let newY;
-				let segment;	
+				let segment;
 
 				length = Utils.getRandomInt(20, 200);
 				direction = baseDirection + this.getDirection(lastDirection);
@@ -294,15 +289,15 @@
 
 				newX = lastX + deltaX;
 				newY = lastY + deltaY;
-				segment = new Segment(newX, newY, length);	
-				
-				if ((newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin) 
+				segment = new Segment(newX, newY, length);
+
+				if ((newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
 					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin))
 					continue;
-	
+
 				this.addStation(length, direction, newX, newY, lastX, lastY);
 				this.addStreet(lastX, lastY, direction);
-			
+
 				this.segments.push(segment);
 
 				lastX = newX;
@@ -310,7 +305,7 @@
 
 				lastDirection = direction;
 			}
-			
+
 			this.addEndStation(lastX, lastY);
 		}
 
@@ -345,7 +340,7 @@
 		}
 
 		addStreet = (startX, startY, angle) => {
-			if (Utils.getRandomInt(1, 5) == 1){
+			if (Utils.getRandomInt(1, 5) == 1) {
 				let street = new Street(startX, startY, angle);
 				this.streets.push(street);
 			}
@@ -367,13 +362,14 @@
 			this.drawStations(ctx);
 		}
 
-		drawSegments = (ctx) => {		
+		drawSegments = (ctx) => {
 			ctx.lineCap = "round";
 			ctx.lineWidth = this.lineThickness;
 			ctx.strokeStyle = this.colorBase();
 			ctx.beginPath();
-			ctx.moveTo(this.x, this.y);	
-			for (const segment of this.segments) {;
+			ctx.moveTo(this.x, this.y);
+			for (const segment of this.segments) {
+				;
 				ctx.lineTo(segment.x, segment.y);
 			}
 			ctx.stroke();
@@ -501,7 +497,7 @@
 
 			return returnObjects;
 		}
-		
+
 		static generateQuadtree = (width, height) => {
 			return new Quadtree(0, new Rectangle(0, 0, width, height));
 		}
@@ -540,68 +536,13 @@
 		getRight = () => this.x + this.width;
 	}
 
-	class Utils {
-
-		static shuffleArray = (array) => {
-			for (let i = array.length - 1; i > 0; i--) {
-			  const j = Math.floor(Math.random() * (i + 1));
-			  const temp = array[i];
-			  array[i] = array[j];
-			  array[j] = temp;
-			}
-		}		  
-		
-		static getRandomInt = (min, max) => {
-			return Math.floor(Math.random() * max) + min;
-		}
-
-		static getRandomFloat = (min, max, decimals) => {
-			const str = (Math.random() * (max - min) + min).toFixed(
-				decimals,
-			);
-
-			return parseFloat(str);
-		}
-
-		static getRandomBool = () => {
-			return Math.random() < 0.5;
-		}
-		
-		static nextCharacter = (c) => {
-			return String.fromCharCode(c.charCodeAt(0) + 1);
-		}
-		
-		static drawCircle = (ctx, x, y, radio, color = '#00FF00', fillColor = '#00FF00') => {
-			ctx.strokeStyle = color;
-			ctx.fillStyle = fillColor;
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.arc(x, y, radio, 0, 2 * Math.PI);
-			ctx.fill();
-			ctx.stroke();
-		}
-
-		static drawRectangle = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00') => {
-			ctx.strokeStyle = color;
-			ctx.fillStyle = fillColor;
-			ctx.beginPath();
-			ctx.rect(x, y, width, height);
-			ctx.fill();
-			ctx.stroke();
-		}
-	}
-
 	let init = () => {
-		width = window.innerWidth;
-		height = window.innerHeight;
-		metroNetwork = new MetroNetwork()		
+		metroNetwork = new MetroNetwork()
 		randomize();
 		addEvents();
 	}
 
 	let addEvents = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-
 		canvas.addEventListener('click', e => {
 			metroNetwork.addMetroLine(e.offsetX, e.offsetY);
 		}, false);
@@ -611,39 +552,25 @@
 		let seed = Utils.getRandomInt(0, HSL_MAX_HUE);
 		let increment = Math.floor(HSL_MAX_HUE / maxNumberOfLines);
 		for (let i = 1; i <= maxNumberOfLines; i++) {
-            let color = seed + i * increment;
-			if (color > HSL_MAX_HUE) 
+			let color = seed + i * increment;
+			if (color > HSL_MAX_HUE)
 				color = color - HSL_MAX_HUE;
-            palette.push(color);
-        }
+			palette.push(color);
+		}
 
 		Utils.shuffleArray(palette);
 	}
-	
-	let randomize = () => {	
+
+	let randomize = () => {
 		maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
 		alphabeticLineSymbol = Utils.getRandomBool();
-		angleSegmentRange = Utils.getRandomInt(1, 3);	
-	}
-		
-	let drawFrame = (ctx, canvas) => {
-		canvas.width = width;
-		canvas.height = height;
-		ctx.fillStyle = "#000";
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		ctx.lineWidth = 1;
-		ctx.strokeStyle = '#000000';
-		ctx.strokeRect(0, 0, width, height);
+		angleSegmentRange = Utils.getRandomInt(1, 3);
 	}
 
-	let draw = () => {	
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext) {
-			let ctx = canvas.getContext('2d')
-			drawFrame(ctx, canvas);
-			metroNetwork.draw(ctx);
-		}
+	let draw = () => {
+		drawBackground(ctx, canvas);
+		metroNetwork.draw(ctx);
 	}
 
 	let loop = (timestamp) => {

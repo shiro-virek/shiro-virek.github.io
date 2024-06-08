@@ -1,26 +1,17 @@
 {
-	let width = 0;
-	let height = 0;
-	let lastPosY = 0;
-	let lastPosX = 0;
 	let angle;
-	let CANVAS_ID = "myCanvas"
-	let ENTROPY_1 = 2;
 	let BUILDINGS_COUNT = 0;
 	let MINIMUM_HEIGHT = 40;
 	let MAXIMUM_HEIGHT = 360;
-	let RAD_CONST = 0.0175;
 	let FIRST_FLOOR_HEIGHT = 20;
-
-	let lastRender = 0
 
 	let objects = [];
 
 	const CWHues = [232, 203, 189, 173, 162];
-	
+
 	const WindowTypes = Object.freeze({
 		Regular: Symbol("regular"),
-		Split: Symbol("split"),		
+		Split: Symbol("split"),
 		SplitV: Symbol("splitV"),
 		MiniWindow: Symbol("miniWindow"),
 		Triangular: Symbol("triangular"),
@@ -28,65 +19,65 @@
 		MiniWindowCenter: Symbol("miniWindowCenter")
 	});
 
-	class Building{
-		constructor(x, y){
+	class Building {
+		constructor(x, y) {
 			this.x = x;
 			this.y = y;
-			this.modules = [];			
-		}		
+			this.modules = [];
+		}
 
 		randomize = () => {
-			this.height = getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
+			this.height = Utils.getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
 			this.rows = this.getRowsNumber();
-			this.cols = getRandomInt(1, 5);		
-			this.margin = getRandomInt(0, 15);
-			this.width = getRandomInt(40, 60);
+			this.cols = Utils.getRandomInt(1, 5);
+			this.margin = Utils.getRandomInt(0, 15);
+			this.width = Utils.getRandomInt(40, 60);
 			this.CWHue = CWHues[(Math.floor(Math.random() * CWHues.length))];
-			this.CWLight= getRandomInt(10,50);
-			this.CWSaturation = getRandomInt(0,100);
-			this.hue = getRandomInt(1, 360);
-			this.saturation = getRandomInt(0, 100);
-			this.light = getRandomInt(20, 80);	
+			this.CWLight = Utils.getRandomInt(10, 50);
+			this.CWSaturation = Utils.getRandomInt(0, 100);
+			this.hue = Utils.getRandomInt(1, 360);
+			this.saturation = Utils.getRandomInt(0, 100);
+			this.light = Utils.getRandomInt(20, 80);
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
 
 			this.calculateProps();
-					
-			var rand = getRandomInt(0, Object.keys(WindowTypes).length);
+
+			var rand = Utils.getRandomInt(0, Object.keys(WindowTypes).length);
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
-			
+
 			this.randomizeModules();
 		}
 
-		getAngleDecrement = (widthDecrement) => {			
-			if (angle <= 3 ) return 0;
+		getAngleDecrement = (widthDecrement) => {
+			if (angle <= 3) return 0;
 			if (angle > 3 && angle < 20)
 				return widthDecrement / 4;
 			else
-				return widthDecrement / 2; 
+				return widthDecrement / 2;
 		}
 
 		randomizeModules = () => {
-			let numberOfModules = this.getNumberOfModules(); 
-			let lastModule = this;		
+			let numberOfModules = this.getNumberOfModules();
+			let lastModule = this;
 
-			if (numberOfModules > 1){				
-				for (let i=1; i <= numberOfModules; i++){				
-					let widthDecrement = lastModule.width * getRandomFloat(0.05, 0.3, 2); 							
-					
+			if (numberOfModules > 1) {
+				for (let i = 1; i <= numberOfModules; i++) {
+					let widthDecrement = lastModule.width * Utils.getRandomFloat(0.05, 0.3, 2);
+
 					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement));
 
-					let heightDecrement = lastModule.height * getRandomFloat(0, 0.7, 2); 
+					let heightDecrement = lastModule.height * Utils.getRandomFloat(0, 0.7, 2);
 					newModule.width = lastModule.width - widthDecrement;
 					newModule.height = lastModule.height - heightDecrement;
 					newModule.firstFloorHeight = 0;
-					
+
 					if (newModule.height >= 20)
 						newModule.rows = lastModule.rows > 1 ? lastModule.rows - 1 : 1;
-					else 
+					else
 						newModule.rows = 0;
 
 					if (newModule.width >= 20)
-						newModule.cols = lastModule.cols > 1 ? lastModule.cols - 1 : 1; 		
+						newModule.cols = lastModule.cols > 1 ? lastModule.cols - 1 : 1;
 					else
 						newModule.cols = 0;
 
@@ -97,32 +88,32 @@
 					newModule.CWSaturation = lastModule.CWSaturation;
 					newModule.hue = lastModule.hue;
 					newModule.saturation = lastModule.saturation;
-					newModule.light = lastModule.light;		
+					newModule.light = lastModule.light;
 
 					newModule.calculateProps();
-					
+
 					this.modules.push(newModule);
 
 					lastModule = newModule;
-				}			
+				}
 			}
 		}
 
-		calculateProps = () => {				
+		calculateProps = () => {
 			this.windowWidth = ((this.width - (this.margin * (this.cols + 1))) / this.cols);
-			this.windowHeight = ((this.height -  this.firstFloorHeight - (this.margin * (this.rows + 1))) / this.rows);
+			this.windowHeight = ((this.height - this.firstFloorHeight - (this.margin * (this.rows + 1))) / this.rows);
 			this.windowWidthFactor = Math.cos(angle * RAD_CONST) * this.windowWidth;
-			this.windowHeightFactor = Math.sin(angle * RAD_CONST) * this.windowWidth;			
+			this.windowHeightFactor = Math.sin(angle * RAD_CONST) * this.windowWidth;
 		}
-		
+
 		drawBuilding = (ctx) => {
 			this.drawModule(ctx, true);
-			
-			if (this.modules.length > 1){				
+
+			if (this.modules.length > 1) {
 				this.modules.forEach((module) => module.drawModule(ctx, false));
 			}
 		}
-			
+
 		drawModule = (ctx, firstModule) => {
 			this.widthFactor = Math.cos(angle * RAD_CONST) * this.width;
 			this.heightFactor = Math.sin(angle * RAD_CONST) * this.width;
@@ -131,31 +122,31 @@
 			this.drawRightFace(ctx);
 			this.drawTopFace(ctx);
 			this.drawLights(ctx);
-		
+
 			this.drawWindows(ctx);
-			
-			if (firstModule) this.drawDoor(ctx);		
+
+			if (firstModule) this.drawDoor(ctx);
 		}
 
-		drawLeftFace = (ctx) => {	
+		drawLeftFace = (ctx) => {
 			ctx.fillStyle = this.colorBase();
 			ctx.beginPath();
-			ctx.moveTo(this.x, this.y); 
-			ctx.lineTo(this.x - this.widthFactor, this.y - this.heightFactor);  
-			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height)); 
-			ctx.lineTo(this.x, this.y - this.height); 
-			ctx.lineTo(this.x, this.y); 
-			ctx.fill();		
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.x - this.widthFactor, this.y - this.heightFactor);
+			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height));
+			ctx.lineTo(this.x, this.y - this.height);
+			ctx.lineTo(this.x, this.y);
+			ctx.fill();
 		}
-				
+
 		drawRightFace = (ctx) => {
 			ctx.fillStyle = this.colorDark();
 			ctx.beginPath();
-			ctx.moveTo(this.x, this.y); 
-			ctx.lineTo(this.x + this.widthFactor, this.y - this.heightFactor);  
-			ctx.lineTo(this.x + this.widthFactor, this.y - (this.heightFactor + this.height)); 
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.x + this.widthFactor, this.y - this.heightFactor);
+			ctx.lineTo(this.x + this.widthFactor, this.y - (this.heightFactor + this.height));
 			ctx.lineTo(this.x, this.y - this.height);
-			ctx.lineTo(this.x, this.y); 
+			ctx.lineTo(this.x, this.y);
 			ctx.fill();
 		}
 
@@ -163,33 +154,33 @@
 			ctx.fillStyle = this.colorLight();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y - this.height);
-			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height));  
-			ctx.lineTo(this.x, this.y -  ((this.heightFactor * 2) + this.height)); 
-			ctx.lineTo(this.x + this.widthFactor, this.y - (this.heightFactor + this.height)); 
-			ctx.lineTo(this.x, this.y - this.height); 
-			ctx.fill();		
+			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height));
+			ctx.lineTo(this.x, this.y - ((this.heightFactor * 2) + this.height));
+			ctx.lineTo(this.x + this.widthFactor, this.y - (this.heightFactor + this.height));
+			ctx.lineTo(this.x, this.y - this.height);
+			ctx.fill();
 		}
 
-		drawLights = (ctx) => {			
+		drawLights = (ctx) => {
 			ctx.strokeStyle = this.colorLight();
 			ctx.beginPath();
-			ctx.moveTo(this.x, this.y); 
-			ctx.lineTo(this.x , this.y - this.height);
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.x, this.y - this.height);
 			ctx.stroke();
 
 			ctx.strokeStyle = this.colorLighter();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y - this.height);
-			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height)); 
-			ctx.stroke(); 
-			
+			ctx.lineTo(this.x - this.widthFactor, this.y - (this.heightFactor + this.height));
+			ctx.stroke();
+
 			ctx.strokeStyle = this.colorBase();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y - this.height);
-			ctx.lineTo(this.x + this.widthFactor, this.y - (this.heightFactor + this.height)); 
-			ctx.stroke(); 
+			ctx.lineTo(this.x + this.widthFactor, this.y - (this.heightFactor + this.height));
+			ctx.stroke();
 		}
-			
+
 		drawDoor = (ctx) => {
 			let doorHeight = 10;
 			let doorWidth = 10;
@@ -200,99 +191,99 @@
 			ctx.beginPath();
 			let wx = this.x - Math.cos(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
 			let wy = this.y - Math.sin(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
-			ctx.moveTo(wx, wy); 
-			ctx.lineTo(wx, wy - doorHeight);  
-			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight); 
-			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor); 
-			ctx.lineTo(wx, wy); 
+			ctx.moveTo(wx, wy);
+			ctx.lineTo(wx, wy - doorHeight);
+			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight);
+			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor);
+			ctx.lineTo(wx, wy);
 			ctx.fill();
 
 			ctx.fillStyle = this.colorDarkest();
 			ctx.beginPath();
 			let wx1 = this.x + Math.cos(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
-			ctx.moveTo(wx1, wy); 
-			ctx.lineTo(wx1, wy - doorHeight);  
-			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight); 
-			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor); 
-			ctx.lineTo(wx1, wy); 
+			ctx.moveTo(wx1, wy);
+			ctx.lineTo(wx1, wy - doorHeight);
+			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight);
+			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor);
+			ctx.lineTo(wx1, wy);
 			ctx.fill();
-			
+
 			ctx.strokeStyle = this.colorLight();
 			ctx.beginPath();
-			ctx.moveTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight); 
-			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor); 
+			ctx.moveTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight);
+			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor);
 			ctx.stroke();
 
 			ctx.strokeStyle = this.colorBase();
-			ctx.beginPath();			
-			ctx.moveTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight); 
-			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor);  
+			ctx.beginPath();
+			ctx.moveTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight);
+			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor);
 			ctx.stroke();
 		}
 
 		drawLeftWindow = (ctx, wx, wy) => {
 			ctx.fillStyle = this.colorCWLight();
 			ctx.beginPath();
-			ctx.moveTo(wx, wy); 
-			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);  
-			ctx.lineTo(wx - this.windowWidthFactor, wy - (this.windowHeightFactor + this.windowHeight)); 
-			ctx.lineTo(wx, wy - this.windowHeight); 
-			ctx.lineTo(wx, wy); 
+			ctx.moveTo(wx, wy);
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);
+			ctx.lineTo(wx - this.windowWidthFactor, wy - (this.windowHeightFactor + this.windowHeight));
+			ctx.lineTo(wx, wy - this.windowHeight);
+			ctx.lineTo(wx, wy);
 			ctx.fill();
 		}
 
 		drawRightWindow = (ctx, wx, wy) => {
 			ctx.fillStyle = this.colorCWBase();
 			ctx.beginPath();
-			ctx.moveTo(wx, wy); 
-			ctx.lineTo(wx + this.windowWidthFactor, wy - this.windowHeightFactor);  
-			ctx.lineTo(wx + this.windowWidthFactor, wy - (this.windowHeightFactor + this.windowHeight)); 
+			ctx.moveTo(wx, wy);
+			ctx.lineTo(wx + this.windowWidthFactor, wy - this.windowHeightFactor);
+			ctx.lineTo(wx + this.windowWidthFactor, wy - (this.windowHeightFactor + this.windowHeight));
 			ctx.lineTo(wx, wy - this.windowHeight);
-			ctx.lineTo(wx, wy); 
-			ctx.fill();		
+			ctx.lineTo(wx, wy);
+			ctx.fill();
 		}
 
-		drawWindows = (ctx) => {				
-			for (let ix = 0; ix < this.cols; ix++){
-				for (let iy = 0; iy < this.rows; iy++){
+		drawWindows = (ctx) => {
+			for (let ix = 0; ix < this.cols; ix++) {
+				for (let iy = 0; iy < this.rows; iy++) {
 					let wx = this.x - (Math.cos(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
 					let wy = this.y - this.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
 					let wx1 = this.x + (Math.cos(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
-					let wy1 = this.y -  this.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
-			
+					let wy1 = this.y - this.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
+
 					this.drawLeftWindow(ctx, wx, wy);
-					this.drawRightWindow(ctx, wx1, wy1);	
-					this.drawSpecialWindow(ctx, wx, wy, wx1, wy1);					
-					this.drawWindowsEdges(ctx, wx, wy, wx1, wy1);				
+					this.drawRightWindow(ctx, wx1, wy1);
+					this.drawSpecialWindow(ctx, wx, wy, wx1, wy1);
+					this.drawWindowsEdges(ctx, wx, wy, wx1, wy1);
 				}
 			}
-		}	
+		}
 
 		drawWindowsEdges = (ctx, wx, wy, wx1, wy1) => {
 			ctx.strokeStyle = this.colorCWLighter();
-			ctx.beginPath();		
-			ctx.moveTo(wx, wy); 
-			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);	
+			ctx.beginPath();
+			ctx.moveTo(wx, wy);
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);
 			ctx.stroke();
 			ctx.strokeStyle = this.colorCWLight();
-			ctx.beginPath();		
-			ctx.moveTo(wx1, wy1); 
-			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);	
+			ctx.beginPath();
+			ctx.moveTo(wx1, wy1);
+			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);
 			ctx.stroke();
 			ctx.strokeStyle = this.colorCWBase();
-			ctx.beginPath();		
-			ctx.moveTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor); 
-			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - this.windowHeight);	
+			ctx.beginPath();
+			ctx.moveTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - this.windowHeight);
 			ctx.stroke();
 			ctx.strokeStyle = this.colorCWDark();
-			ctx.beginPath();		
-			ctx.moveTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor); 
-			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - this.windowHeight);	
+			ctx.beginPath();
+			ctx.moveTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);
+			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - this.windowHeight);
 			ctx.stroke();
 		}
 
 		drawSpecialWindow = (ctx, wx, wy, wx1, wy1) => {
-			switch(this.windowType){
+			switch (this.windowType) {
 				case WindowTypes.MiniWindow:
 					this.drawMiniWindow(ctx, wx, wy, wx1, wy1);
 					break;
@@ -310,7 +301,7 @@
 					break;
 				case WindowTypes.MiniWindowCenter:
 					this.drawMiniWindowCenter(ctx, wx, wy, wx1, wy1);
-					break;				
+					break;
 				case WindowTypes.BorderWindow:
 					this.drawBorderWindow(ctx, wx, wy, wx1, wy1);
 					break;
@@ -321,57 +312,57 @@
 			let halfWindowHeight = (this.windowHeight / 2);
 			let halfWindowWidth = (this.windowWidth / 2);
 			let halfWidthFactor = Math.cos(angle * RAD_CONST) * halfWindowWidth;
-			let halfHeightFactor = Math.sin(angle * RAD_CONST) * halfWindowWidth; 
+			let halfHeightFactor = Math.sin(angle * RAD_CONST) * halfWindowWidth;
 
 			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
-			ctx.moveTo(wx, wy - halfWindowHeight); 
-			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor - halfWindowHeight);					
-			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor);  
+			ctx.moveTo(wx, wy - halfWindowHeight);
+			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor - halfWindowHeight);
+			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor);
 			ctx.stroke();
 
 			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
 			ctx.moveTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - halfWindowHeight);
-			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor - halfWindowHeight);  
-			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor);  
+			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor - halfWindowHeight);
+			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor);
 			ctx.stroke();
 		}
-		
+
 		drawSplitWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowHeight = (this.windowHeight / 2);
 			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
-			ctx.moveTo(wx, wy - halfWindowHeight); 
-			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - halfWindowHeight);  				
+			ctx.moveTo(wx, wy - halfWindowHeight);
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor - halfWindowHeight);
 			ctx.stroke();
 
 			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
-			ctx.moveTo(wx1, wy1 - halfWindowHeight); 
-			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - halfWindowHeight);  
+			ctx.moveTo(wx1, wy1 - halfWindowHeight);
+			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - halfWindowHeight);
 			ctx.stroke();
 		}
 
-		drawSplitVWindow = (ctx, wx, wy, wx1, wy1) => {		
+		drawSplitVWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowWidth = (this.windowWidth / 2);
 			let halfHeightFactor = Math.sin(angle * RAD_CONST) * halfWindowWidth;
 			let halfWidthFactor = Math.cos(angle * RAD_CONST) * halfWindowWidth;
 			ctx.strokeStyle = this.colorCWBase();
 
 			ctx.beginPath();
-			ctx.moveTo(wx - halfWidthFactor, wy - halfHeightFactor); 
-			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor - this.windowHeight);  				
+			ctx.moveTo(wx - halfWidthFactor, wy - halfHeightFactor);
+			ctx.lineTo(wx - halfWidthFactor, wy - halfHeightFactor - this.windowHeight);
 			ctx.stroke();
 
 			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
-			ctx.moveTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor); 
-			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor - this.windowHeight);  
+			ctx.moveTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor);
+			ctx.lineTo(wx1 + halfWidthFactor, wy1 - halfHeightFactor - this.windowHeight);
 			ctx.stroke();
 		}
-		
-		drawInterlacedWindow = (ctx, wx, wy, wx1, wy1) => {		
+
+		drawInterlacedWindow = (ctx, wx, wy, wx1, wy1) => {
 			let thirdHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3);
 			let thirdWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3);
 			let twoThirdsHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
@@ -380,42 +371,42 @@
 
 			ctx.fillStyle = this.colorCWBase();
 			ctx.beginPath();
-			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor); 
-			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);		
-			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight); 			
-			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2); 					
-			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor);		
+			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor);
+			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);
+			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2 - thirdWindowHeight);
+			ctx.lineTo(wx - thirdWidthFactor * 2, wy - thirdHeightFactor * 2);
+			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor);
 			ctx.fill();
 
 			ctx.fillStyle = this.colorCWBase();
 			ctx.beginPath();
-			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2); 
-			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 3);		
-			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 3); 			
-			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 2); 					
-			ctx.lineTo(wx - thirdWidthFactor,  wy - thirdHeightFactor - thirdWindowHeight * 2);		
-			ctx.fill();
-			
-			ctx.fillStyle = this.colorCWDark();
-			ctx.beginPath();
-			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor); 
-			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
-			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight); 			
-			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor); 					
-			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor);		
+			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 3);
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 3);
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2);
 			ctx.fill();
 
 			ctx.fillStyle = this.colorCWDark();
 			ctx.beginPath();
-			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2); 
-			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 3);		
-			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 3); 			
-			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 2); 					
-			ctx.lineTo(wx1 + thirdWidthFactor,  wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
+			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor);
+			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight);
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor);
+			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor);
+			ctx.fill();
+
+			ctx.fillStyle = this.colorCWDark();
+			ctx.beginPath();
+			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 3);
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 3);
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2);
 			ctx.fill();
 		}
-		
-		drawMiniWindowCenter = (ctx, wx, wy, wx1, wy1) => {		
+
+		drawMiniWindowCenter = (ctx, wx, wy, wx1, wy1) => {
 			let thirdHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3);
 			let thirdWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3);
 			let twoThirdsHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
@@ -424,141 +415,104 @@
 
 			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
-			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight); 
-			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2);		
-			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 2); 			
-			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight); 					
-			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);		
-			ctx.stroke();	
-			
+			ctx.moveTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);
+			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx - twoThirdsWidthFactor, wy - twoThirdsHeightFactor - thirdWindowHeight);
+			ctx.lineTo(wx - thirdWidthFactor, wy - thirdHeightFactor - thirdWindowHeight);
+			ctx.stroke();
+
 			ctx.strokeStyle = this.colorCWLight();
 			ctx.beginPath();
-			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight); 
-			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2);		
-			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 2); 			
-			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight); 					
-			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);		
+			ctx.moveTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);
+			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight * 2);
+			ctx.lineTo(wx1 + twoThirdsWidthFactor, wy1 - twoThirdsHeightFactor - thirdWindowHeight);
+			ctx.lineTo(wx1 + thirdWidthFactor, wy1 - thirdHeightFactor - thirdWindowHeight);
 			ctx.stroke();
 		}
 
 		drawTriangularWindow = (ctx, wx, wy, wx1, wy1) => {
 			ctx.fillStyle = this.colorCWLighter();
 			ctx.beginPath();
-			ctx.moveTo(wx, wy - this.windowHeight);				
-			ctx.lineTo(wx -  this.windowWidthFactor, wy - this.windowHeight - this.windowHeightFactor); 
-			ctx.lineTo(wx -  this.windowWidthFactor, wy - this.windowHeightFactor); 		
+			ctx.moveTo(wx, wy - this.windowHeight);
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeight - this.windowHeightFactor);
+			ctx.lineTo(wx - this.windowWidthFactor, wy - this.windowHeightFactor);
 			ctx.fill();
 
 			ctx.fillStyle = this.colorCWDark();
-			ctx.beginPath();		
-			ctx.moveTo(wx1, wy1); 
-			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);		
-			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - this.windowHeight); 		
-			ctx.lineTo(wx1, wy1); 
+			ctx.beginPath();
+			ctx.moveTo(wx1, wy1);
+			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor);
+			ctx.lineTo(wx1 + this.windowWidthFactor, wy1 - this.windowHeightFactor - this.windowHeight);
+			ctx.lineTo(wx1, wy1);
 			ctx.fill();
 		}
-		
+
 		getRowsNumber = () => {
-			return getRandomInt(1, Math.floor(this.height / 20)); 
+			return Utils.getRandomInt(1, Math.floor(this.height / 20));
 		}
 
 		getNumberOfModules = () => {
-			let dice = getRandomInt(1, 6);
+			let dice = Utils.getRandomInt(1, 6);
 
 			if (dice > 4)
-				return getRandomInt(1, 3);
-			else 
-				return getRandomInt(1, 10);
+				return Utils.getRandomInt(1, 3);
+			else
+				return Utils.getRandomInt(1, 10);
 		}
 
-		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`; 
-		colorLight  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light + 20}%)`; 
-		colorLighter  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light + 40}%)`; 
-		colorDark = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light - 20}%)`; 		
-		colorDarker  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light - 40}%)`;		
-		colorDarkest  = () =>  `hsl(${this.hue}, ${this.saturation}%, ${this.light - 60}%)`; 	
+		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`;
+		colorLight = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light + 20}%)`;
+		colorLighter = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light + 40}%)`;
+		colorDark = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light - 20}%)`;
+		colorDarker = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light - 40}%)`;
+		colorDarkest = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light - 60}%)`;
 
-		colorCWBase = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight}%)`; 
-		colorCWLight = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 20}%)`; 
+		colorCWBase = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight}%)`;
+		colorCWLight = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 20}%)`;
 		colorCWLighter = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 40}%)`;
 		colorCWDark = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 20}%)`;
 		colorCWDarker = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 40}%)`;
 	}
 
-	init = () => {
+	let init = () => {
 		randomize();
 		addEvents();
 		drawFrame();
 	}
 
-	getRandomInt = (min, max) => {
-		return Math.floor(Math.random() * max) + min;
-	}
-
-	getRandomFloat = (min, max, decimals) => {
-		const str = (Math.random() * (max - min) + min).toFixed(
-		  decimals,
-		);
-	  
-		return parseFloat(str);
-	}
-
-	getRandomBool = () => {
-		return Math.random() < 0.5;
-	}
-
-	addEvents = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-
+	let addEvents = () => {
 		canvas.addEventListener('click', e => {
 			addBuilding(e.offsetX, e.offsetY);
 		}, false);
 	}
 
-	randomize = () => {	
-		angle = getRandomInt(0, 40);
+	let randomize = () => {
+		angle = Utils.getRandomInt(0, 40);
 	}
 
-	drawFrame = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-		if (canvas.getContext){
-			canvas.width = width;
-	  		canvas.height = height;
-			let ctx = canvas.getContext('2d')
-			ctx.fillStyle = "#000";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			ctx.lineWidth = 1;
-			ctx.strokeStyle = '#000000';
-			ctx.strokeRect(0, 0, width, height);
-		}
-	}	
-
-	addBuilding = (x, y) => {	
-		let building = new Building(x, y);	
-		building.randomize();	
+	let addBuilding = (x, y) => {
+		let building = new Building(x, y);
+		building.randomize();
 		objects.push(building);
-		BUILDINGS_COUNT++; 
-	}			
-			
-	draw = () => {	
-		drawFrame();
+		BUILDINGS_COUNT++;
+	}
+
+	let draw = () => {
+		drawBackground(ctx, canvas);
 
 		if (BUILDINGS_COUNT > 0)
-			for (let i = 0; i < BUILDINGS_COUNT; i++){
+			for (let i = 0; i < BUILDINGS_COUNT; i++) {
 				let canvas = document.getElementById(CANVAS_ID);
-				if (canvas.getContext){
+				if (canvas.getContext) {
 					let ctx = canvas.getContext('2d');
 					objects[i].drawBuilding(ctx);
-				}			
-			}				
+				}
+			}
 	}
 
-	width = window.innerWidth;
-	height = window.innerHeight;
-	lastPosY = 0;
-	lastPosX = 0;			
-
-	loop = (timestamp) => {
+	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
 		draw();
