@@ -1,5 +1,7 @@
 let width = 0;
 let height = 0;
+let halfWidth = 0;
+let halfHeight = 0;
 let lastPosY = 0;
 let lastPosX = 0;
 let CANVAS_ID = "myCanvas"
@@ -10,6 +12,8 @@ let lastRender = 0;
 
 width = window.innerWidth;
 height = window.innerHeight;
+halfWidth = width / 2;
+halfHeight = height / 2;
 lastPosY = 0;
 lastPosX = 0;
 
