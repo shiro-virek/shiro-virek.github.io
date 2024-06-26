@@ -10,13 +10,96 @@
         }
 
         draw = () => {
+            const visibleFaces = [];
+
+            const distance = 2000;
+            const theta = Math.PI / 4;  // 45 grados
+            const phi = Math.PI / 4;    // 45 grados
+            
+            //const cameraPosition = Utils.calculateCameraPosition(distance, theta, phi);
+            const cameraPosition = [width / 2, height / 2, 0];
+
+
+            for (let i = 0; i < this.figures.length; i++) {
+
+                let vertices = this.figures[i].vertices;
+
+                for (let j = 0; j < this.figures[i].faces.length; j++) {
+                    let face = this.figures[i].faces[j];
+                    let center = Utils.calculateCenter(vertices, face);
+                    let viewVector = Utils.subtractVectors(center, cameraPosition);  
+                    let normal = Utils.calculateFaceNormal(vertices, face);
+                    let dp = Utils.dotProduct(normal, viewVector);
+                    
+                    if (dp > 0) {
+                        visibleFaces.push(face); 
+                    }
+                }
+
+                visibleFaces.forEach(face => {                    
+                    ctx.fillStyle = "#0080f0";
+                    ctx.beginPath();
+                    let point2d = world.worldToScreen(vertices[face[0]]);                                                
+                    ctx.moveTo(point2d.x, point2d.y);
+                    point2d = world.worldToScreen(vertices[face[1]]);  
+                    ctx.lineTo(point2d.x, point2d.y);
+                    point2d = world.worldToScreen(vertices[face[2]]);  
+                    ctx.lineTo(point2d.x, point2d.y);
+                    point2d = world.worldToScreen(vertices[face[3]]);  
+                    ctx.lineTo(point2d.x, point2d.y);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                });
+            }
+
+            /*
             if (this.drawEdges)
                 this.drawFigures();
             else
                 this.drawFiguresVertices();
+            */
         }
 
         setFigureTypes = () => {
+            let cube = {
+                vertices: [
+                    [0, 0, 0],
+                    [32, 0, 0],
+                    [32, 32, 0],
+                    [0, 32, 0],
+                    [0, 0, 32],
+                    [32, 0, 32],
+                    [32, 32, 32],
+                    [0, 32, 32]
+                ],
+                edges: [
+                    [0, 1],
+                    [1, 2],
+                    [2, 3],
+                    [3, 0],
+                    [0, 4],
+                    [1, 5],
+                    [2, 6],
+                    [3, 7],
+                    [4, 5],
+                    [5, 6],
+                    [6, 7],
+                    [7, 4]
+                ],
+                faces: [
+                    [0, 1, 2, 3], 
+                    [4, 5, 6, 7], 
+                    [3, 2, 6, 7], 
+                    [0, 1, 5, 4],  
+                    [0, 3, 7, 4], 
+                    [1, 2, 6, 5]  
+                ]
+
+            };
+
+            this.figureTypes.push(cube);
+            /*
                         let letterV = {
                             vertices: [
                                 [0, 0, 0],
@@ -41,16 +124,13 @@
                                 [10, 8],
                                 [8, 9],
                                 [6, 11],
-                                [11, 9],
-            
-                                //Z              
+                                [11, 9],            
                                 [0, 6],
                                 [1, 7],
                                 [2, 8],
                                 [3, 9],
                                 [4, 10],
                                 [5, 11],
-            
                                 [0, 1],
                                 [1, 4],
                                 [4, 2],
@@ -62,39 +142,6 @@
                         };
             
                         this.figureTypes.push(letterV);
-            
-                        let cube = {
-                            vertices: [
-                                [0, 0, 0],
-                                [30, 0, 0],
-                                [0, 30, 0],
-                                [30, 30, 0],
-                                [0, 0, 30],
-                                [30, 0, 30],
-                                [0, 30, 30],
-                                [30, 30, 30],
-                            ],
-                            edges: [
-            
-                                [0, 1],
-                                [1, 3],
-                                [2, 3],
-                                [0, 2],
-            
-                                [4, 5],
-                                [5, 7],
-                                [7, 6],
-                                [4, 6],
-            
-                                [0, 4],
-                                [1, 5],
-                                [3, 7],
-                                [2, 6]
-                            ]
-            
-                        };
-            
-                        this.figureTypes.push(cube);
             
                         let pyramid = {
                             vertices: [
@@ -166,23 +213,7 @@
                         };
             
                         this.figureTypes.push(icosahedron);
-            
-
-            let dodecahedron = {
-                vertices: [
-                    [16, 16, 16], [-16, 16, 16], [16, -16, 16], [16, 16, -16], [-16, -16, 16], [16, -16, -16], [-16, 16, -16], [-16, -16, -16],
-                    [0, 25.88854, 9.47214], [0, 25.88854, -9.47214], [0, -25.88854, 9.47214], [0, -25.88854, -9.47214],
-                    [9.47214, 0, 25.88854], [-9.47214, 0, 25.88854], [9.47214, 0, -25.88854], [-9.47214, 0, -25.88854],
-                    [25.88854, 9.47214, 0], [-25.88854, 9.47214, 0], [25.88854, -9.47214, 0], [-25.88854, -9.47214, 0]
-                ],
-                edges: [
-                    [0, 1], [0, 2], [0, 3], [1, 4], [1, 6], [2, 5], [2, 8], [3, 7], [3, 14], [4, 5], [4, 9], [5, 10],
-                    [6, 7], [6, 15], [7, 11], [8, 10], [8, 12], [9, 11], [9, 13], [10, 16], [11, 17], [12, 14], [12, 18],
-                    [13, 15], [13, 19], [14, 16], [15, 17], [16, 18], [17, 19], [18, 19]
-                ]
-            };
-
-            this.figureTypes.push(dodecahedron);
+            */
         }
 
         worldToScreen = (point) => {
@@ -231,10 +262,6 @@
             return p1;
         }
 
-        static sexagesimalToRadian = (degrees) => {
-            return degrees * (Math.PI / 180);
-        }
-
         addDistance = (distance) => {
             if (this.FOV + distance > 0)
                 this.FOV += distance;
@@ -257,6 +284,7 @@
 
             figure.vertices = Utils.clone(this.figureInfo.vertices);
             figure.edges = Utils.clone(this.figureInfo.edges);
+            figure.faces = Utils.clone(this.figureInfo.faces);
 
             figure.translateX(x);
             figure.translateY(y);
@@ -272,7 +300,7 @@
         }
 
         rotateZ = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Utils.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
@@ -282,7 +310,7 @@
         }
 
         rotateY = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Utils.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
@@ -292,7 +320,7 @@
         }
 
         rotateX = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Utils.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
