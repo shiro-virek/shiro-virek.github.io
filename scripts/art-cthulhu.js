@@ -8,6 +8,7 @@
 	let SHOW_RINGS = true;
 	let SATURATION = 50;
 	let LIGHTNESS_FACTOR = 50;
+	let ROTATE = 0;
 
 	let TENTACLES_COUNT = 5;
 
@@ -44,7 +45,7 @@
 			this.deltaX = mouseX - this.x;
 			this.deltaY = mouseY - this.y;
 
-			let speedAxes = Utils.polarToCartesian(this.speed, this.tentacle * (Utils.degToRad(360) / TENTACLES_COUNT));
+			let speedAxes = Utils.polarToCartesian(this.speed, (this.tentacle * Utils.degToRad(360) / TENTACLES_COUNT) + Utils.degToRad(ROTATE));
 
 			this.deltaX += speedAxes.x + distanceToCenter;
 			this.deltaY += speedAxes.y + distanceToCenter;
@@ -92,9 +93,9 @@
 	}
 
 	let addSlices = () => {
-		for (let i = 1; i <= TENTACLES_COUNT; i++)	{
-			for (let j = SLICES_COUNT; j > 0; j--) {
-				slices.push(new Slice(i, j, mouseX, mouseY));
+		for (let j = SLICES_COUNT; j > 0; j--) {
+			for (let i = 1; i <= TENTACLES_COUNT; i++)	{
+				slices.push(new Slice(i, j, 0, mouseX, mouseY));
 			}
 		}
 	}
@@ -104,10 +105,11 @@
 		LIGHTNESS_FACTOR = Utils.getRandomInt(0, 100);
 		SATURATION = Utils.getRandomInt(0, 100);
 		SHOW_RINGS = Utils.getRandomBool();
-		TENTACLES_COUNT = Utils.getRandomInt(1, 6);
+		TENTACLES_COUNT = Utils.getRandomInt(1, 8);
+		ROTATE = Utils.getRandomInt(0, 360);
 
-		SLICES_COUNT = Utils.getRandomInt(10, 60); //60
-		RINGS_DISTANCE = Utils.getRandomInt(10, 20); //20
+		SLICES_COUNT = Utils.getRandomInt(10, 60);
+		RINGS_DISTANCE = Utils.getRandomInt(10, 20); 
 		RINGS_SPEED = Utils.getRandomInt(1, 5);
 		CENTER_MOVEMENT_SPEED = Utils.getRandomInt(1, 5);
 		MAX_DISTANCE_TO_CENTER = Utils.getRandomInt(0, 60);
@@ -150,8 +152,10 @@
 	}
 
 	let draw = () => {
-		drawBackground(ctx, canvas);
+		ROTATE += 0.5;
 
+		drawBackground(ctx, canvas);
+		
 		for (let i = 0; i < SLICES_COUNT * TENTACLES_COUNT; i++) {
 			slices[i].update();
 
