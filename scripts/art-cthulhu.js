@@ -10,16 +10,17 @@
 	let LIGHTNESS_FACTOR = 50;
 	let ROTATE_AUTO = false;
 	let ROTATION_ANGLE = 0;
-
+	let ROTATION_INCREMENT = 0.5;
 	let TENTACLES_COUNT = 5;
 
 	let HUE = 0;
 
 	let distanceToCenter = 0;
 	let movingToCenter = false;
-	let colorFactor = 0;
-	let globalCounter = 0;
+	let ringShift = 0;
+	let timeCounter = 0;
 	let slices = [];
+	let ringIterations = 0;
 
 	let mouseX;
 	let mouseY;
@@ -69,17 +70,17 @@
 		}
 	}
 
-	let updateColorFactor = () => {
-		if (globalCounter % RINGS_SPEED == 0) {
-			if (colorFactor >= RINGS_DISTANCE)
-				colorFactor = 1;
+	let updateRingShift = () => {
+		if (timeCounter % RINGS_SPEED == 0) {
+			if (ringShift >= RINGS_DISTANCE)
+				ringShift = 1;
 			else
-				colorFactor += 1;
+				ringShift += 1;
 		}
 	}
 
 	let updateDistanceToCenter = () => {
-		if (globalCounter % CENTER_MOVEMENT_SPEED == 0) {
+		if (timeCounter % CENTER_MOVEMENT_SPEED == 0) {
 			if (distanceToCenter > MAX_DISTANCE_TO_CENTER)
 				movingToCenter = true;
 
@@ -109,13 +110,15 @@
 		TENTACLES_COUNT = Utils.getRandomInt(1, 8);
 		ROTATE_AUTO = Utils.getRandomBool();
 		ROTATION_ANGLE = Utils.getRandomInt(0, 360);
-
+		ROTATION_INCREMENT = Utils.getRandomFloat(-1.0, 1.0, 1);
 		SLICES_COUNT = Utils.getRandomInt(10, 60);
 		RINGS_DISTANCE = Utils.getRandomInt(10, 20); 
 		RINGS_SPEED = Utils.getRandomInt(1, 5);
 		CENTER_MOVEMENT_SPEED = Utils.getRandomInt(1, 5);
 		MAX_DISTANCE_TO_CENTER = Utils.getRandomInt(0, 60);
 		TENTACLES_MOVEMENT = Utils.getRandomBool();
+
+		ringIterations = SLICES_COUNT / RINGS_DISTANCE * TENTACLES_COUNT;
 	}
 
 	let addEvents = () => {
@@ -141,20 +144,18 @@
 		drawBackground(ctx, canvas);
 	}
 
-	let isLight = (indexRing) => {
+	let isRing = (indexSlice) => {
 		let result = false;
 
-		let iterations = SLICES_COUNT / RINGS_DISTANCE * 4;
-
-		for (let i = 0; i <= iterations; i++) {
-			result = result || (indexRing >= colorFactor + (RINGS_DISTANCE * i) && indexRing < colorFactor + (RINGS_DISTANCE * i) + 4);
+		for (let i = 0; i <= ringIterations; i++) {
+			result = result || (indexSlice >= ringShift + (RINGS_DISTANCE * i) && indexSlice < ringShift + (RINGS_DISTANCE * i) + TENTACLES_COUNT);
 		}
 
 		return result;
 	}
 
 	let draw = () => {
-		if (ROTATE_AUTO) ROTATION_ANGLE += 0.5;
+		if (ROTATE_AUTO) ROTATION_ANGLE += ROTATION_INCREMENT;
 
 		drawBackground(ctx, canvas);
 		
@@ -163,7 +164,7 @@
 
 			let lightness = Utils.scale(SLICES_COUNT-slices[i].index, 0, SLICES_COUNT, 0, LIGHTNESS_FACTOR); 
 
-			if (SHOW_RINGS && isLight(i))
+			if (SHOW_RINGS && isRing(i))
 				color = `hsl(${HUE}, ${SATURATION}%, ${lightness + 10}%)`;
 			else
 				color = `hsl(${HUE}, ${SATURATION}%, ${lightness}%)`;
@@ -171,11 +172,11 @@
 			Utils.drawCircle(ctx, slices[i].x, slices[i].y, slices[i].diameter, color, color);
 		}
 
-		updateColorFactor();
+		updateRingShift();
 
 		if (TENTACLES_MOVEMENT) updateDistanceToCenter();
 
-		globalCounter++;
+		timeCounter++;
 	}
 
 	let trackMouse = (x, y) => {
