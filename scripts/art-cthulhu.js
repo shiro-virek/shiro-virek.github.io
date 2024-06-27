@@ -8,7 +8,8 @@
 	let SHOW_RINGS = true;
 	let SATURATION = 50;
 	let LIGHTNESS_FACTOR = 50;
-	let ROTATE = 0;
+	let ROTATE_AUTO = false;
+	let ROTATION_ANGLE = 0;
 
 	let TENTACLES_COUNT = 5;
 
@@ -45,10 +46,10 @@
 			this.deltaX = mouseX - this.x;
 			this.deltaY = mouseY - this.y;
 
-			let speedAxes = Utils.polarToCartesian(this.speed, (this.tentacle * Utils.degToRad(360) / TENTACLES_COUNT) + Utils.degToRad(ROTATE));
+			let speedAxes = Utils.polarToCartesian(this.speed + distanceToCenter, (this.tentacle * Utils.degToRad(360) / TENTACLES_COUNT) + Utils.degToRad(ROTATION_ANGLE));
 
-			this.deltaX += speedAxes.x + distanceToCenter;
-			this.deltaY += speedAxes.y + distanceToCenter;
+			this.deltaX += speedAxes.x;
+			this.deltaY += speedAxes.y;
 
 			this.x += (this.deltaX / this.speed);
 			this.y += (this.deltaY / this.speed);
@@ -106,7 +107,8 @@
 		SATURATION = Utils.getRandomInt(0, 100);
 		SHOW_RINGS = Utils.getRandomBool();
 		TENTACLES_COUNT = Utils.getRandomInt(1, 8);
-		ROTATE = Utils.getRandomInt(0, 360);
+		ROTATE_AUTO = Utils.getRandomBool();
+		ROTATION_ANGLE = Utils.getRandomInt(0, 360);
 
 		SLICES_COUNT = Utils.getRandomInt(10, 60);
 		RINGS_DISTANCE = Utils.getRandomInt(10, 20); 
@@ -152,18 +154,18 @@
 	}
 
 	let draw = () => {
-		ROTATE += 0.5;
+		if (ROTATE_AUTO) ROTATION_ANGLE += 0.5;
 
 		drawBackground(ctx, canvas);
 		
 		for (let i = 0; i < SLICES_COUNT * TENTACLES_COUNT; i++) {
 			slices[i].update();
 
-			let lightness = Utils.scale(SLICES_COUNT-slices[i].index, 0, SLICES_COUNT, 0, LIGHTNESS_FACTOR); // (i * LIGHTNESS_FACTOR); // / (SLICES_COUNT * TENTACLES_COUNT * slices[i].tentacle ));
+			let lightness = Utils.scale(SLICES_COUNT-slices[i].index, 0, SLICES_COUNT, 0, LIGHTNESS_FACTOR); 
 
-			//if (SHOW_RINGS && isLight(i))
-			//	color = `hsl(${HUE}, ${SATURATION}%, ${lightness + 10}%)`;
-			//else
+			if (SHOW_RINGS && isLight(i))
+				color = `hsl(${HUE}, ${SATURATION}%, ${lightness + 10}%)`;
+			else
 				color = `hsl(${HUE}, ${SATURATION}%, ${lightness}%)`;
 
 			Utils.drawCircle(ctx, slices[i].x, slices[i].y, slices[i].diameter, color, color);
@@ -171,7 +173,7 @@
 
 		updateColorFactor();
 
-		//if (TENTACLES_MOVEMENT) updateDistanceToCenter();
+		if (TENTACLES_MOVEMENT) updateDistanceToCenter();
 
 		globalCounter++;
 	}
