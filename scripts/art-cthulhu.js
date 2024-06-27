@@ -12,7 +12,6 @@
 	let ROTATION_ANGLE = 0;
 	let ROTATION_INCREMENT = 0.5;
 	let TENTACLES_COUNT = 5;
-
 	let HUE = 0;
 
 	let distanceToCenter = 0;

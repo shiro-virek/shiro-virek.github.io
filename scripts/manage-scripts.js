@@ -1,7 +1,6 @@
 let currentScript = 0;
 let scriptCount = 0;
 const art = [
-                "tentacles", 
                 "confetti", 
                 "fire", 
                 "rotators", 
