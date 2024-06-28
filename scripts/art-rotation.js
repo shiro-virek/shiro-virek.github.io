@@ -2,56 +2,50 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = 2000;
+            this.FOV = 1000;
             this.drawEdges = true;
             this.figureTypes = [];
             this.setFigureTypes();
             this.figureInfo = {};
         }
 
+        shouldDrawFace = (vertices) => {
+            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
+            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
+    
+            const normal = Utils.crossProduct(vector1, vector2);
+    
+            const cameraDirection = [0, 0, 1];
+    
+            return Utils.dotProduct(normal, cameraDirection) > 0;
+        }
+
         draw = () => {
-            const visibleFaces = [];
 
-            const distance = 2000;
-            const theta = Math.PI / 4;  // 45 grados
-            const phi = Math.PI / 4;    // 45 grados
-            
-            //const cameraPosition = Utils.calculateCameraPosition(distance, theta, phi);
-            const cameraPosition = [width / 2, height / 2, 0];
+            this.figures.forEach(figure => {
+                
+                figure.faces.forEach(face => {
+                    const faceVertices = face.map(index => figure.vertices[index]);
+                    if (this.shouldDrawFace(faceVertices)) {
 
-
-            for (let i = 0; i < this.figures.length; i++) {
-
-                let vertices = this.figures[i].vertices;
-
-                for (let j = 0; j < this.figures[i].faces.length; j++) {
-                    let face = this.figures[i].faces[j];
-                    let center = Utils.calculateCenter(vertices, face);
-                    let viewVector = Utils.subtractVectors(center, cameraPosition);  
-                    let normal = Utils.calculateFaceNormal(vertices, face);
-                    let dp = Utils.dotProduct(normal, viewVector);
-                    
-                    if (dp > 0) {
-                        visibleFaces.push(face); 
+                
+                        ctx.fillStyle = "#0080f0";
+                        ctx.beginPath();
+                        ctx.moveTo(figure.vertices[face[0]][0], figure.vertices[face[0]][1]);
+                        ctx.lineTo(figure.vertices[face[1]][0], figure.vertices[face[1]][1]);
+                        ctx.lineTo(figure.vertices[face[2]][0], figure.vertices[face[2]][1]);
+                        ctx.lineTo(figure.vertices[face[3]][0], figure.vertices[face[3]][1]);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                        
                     }
-                }
-
-                visibleFaces.forEach(face => {                    
-                    ctx.fillStyle = "#0080f0";
-                    ctx.beginPath();
-                    let point2d = world.worldToScreen(vertices[face[0]]);                                                
-                    ctx.moveTo(point2d.x, point2d.y);
-                    point2d = world.worldToScreen(vertices[face[1]]);  
-                    ctx.lineTo(point2d.x, point2d.y);
-                    point2d = world.worldToScreen(vertices[face[2]]);  
-                    ctx.lineTo(point2d.x, point2d.y);
-                    point2d = world.worldToScreen(vertices[face[3]]);  
-                    ctx.lineTo(point2d.x, point2d.y);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
                 });
-            }
+
+            });
+
+
+
 
             /*
             if (this.drawEdges)
@@ -64,14 +58,14 @@
         setFigureTypes = () => {
             let cube = {
                 vertices: [
-                    [0, 0, 0],
-                    [32, 0, 0],
-                    [32, 32, 0],
-                    [0, 32, 0],
-                    [0, 0, 32],
-                    [32, 0, 32],
-                    [32, 32, 32],
-                    [0, 32, 32]
+                    [16, 16, 16],
+                    [16, -16, 16],
+                    [-16, -16, 16],
+                    [-16, 16, 16],
+                    [16, 16, -16],
+                    [16, -16, -16],
+                    [-16, -16, -16],
+                    [-16, 16, -16]
                 ],
                 edges: [
                     [0, 1],
@@ -88,12 +82,12 @@
                     [7, 4]
                 ],
                 faces: [
-                    [0, 1, 2, 3], 
-                    [4, 5, 6, 7], 
-                    [3, 2, 6, 7], 
-                    [0, 1, 5, 4],  
-                    [0, 3, 7, 4], 
-                    [1, 2, 6, 5]  
+                    [0, 1, 2, 3],
+                    [4, 5, 6, 7],
+                    [0, 1, 5, 4],
+                    [1, 2, 6, 5],
+                    [2, 3, 7, 6],
+                    [3, 0, 4, 7]
                 ]
 
             };
@@ -220,12 +214,7 @@
             const scaleFactor = this.FOV / (this.FOV + point[2]);
             const projectedX = point[0] * scaleFactor;
             const projectedY = point[1] * scaleFactor;
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
+            return [projectedX, projectedY];
         }
 
         worldToScreenOblique = (point, angleX, angleY) => {
@@ -279,7 +268,7 @@
             }
         }
 
-        addFigure(x, y) {
+        addFigure = (x, y) => {
             let figure = new Figure();
 
             figure.vertices = Utils.clone(this.figureInfo.vertices);
@@ -353,7 +342,6 @@
                 this.vertices[i][1] *= factor;
                 this.vertices[i][2] *= factor;
             }
-
         }
 
         scaleX = (factor) => {
@@ -399,7 +387,7 @@
             let point2d0 = world.worldToScreen(p0);
             let point2d1 = world.worldToScreen(p1);
 
-            Utils.drawLine(ctx, point2d0.x, point2d0.y, point2d1.x, point2d1.y, 1, color);
+            Utils.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
         }
 
         drawVertex = (point, color) => {
@@ -407,7 +395,7 @@
 
             let newColor = `hsl(${Utils.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
 
-            Utils.drawDot(ctx, vertex.x, vertex.y, newColor);
+            Utils.drawDot(ctx, vertex[0], vertex[1], newColor);
         }
 
         drawFigure = () => {
