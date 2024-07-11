@@ -13,7 +13,8 @@ const art = [
                 "conway", 
                 "motion-matrix",
                 "balls-bouncing",
-                "cthulhu"
+                "cthulhu",
+                "rotation-solid"
             ];
 const scripts = [];
 
