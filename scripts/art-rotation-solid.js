@@ -9,41 +9,10 @@
             this.figureInfo = {};
         }
 
-        shouldDrawFace = (vertices) => {
-            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
-            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
-    
-            const normal = Utils.crossProduct(vector1, vector2);
-    
-            const cameraDirection = [0, 0, 1];
-    
-            return Utils.dotProduct(normal, cameraDirection) > 0;
-        }
-
         draw = () => {
-
-            this.figures.forEach(figure => {
-                
-                figure.faces.forEach(face => {
-                    const faceVertices = face.map(index => figure.vertices[index]);
-                    if (this.shouldDrawFace(faceVertices)) {
-
-                
-                        ctx.fillStyle = "#0080f0";
-                        ctx.beginPath();
-                        ctx.moveTo(figure.vertices[face[0]][0], figure.vertices[face[0]][1]);
-                        ctx.lineTo(figure.vertices[face[1]][0], figure.vertices[face[1]][1]);
-                        ctx.lineTo(figure.vertices[face[2]][0], figure.vertices[face[2]][1]);
-                        ctx.lineTo(figure.vertices[face[3]][0], figure.vertices[face[3]][1]);
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.stroke();
-                        
-                    }
-                });
-
+            this.figures.forEach(figure => {          
+                figure.draw();       
             });
-
         }
 
         setFigureTypes = () => {
@@ -80,7 +49,6 @@
                     [2, 3, 7, 6],
                     [3, 0, 4, 7]
                 ]
-
             };
 
             this.figureTypes.push(cube);
@@ -93,55 +61,9 @@
             return [projectedX, projectedY];
         }
 
-        worldToScreenOblique = (point, angleX, angleY) => {
-            const radianX = (angleX * Math.PI) / 180;
-            const radianY = (angleY * Math.PI) / 180;
-
-            const projectedX = point[0] + point[2] * Math.tan(radianY);
-            const projectedY = point[1] + point[2] * Math.tan(radianX);
-
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
-        }
-
-        worldToScreenIsometric = (point) => {
-            const isoMatrix = [
-                Math.sqrt(3) / 2, -1 / 2, 0,
-                Math.sqrt(3) / 2, 1 / 2, 0,
-                0, 0, 1
-            ];
-
-            const projectedX = isoMatrix[0] * point[0] + isoMatrix[1] * point[1] + isoMatrix[2] * point[2];
-            const projectedY = isoMatrix[3] * point[0] + isoMatrix[4] * point[1] + isoMatrix[5] * point[2];
-            const projectedZ = isoMatrix[6] * point[0] + isoMatrix[7] * point[1] + isoMatrix[8] * point[2];
-
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
-        }
-
         addDistance = (distance) => {
             if (this.FOV + distance > 0)
                 this.FOV += distance;
-        }
-
-        drawFigures = () => {
-            for (let i = this.figures.length - 1; i >= 0; i--) {
-                this.figures[i].drawFigure(ctx);
-            }
-        }
-
-        drawFiguresVertices = () => {
-            for (let i = this.figures.length - 1; i >= 0; i--) {
-                this.figures[i].drawVertices(ctx);
-            }
         }
 
         addFigure = (x, y) => {
@@ -259,31 +181,37 @@
             }
         }
 
-        drawEdge = (p0, p1, color) => {
-            let point2d0 = world.worldToScreen(p0);
-            let point2d1 = world.worldToScreen(p1);
-
-            Utils.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
+        draw = () => {
+            this.faces.forEach(face => {
+                const faceVertices = face.map(index => this.vertices[index]);
+                if (this.shouldDrawFace(faceVertices)) {
+                    this.drawFace(faceVertices);                        
+                }
+            });
         }
 
-        drawVertex = (point, color) => {
-            let vertex = world.worldToScreen(point);
-
-            let newColor = `hsl(${Utils.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
-
-            Utils.drawDot(ctx, vertex[0], vertex[1], newColor);
+        shouldDrawFace = (vertices) => {
+            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
+            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
+    
+            const normal = Utils.crossProduct(vector1, vector2);
+    
+            const cameraDirection = [0, 0, 1];
+    
+            return Utils.dotProduct(normal, cameraDirection) > 0;
         }
 
-        drawFigure = () => {
-            for (let i = this.edges.length - 1; i >= 0; i--) {
-                this.drawEdge(this.vertices[this.edges[i][0]], this.vertices[this.edges[i][1]]);
+
+        drawFace = (vertices) => {
+            ctx.fillStyle = "#0080f0";
+            ctx.beginPath();
+            ctx.moveTo(vertices[0][0], vertices[0][1]);
+            for (let i = 1; i < vertices.length; i++) {
+                ctx.lineTo(vertices[i][0], vertices[i][1]);
             }
-        }
-
-        drawVertices = () => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.drawVertex(this.vertices[i]);
-            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fill();
         }
     }
 
