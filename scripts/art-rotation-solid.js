@@ -201,7 +201,6 @@
             return Utils.dotProduct(normal, cameraDirection) > 0;
         }
 
-
         drawFace = (vertices) => {
             ctx.fillStyle = "#0080f0";
             ctx.beginPath();
