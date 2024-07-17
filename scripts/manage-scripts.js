@@ -1,7 +1,6 @@
 let currentScript = 0;
 let scriptCount = 0;
 const art = [
-                "tentacles", 
                 "confetti", 
                 "fire", 
                 "rotators", 
@@ -13,7 +12,9 @@ const art = [
                 "ledscreen", 
                 "conway", 
                 "motion-matrix",
-                "balls-bouncing"
+                "balls-bouncing",
+                "cthulhu",
+                "rotation-solid"
             ];
 const scripts = [];
 

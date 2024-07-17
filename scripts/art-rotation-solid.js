@@ -2,7 +2,7 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = 2000;
+            this.FOV = 1000;
             this.drawEdges = true;
             this.figureTypes = [];
             this.setFigureTypes();
@@ -10,186 +10,55 @@
         }
 
         draw = () => {
-            if (this.drawEdges)
-                this.drawFigures();
-            else
-                this.drawFiguresVertices();
+            this.figures.forEach(figure => {          
+                figure.draw();       
+            });
         }
 
         setFigureTypes = () => {
-            let letterV = {
-                vertices: [
-                    [0, 0, 0],
-                    [30, 0, 0],
-                    [60, 0, 0],
-                    [90, 0, 0],
-
-                    [45, 35, 0],
-                    [45, 75, 0],
-
-                    [0, 0, 20],
-                    [30, 0, 20],
-                    [60, 0, 20],
-                    [90, 0, 20],
-
-                    [45, 35, 20],
-                    [45, 75, 20]
-                ],
-                edges: [
-                    [6, 7, "#00FF00"],
-                    [7, 10, "#00FF00"],
-                    [10, 8, "#00FF00"],
-                    [8, 9, "#00FF00"],
-                    [6, 11, "#00FF00"],
-                    [11, 9, "#00FF00"],
-
-                    //Z              
-                    [0, 6, "#0000FF"],
-                    [1, 7, "#0000FF"],
-                    [2, 8, "#0000FF"],
-                    [3, 9, "#0000FF"],
-                    [4, 10, "#0000FF"],
-                    [5, 11, "#0000FF"],
-
-                    [0, 1, "#FF0000"],
-                    [1, 4, "#FF0000"],
-                    [4, 2, "#FF0000"],
-                    [2, 3, "#FF0000"],
-                    [0, 5, "#FF0000"],
-                    [5, 3, "#FF0000"]
-                ]
-
-            };
-
-            this.figureTypes.push(letterV);
-
             let cube = {
                 vertices: [
-                    [0, 0, 0],
-                    [30, 0, 0],
-                    [0, 30, 0],
-                    [30, 30, 0],
-                    [0, 0, 30],
-                    [30, 0, 30],
-                    [0, 30, 30],
-                    [30, 30, 30],
+                    [16, 16, 16],
+                    [16, -16, 16],
+                    [-16, -16, 16],
+                    [-16, 16, 16],
+                    [16, 16, -16],
+                    [16, -16, -16],
+                    [-16, -16, -16],
+                    [-16, 16, -16]
                 ],
                 edges: [
-
-                    [0, 1, "#0000FF"],
-                    [1, 3, "#0000FF"],
-                    [2, 3, "#0000FF"],
-                    [0, 2, "#0000FF"],
-
-                    [4, 5, "#00FF00"],
-                    [5, 7, "#00FF00"],
-                    [7, 6, "#00FF00"],
-                    [4, 6, "#00FF00"],
-
-                    [0, 4, "#FF0000"],
-                    [1, 5, "#FF0000"],
-                    [3, 7, "#FF0000"],
-                    [2, 6, "#FF0000"]
+                    [0, 1],
+                    [1, 2],
+                    [2, 3],
+                    [3, 0],
+                    [0, 4],
+                    [1, 5],
+                    [2, 6],
+                    [3, 7],
+                    [4, 5],
+                    [5, 6],
+                    [6, 7],
+                    [7, 4]
+                ],
+                faces: [
+                    [0, 1, 2, 3],
+                    [4, 5, 6, 7],
+                    [0, 1, 5, 4],
+                    [1, 2, 6, 5],
+                    [2, 3, 7, 6],
+                    [3, 0, 4, 7]
                 ]
-
             };
 
             this.figureTypes.push(cube);
-
-            let pyramid = {
-                vertices: [
-                    [10, 0, 10],
-                    [0, 20, 20],
-                    [20, 20, 20],
-                    [0, 20, 0],
-                    [20, 20, 0]
-                ],
-                edges: [
-
-                    [0, 1, "#0000FF"],
-                    [0, 2, "#0000FF"],
-                    [0, 3, "#0000FF"],
-                    [0, 4, "#0000FF"],
-                    [1, 2, "#00FF00"],
-                    [2, 4, "#00FF00"],
-                    [3, 4, "#00FF00"],
-                    [3, 1, "#00FF00"]
-                ]
-
-            };
-
-            this.figureTypes.push(pyramid);
-
-            let pyramid2 = {
-                vertices: [
-                    [10, 0, 10],
-                    [10, 20, 20],
-                    [0, 20, 0],
-                    [20, 20, 0]
-                ],
-                edges: [
-
-                    [0, 1, "#0000FF"],
-                    [0, 2, "#0000FF"],
-                    [0, 3, "#0000FF"],
-                    [1, 2, "#00FF00"],
-                    [2, 3, "#00FF00"],
-                    [1, 3, "#00FF00"]
-                ]
-
-            };
-
-            this.figureTypes.push(pyramid2);
         }
 
         worldToScreen = (point) => {
             const scaleFactor = this.FOV / (this.FOV + point[2]);
             const projectedX = point[0] * scaleFactor;
             const projectedY = point[1] * scaleFactor;
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
-        }
-
-        worldToScreenOblique = (point, angleX, angleY) => {
-            const radianX = (angleX * Math.PI) / 180;
-            const radianY = (angleY * Math.PI) / 180;
-
-            const projectedX = point[0] + point[2] * Math.tan(radianY);
-            const projectedY = point[1] + point[2] * Math.tan(radianX);
-
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
-        }
-
-        worldToScreenIsometric = (point) => {
-            const isoMatrix = [
-                Math.sqrt(3) / 2, -1 / 2, 0,
-                Math.sqrt(3) / 2, 1 / 2, 0,
-                0, 0, 1
-            ];
-
-            const projectedX = isoMatrix[0] * point[0] + isoMatrix[1] * point[1] + isoMatrix[2] * point[2];
-            const projectedY = isoMatrix[3] * point[0] + isoMatrix[4] * point[1] + isoMatrix[5] * point[2];
-            const projectedZ = isoMatrix[6] * point[0] + isoMatrix[7] * point[1] + isoMatrix[8] * point[2];
-
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
-        }
-
-        static sexagesimalToRadian = (degrees) => {
-            return degrees * (Math.PI / 180);
+            return [projectedX, projectedY];
         }
 
         addDistance = (distance) => {
@@ -197,23 +66,12 @@
                 this.FOV += distance;
         }
 
-        drawFigures = () => {
-            for (let i = this.figures.length - 1; i >= 0; i--) {
-                this.figures[i].drawFigure(ctx);
-            }
-        }
-
-        drawFiguresVertices = () => {
-            for (let i = this.figures.length - 1; i >= 0; i--) {
-                this.figures[i].drawVertices(ctx);
-            }
-        }
-
-        addFigure(x, y) {
+        addFigure = (x, y) => {
             let figure = new Figure();
 
             figure.vertices = Utils.clone(this.figureInfo.vertices);
             figure.edges = Utils.clone(this.figureInfo.edges);
+            figure.faces = Utils.clone(this.figureInfo.faces);
 
             figure.translateX(x);
             figure.translateY(y);
@@ -229,7 +87,7 @@
         }
 
         rotateZ = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Utils.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
@@ -239,7 +97,7 @@
         }
 
         rotateY = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Utils.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
@@ -249,7 +107,7 @@
         }
 
         rotateX = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Utils.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
@@ -282,7 +140,6 @@
                 this.vertices[i][1] *= factor;
                 this.vertices[i][2] *= factor;
             }
-
         }
 
         scaleX = (factor) => {
@@ -324,31 +181,36 @@
             }
         }
 
-        drawEdge = (p0, p1, color) => {
-            let point2d0 = world.worldToScreen(p0);
-            let point2d1 = world.worldToScreen(p1);
-
-            Utils.drawLine(ctx, point2d0.x, point2d0.y, point2d1.x, point2d1.y, 1, color);
+        draw = () => {
+            this.faces.forEach(face => {
+                const faceVertices = face.map(index => this.vertices[index]);
+                if (this.shouldDrawFace(faceVertices)) {
+                    this.drawFace(faceVertices);                        
+                }
+            });
         }
 
-        drawVertex = (point, color) => {
-            let vertex = world.worldToScreen(point);
-
-            let newColor = `hsl(${Utils.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
-
-            Utils.drawDot(ctx, vertex.x, vertex.y, newColor);
+        shouldDrawFace = (vertices) => {
+            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
+            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
+    
+            const normal = Utils.crossProduct(vector1, vector2);
+    
+            const cameraDirection = [0, 0, 1];
+    
+            return Utils.dotProduct(normal, cameraDirection) > 0;
         }
 
-        drawFigure = () => {
-            for (let i = this.edges.length - 1; i >= 0; i--) {
-                this.drawEdge(this.vertices[this.edges[i][0]], this.vertices[this.edges[i][1]]);
+        drawFace = (vertices) => {
+            ctx.fillStyle = "#0080f0";
+            ctx.beginPath();
+            ctx.moveTo(vertices[0][0], vertices[0][1]);
+            for (let i = 1; i < vertices.length; i++) {
+                ctx.lineTo(vertices[i][0], vertices[i][1]);
             }
-        }
-
-        drawVertices = () => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.drawVertex(this.vertices[i]);
-            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fill();
         }
     }
 

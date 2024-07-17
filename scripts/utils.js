@@ -125,4 +125,75 @@ class Utils {
         ctx.strokeStyle = color;
         ctx.stroke();
     }
+
+    static sexagesimalToRadian = (degrees) => {
+        return degrees * (Math.PI / 180);
+    }
+
+    static calculateCenter = (vertices, face) => {
+        let center = [0, 0, 0];
+        face.forEach(index => {
+            center[0] += vertices[index][0];
+            center[1] += vertices[index][1];
+            center[2] += vertices[index][2];
+        });
+        center[0] /= face.length;
+        center[1] /= face.length;
+        center[2] /= face.length;
+        return center;
+    }
+
+    static dotProduct = (v1, v2) => {
+        return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+    }
+    
+    static addVectors = (v1, v2) => {
+        return [
+            v1[0] + v2[0],
+            v1[1] + v2[1],
+            v1[2] + v2[2]
+        ];
+    }
+        
+    static calculateCameraPosition = (distance, theta, phi) => {
+        const x = distance * Math.sin(theta) * Math.cos(phi);
+        const y = distance * Math.sin(theta) * Math.sin(phi);
+        const z = distance * Math.cos(theta);
+        return [x, y, z];
+    }
+        
+    static subtractVectors = (v1, v2) => {
+        return [v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]];
+    }
+    
+    static crossProduct = (v1, v2) => {
+        return [
+            v1[1] * v2[2] - v1[2] * v2[1],
+            v1[2] * v1[0] - v1[0] * v2[2],
+            v1[0] * v2[1] - v1[1] * v2[0]
+        ];
+    }
+    
+    static normalizeVector = (v) => {
+        const length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+        if (length === 0) return [0, 0, 0];
+        return [v[0] / length, v[1] / length, v[2] / length];
+    }
+    
+    static calculateFaceNormal = (vertices, face) => {
+        if (face.length < 3) {
+            throw new Error('Se necesitan al menos 3 vértices para definir una cara.');
+        }
+    
+        const v0 = vertices[face[0]];
+        const v1 = vertices[face[1]];
+        const v2 = vertices[face[2]];
+    
+        const u = Utils.subtractVectors(v1, v0);
+        const v = Utils.subtractVectors(v2, v0);
+    
+        const normal = Utils.crossProduct(u, v);
+        return Utils.normalizeVector(normal);
+    }
+
 }
