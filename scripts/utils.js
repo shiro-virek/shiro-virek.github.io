@@ -1,4 +1,8 @@
 class Utils {
+    static getColorLightness = (r, g, b) => {
+      return (0.21 * r) + (0.72 * g) + (0.07 * b)
+    }
+
 	static degToRad = (deg) => {
 	    return deg * (Math.PI / 180.0);
 	}

@@ -1,4 +1,4 @@
- 
+
 {
     let crtRows = 50
     let crtColumns = 50;
@@ -7,11 +7,17 @@
     let crtDiameter = 20;
     let hue = 150;
     let crtScreen;
-    
+
+    /*
+    let canvasImg;
+    let ctxImg;
+    let imgData;
+    */
+
     class CrtScreen {
         constructor() {
-            this.crts = [];       
-            this.generateCrts();          
+            this.crts = [];
+            this.generateCrts();
         }
 
         generateCrts = () => {
@@ -27,21 +33,34 @@
             }
         }
 
-        setPixel = (x, y) => {            
+        setPixel = (x, y) => {
             let col = Math.round((x - crtMargin) / ((crtDiameter) + crtPadding));
             let row = Math.round((y - crtMargin) / ((crtDiameter) + crtPadding));
             //this.crts[col][row].on = true;
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < crtColumns; x++) {
-                for (let y = 0; y < crtRows; y++) {
-                    this.crts[x][y].draw(ctx);
+            const canvasImg = document.getElementById("auxCanvas");
+            var ctxImg = canvasImg.getContext("2d");
+            const imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
+
+            for (let y = 0; y < crtRows; y++) {
+                for (let x = 0; x < crtColumns; x++) {
+                    let i = y * crtColumns + x;
+                    const r = imgData[i * 4 + 0];
+                    const g = imgData[i * 4 + 1];
+                    const b = imgData[i * 4 + 2];
+                    const a = imgData[i * 4 + 3];
+
+                    let value = Utils.getColorLightness(r, g, b);
+                    
+                    this.crts[x][y].draw(ctx, r, g, b);
                 }
             }
+
         }
 
-        update = () => {                           
+        update = () => {
         }
     }
 
@@ -57,56 +76,72 @@
             this.y = crtMargin + row * crtPadding + row * this.diameter;
         }
 
-        draw = (ctx) => {
+        draw = (ctx, lightnessR, lightnessG, lightnessB) => {
             let borderColor = '#000';
             let third = this.diameter / 3;
-            
-            let colorR = `hsl(${0}, 100%, 50%)`;
-            let colorG = `hsl(${120}, 100%, 50%)`;
-            let colorB = `hsl(${255}, 100%, 50%)`;
+
+            let colorR = `hsl(${0}, 100%, ${lightnessR}%)`;
+            let colorG = `hsl(${120}, 100%, ${lightnessG}%)`;
+            let colorB = `hsl(${255}, 100%, ${lightnessB}%)`;
             Utils.drawRectangle(ctx, this.x, this.y, third, this.diameter, borderColor, colorR)
             Utils.drawRectangle(ctx, this.x + third, this.y, third, this.diameter, borderColor, colorG)
             Utils.drawRectangle(ctx, this.x + third * 2, this.y, third, this.diameter, borderColor, colorB)
         }
     }
 
+    let loadImage = () => {
+
+        canvasImg = document.getElementById('auxCanvas');
+        ctxImg = canvasImg.getContext("2d");
+
+        const img = new Image();
+        img.src = '../assets/Picture1.jpg';
+
+        img.onload = function () {
+            ctxImg.drawImage(img, 0, 0, canvasImg.width, canvasImg.height);
+        };
+    }
+
     let init = () => {
+        loadImage();
         initCanvas();
-        crtDiameter = Utils.getRandomInt(5, 20);        
+        crtDiameter = Utils.getRandomInt(5, 20);
         crtPadding = 0;
         crtMargin = 0;
 
         randomize();
 
-        crtRows = Math.floor((height - crtMargin)/ (crtDiameter + crtPadding));
-        crtColumns = Math.floor((width - crtMargin)/ (crtDiameter + crtPadding));
+        crtRows = Math.floor((height - crtMargin) / (crtDiameter + crtPadding));
+        crtColumns = Math.floor((width - crtMargin) / (crtDiameter + crtPadding));
         crtScreen = new CrtScreen();
-        
+
+        //imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
+
         addEvents();
     }
 
-    let addEvents = () => {   
+    let addEvents = () => {
         /*     
-		canvas.addEventListener('click', e => {
-			crtScreen.setPixel(e.offsetX, e.offsetY);
-		}, false);
+        canvas.addEventListener('click', e => {
+            crtScreen.setPixel(e.offsetX, e.offsetY);
+        }, false);
         
-		canvas.addEventListener('mousemove', e => {
-			crtScreen.setPixel(e.offsetX, e.offsetY);
-		}, false);
+        canvas.addEventListener('mousemove', e => {
+            crtScreen.setPixel(e.offsetX, e.offsetY);
+        }, false);
 
-		canvas.addEventListener('touchstart', function(e){
-			crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
+        canvas.addEventListener('touchstart', function(e){
+            crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+        });
 
-		canvas.addEventListener('touchmove', function(e){
-			e.preventDefault();
-			crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});	
+        canvas.addEventListener('touchmove', function(e){
+            e.preventDefault();
+            crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+        });	
         */
     }
 
-    let randomize = () => {        
+    let randomize = () => {
         hue = Utils.getRandomInt(0, 255);
     }
 
