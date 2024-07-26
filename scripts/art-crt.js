@@ -55,8 +55,8 @@
                     //let value = Utils.getColorLightness(r, g, b);
 
                     let newR = Utils.scale(r, 0, 255, 0, 50);
-                    let newG = Utils.scale(r, 0, 255, 0, 50);
-                    let newB = Utils.scale(r, 0, 255, 0, 50);
+                    let newG = Utils.scale(g, 0, 255, 0, 50);
+                    let newB = Utils.scale(b, 0, 255, 0, 50);
 
                     this.crts[x][y].draw(ctx, newR, newG, newB);
                 }
