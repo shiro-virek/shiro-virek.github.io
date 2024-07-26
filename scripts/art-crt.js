@@ -61,7 +61,6 @@
                     this.crts[x][y].draw(ctx, newR, newG, newB);
                 }
             }
-
         }
 
         update = () => {
@@ -97,13 +96,20 @@
 
         canvasImg = document.getElementById('auxCanvas');
         ctxImg = canvasImg.getContext("2d");
+        //ctxImg.scale(0.3, 0.3);
+
+        canvasImg.width = crtColumns;
+        canvasImg.height = crtRows;
 
         const img = new Image();
         img.src = '../assets/Picture1.jpg';
 
         img.onload = function () {
             ctxImg.drawImage(img, 0, 0, canvasImg.width, canvasImg.height);
+            
         };
+
+
     }
 
     let init = () => {
