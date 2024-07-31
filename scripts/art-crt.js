@@ -1,11 +1,8 @@
 
 {
-    let crtRows = 50
-    let crtColumns = 50;
-    let crtMargin = 0;
-    let crtPadding = 0;
-    let crtDiameter = 20;
-    let hue = 150;
+    let crtRows = 0
+    let crtColumns = 0;
+    let crtDiameter = 0;
     let crtScreen;
 
     /*
@@ -34,9 +31,8 @@
         }
 
         setPixel = (x, y) => {
-            let col = Math.round((x - crtMargin) / ((crtDiameter) + crtPadding));
-            let row = Math.round((y - crtMargin) / ((crtDiameter) + crtPadding));
-            //this.crts[col][row].on = true;
+            let col = Math.round(x / crtDiameter);
+            let row = Math.round(y / crtDiameter);
         }
 
         draw = (ctx) => {
@@ -75,8 +71,8 @@
             this.r = 0;
             this.g = 0;
             this.b = 0;
-            this.x = crtMargin + column * crtPadding + column * this.diameter;
-            this.y = crtMargin + row * crtPadding + row * this.diameter;
+            this.x = column + column * this.diameter;
+            this.y = row + row * this.diameter;
         }
 
         draw = (ctx, lightnessR, lightnessG, lightnessB) => {
@@ -108,21 +104,17 @@
             ctxImg.drawImage(img, 0, 0, canvasImg.width, canvasImg.height);
             
         };
-
-
     }
 
     let init = () => {
+        crtColumns = Utils.getRandomInt(30, 100); 
+        crtDiameter = Math.floor(width / crtColumns);
+        crtRows = Math.floor(height / crtDiameter);      
+
         loadImage();
-        initCanvas();
-        crtDiameter = Utils.getRandomInt(5, 20);
-        crtPadding = 0;
-        crtMargin = 0;
+        initCanvas(); 
 
         randomize();
-
-        crtRows = Math.floor((height - crtMargin) / (crtDiameter + crtPadding));
-        crtColumns = Math.floor((width - crtMargin) / (crtDiameter + crtPadding));
         crtScreen = new CrtScreen();
 
         //imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
@@ -152,7 +144,7 @@
     }
 
     let randomize = () => {
-        hue = Utils.getRandomInt(0, 255);
+    
     }
 
     let draw = () => {
