@@ -4,13 +4,11 @@
     let crtColumns = 0;
     let crtDiameter = 0;
     let crtScreen;
-
-    /*
-    let canvasImg;
-    let ctxImg;
+    
+    let canvasImg = document.getElementById('auxCanvas');
+    let ctxImg = canvasImg.getContext("2d");
     let imgData;
-    */
-
+    
     class CrtScreen {
         constructor() {
             this.crts = [];
@@ -35,11 +33,8 @@
             let row = Math.round(y / crtDiameter);
         }
 
-        draw = (ctx) => {
-            const canvasImg = document.getElementById("auxCanvas");
-            var ctxImg = canvasImg.getContext("2d");
-            const imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
-
+        draw = (ctx) => {   
+            
             for (let y = 0; y < crtRows; y++) {
                 for (let x = 0; x < crtColumns; x++) {
                     let i = y * crtColumns + x;
@@ -47,8 +42,6 @@
                     const g = imgData[i * 4 + 1];
                     const b = imgData[i * 4 + 2];
                     const a = imgData[i * 4 + 3];
-
-                    //let value = Utils.getColorLightness(r, g, b);
 
                     let newR = Utils.scale(r, 0, 255, 0, 50);
                     let newG = Utils.scale(g, 0, 255, 0, 50);
@@ -89,11 +82,6 @@
     }
 
     let loadImage = () => {
-
-        canvasImg = document.getElementById('auxCanvas');
-        ctxImg = canvasImg.getContext("2d");
-        //ctxImg.scale(0.3, 0.3);
-
         canvasImg.width = crtColumns;
         canvasImg.height = crtRows;
 
@@ -103,23 +91,21 @@
         img.onload = function () {
             ctxImg.drawImage(img, 0, 0, canvasImg.width, canvasImg.height);
             
+            imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
         };
     }
 
     let init = () => {
+        canvasImg = document.getElementById('auxCanvas');
+        ctxImg = canvasImg.getContext("2d");
         crtColumns = Utils.getRandomInt(30, 100); 
         crtDiameter = Math.floor(width / crtColumns);
-        crtRows = Math.floor(height / crtDiameter);      
-
+        crtRows = Math.floor(height / crtDiameter);              
         loadImage();
         initCanvas(); 
-
-        randomize();
         crtScreen = new CrtScreen();
-
-        //imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
-
         addEvents();
+        window.requestAnimationFrame(loop);
     }
 
     let addEvents = () => {
@@ -164,6 +150,4 @@
     }
 
     init();
-
-    window.requestAnimationFrame(loop);
 }
