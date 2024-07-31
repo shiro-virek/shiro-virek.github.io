@@ -115,6 +115,7 @@
 		addParticles();
 		addEvents();
 		drawBackground(ctx, canvas);
+		window.requestAnimationFrame(loop)
 	}
 
 	let draw = () => {
@@ -150,6 +151,4 @@
 	}
 
 	init();
-
-	window.requestAnimationFrame(loop)
 }

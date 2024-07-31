@@ -115,8 +115,8 @@
         ledScreen = new LedScreen();
 
         addEvents();
+        window.requestAnimationFrame(loop)
     }
-
 
     let addEvents = () => {
         canvas.addEventListener('click', e => {
@@ -166,6 +166,4 @@
     }
 
     init();
-
-    window.requestAnimationFrame(loop);
 }

@@ -173,6 +173,7 @@
         addModifierFunctions();
         randomize();
         addEvents();
+        window.requestAnimationFrame(loop)
     }
 
     let addModifierFunctions = () => {
@@ -260,6 +261,4 @@
     }
 
     init();
-
-    window.requestAnimationFrame(loop);
 }

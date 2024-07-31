@@ -14,7 +14,8 @@ const art = [
                 "motion-matrix",
                 "balls-bouncing",
                 "cthulhu",
-                "rotation-solid"
+                "rotation-solid",
+                "crt"
             ];
 const scripts = [];
 

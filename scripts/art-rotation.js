@@ -36,27 +36,26 @@
                     [45, 75, 20]
                 ],
                 edges: [
-                    [6, 7, "#00FF00"],
-                    [7, 10, "#00FF00"],
-                    [10, 8, "#00FF00"],
-                    [8, 9, "#00FF00"],
-                    [6, 11, "#00FF00"],
-                    [11, 9, "#00FF00"],
+                    [6, 7],
+                    [7, 10],
+                    [10, 8],
+                    [8, 9],
+                    [6, 11],
+                    [11, 9],
+  
+                    [0, 6],
+                    [1, 7],
+                    [2, 8],
+                    [3, 9],
+                    [4, 10],
+                    [5, 11],
 
-                    //Z              
-                    [0, 6, "#0000FF"],
-                    [1, 7, "#0000FF"],
-                    [2, 8, "#0000FF"],
-                    [3, 9, "#0000FF"],
-                    [4, 10, "#0000FF"],
-                    [5, 11, "#0000FF"],
-
-                    [0, 1, "#FF0000"],
-                    [1, 4, "#FF0000"],
-                    [4, 2, "#FF0000"],
-                    [2, 3, "#FF0000"],
-                    [0, 5, "#FF0000"],
-                    [5, 3, "#FF0000"]
+                    [0, 1],
+                    [1, 4],
+                    [4, 2],
+                    [2, 3],
+                    [0, 5],
+                    [5, 3]
                 ]
 
             };
@@ -76,20 +75,20 @@
                 ],
                 edges: [
 
-                    [0, 1, "#0000FF"],
-                    [1, 3, "#0000FF"],
-                    [2, 3, "#0000FF"],
-                    [0, 2, "#0000FF"],
+                    [0, 1],
+                    [1, 3],
+                    [2, 3],
+                    [0, 2],
 
-                    [4, 5, "#00FF00"],
-                    [5, 7, "#00FF00"],
-                    [7, 6, "#00FF00"],
-                    [4, 6, "#00FF00"],
+                    [4, 5],
+                    [5, 7],
+                    [7, 6],
+                    [4, 6],
 
-                    [0, 4, "#FF0000"],
-                    [1, 5, "#FF0000"],
-                    [3, 7, "#FF0000"],
-                    [2, 6, "#FF0000"]
+                    [0, 4],
+                    [1, 5],
+                    [3, 7],
+                    [2, 6]
                 ]
 
             };
@@ -106,14 +105,14 @@
                 ],
                 edges: [
 
-                    [0, 1, "#0000FF"],
-                    [0, 2, "#0000FF"],
-                    [0, 3, "#0000FF"],
-                    [0, 4, "#0000FF"],
-                    [1, 2, "#00FF00"],
-                    [2, 4, "#00FF00"],
-                    [3, 4, "#00FF00"],
-                    [3, 1, "#00FF00"]
+                    [0, 1],
+                    [0, 2],
+                    [0, 3],
+                    [0, 4],
+                    [1, 2],
+                    [2, 4],
+                    [3, 4],
+                    [3, 1]
                 ]
 
             };
@@ -129,29 +128,69 @@
                 ],
                 edges: [
 
-                    [0, 1, "#0000FF"],
-                    [0, 2, "#0000FF"],
-                    [0, 3, "#0000FF"],
-                    [1, 2, "#00FF00"],
-                    [2, 3, "#00FF00"],
-                    [1, 3, "#00FF00"]
+                    [0, 1],
+                    [0, 2],
+                    [0, 3],
+                    [1, 2],
+                    [2, 3],
+                    [1, 3]
                 ]
 
             };
 
             this.figureTypes.push(pyramid2);
+            let icosahedron = {
+                vertices: [
+                    [0, 16, 0],
+                    [14.304, 7.152, 0],
+                    [4.416, 7.152, 13.616],
+                    [-11.584, 7.152, 8.416],
+                    [-11.584, 7.152, -8.416],
+                    [4.416, 7.152, -13.616],
+                    [11.584, -7.152, 8.416],
+                    [-4.416, -7.152, 13.616],
+                    [-14.304, -7.152, 0],
+                    [-4.416, -7.152, -13.616],
+                    [11.584, -7.152, -8.416],
+                    [0, -16, 0]
+                ],
+                edges: [
+                    [0, 1],
+                    [0, 2],
+                    [0, 3],
+                    [0, 4],
+                    [0, 5],
+                    [1, 2],
+                    [1, 5],
+                    [1, 6],
+                    [2, 3],
+                    [2, 7],
+                    [3, 4],
+                    [3, 8],
+                    [4, 5],
+                    [4, 9],
+                    [5, 10],
+                    [6, 7],
+                    [6, 10],
+                    [6, 11],
+                    [7, 8],
+                    [7, 11],
+                    [8, 9],
+                    [8, 11],
+                    [9, 10],
+                    [9, 11],
+                    [10, 11]
+                ]
+            };
+
+            this.figureTypes.push(icosahedron);
         }
 
         worldToScreen = (point) => {
             const scaleFactor = this.FOV / (this.FOV + point[2]);
             const projectedX = point[0] * scaleFactor;
             const projectedY = point[1] * scaleFactor;
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
+            return [projectedX, projectedY];
         }
 
         worldToScreenOblique = (point, angleX, angleY) => {
@@ -161,12 +200,7 @@
             const projectedX = point[0] + point[2] * Math.tan(radianY);
             const projectedY = point[1] + point[2] * Math.tan(radianX);
 
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
+            return [projectedX, projectedY];
         }
 
         worldToScreenIsometric = (point) => {
@@ -180,12 +214,7 @@
             const projectedY = isoMatrix[3] * point[0] + isoMatrix[4] * point[1] + isoMatrix[5] * point[2];
             const projectedZ = isoMatrix[6] * point[0] + isoMatrix[7] * point[1] + isoMatrix[8] * point[2];
 
-            let p1 = {
-                'x': projectedX,
-                'y': projectedY
-            };
-
-            return p1;
+            return [projectedX, projectedY];
         }
 
         static sexagesimalToRadian = (degrees) => {
@@ -282,7 +311,6 @@
                 this.vertices[i][1] *= factor;
                 this.vertices[i][2] *= factor;
             }
-
         }
 
         scaleX = (factor) => {
@@ -328,7 +356,7 @@
             let point2d0 = world.worldToScreen(p0);
             let point2d1 = world.worldToScreen(p1);
 
-            Utils.drawLine(ctx, point2d0.x, point2d0.y, point2d1.x, point2d1.y, 1, color);
+            Utils.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
         }
 
         drawVertex = (point, color) => {
@@ -336,7 +364,7 @@
 
             let newColor = `hsl(${Utils.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
 
-            Utils.drawDot(ctx, vertex.x, vertex.y, newColor);
+            Utils.drawDot(ctx, vertex[0], vertex[1], newColor);
         }
 
         drawFigure = () => {
@@ -357,6 +385,7 @@
         world = new ThreeDWorld();
         randomize();
         addEvents();
+        window.requestAnimationFrame(loop)
     }
 
     let addEvents = () => {
@@ -400,7 +429,7 @@
 
     let randomize = () => {
         world.drawEdges = Utils.getRandomBool();
-        world.figureInfo = world.figureTypes[Utils.getRandomInt(0, world.figureTypes.length - 1)];
+        world.figureInfo = world.figureTypes[Utils.getRandomInt(0, world.figureTypes.length)];
     }
 
     let draw = () => {
@@ -418,6 +447,4 @@
     }
 
     init();
-
-    window.requestAnimationFrame(loop);
 }

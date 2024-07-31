@@ -141,6 +141,7 @@
 		addSlices();
 		addEvents();
 		drawBackground(ctx, canvas);
+		window.requestAnimationFrame(loop)
 	}
 
 	let isRing = (indexSlice) => {
@@ -193,6 +194,4 @@
 	}
 
 	init();
-
-	window.requestAnimationFrame(loop)
 }

@@ -481,6 +481,7 @@
 		randomize();
 		addEvents();
 		drawBackground(ctx, canvas);
+		window.requestAnimationFrame(loop);
 	}
 
 	let addEvents = () => {
@@ -519,7 +520,4 @@
 	}
 
 	init();
-
-	window.requestAnimationFrame(loop);
-
 }

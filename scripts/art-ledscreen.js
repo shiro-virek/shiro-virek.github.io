@@ -91,6 +91,7 @@
         ledScreen = new LedScreen();
         
         addEvents();
+        window.requestAnimationFrame(loop)
     }
 
     let addEvents = () => {        
@@ -133,6 +134,4 @@
     }
 
     init();
-
-    window.requestAnimationFrame(loop);
 }
