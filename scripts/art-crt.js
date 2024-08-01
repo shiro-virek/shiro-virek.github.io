@@ -92,6 +92,11 @@
             ctxImg.drawImage(img, 0, 0, canvasImg.width, canvasImg.height);
             
             imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
+
+            initCanvas(); 
+            crtScreen = new CrtScreen();
+            addEvents();
+            window.requestAnimationFrame(loop);
         };
     }
 
@@ -102,10 +107,6 @@
         crtDiameter = Math.floor(width / crtColumns);
         crtRows = Math.floor(height / crtDiameter);              
         loadImage();
-        initCanvas(); 
-        crtScreen = new CrtScreen();
-        addEvents();
-        window.requestAnimationFrame(loop);
     }
 
     let addEvents = () => {
