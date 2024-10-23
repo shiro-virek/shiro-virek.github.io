@@ -15,7 +15,8 @@ const art = [
                 "balls-bouncing",
                 "cthulhu",
                 "rotation-solid",
-                "crt"
+                "crt",
+                "ledscreen-tones"
             ];
 const scripts = [];
 
