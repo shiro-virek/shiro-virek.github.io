@@ -19,6 +19,14 @@ const art = [
             ];
 const scripts = [];
 
+let reload = () => {
+    location.href = `${window.location.origin}`;
+}
+
+let reloadParams = () => {
+    location.href = `${window.location.origin}?art=${art[currentScript]}`;
+}
+
 let initScripts = () =>{	
     art.forEach(element => {					
         scripts.push(`scripts/art-${element}.js`);
@@ -47,7 +55,7 @@ let setScriptIndexByURL = () =>{
     let artItemIndex = art.indexOf(artItem);
     if (artItemIndex >= 0){						
         let randomButton = document.getElementById("randomButton");
-        randomButton.innerHTML = '🔄';
+        //randomButton.innerHTML = '🔄';
         currentScript = artItemIndex;
     } else {					
         randomScriptIndex();

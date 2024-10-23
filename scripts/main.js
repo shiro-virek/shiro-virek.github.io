@@ -17,10 +17,6 @@ halfHeight = height / 2;
 lastPosY = 0;
 lastPosX = 0;
 
-let reload = () => {
-    location.reload();
-}
-
 let drawBackground = (ctx, canvas) => {
     if (canvas.getContext) {
         canvas.width = width;
