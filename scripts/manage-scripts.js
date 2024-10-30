@@ -14,7 +14,6 @@ const art = [
                 "motion-matrix",
                 "balls-bouncing",
                 "cthulhu",
-                "rotation-solid",
                 "crt",
                 "ledscreen-tones"
             ];
@@ -26,6 +25,10 @@ let reload = () => {
 
 let reloadParams = () => {
     location.href = `${window.location.origin}?art=${art[currentScript]}`;
+}
+
+let goToRepo = () => {
+    window.open('https://github.com/eapelroso/eapelroso-lab', '_blank');
 }
 
 let initScripts = () =>{	
