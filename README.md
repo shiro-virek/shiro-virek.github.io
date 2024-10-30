@@ -1,6 +1,6 @@
 # eapelroso-lab
 
-Here I put most of my creative coding experiments 🧪⚗️
+This is my creative coding playground 🧪⚗️
 
 By default, a random scene is selected 🎲 
 
@@ -20,6 +20,8 @@ Scenes currently available:
 - tentacles
 - semitone
 - ledscreen
+- ledscreen-tones
+- crt
 - conway
 - motion-matrix
 - balls-bouncing
