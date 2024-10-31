@@ -114,6 +114,29 @@ class Utils {
         ctx.stroke();
     }
 
+    static drawPolygon = (ctx, x, y, r, sides, color = '#00FF00', fillColor = '#00FF00') => {
+        ctx.strokeStyle = color;
+        ctx.fillStyle = fillColor;
+        ctx.beginPath();
+
+        ctx.translate(x, y);
+    
+        for (let i = 0; i < sides; i++) {
+            const rotation = ((Math.PI * 2) / sides) * i;
+    
+            if (i === 0) {
+                ctx.moveTo(r * Math.cos(rotation), r * Math.sin(rotation));
+            } else {
+                ctx.lineTo(r * Math.cos(rotation), r * Math.sin(rotation));
+            }
+        }
+    
+        ctx.fill();
+        ctx.stroke();
+    
+        ctx.resetTransform();
+    }
+
     static drawDot = (ctx, x, y, color = '#FFF') => {
         ctx.fillStyle = color;
         ctx.beginPath();
