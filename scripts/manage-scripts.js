@@ -31,6 +31,15 @@ let goToRepo = () => {
     window.open('https://github.com/eapelroso/eapelroso-lab', '_blank');
 }
 
+let downloadPicture = () => {
+    var canvas = document.getElementById("myCanvas");
+    var image = canvas.toDataURL();
+    var aDownloadLink = document.createElement('a');
+    aDownloadLink.download = 'eap.png';
+    aDownloadLink.href = image;
+    aDownloadLink.click();
+}
+
 let initScripts = () =>{	
     art.forEach(element => {					
         scripts.push(`scripts/art-${element}.js`);
