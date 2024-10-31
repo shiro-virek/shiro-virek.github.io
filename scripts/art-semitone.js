@@ -17,7 +17,8 @@
 
     const Figures = Object.freeze({
 		Square: Symbol("square"),
-		Circle: Symbol("circle")
+		Circle: Symbol("circle"),
+		Hexagon: Symbol("hexagon")
 	});
 
     class Semitone {
@@ -160,6 +161,9 @@
                         break;
                     case Figures.Square:             
                         Utils.drawSquare(ctx, this.x, this.y, this.radio, 0, this.color, this.color);
+                        break;
+                    case Figures.Hexagon:                    
+                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.color, this.color);
                         break;
                 }                
         }
