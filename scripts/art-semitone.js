@@ -15,9 +15,16 @@
     let xPositionFunctions = [];
     let yPositionFunctions = [];
 
+    const Figures = Object.freeze({
+		Square: Symbol("square"),
+		Circle: Symbol("circle")
+	});
+
     class Semitone {
         constructor() {
             this.dots = [];
+			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);  
+			this.shape = Figures[Object.keys(Figures)[rand]];
             this.generateDots();
         }
 
@@ -147,7 +154,14 @@
 
         draw = (ctx) => {
             if (this.on)
-                Utils.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color)
+                switch(semitone.shape){
+                    case Figures.Circle:
+                        Utils.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color);
+                        break;
+                    case Figures.Square:             
+                        Utils.drawSquare(ctx, this.x, this.y, this.radio, 0, this.color, this.color);
+                        break;
+                }                
         }
 
         update = (xMouse, yMouse) => {
