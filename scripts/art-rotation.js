@@ -1,4 +1,7 @@
 {
+	let clicking = false;
+    let mouseMoved = false;
+
     class ThreeDWorld {
         constructor() {
             this.figures = [];
@@ -250,7 +253,6 @@
             this.figures.push(figure);
         }
     }
-
     class Figure {
         constructor() {
             this.vertices = [];
@@ -389,42 +391,64 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('click', e => {
-            world.addFigure(e.offsetX, e.offsetY);
-        }, false);
-
         canvas.addEventListener('mousemove', e => {
-            trackMouse(e.offsetX, e.offsetY);
-        }, false);
+            mouseMoved = true;
+			trackMouse(e.offsetX, e.offsetY);
+		}, false);
 
-        canvas.addEventListener('touchstart', function (e) {
-            world.addFigure(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-        });
+		canvas.addEventListener('touchmove', function (e) {
+			e.preventDefault();
+            mouseMoved = true;
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		});
 
-        canvas.addEventListener('touchmove', function (e) {
-            e.preventDefault();
-            trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-        });
+		canvas.addEventListener('touchstart', function (e) {
+            mouseMoved = false;
+			clicking = true;
+		});
+
+		canvas.addEventListener('mousedown', e => {
+            mouseMoved = false;
+			clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+            if (!mouseMoved)
+                world.addFigure(e.offsetX, e.offsetY);
+
+			clicking = false;
+		}, false);  
+
+		canvas.addEventListener('click', function (e) {
+            if (!mouseMoved)
+                world.addFigure(e.offsetX, e.offsetY);
+		});
     }
 
     let trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
-        let movX = lastPosX - x;
-        let movY = lastPosY - y;
-
-        world.figures.forEach(figure => {
-            figure.translateX(-halfWidth);
-            figure.translateY(-halfHeight);
-            figure.rotateX(movY);
-            figure.rotateY(movX);
-            figure.translateX(halfWidth);
-            figure.translateY(halfHeight);
-        });
-
-        lastPosX = x;
-        lastPosY = y;
+        if (clicking) {
+            if (lastPosX == 0) lastPosX = x;
+            if (lastPosY == 0) lastPosY = y;
+    
+            let movX = lastPosX - x;
+            let movY = lastPosY - y;
+    
+            world.figures.forEach(figure => {
+                figure.translateX(-halfWidth);
+                figure.translateY(-halfHeight);
+                figure.rotateX(movY);
+                figure.rotateY(movX);
+                figure.translateX(halfWidth);
+                figure.translateY(halfHeight);
+            });
+    
+            lastPosX = x;
+            lastPosY = y;
+        }
     }
 
     let randomize = () => {
