@@ -60,15 +60,15 @@
 	}
 
 	let trackMouse = (xPointer, yPointer) => {
-		if (clicking){
-			if (lastPosX == 0) lastPosX = xPointer;
-			if (lastPosY == 0) lastPosY = yPointer;
-	
+		if (lastPosX == 0) lastPosX = xPointer;
+		if (lastPosY == 0) lastPosY = yPointer;
+
+		if (clicking){	
 			draw(ctx, xPointer, yPointer);
-	
-			lastPosX = xPointer;
-			lastPosY = yPointer;
 		}	
+	
+		lastPosX = xPointer;
+		lastPosY = yPointer;
 	}
 
 	let draw = (ctx, xPointer, yPointer) => {

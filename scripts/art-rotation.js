@@ -430,13 +430,13 @@
     }
 
     let trackMouse = (x, y) => {
-        if (clicking) {
-            if (lastPosX == 0) lastPosX = x;
-            if (lastPosY == 0) lastPosY = y;
-    
-            let movX = lastPosX - x;
-            let movY = lastPosY - y;
-    
+        if (lastPosX == 0) lastPosX = x;
+        if (lastPosY == 0) lastPosY = y;
+
+        let movX = lastPosX - x;
+        let movY = lastPosY - y;
+
+        if (clicking) {    
             world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
@@ -445,10 +445,10 @@
                 figure.translateX(halfWidth);
                 figure.translateY(halfHeight);
             });
-    
-            lastPosX = x;
-            lastPosY = y;
         }
+    
+        lastPosX = x;
+        lastPosY = y;
     }
 
     let randomize = () => {
