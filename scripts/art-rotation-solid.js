@@ -5,7 +5,7 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = 1000;
+            this.FOV = 10000;
             this.drawEdges = true;
             this.figureTypes = [];
             this.setFigureTypes();
@@ -201,15 +201,18 @@
     
             const cameraDirection = [0, 0, 1];
     
-            return Utils.dotProduct(normal, cameraDirection) > 0;
+            return Utils.dotProduct(normal, cameraDirection) < 0;
         }
 
         drawFace = (vertices) => {
             ctx.fillStyle = "#0080f0";
             ctx.beginPath();
-            ctx.moveTo(vertices[0][0], vertices[0][1]);
+
+            let vertex = world.worldToScreen(vertices[0]);
+            ctx.moveTo(vertex[0], vertex[1]);
             for (let i = 1; i < vertices.length; i++) {
-                ctx.lineTo(vertices[i][0], vertices[i][1]);
+                vertex = world.worldToScreen(vertices[i]);
+                ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
             ctx.stroke();
