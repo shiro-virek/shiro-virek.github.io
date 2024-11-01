@@ -7,8 +7,8 @@ const art = [
                 "bokeh", 
                 "skyscrapers", 
                 "metro", 
-                "rotation", 
-                "semitone", 
+                "3d-rotation", 
+                "chaos", 
                 "ledscreen", 
                 "conway", 
                 "motion-matrix",
@@ -16,7 +16,8 @@ const art = [
                 "cthulhu",
                 "crt",
                 "ledscreen-tones",
-                "rotation-solid"
+                "3d-rotation-solid", 
+                "rotators-solid"
             ];
 const scripts = [];
 

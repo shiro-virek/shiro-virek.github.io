@@ -16,14 +16,14 @@
 	});
 
     class LedScreen {
-        constructor() {
-            this.leds = [];       
+        constructor() {      
             this.generateLeds();          
 			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);  
 			this.shape = Figures[Object.keys(Figures)[rand]];
         }
 
         generateLeds = () => {
+            this.leds = []; 
             for (let x = 0; x < ledColumns; x++) {
                 this.leds[x] = new Array(ledRows);
             }
@@ -151,4 +151,8 @@
     }
 
     init();
+
+	window.clearCanvas = () => {		
+        ledScreen.generateLeds();  
+	}
 }
