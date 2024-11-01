@@ -114,15 +114,17 @@ class Utils {
         ctx.stroke();
     }
 
-    static drawPolygon = (ctx, x, y, r, sides, color = '#00FF00', fillColor = '#00FF00') => {
+    static drawPolygon = (ctx, x, y, r, sides, angle, color = '#00FF00', fillColor = '#00FF00') => {
         ctx.strokeStyle = color;
         ctx.fillStyle = fillColor;
         ctx.beginPath();
 
         ctx.translate(x, y);
+
+        let radAngle = this.sexagesimalToRadian(angle);
     
         for (let i = 0; i < sides; i++) {
-            const rotation = ((Math.PI * 2) / sides) * i;
+            const rotation = ((Math.PI * 2) / sides) * i + radAngle;
     
             if (i === 0) {
                 ctx.moveTo(r * Math.cos(rotation), r * Math.sin(rotation));

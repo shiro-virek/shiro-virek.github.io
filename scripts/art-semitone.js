@@ -14,13 +14,16 @@
     let colorFunctions = [];
     let xPositionFunctions = [];
     let yPositionFunctions = [];
+    let angleFunctions = [];
+    let alphaFunctions = [];
 
 	let clicking = false;    
 
     const Figures = Object.freeze({
 		Square: Symbol("square"),
 		Circle: Symbol("circle"),
-		Hexagon: Symbol("hexagon")
+		Hexagon: Symbol("hexagon"),
+		Triangle: Symbol("trieangle")
 	});
 
     class Semitone {
@@ -54,21 +57,21 @@
     }
 
     class ModifierFunctions {
-        static getRadio1 = (dist) => {
+        static getRadio1 = (dist, x, y, angle) => {
             return Utils.scale(dist, 0, 500, 5, 15);
         }
 
-        static getRadio2 = (dist) => {
+        static getRadio2 = (dist, x, y, angle) => {
             let decrement = Utils.scale(dist, 0, 500, 5, 15);
             return decrement < 20 ? 20 - decrement : 1;
         }
 
-        static getColor1 = (dist) => {
-            return `hsl(${hue}, ${Utils.scale(dist, 0, 500, 0, 100)}%, 50%)`;
+        static getColor1 = (dist, x, y, angle) => {
+            return `hsla(${hue}, ${Utils.scale(dist, 0, 500, 0, 100)}%, 50%, ${semitone.alphaFunction(dist, x, y, angle)})`;
         }
 
-        static getColor2 = (dist) => {
-            return `hsl(${hue}, 100%, ${Utils.scale(dist, 0, 500, 0, 100)}%)`;
+        static getColor2 = (dist, x, y, angle) => {
+            return `hsla(${hue}, 100%, ${Utils.scale(dist, 0, 500, 0, 100)}%, ${semitone.alphaFunction(dist, x, y, angle)})`;
         }
 
         static getXPosition1 = (dist, x, y, angle) => {
@@ -142,6 +145,26 @@
         static getYPosition9 = (dist, x, y, angle) => {
             return y + Math.sin((angle) * RAD_CONST) * (x);
         }
+
+        static getAngle1 = (dist, x, y, angle) => {
+            return 0;
+        }
+
+        static getAngle2 = (dist, x, y, angle) => {
+            return angle;
+        }
+
+        static getAlpha1 = (dist, x, y, angle) => {
+            return 1;
+        }
+
+        static getAlpha2 = (dist, x, y, angle) => {
+            return Utils.scale(dist, 0, 500, 0, 1);
+        }
+
+        static getAlpha3 = (dist, x, y, angle) => {
+            return Utils.scale(dist, 0, 500, 1, 0);
+        }
     }
 
     class Dot {
@@ -162,10 +185,13 @@
                         Utils.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color);
                         break;
                     case Figures.Square:             
-                        Utils.drawSquare(ctx, this.x, this.y, this.radio, 0, this.color, this.color);
-                        break;
+                        Utils.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color, this.color);
+                        break; 
                     case Figures.Hexagon:                    
-                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.color, this.color);
+                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.angle, this.color, this.color);
+                        break;
+                    case Figures.Triangle:                    
+                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 3, this.angle, this.color, this.color);
                         break;
                 }                
         }
@@ -177,11 +203,13 @@
             let dist = Math.sqrt(Math.pow(xDot - xMouse, 2) + Math.pow(yDot - yMouse, 2));
             let angle = Utils.angleBetweenTwoPoints(xDot, yDot, xMouse, yMouse);
 
-            this.radio = semitone.radioFunction(dist);
-            this.color = semitone.colorFunction(dist);
+            this.radio = semitone.radioFunction(dist, xDot, yDot, angle);
+            this.color = semitone.colorFunction(dist, xDot, yDot, angle);
 
             this.x = semitone.xPositionFunction(dist, xDot, yDot, angle);
             this.y = semitone.yPositionFunction(dist, xDot, yDot, angle);
+
+            this.angle = semitone.angleFunction(dist, xDot, yDot, angle);
         }
     }
 
@@ -227,6 +255,15 @@
             ModifierFunctions.getYPosition7,
             ModifierFunctions.getYPosition8,
             ModifierFunctions.getYPosition9,
+        ];
+        angleFunctions = [
+            ModifierFunctions.getAngle1,
+            ModifierFunctions.getAngle2
+        ];
+        alphaFunctions = [
+            ModifierFunctions.getAlpha1,
+            ModifierFunctions.getAlpha2, 
+            ModifierFunctions.getAlpha3
         ];
     }
 
@@ -282,7 +319,9 @@
         semitone.radioFunction = Utils.getRandomFromArray(radioFunctions);
         semitone.colorFunction = Utils.getRandomFromArray(colorFunctions);
         semitone.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);  
-        semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);
+        semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);          
+        semitone.angleFunction = Utils.getRandomFromArray(angleFunctions);        
+        semitone.alphaFunction = Utils.getRandomFromArray(alphaFunctions);
     }
 
     let draw = () => {
