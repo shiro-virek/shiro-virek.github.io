@@ -14,6 +14,8 @@
 	let COLOR_MAP_MAX = 500;
 	let ROTATORS = 3;
 
+	let clicking = false;
+
 	let randomize = () => {
 		OPACITY = Utils.getRandomFloat(0.03, 0.1, 2);
 		THICKNESS = Utils.getRandomInt(1, 20);
@@ -37,17 +39,30 @@
 
 	let addEvents = () => {
 		canvas.addEventListener('mousemove', e => {
-			draw(e.offsetX, e.offsetY);
+			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
 		canvas.addEventListener('touchstart', function (e) {
-			draw(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+			clicking = true;
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
-			draw(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
+
+		canvas.addEventListener('mousedown', e => {
+			clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+			clicking = false;
+		}, false);   
 	}
 
 	let init = () => {
@@ -57,9 +72,19 @@
 		drawBackground(ctx, canvas);
 	}
 
+	let trackMouse = (xPointer, yPointer) => {
+		if (clicking){
+			if (lastPosX == 0) lastPosX = xPointer;
+			if (lastPosY == 0) lastPosY = yPointer;
+	
+			draw(xPointer, yPointer);
+	
+			lastPosX = xPointer;
+			lastPosY = yPointer;
+		}
+	}
+
 	let draw = (xPointer, yPointer) => {
-		if (lastPosX == 0) lastPosX = xPointer;
-		if (lastPosY == 0) lastPosY = yPointer;
 
 		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))
 		let hue = Utils.scale(distance, 0, 360, 0, COLOR_MAP_MAX);
@@ -89,9 +114,6 @@
 			}
 
 		angle += ANGLE_ROTATION;
-
-		lastPosX = xPointer;
-		lastPosY = yPointer;
 	}
 
 	angle = 0;

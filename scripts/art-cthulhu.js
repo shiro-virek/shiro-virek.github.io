@@ -24,6 +24,8 @@
 	let mouseX;
 	let mouseY;
 
+	let clicking = false;
+
 	class Slice {
 
 		constructor(tentacle, slice, mouseX, mouseY) {
@@ -126,6 +128,7 @@
 		}, false);
 
 		canvas.addEventListener('touchstart', function (e) {
+			clicking = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
@@ -133,6 +136,18 @@
 			e.preventDefault();
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
+
+		canvas.addEventListener('mousedown', e => {
+			clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+			clicking = false;
+		}, false);
 	}
 
 	let init = () => {
@@ -180,8 +195,10 @@
 	}
 
 	let trackMouse = (x, y) => {
-		mouseX = x;
-		mouseY = y;
+		if (clicking){
+			mouseX = x;
+			mouseY = y;
+		}
 	}
 
 	let loop = (timestamp) => {

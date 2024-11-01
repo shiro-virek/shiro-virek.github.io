@@ -8,6 +8,11 @@
 	let lightness = 0;
 	let opacity = 0.001;
 
+	let lastPosX = 0;
+	let lastPosY = 0;
+
+	let clicking = false;
+
 	let init = () => {
 		initCanvas();
 		randomize();
@@ -15,18 +20,32 @@
 	}
 
 	let addEvents = () => {
+
 		canvas.addEventListener('mousemove', e => {
-			draw(ctx, e.offsetX, e.offsetY);
+			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
 		canvas.addEventListener('touchstart', function (e) {
-			draw(ctx, e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+			clicking = true;
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
-			draw(ctx, e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
+
+		canvas.addEventListener('mousedown', e => {
+			clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+			clicking = false;
+		}, false);
 	}
 
 	let randomize = () => {
@@ -40,10 +59,19 @@
 		opacity = Utils.getRandomFloat(0.003, 0.03, 3);
 	}
 
-	let draw = (ctx, xPointer, yPointer) => {
+	let trackMouse = (xPointer, yPointer) => {
+		if (clicking){
+			if (lastPosX == 0) lastPosX = xPointer;
+			if (lastPosY == 0) lastPosY = yPointer;
+	
+			draw(ctx, xPointer, yPointer);
+	
+			lastPosX = xPointer;
+			lastPosY = yPointer;
+		}	
+	}
 
-		if (lastPosX == 0) lastPosX = xPointer;
-		if (lastPosY == 0) lastPosY = yPointer;
+	let draw = (ctx, xPointer, yPointer) => {
 
 		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))
 
@@ -90,9 +118,6 @@
 				Utils.drawCircle(ctx, x, y, size * (CIRCLES / i), color, color);
 			}
 		}
-
-		lastPosX = xPointer;
-		lastPosY = yPointer;
 	}
 
 	init();
