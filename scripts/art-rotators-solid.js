@@ -14,6 +14,8 @@
 	let COLOR_MAP_MAX = 500;
 	let ROTATORS = 3;
 
+	let functionsArray = [];
+
 	let clicking = false;
 
 	let randomize = () => {
@@ -35,6 +37,8 @@
 			rotatorsLengths.push(rotatorsLength);
 			rotatorsAngles.push(rotatorsAngle);
 		}
+
+		functionsArray = new Array(4).fill(Utils.getRandomBool());
 	}
 
 	let addEvents = () => {
@@ -104,11 +108,10 @@
 				ctx.lineTo(xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad)), yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)));
 				ctx.lineTo(xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)), yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)));
 				
-				ctx.lineTo(xPointer, yPointer);
-				//Random pick:
-				//ctx.lineTo(yPointer, xPointer);
-				//ctx.lineTo(yPointer, yPointer);
-				//ctx.lineTo(xPointer, xPointer);
+				if (functionsArray[0]) ctx.lineTo(xPointer, yPointer);
+				if (functionsArray[1]) ctx.lineTo(yPointer, yPointer);
+				if (functionsArray[2]) ctx.lineTo(xPointer, xPointer);
+				if (functionsArray[3]) ctx.lineTo(yPointer, xPointer);
 				
 				ctx.fillStyle = color;
 				ctx.fill();
