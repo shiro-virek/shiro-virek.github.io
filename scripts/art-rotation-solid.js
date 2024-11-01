@@ -1,8 +1,11 @@
 {
+    let clicking = false;
+    let mouseMoved = false;
+
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = 1000;
+            this.FOV = 10000;
             this.drawEdges = true;
             this.figureTypes = [];
             this.setFigureTypes();
@@ -198,15 +201,18 @@
     
             const cameraDirection = [0, 0, 1];
     
-            return Utils.dotProduct(normal, cameraDirection) > 0;
+            return Utils.dotProduct(normal, cameraDirection) < 0;
         }
 
         drawFace = (vertices) => {
             ctx.fillStyle = "#0080f0";
             ctx.beginPath();
-            ctx.moveTo(vertices[0][0], vertices[0][1]);
+
+            let vertex = world.worldToScreen(vertices[0]);
+            ctx.moveTo(vertex[0], vertex[1]);
             for (let i = 1; i < vertices.length; i++) {
-                ctx.lineTo(vertices[i][0], vertices[i][1]);
+                vertex = world.worldToScreen(vertices[i]);
+                ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
             ctx.stroke();
@@ -223,22 +229,42 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('click', e => {
-            world.addFigure(e.offsetX, e.offsetY);
-        }, false);
-
         canvas.addEventListener('mousemove', e => {
-            trackMouse(e.offsetX, e.offsetY);
-        }, false);
+            mouseMoved = true;
+			trackMouse(e.offsetX, e.offsetY);
+		}, false);
 
-        canvas.addEventListener('touchstart', function (e) {
-            world.addFigure(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-        });
+		canvas.addEventListener('touchmove', function (e) {
+			e.preventDefault();
+            mouseMoved = true;
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		});
 
-        canvas.addEventListener('touchmove', function (e) {
-            e.preventDefault();
-            trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-        });
+		canvas.addEventListener('touchstart', function (e) {
+            mouseMoved = false;
+			clicking = true;
+		});
+
+		canvas.addEventListener('mousedown', e => {
+            mouseMoved = false;
+			clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+            if (!mouseMoved)
+                world.addFigure(e.offsetX, e.offsetY);
+
+			clicking = false;
+		}, false);  
+
+		canvas.addEventListener('click', function (e) {
+            if (!mouseMoved)
+                world.addFigure(e.offsetX, e.offsetY);
+		});
     }
 
     let trackMouse = (x, y) => {
@@ -248,14 +274,16 @@
         let movX = lastPosX - x;
         let movY = lastPosY - y;
 
-        world.figures.forEach(figure => {
-            figure.translateX(-halfWidth);
-            figure.translateY(-halfHeight);
-            figure.rotateX(movY);
-            figure.rotateY(movX);
-            figure.translateX(halfWidth);
-            figure.translateY(halfHeight);
-        });
+        if (clicking) {  
+            world.figures.forEach(figure => {
+                figure.translateX(-halfWidth);
+                figure.translateY(-halfHeight);
+                figure.rotateX(movY);
+                figure.rotateY(movX);
+                figure.translateX(halfWidth);
+                figure.translateY(halfHeight);
+            });
+        }
 
         lastPosX = x;
         lastPosY = y;

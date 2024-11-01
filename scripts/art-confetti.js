@@ -10,6 +10,7 @@
 	let ALL_SIN = false;
 
 	let objects = [];
+	let clicking = false;
 
 	const Figures = Object.freeze({
 		Square: Symbol("square"),
@@ -93,13 +94,12 @@
 	}
 
 	let addEvents = () => {
-		let canvas = document.getElementById(CANVAS_ID);
-
 		canvas.addEventListener('mousemove', e => {
 			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
 		canvas.addEventListener('touchstart', function (e) {
+			clicking = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
@@ -107,6 +107,18 @@
 			e.preventDefault();
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
+
+		canvas.addEventListener('mousedown', e => {
+			clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+			clicking = false;
+		}, false);
 	}
 
 	let init = () => {
@@ -138,7 +150,8 @@
 	}
 
 	let trackMouse = (mouseX, mouseY) => {
-		addParticle(mouseX, mouseY, true);
+		if (clicking)
+			addParticle(mouseX, mouseY, true);
 	}
 
 	let loop = (timestamp) => {

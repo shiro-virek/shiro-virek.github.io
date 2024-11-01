@@ -7,6 +7,8 @@
     let ledDiameter = 20;
     let hue = 150;
     let ledScreen;
+
+	let clicking = false;
     
     const Figures = Object.freeze({
 		Square: Symbol("square"),
@@ -95,22 +97,36 @@
     }
 
     let addEvents = () => {        
-		canvas.addEventListener('click', e => {
-			ledScreen.setPixel(e.offsetX, e.offsetY);
-		}, false);
-        
-		canvas.addEventListener('mousemove', e => {
-			ledScreen.setPixel(e.offsetX, e.offsetY);
+        canvas.addEventListener('mousemove', e => {
+			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
-		canvas.addEventListener('touchstart', function(e){
-			ledScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		canvas.addEventListener('touchstart', function (e) {
+			clicking = true;
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
-		canvas.addEventListener('touchmove', function(e){
+		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
-			ledScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});	
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		});
+
+		canvas.addEventListener('mousedown', e => {
+			clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+			clicking = false;
+		}, false);   
+    }
+
+    let trackMouse = (xMouse, yMouse) => {
+        if (clicking)
+            ledScreen.setPixel(xMouse, yMouse);
     }
 
     let randomize = () => {        
