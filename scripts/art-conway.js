@@ -15,15 +15,15 @@
 	});
 
     class LedScreen {
-        constructor() {
-            this.leds = [];
-            this.ledsBuffer = [];            
+        constructor() {            
             this.generateLeds();     
 			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);
 			this.shape = Figures[Object.keys(Figures)[rand]];     
         }
 
         generateLeds = () => {
+            this.leds = [];
+            this.ledsBuffer = [];
             for (let x = 0; x < ledColumns; x++) {
                 this.leds[x] = new Array(ledRows);
                 this.ledsBuffer[x] = new Array(ledRows);
@@ -35,8 +35,9 @@
                     this.leds[x][y] = led;
                     let ledBuffer = new Led(x, y);
                     this.ledsBuffer[x][y] = ledBuffer;
+                    this.leds[x][y].on =  Utils.getRandomBool();
                 }
-            }
+            }  
         }
 
         setPixel = (x, y) => {            
@@ -146,15 +147,8 @@
     }
 
     let randomize = () => {        
-        hue = Utils.getRandomInt(0, 255);
-
+        hue = Utils.getRandomInt(0, 255); 
         ledScreen = new LedScreen();
-
-        for (let x = 0; x < ledColumns; x++) {
-            for (let y = 0; y < ledRows; y++) {
-                ledScreen.leds[x][y].on =  Utils.getRandomBool();
-            }
-        }    
     }
 
     let draw = () => {
@@ -177,4 +171,8 @@
     }
 
     init();
+    
+	window.clearCanvas = () => {         
+        ledScreen.generateLeds();  
+	}
 }

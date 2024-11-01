@@ -151,4 +151,7 @@
     }
 
     init();
+
+	window.clearCanvas = () => {  
+	}
 }

@@ -439,4 +439,8 @@
 	}
 
 	init();
+
+	window.clearCanvas = () => {  
+		metroNetwork.lines = [];
+	}
 }

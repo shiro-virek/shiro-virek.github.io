@@ -520,4 +520,9 @@
 	}
 
 	init();
+
+	window.clearCanvas = () => {
+		objects = []; 
+		BUILDINGS_COUNT = 0;
+	}
 }

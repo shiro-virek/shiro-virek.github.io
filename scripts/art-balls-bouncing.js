@@ -183,4 +183,8 @@
 	}
 
 	init();
+
+	window.clearCanvas = () => {		
+		ballCollection = new BallCollection();
+	}
 }

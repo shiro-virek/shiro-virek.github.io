@@ -16,16 +16,15 @@
 
 	let clicking = false;
 
-
 	let randomize = () => {
-		OPACITY = Utils.getRandomFloat(0.03, 0.1, 2);
+		OPACITY = Utils.getRandomFloat(0.01, 0.1, 2);
 		THICKNESS = Utils.getRandomInt(1, 20);
 		ANGLE_ROTATION = Utils.getRandomInt(0, 20);
 		COLOR_MAP_MAX = Utils.getRandomInt(1, 10000);
 
 		colorShift = Utils.getRandomInt(0, 359);
 
-		ROTATORS = Utils.getRandomInt(0, 100);
+		ROTATORS = Utils.getRandomInt(2, 5);
 
 		let rotatorsLength = 0
 		let rotatorsAngle = 0;
@@ -93,25 +92,26 @@
 		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
-
-		let lineWidth = Utils.scale(distance, 1, 400, 1, THICKNESS);
-
-		Utils.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
-
+		
 		let angleRad = angle * RAD_CONST;
-
-		Utils.drawLine(ctx, xPointer, yPointer,
-			xPointer + parseInt(distance * Math.cos(angleRad)),
-			yPointer + parseInt(distance * Math.sin(angleRad)),
-			lineWidth, color);
 
 		if (ROTATORS > 0)
 			for (let i = 0; i < ROTATORS - 1; i++) {
 				let angleRad2 = (angle + rotatorsAngles[i]) * RAD_CONST;
-				Utils.drawLine(ctx, xPointer, yPointer,
-					xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)),
-					yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)),
-					lineWidth, color);
+				ctx.beginPath();
+
+				ctx.moveTo(lastPosX, lastPosY);
+				ctx.lineTo(xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad)), yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)));
+				ctx.lineTo(xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)), yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)));
+				
+				ctx.lineTo(xPointer, yPointer);
+				//Random pick:
+				//ctx.lineTo(yPointer, xPointer);
+				//ctx.lineTo(yPointer, yPointer);
+				//ctx.lineTo(xPointer, xPointer);
+				
+				ctx.fillStyle = color;
+				ctx.fill();
 			}
 
 		angle += ANGLE_ROTATION;

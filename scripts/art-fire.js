@@ -156,4 +156,9 @@
 	}
 
 	init();
+
+	window.clearCanvas = () => {		
+		objects = [];
+		addParticles();
+	}
 }

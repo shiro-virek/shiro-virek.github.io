@@ -150,4 +150,8 @@
     }
 
     init();
+    
+	window.clearCanvas = () => {		
+        ledScreen.generateLeds();  
+	}
 }
