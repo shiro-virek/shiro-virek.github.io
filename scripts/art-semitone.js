@@ -21,7 +21,8 @@
     const Figures = Object.freeze({
 		Square: Symbol("square"),
 		Circle: Symbol("circle"),
-		Hexagon: Symbol("hexagon")
+		Hexagon: Symbol("hexagon"),
+		Triangle: Symbol("trieangle")
 	});
 
     class Semitone {
@@ -173,9 +174,12 @@
                         break;
                     case Figures.Square:             
                         Utils.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color, this.color);
-                        break;
+                        break; 
                     case Figures.Hexagon:                    
-                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.color, this.color);
+                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.angle, this.color, this.color);
+                        break;
+                    case Figures.Triangle:                    
+                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 3, this.angle, this.color, this.color);
                         break;
                 }                
         }
