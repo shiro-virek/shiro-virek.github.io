@@ -14,6 +14,7 @@
     let colorFunctions = [];
     let xPositionFunctions = [];
     let yPositionFunctions = [];
+    let angleFunctions = [];
 
 	let clicking = false;    
 
@@ -142,6 +143,15 @@
         static getYPosition9 = (dist, x, y, angle) => {
             return y + Math.sin((angle) * RAD_CONST) * (x);
         }
+
+        static getAngle1 = (dist, x, y, angle) => {
+            return 0;
+        }
+
+        static getAngle2 = (dist, x, y, angle) => {
+            return angle;
+        }
+
     }
 
     class Dot {
@@ -162,7 +172,7 @@
                         Utils.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color);
                         break;
                     case Figures.Square:             
-                        Utils.drawSquare(ctx, this.x, this.y, this.radio, 0, this.color, this.color);
+                        Utils.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color, this.color);
                         break;
                     case Figures.Hexagon:                    
                         Utils.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.color, this.color);
@@ -182,6 +192,8 @@
 
             this.x = semitone.xPositionFunction(dist, xDot, yDot, angle);
             this.y = semitone.yPositionFunction(dist, xDot, yDot, angle);
+
+            this.angle = semitone.angleFunction(dist, xDot, yDot, angle);
         }
     }
 
@@ -228,6 +240,10 @@
             ModifierFunctions.getYPosition8,
             ModifierFunctions.getYPosition9,
         ];
+        angleFunctions = [
+            ModifierFunctions.getAngle1,
+            ModifierFunctions.getAngle2
+        ]
     }
 
     let addEvents = () => {
@@ -282,7 +298,8 @@
         semitone.radioFunction = Utils.getRandomFromArray(radioFunctions);
         semitone.colorFunction = Utils.getRandomFromArray(colorFunctions);
         semitone.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);  
-        semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);
+        semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);          
+        semitone.angleFunction = Utils.getRandomFromArray(angleFunctions);
     }
 
     let draw = () => {
