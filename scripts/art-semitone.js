@@ -15,6 +15,7 @@
     let xPositionFunctions = [];
     let yPositionFunctions = [];
     let angleFunctions = [];
+    let alphaFunctions = [];
 
 	let clicking = false;    
 
@@ -56,21 +57,21 @@
     }
 
     class ModifierFunctions {
-        static getRadio1 = (dist) => {
+        static getRadio1 = (dist, x, y, angle) => {
             return Utils.scale(dist, 0, 500, 5, 15);
         }
 
-        static getRadio2 = (dist) => {
+        static getRadio2 = (dist, x, y, angle) => {
             let decrement = Utils.scale(dist, 0, 500, 5, 15);
             return decrement < 20 ? 20 - decrement : 1;
         }
 
-        static getColor1 = (dist) => {
-            return `hsl(${hue}, ${Utils.scale(dist, 0, 500, 0, 100)}%, 50%)`;
+        static getColor1 = (dist, x, y, angle) => {
+            return `hsla(${hue}, ${Utils.scale(dist, 0, 500, 0, 100)}%, 50%, ${semitone.alphaFunction(dist, x, y, angle)})`;
         }
 
-        static getColor2 = (dist) => {
-            return `hsl(${hue}, 100%, ${Utils.scale(dist, 0, 500, 0, 100)}%)`;
+        static getColor2 = (dist, x, y, angle) => {
+            return `hsla(${hue}, 100%, ${Utils.scale(dist, 0, 500, 0, 100)}%, ${semitone.alphaFunction(dist, x, y, angle)})`;
         }
 
         static getXPosition1 = (dist, x, y, angle) => {
@@ -153,6 +154,17 @@
             return angle;
         }
 
+        static getAlpha1 = (dist, x, y, angle) => {
+            return 1;
+        }
+
+        static getAlpha2 = (dist, x, y, angle) => {
+            return Utils.scale(dist, 0, 500, 0, 1);
+        }
+
+        static getAlpha3 = (dist, x, y, angle) => {
+            return Utils.scale(dist, 0, 500, 1, 0);
+        }
     }
 
     class Dot {
@@ -191,8 +203,8 @@
             let dist = Math.sqrt(Math.pow(xDot - xMouse, 2) + Math.pow(yDot - yMouse, 2));
             let angle = Utils.angleBetweenTwoPoints(xDot, yDot, xMouse, yMouse);
 
-            this.radio = semitone.radioFunction(dist);
-            this.color = semitone.colorFunction(dist);
+            this.radio = semitone.radioFunction(dist, xDot, yDot, angle);
+            this.color = semitone.colorFunction(dist, xDot, yDot, angle);
 
             this.x = semitone.xPositionFunction(dist, xDot, yDot, angle);
             this.y = semitone.yPositionFunction(dist, xDot, yDot, angle);
@@ -247,7 +259,12 @@
         angleFunctions = [
             ModifierFunctions.getAngle1,
             ModifierFunctions.getAngle2
-        ]
+        ];
+        alphaFunctions = [
+            ModifierFunctions.getAlpha1,
+            ModifierFunctions.getAlpha2, 
+            ModifierFunctions.getAlpha3
+        ];
     }
 
     let addEvents = () => {
@@ -303,7 +320,8 @@
         semitone.colorFunction = Utils.getRandomFromArray(colorFunctions);
         semitone.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);  
         semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);          
-        semitone.angleFunction = Utils.getRandomFromArray(angleFunctions);
+        semitone.angleFunction = Utils.getRandomFromArray(angleFunctions);        
+        semitone.alphaFunction = Utils.getRandomFromArray(alphaFunctions);
     }
 
     let draw = () => {
