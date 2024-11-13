@@ -55,9 +55,9 @@
 		}
 
 		randomizePinnacle = () => {
-			this.hasPinnacle = Utils.getRandomBool();
+			this.hasPinnacle = Utils.getRandomInt(1, 6) == 1;
 			if (this.hasPinnacle){
-				this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width), Utils.getRandomInt(5, this.width * 2));
+				this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width / 2), Utils.getRandomInt(5, this.width * 2));
 			}
 		}
 
@@ -146,24 +146,22 @@
 			if (firstModule) this.drawDoor(ctx);
 			
 			if (this.hasPinnacle){
-				let pinnacleHeightFactor = Math.sin(angle * RAD_CONST) * (this.pinnacle.width / 2);
+				let pinnacleWidthFactor = Math.sin(angle * RAD_CONST) * (this.pinnacle.width / 2);
 
 				ctx.fillStyle = this.colorDark();
 				ctx.beginPath();
-				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
 				ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
-				//ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
 				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
-				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
 				ctx.fill();
 
 				ctx.fillStyle = this.colorDarker();
 				ctx.beginPath();
-				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
 				ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
-				//ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
 				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
-				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
 				ctx.fill();
 			}
 		}
