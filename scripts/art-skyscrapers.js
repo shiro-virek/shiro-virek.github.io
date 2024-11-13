@@ -145,8 +145,25 @@
 
 			if (firstModule) this.drawDoor(ctx);
 			
-			if (this.hasPinnacle)
-				Utils.drawRectangle(ctx, this.x - this.pinnacle.width / 2, this.y - this.height - this.pinnacle.height - (this.heightFactor / 2), this.pinnacle.width, this.pinnacle.height - (this.heightFactor / 2), "#000", "#000");
+			if (this.hasPinnacle){
+				ctx.fillStyle = this.colorDarker();
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.fill();
+
+				ctx.fillStyle = this.colorDarkest();
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.fill();
+			}
 		}
 
 		drawLeftFace = (ctx) => {
