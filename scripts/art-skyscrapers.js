@@ -146,22 +146,24 @@
 			if (firstModule) this.drawDoor(ctx);
 			
 			if (this.hasPinnacle){
-				ctx.fillStyle = this.colorDarker();
+				let pinnacleHeightFactor = Math.sin(angle * RAD_CONST) * (this.pinnacle.width / 2);
+
+				ctx.fillStyle = this.colorDark();
 				ctx.beginPath();
-				ctx.moveTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
 				ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
-				ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
+				//ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
 				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
-				ctx.lineTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
 				ctx.fill();
 
-				ctx.fillStyle = this.colorDarkest();
+				ctx.fillStyle = this.colorDarker();
 				ctx.beginPath();
-				ctx.moveTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
 				ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
-				ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
+				//ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor - this.pinnacle.height);
 				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
-				ctx.lineTo(this.x, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleHeightFactor);
 				ctx.fill();
 			}
 		}
