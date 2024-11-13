@@ -40,11 +40,9 @@
 			this.saturation = Utils.getRandomInt(0, 100);
 			this.light = Utils.getRandomInt(20, 80);
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
-			this.pinnacle = Utils.getRandomBool();
-			this.pinnacleHeight = Utils.getRandomInt(10, 100);
-			this.pinnacleWidth = Utils.getRandomInt(5, 20);
 			this.horizontalLines = Utils.getRandomInt(0, 3);
 			this.heliport = Utils.getRandomBool();
+			this.randomizePinnacle();
 
 			this.calculateProps();
 
@@ -52,6 +50,13 @@
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 
 			this.randomizeExtraModules();
+		}
+
+		randomizePinnacle = () => {
+			this.hasPinnacle = Utils.getRandomBool();
+			if (this.hasPinnacle){
+				this.pinnacle = new Pinnacle(Utils.getRandomInt(5, 20), Utils.getRandomInt(10, 100));
+			}
 		}
 
 		getAngleDecrement = (widthDecrement) => {
@@ -72,9 +77,8 @@
 
 					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i);
 					newModule.numberOfExtraModules = this.numberOfExtraModules;
+					newModule.hasPinnacle = this.hasPinnacle;
 					newModule.pinnacle = this.pinnacle;
-					newModule.pinnacleHeight = this.pinnacleHeight;
-					newModule.pinnacleWidth = this.pinnacleWidth;
 
 					let heightDecrement = lastModule.height * Utils.getRandomFloat(0, 0.7, 2);
 					newModule.width = lastModule.width - widthDecrement;
@@ -137,10 +141,10 @@
 
 			if (firstModule) this.drawDoor(ctx);
 			
-			console.log(this.moduleNumber + " " + this.numberOfExtraModules + " " + this.pinnacle);
+			//console.log(this.moduleNumber + " " + this.numberOfExtraModules + " " + this.pinnacle);
 
-			if (this.pinnacle && this.moduleNumber == this.numberOfExtraModules)
-				Utils.drawRectangle(ctx, this.x, this.y - this.height - this.pinnacleHeight, this.pinnacleWidth, this.pinnacleHeight, "#FF0000", "#000");
+			if (this.hasPinnacle && this.moduleNumber == this.numberOfExtraModules)
+				Utils.drawRectangle(ctx, this.x, this.y - this.height - this.pinnacle.height, this.pinnacle.width, this.pinnacle.height, "#FF0000", "#000");
 		}
 
 		drawLeftFace = (ctx) => {
@@ -489,6 +493,13 @@
 		colorCWLighter = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 40}%)`;
 		colorCWDark = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 20}%)`;
 		colorCWDarker = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 40}%)`;
+	}
+
+	class Pinnacle {
+		constructor(width, height) {
+			this.width = width;
+			this.height = height;
+		}
 	}
 
 	let init = () => {
