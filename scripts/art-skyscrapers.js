@@ -42,7 +42,6 @@
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
 			this.horizontalLines = Utils.getRandomInt(0, 3);
 			this.heliport = Utils.getRandomBool();
-			this.randomizePinnacle();
 
 			this.calculateProps();
 
@@ -50,12 +49,15 @@
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 
 			this.randomizeExtraModules();
+
+			if (this.numberOfModules == 1)
+				this.randomizePinnacle();
 		}
 
 		randomizePinnacle = () => {
 			this.hasPinnacle = Utils.getRandomBool();
 			if (this.hasPinnacle){
-				this.pinnacle = new Pinnacle(Utils.getRandomInt(5, 20), Utils.getRandomInt(10, 100));
+				this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width), Utils.getRandomInt(5, this.width * 2));
 			}
 		}
 
@@ -68,17 +70,15 @@
 		}
 
 		randomizeExtraModules = () => {
-			this.numberOfExtraModules = this.randomizenumberOfExtraModules();
+			this.numberOfModules = this.randomizenumberOfModules();
 			let lastModule = this;
 
-			if (this.numberOfExtraModules > 1) {
-				for (let i = 1; i <= this.numberOfExtraModules; i++) {
+			if (this.numberOfModules > 1) {
+				for (let i = 1; i <= this.numberOfModules; i++) {
 					let widthDecrement = lastModule.width * Utils.getRandomFloat(0.05, 0.3, 2);
 
 					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i);
-					newModule.numberOfExtraModules = this.numberOfExtraModules;
-					newModule.hasPinnacle = this.hasPinnacle;
-					newModule.pinnacle = this.pinnacle;
+					newModule.numberOfModules = this.numberOfModules;
 
 					let heightDecrement = lastModule.height * Utils.getRandomFloat(0, 0.7, 2);
 					newModule.width = lastModule.width - widthDecrement;
@@ -106,6 +106,10 @@
 
 					newModule.calculateProps();
 
+					if (newModule.moduleNumber  == newModule.numberOfModules){
+						newModule.randomizePinnacle();
+					}
+
 					this.modules.push(newModule);
 
 					lastModule = newModule;
@@ -123,7 +127,7 @@
 		drawBuilding = (ctx) => {
 			this.drawModule(ctx, true);
 
-			if (this.numberOfExtraModules > 1) {
+			if (this.numberOfModules > 1) {
 				this.modules.forEach((module) => module.drawModule(ctx, false));
 			}
 		}
@@ -141,10 +145,8 @@
 
 			if (firstModule) this.drawDoor(ctx);
 			
-			//console.log(this.moduleNumber + " " + this.numberOfExtraModules + " " + this.pinnacle);
-
-			if (this.hasPinnacle && this.moduleNumber == this.numberOfExtraModules)
-				Utils.drawRectangle(ctx, this.x, this.y - this.height - this.pinnacle.height, this.pinnacle.width, this.pinnacle.height, "#FF0000", "#000");
+			if (this.hasPinnacle)
+				Utils.drawRectangle(ctx, this.x - this.pinnacle.width / 2, this.y - this.height - this.pinnacle.height - (this.heightFactor / 2), this.pinnacle.width, this.pinnacle.height - (this.heightFactor / 2), "#000", "#000");
 		}
 
 		drawLeftFace = (ctx) => {
@@ -472,7 +474,7 @@
 			return Utils.getRandomInt(1, Math.floor(this.height / 20));
 		}
 
-		randomizenumberOfExtraModules = () => {
+		randomizenumberOfModules = () => {
 			let dice = Utils.getRandomInt(1, 6);
 
 			if (dice > 4)
