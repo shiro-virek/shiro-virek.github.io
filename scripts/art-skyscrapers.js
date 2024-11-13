@@ -39,6 +39,9 @@
 			this.saturation = Utils.getRandomInt(0, 100);
 			this.light = Utils.getRandomInt(20, 80);
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
+			this.pinnacle = Utils.getRandomInt(0, 3);
+			this.horizontalLines = Utils.getRandomInt(0, 3);
+			this.heliport = Utils.getRandomBool();
 
 			this.calculateProps();
 
@@ -126,6 +129,9 @@
 			this.drawWindows(ctx);
 
 			if (firstModule) this.drawDoor(ctx);
+			
+			if (this.pinnacle)
+				Utils.drawRectangle(ctx, this.x, this.y - this.height, 10, 100, "#FF0000", "#000");
 		}
 
 		drawLeftFace = (ctx) => {
