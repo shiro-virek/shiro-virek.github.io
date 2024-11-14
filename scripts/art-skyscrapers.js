@@ -5,7 +5,7 @@
 	let MAXIMUM_HEIGHT = 360;
 	let FIRST_FLOOR_HEIGHT = 20;
 
-	let objects = [];
+	let city;
 
 	const CWHues = [232, 203, 189, 173, 162];
 
@@ -18,6 +18,32 @@
 		Interlaced: Symbol("interlaced"),
 		MiniWindowCenter: Symbol("miniWindowCenter")
 	});
+
+	class City {
+		constructor(){
+			this.buildings = [];
+		}
+
+		addBuilding = (x, y) => {
+			let building = new Building(x, y);
+			building.randomize();
+			this.buildings.push(building);
+			BUILDINGS_COUNT++;
+		}
+
+		draw = () => {
+			drawBackground(ctx, canvas);
+
+			if (BUILDINGS_COUNT > 0)
+			for (let i = 0; i < BUILDINGS_COUNT; i++) {	
+				this.buildings[i].drawBuilding(ctx);
+			}
+		}
+
+		randomize = () => {
+			angle = Utils.getRandomInt(0, 40);
+		}
+	}
 
 	class Building {
 		constructor(x, y, moduleNumber = 0) {
@@ -523,7 +549,8 @@
 
 	let init = () => {
 		initCanvas();
-		randomize();
+		city = new City()
+		city.randomize();
 		addEvents();
 		drawBackground(ctx, canvas);
 		window.requestAnimationFrame(loop);
@@ -531,34 +558,14 @@
 
 	let addEvents = () => {
 		canvas.addEventListener('click', e => {
-			addBuilding(e.offsetX, e.offsetY);
+			city.addBuilding(e.offsetX, e.offsetY);
 		}, false);
-	}
-
-	let randomize = () => {
-		angle = Utils.getRandomInt(0, 40);
-	}
-
-	let addBuilding = (x, y) => {
-		let building = new Building(x, y);
-		building.randomize();
-		objects.push(building);
-		BUILDINGS_COUNT++;
-	}
-
-	let draw = () => {
-		drawBackground(ctx, canvas);
-
-		if (BUILDINGS_COUNT > 0)
-		for (let i = 0; i < BUILDINGS_COUNT; i++) {	
-			objects[i].drawBuilding(ctx);
-		}
 	}
 
 	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
-		draw();
+		city.draw();
 
 		lastRender = timestamp;
 		window.requestAnimationFrame(loop);
