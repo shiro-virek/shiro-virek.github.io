@@ -1,10 +1,7 @@
 {
-	let angle;
-	let BUILDINGS_COUNT = 0;
 	let MINIMUM_HEIGHT = 40;
 	let MAXIMUM_HEIGHT = 360;
 	let FIRST_FLOOR_HEIGHT = 20;
-
 	let city;
 
 	const CWHues = [232, 203, 189, 173, 162];
@@ -22,26 +19,25 @@
 	class City {
 		constructor(){
 			this.buildings = [];
+			this.buildingsCount = 0;
 		}
 
 		addBuilding = (x, y) => {
 			let building = new Building(x, y);
 			building.randomize();
 			this.buildings.push(building);
-			BUILDINGS_COUNT++;
+			this.buildingsCount++;
 		}
 
 		draw = () => {
-			drawBackground(ctx, canvas);
-
-			if (BUILDINGS_COUNT > 0)
-			for (let i = 0; i < BUILDINGS_COUNT; i++) {	
-				this.buildings[i].drawBuilding(ctx);
-			}
+			if (this.buildingsCount > 0)
+				for (let i = 0; i < this.buildingsCount; i++) {	
+					this.buildings[i].drawBuilding(ctx);
+				}
 		}
 
 		randomize = () => {
-			angle = Utils.getRandomInt(0, 40);
+			this.angle = Utils.getRandomInt(0, 40);
 		}
 	}
 
@@ -88,8 +84,8 @@
 		}
 
 		getAngleDecrement = (widthDecrement) => {
-			if (angle <= 3) return 0;
-			if (angle > 3 && angle < 20)
+			if (city.angle <= 3) return 0;
+			if (city.angle > 3 && city.angle < 20)
 				return widthDecrement / 4;
 			else
 				return widthDecrement / 2;
@@ -146,8 +142,8 @@
 		calculateProps = () => {
 			this.windowWidth = ((this.width - (this.margin * (this.cols + 1))) / this.cols);
 			this.windowHeight = ((this.height - this.firstFloorHeight - (this.margin * (this.rows + 1))) / this.rows);
-			this.windowWidthFactor = Math.cos(angle * RAD_CONST) * this.windowWidth;
-			this.windowHeightFactor = Math.sin(angle * RAD_CONST) * this.windowWidth;
+			this.windowWidthFactor = Math.cos(city.angle * RAD_CONST) * this.windowWidth;
+			this.windowHeightFactor = Math.sin(city.angle * RAD_CONST) * this.windowWidth;
 		}
 
 		drawBuilding = (ctx) => {
@@ -159,8 +155,8 @@
 		}
 
 		drawModule = (ctx, firstModule) => {
-			this.widthFactor = Math.cos(angle * RAD_CONST) * this.width;
-			this.heightFactor = Math.sin(angle * RAD_CONST) * this.width;
+			this.widthFactor = Math.cos(city.angle * RAD_CONST) * this.width;
+			this.heightFactor = Math.sin(city.angle * RAD_CONST) * this.width;
 
 			this.drawLeftFace(ctx);
 			this.drawRightFace(ctx);
@@ -172,7 +168,7 @@
 			if (firstModule) this.drawDoor(ctx);
 			
 			if (this.hasPinnacle){
-				let pinnacleWidthFactor = Math.sin(angle * RAD_CONST) * (this.pinnacle.width / 2);
+				let pinnacleWidthFactor = Math.sin(city.angle * RAD_CONST) * (this.pinnacle.width / 2);
 
 				ctx.fillStyle = this.colorDark();
 				ctx.beginPath();
@@ -248,13 +244,13 @@
 		drawDoor = (ctx) => {
 			let doorHeight = 10;
 			let doorWidth = 10;
-			let doorWidthFactor = Math.cos(angle * RAD_CONST) * (doorWidth);
-			let doorHeightFactor = Math.sin(angle * RAD_CONST) * (doorHeight);
+			let doorWidthFactor = Math.cos(city.angle * RAD_CONST) * (doorWidth);
+			let doorHeightFactor = Math.sin(city.angle * RAD_CONST) * (doorHeight);
 
 			ctx.fillStyle = this.colorDarker();
 			ctx.beginPath();
-			let wx = this.x - Math.cos(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
-			let wy = this.y - Math.sin(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
+			let wx = this.x - Math.cos(city.angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
+			let wy = this.y - Math.sin(city.angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
 			ctx.moveTo(wx, wy);
 			ctx.lineTo(wx, wy - doorHeight);
 			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight);
@@ -264,7 +260,7 @@
 
 			ctx.fillStyle = this.colorDarkest();
 			ctx.beginPath();
-			let wx1 = this.x + Math.cos(angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
+			let wx1 = this.x + Math.cos(city.angle * RAD_CONST) * (this.width / 2 - doorWidth / 2);
 			ctx.moveTo(wx1, wy);
 			ctx.lineTo(wx1, wy - doorHeight);
 			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight);
@@ -310,10 +306,10 @@
 		drawWindows = (ctx) => {
 			for (let ix = 0; ix < this.cols; ix++) {
 				for (let iy = 0; iy < this.rows; iy++) {
-					let wx = this.x - (Math.cos(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
-					let wy = this.y - this.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
-					let wx1 = this.x + (Math.cos(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
-					let wy1 = this.y - this.firstFloorHeight - (Math.sin(angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
+					let wx = this.x - (Math.cos(city.angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
+					let wy = this.y - this.firstFloorHeight - (Math.sin(city.angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
+					let wx1 = this.x + (Math.cos(city.angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
+					let wy1 = this.y - this.firstFloorHeight - (Math.sin(city.angle * RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
 
 					this.drawLeftWindow(ctx, wx, wy);
 					this.drawRightWindow(ctx, wx1, wy1);
@@ -375,8 +371,8 @@
 		drawMiniWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowHeight = (this.windowHeight / 2);
 			let halfWindowWidth = (this.windowWidth / 2);
-			let halfWidthFactor = Math.cos(angle * RAD_CONST) * halfWindowWidth;
-			let halfHeightFactor = Math.sin(angle * RAD_CONST) * halfWindowWidth;
+			let halfWidthFactor = Math.cos(city.angle * RAD_CONST) * halfWindowWidth;
+			let halfHeightFactor = Math.sin(city.angle * RAD_CONST) * halfWindowWidth;
 
 			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
@@ -410,8 +406,8 @@
 
 		drawSplitVWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowWidth = (this.windowWidth / 2);
-			let halfHeightFactor = Math.sin(angle * RAD_CONST) * halfWindowWidth;
-			let halfWidthFactor = Math.cos(angle * RAD_CONST) * halfWindowWidth;
+			let halfHeightFactor = Math.sin(city.angle * RAD_CONST) * halfWindowWidth;
+			let halfWidthFactor = Math.cos(city.angle * RAD_CONST) * halfWindowWidth;
 			ctx.strokeStyle = this.colorCWBase();
 
 			ctx.beginPath();
@@ -427,10 +423,10 @@
 		}
 
 		drawInterlacedWindow = (ctx, wx, wy, wx1, wy1) => {
-			let thirdHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3);
-			let thirdWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3);
-			let twoThirdsHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
-			let twoThirdsWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
+			let thirdHeightFactor = Math.sin(city.angle * RAD_CONST) * (this.windowWidth / 3);
+			let thirdWidthFactor = Math.cos(city.angle * RAD_CONST) * (this.windowWidth / 3);
+			let twoThirdsHeightFactor = Math.sin(city.angle * RAD_CONST) * (this.windowWidth / 3 * 2);
+			let twoThirdsWidthFactor = Math.cos(city.angle * RAD_CONST) * (this.windowWidth / 3 * 2);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
 			ctx.fillStyle = this.colorCWBase();
@@ -471,10 +467,10 @@
 		}
 
 		drawMiniWindowCenter = (ctx, wx, wy, wx1, wy1) => {
-			let thirdHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3);
-			let thirdWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3);
-			let twoThirdsHeightFactor = Math.sin(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
-			let twoThirdsWidthFactor = Math.cos(angle * RAD_CONST) * (this.windowWidth / 3 * 2);
+			let thirdHeightFactor = Math.sin(city.angle * RAD_CONST) * (this.windowWidth / 3);
+			let thirdWidthFactor = Math.cos(city.angle * RAD_CONST) * (this.windowWidth / 3);
+			let twoThirdsHeightFactor = Math.sin(city.angle * RAD_CONST) * (this.windowWidth / 3 * 2);
+			let twoThirdsWidthFactor = Math.cos(city.angle * RAD_CONST) * (this.windowWidth / 3 * 2);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
 			ctx.strokeStyle = this.colorCWBase();
@@ -565,6 +561,8 @@
 	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
+		drawBackground(ctx, canvas);
+
 		city.draw();
 
 		lastRender = timestamp;
@@ -575,6 +573,6 @@
 
 	window.clearCanvas = () => {
 		objects = []; 
-		BUILDINGS_COUNT = 0;
+		buildingsCount = 0;
 	}
 }
