@@ -63,8 +63,7 @@
 			this.light = Utils.getRandomInt(20, 80);
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
 			this.horizontalLines = Utils.getRandomInt(0, 3);
-			this.heliport = Utils.getRandomBool();
-
+			
 			this.calculateProps();
 
 			var rand = Utils.getRandomInt(0, Object.keys(WindowTypes).length);
@@ -73,10 +72,10 @@
 			this.randomizeExtraModules();
 
 			if (this.numberOfModules == 1)
-				this.randomizePinnacle();
+				this.randomizeTop();
 		}
 
-		randomizePinnacle = () => {
+		randomizeTop = () => {
 			this.hasPinnacle = Utils.getRandomInt(1, 6) == 1;
 			if (this.hasPinnacle){
 				this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width / 2), Utils.getRandomInt(5, this.width * 2));
@@ -129,7 +128,7 @@
 					newModule.calculateProps();
 
 					if (newModule.moduleNumber  == newModule.numberOfModules){
-						newModule.randomizePinnacle();
+						newModule.randomizeTop();
 					}
 
 					this.modules.push(newModule);
@@ -522,6 +521,7 @@
 				return Utils.getRandomInt(1, 10);
 		}
 
+
 		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`;
 		colorLight = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light + 20}%)`;
 		colorLighter = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light + 40}%)`;
@@ -540,6 +540,13 @@
 		constructor(width, height) {
 			this.width = width;
 			this.height = height;
+		}
+	}
+
+	class Heliport {
+		constructor(diameter, color) {
+			this.diameter = diameter;
+			this.color = color;
 		}
 	}
 
