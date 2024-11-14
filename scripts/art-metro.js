@@ -12,6 +12,10 @@
 	let INFO_WIDTH = 120;
 	let DRAW_QUADTREE = false;
 	let LINES_LIMIT = true;
+	let stationRadio = 10;
+	let stationColorBorder = false;
+	let drawStreets = false;
+	let drawIcons = false;
 
 	let maxNumberOfLines = 15;
 	let angleSegmentRange = 2;
@@ -70,13 +74,14 @@
 			let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
 			let station2 = new Station(INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
 			station1.transfer = station2;
-			station1.drawTransferLine(ctx, true);
+			station1.drawTransferLine(ctx, true, 10);
 		}
 
 		drawLines = (ctx) => {
-			for (const line of metroNetwork.lines) {
-				line.drawStreets(ctx);
-			}
+			if (drawStreets)
+				for (const line of metroNetwork.lines) {
+					line.drawStreets(ctx);
+				}
 
 			for (const line of metroNetwork.lines) {
 				line.drawMetroLine(ctx);
@@ -84,7 +89,7 @@
 
 			for (const line of metroNetwork.lines) {
 				for (const station of line.stations) {
-					station.drawTransferLine(ctx, true);
+					station.drawTransferLine(ctx, true, LINE_THICKNESS);
 				}
 			}
 		}
@@ -143,8 +148,8 @@
 			this.transfer = null;
 		}
 
-		drawStation = (ctx) => {
-			Utils.drawCircle(ctx, this.x, this.y, 3, "#000", "#FFF");
+		drawStation = (ctx, color) => {
+			Utils.drawCircle(ctx, this.x, this.y, stationRadio, stationColorBorder ? color : "#000", "#FFF");
 		}
 
 		addTransfers = (metroNetwork) => {
@@ -173,11 +178,11 @@
 			}
 		}
 
-		drawTransferLine = (ctx, blackBorder = false) => {
+		drawTransferLine = (ctx, blackBorder = false, lineWidth) => {
 			if (this.transfer == null) return;
 			if (blackBorder) {
 				ctx.strokeStyle = "#000";
-				ctx.lineWidth = 6;
+				ctx.lineWidth = lineWidth + 1;
 				ctx.lineCap = "round";
 				ctx.beginPath();
 				ctx.moveTo(this.x, this.y);
@@ -186,7 +191,7 @@
 			}
 
 			ctx.strokeStyle = "#FFF";
-			ctx.lineWidth = 5;
+			ctx.lineWidth = lineWidth;
 			ctx.lineCap = "round";
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y);
@@ -368,8 +373,7 @@
 			ctx.strokeStyle = this.colorBase();
 			ctx.beginPath();
 			ctx.moveTo(this.x, this.y);
-			for (const segment of this.segments) {
-				;
+			for (const segment of this.segments) {				
 				ctx.lineTo(segment.x, segment.y);
 			}
 			ctx.stroke();
@@ -377,7 +381,7 @@
 
 		drawStations = (ctx) => {
 			for (const station of this.stations) {
-				station.drawStation(ctx);
+				station.drawStation(ctx, this.colorBase());
 			}
 		}
 
@@ -418,10 +422,15 @@
 	}
 
 	let randomize = () => {
+		LINE_THICKNESS = Utils.getRandomInt(LINE_THICKNESS, LINE_THICKNESS * 2)
+		stationColorBorder = Utils.getRandomBool();
+		stationRadio = Utils.getRandomInt(3,10);
 		maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
 		alphabeticLineSymbol = Utils.getRandomBool();
 		angleSegmentRange = Utils.getRandomInt(1, 3);
+		drawIcons = Utils.getRandomBool();
+		drawStreets = Utils.getRandomBool();
 	}
 
 	let draw = () => {

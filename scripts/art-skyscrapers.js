@@ -20,15 +20,16 @@
 	});
 
 	class Building {
-		constructor(x, y) {
+		constructor(x, y, moduleNumber = 0) {
 			this.x = x;
 			this.y = y;
+			this.moduleNumber = moduleNumber;
 			this.modules = [];
 		}
 
 		randomize = () => {
 			this.height = Utils.getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
-			this.rows = this.getRowsNumber();
+			this.rows = this.randomizeRowsNumber();
 			this.cols = Utils.getRandomInt(1, 5);
 			this.margin = Utils.getRandomInt(0, 15);
 			this.width = Utils.getRandomInt(40, 60);
@@ -39,13 +40,25 @@
 			this.saturation = Utils.getRandomInt(0, 100);
 			this.light = Utils.getRandomInt(20, 80);
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
+			this.horizontalLines = Utils.getRandomInt(0, 3);
+			this.heliport = Utils.getRandomBool();
 
 			this.calculateProps();
 
 			var rand = Utils.getRandomInt(0, Object.keys(WindowTypes).length);
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 
-			this.randomizeModules();
+			this.randomizeExtraModules();
+
+			if (this.numberOfModules == 1)
+				this.randomizePinnacle();
+		}
+
+		randomizePinnacle = () => {
+			this.hasPinnacle = Utils.getRandomInt(1, 6) == 1;
+			if (this.hasPinnacle){
+				this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width / 2), Utils.getRandomInt(5, this.width * 2));
+			}
 		}
 
 		getAngleDecrement = (widthDecrement) => {
@@ -56,15 +69,16 @@
 				return widthDecrement / 2;
 		}
 
-		randomizeModules = () => {
-			let numberOfModules = this.getNumberOfModules();
+		randomizeExtraModules = () => {
+			this.numberOfModules = this.randomizenumberOfModules();
 			let lastModule = this;
 
-			if (numberOfModules > 1) {
-				for (let i = 1; i <= numberOfModules; i++) {
+			if (this.numberOfModules > 1) {
+				for (let i = 1; i <= this.numberOfModules; i++) {
 					let widthDecrement = lastModule.width * Utils.getRandomFloat(0.05, 0.3, 2);
 
-					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement));
+					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i);
+					newModule.numberOfModules = this.numberOfModules;
 
 					let heightDecrement = lastModule.height * Utils.getRandomFloat(0, 0.7, 2);
 					newModule.width = lastModule.width - widthDecrement;
@@ -92,6 +106,10 @@
 
 					newModule.calculateProps();
 
+					if (newModule.moduleNumber  == newModule.numberOfModules){
+						newModule.randomizePinnacle();
+					}
+
 					this.modules.push(newModule);
 
 					lastModule = newModule;
@@ -109,7 +127,7 @@
 		drawBuilding = (ctx) => {
 			this.drawModule(ctx, true);
 
-			if (this.modules.length > 1) {
+			if (this.numberOfModules > 1) {
 				this.modules.forEach((module) => module.drawModule(ctx, false));
 			}
 		}
@@ -126,6 +144,26 @@
 			this.drawWindows(ctx);
 
 			if (firstModule) this.drawDoor(ctx);
+			
+			if (this.hasPinnacle){
+				let pinnacleWidthFactor = Math.sin(angle * RAD_CONST) * (this.pinnacle.width / 2);
+
+				ctx.fillStyle = this.colorDark();
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
+				ctx.lineTo(this.x - this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
+				ctx.fill();
+
+				ctx.fillStyle = this.colorDarker();
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
+				ctx.lineTo(this.x + this.pinnacle.width / 2, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
+				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
+				ctx.fill();
+			}
 		}
 
 		drawLeftFace = (ctx) => {
@@ -449,11 +487,11 @@
 			ctx.fill();
 		}
 
-		getRowsNumber = () => {
+		randomizeRowsNumber = () => {
 			return Utils.getRandomInt(1, Math.floor(this.height / 20));
 		}
 
-		getNumberOfModules = () => {
+		randomizenumberOfModules = () => {
 			let dice = Utils.getRandomInt(1, 6);
 
 			if (dice > 4)
@@ -474,6 +512,13 @@
 		colorCWLighter = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight + 40}%)`;
 		colorCWDark = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 20}%)`;
 		colorCWDarker = () => `hsl(${this.CWHue}, ${this.CWSaturation}%, ${this.CWLight - 40}%)`;
+	}
+
+	class Pinnacle {
+		constructor(width, height) {
+			this.width = width;
+			this.height = height;
+		}
 	}
 
 	let init = () => {
