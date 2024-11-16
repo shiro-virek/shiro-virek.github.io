@@ -5,6 +5,7 @@
 	let city;
 
 	const CWHues = [232, 203, 189, 173, 162];
+	const HeliportColors = ["#FF0000", "#FFFFFF", "#000000"];
 
 	const WindowTypes = Object.freeze({
 		Regular: Symbol("regular"),
@@ -14,6 +15,12 @@
 		Triangular: Symbol("triangular"),
 		Interlaced: Symbol("interlaced"),
 		MiniWindowCenter: Symbol("miniWindowCenter")
+	});
+
+	const TopTypes = Object.freeze({
+		None: Symbol("none"),
+		Pinnacle: Symbol("pinnacle"),
+		Heliport: Symbol("heliport")
 	});
 
 	class City {
@@ -76,9 +83,17 @@
 		}
 
 		randomizeTop = () => {
-			this.hasPinnacle = Utils.getRandomInt(1, 6) == 1;
-			if (this.hasPinnacle){
-				this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width / 2), Utils.getRandomInt(5, this.width * 2));
+			var rand = Utils.getRandomInt(0, Object.keys(TopTypes).length);
+			this.topType = TopTypes[Object.keys(TopTypes)[rand]];
+
+			switch (this.topType) {
+				case TopTypes.Pinnacle:
+					this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width / 2), Utils.getRandomInt(5, this.width * 2));
+					break;
+				case TopTypes.Heliport:
+					let heliportColor = HeliportColors[(Math.floor(Math.random() * HeliportColors.length))];
+					this.heliport = new Heliport(20, heliportColor);
+					break;				
 			}
 		}
 
@@ -163,10 +178,10 @@
 			this.drawLights(ctx);
 
 			this.drawWindows(ctx);
-
+			
 			if (firstModule) this.drawDoor(ctx);
 			
-			if (this.hasPinnacle){
+			if (this.pinnacle){
 				let pinnacleWidthFactor = Math.sin(city.angle * RAD_CONST) * (this.pinnacle.width / 2);
 
 				ctx.fillStyle = this.colorDark();
@@ -184,6 +199,13 @@
 				ctx.lineTo(this.x, this.y - this.height - this.heightFactor - this.pinnacle.height);				
 				ctx.lineTo(this.x, this.y - this.height - this.heightFactor + pinnacleWidthFactor);
 				ctx.fill();
+			}
+
+			if (this.heliport && this.heliport.height < this.heightFactor * 3) {  
+				ctx.beginPath();
+				ctx.strokeStyle = this.heliport.color;
+				ctx.ellipse(this.x, this.y - this.height - this.heightFactor, this.heliport.width, this.heliport.height, Math.PI, 0, 2 * Math.PI);
+				ctx.stroke();
 			}
 		}
 
@@ -544,8 +566,9 @@
 	}
 
 	class Heliport {
-		constructor(diameter, color) {
-			this.diameter = diameter;
+		constructor(width, color) {
+			this.width = width;
+			this.height = city.angle * width / 45;
 			this.color = color;
 		}
 	}
