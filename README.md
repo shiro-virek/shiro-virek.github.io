@@ -1,4 +1,4 @@
-# eapelroso-lab
+# creative-coding-lab
 
 This is my creative coding playground 🧪⚗️
 

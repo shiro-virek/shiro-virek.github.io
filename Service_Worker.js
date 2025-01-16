@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eapelrosopwa',
+const CACHE_NAME = 'creataive-coding-lab',
     urlsToCache = [
         '.',
         './index.html',

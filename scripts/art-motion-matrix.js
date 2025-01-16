@@ -12,6 +12,7 @@
     let maxSize = 100;
 
     let transparent = false;
+    let rotate = false;
 
     let hue = 100;
 
@@ -49,17 +50,25 @@
             let col = Math.round((x - ledMargin) / ((ledDiameter) + ledPadding));
             let row = Math.round((y - ledMargin) / ((ledDiameter) + ledPadding));
             this.leds[col][row].growing = growSpeed;
+            this.leds[col][row].rotating = growSpeed;
         }
 
         movePixel = (col, row) => {
             this.leds[col][row].diameter += this.leds[col][row].growing;
             this.leds[col][row].radius = this.leds[col][row].diameter / 2;
+            this.leds[col][row].angle += this.leds[col][row].rotating;
 
-            if (this.leds[col][row].diameter > maxSize)
+            if (this.leds[col][row].diameter > maxSize){
                 this.leds[col][row].growing = -shrinkSpeed;
+                this.leds[col][row].rotating = -shrinkSpeed;
+            }
 
             if (this.leds[col][row].diameter <= ledDiameter)
                 this.leds[col][row].growing = 0;
+
+            if (this.leds[col][row].angle <= 0)
+                this.leds[col][row].rotating = 0;
+
         }
 
         draw = (ctx) => {
@@ -86,9 +95,11 @@
             this.row = row;
             this.column = column;
             this.x = ledMargin + column * ledPadding + column * this.diameter;
-            this.y = ledMargin + row * ledPadding + row * this.diameter;
+            this.y = ledMargin + row * ledPadding + row * this.diameter;            
             this.hue = hue;
             this.growing = 0;
+            this.angle = 0;
+            this.rotating = 0;
         }
 
         getColor = (opacity = 1.0) => {
@@ -102,7 +113,7 @@
                     Utils.drawCircle(ctx, this.x + ledRadius, this.y + ledRadius, this.radius, this.getColor(), this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Utils.drawRectangle(ctx, this.x - this.radius, this.y - this.radius, this.diameter, this.diameter, this.getColor(), this.getColor(opacity));
+                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, rotate ? this.angle : 0, this.getColor(), this.getColor(opacity));
                     break;
             }
         }
@@ -162,6 +173,7 @@
         growSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
         shrinkSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
         maxSize = Utils.getRandomInt(ledDiameter + 1, 255);
+        rotate = Utils.getRandomBool();
     }
 
     let draw = () => {
