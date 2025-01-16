@@ -37,7 +37,7 @@ let downloadPicture = () => {
     var canvas = document.getElementById("myCanvas");
     var image = canvas.toDataURL();
     var aDownloadLink = document.createElement('a');
-    aDownloadLink.download = 'eap.png';
+    aDownloadLink.download = 'ccl.png';
     aDownloadLink.href = image;
     aDownloadLink.click();
 }
