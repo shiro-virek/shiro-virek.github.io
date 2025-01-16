@@ -30,7 +30,7 @@ let reloadParams = () => {
 }
 
 let goToRepo = () => {
-    window.open('https://github.com/eapelroso/eapelroso-lab', '_blank');
+    window.open('https://github.com/shiro-virek/creative-coding-lab', '_blank');
 }
 
 let downloadPicture = () => {
