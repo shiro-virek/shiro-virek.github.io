@@ -201,7 +201,7 @@
 				ctx.fill();
 			}
 
-			if (this.heliport && this.heliport.width < (this.widthFactor / 2 ) {  
+			if (this.heliport && this.heliport.width < (this.widthFactor / 2 )) {  
 				ctx.beginPath();
 				ctx.strokeStyle = this.heliport.color;
 				ctx.ellipse(this.x, this.y - this.height - this.heightFactor, this.heliport.width / 2, this.heliport.height / 2, Math.PI, 0, 2 * Math.PI);
