@@ -88,6 +88,7 @@
         constructor() {
             this.vertices = [];
             this.edges = [];
+            this.hue = Utils.getRandomInt(1, 360);
         }
 
         rotateZ = (angle) => {
@@ -206,7 +207,7 @@
         }
 
         drawFace = (vertices) => {
-            ctx.fillStyle = "#0080f0";
+            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${50}%)`;
             ctx.beginPath();
 
             let vertex = world.worldToScreen(vertices[0]);
