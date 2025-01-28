@@ -1,6 +1,7 @@
 {
     let clicking = false;
     let mouseMoved = false;
+    let cubeSize = 20;
 
     class ThreeDWorld {
         constructor() {
@@ -13,6 +14,8 @@
         }
 
         draw = () => {
+            this.figures.sort((a, b) => b.getAverageZ() - a.getAverageZ());
+
             this.figures.forEach(figure => {          
                 figure.draw();       
             });
@@ -21,14 +24,14 @@
         setFigureTypes = () => {
             let cube = {
                 vertices: [
-                    [16, 16, 16],
-                    [16, -16, 16],
-                    [-16, -16, 16],
-                    [-16, 16, 16],
-                    [16, 16, -16],
-                    [16, -16, -16],
-                    [-16, -16, -16],
-                    [-16, 16, -16]
+                    [-cubeSize, -cubeSize, -cubeSize],
+                    [cubeSize, -cubeSize, -cubeSize],
+                    [cubeSize, cubeSize, -cubeSize],
+                    [-cubeSize, cubeSize, -cubeSize],
+                    [-cubeSize, -cubeSize, cubeSize],
+                    [cubeSize, -cubeSize, cubeSize],
+                    [cubeSize, cubeSize, cubeSize],
+                    [-cubeSize, cubeSize, cubeSize]
                 ],
                 edges: [
                     [0, 1],
@@ -46,11 +49,11 @@
                 ],
                 faces: [
                     [0, 1, 2, 3],
-                    [4, 5, 6, 7],
-                    [0, 1, 5, 4],
-                    [1, 2, 6, 5],
-                    [2, 3, 7, 6],
-                    [3, 0, 4, 7]
+                    [0, 4, 5, 1],
+                    [1, 5, 6, 2],
+                    [3, 2, 6, 7],
+                    [0, 3, 7, 4],
+                    [4, 7, 6, 5]
                 ]
             };
 
@@ -87,6 +90,15 @@
         constructor() {
             this.vertices = [];
             this.edges = [];
+            this.hue = Utils.getRandomInt(1, 360);
+        }
+
+        getAverageZ = () => {
+            let sumZ = 0;
+            for (let i = 0; i < this.vertices.length; i++) {
+                sumZ += this.vertices[i][2];
+            }
+            return sumZ / this.vertices.length;
         }
 
         rotateZ = (angle) => {
@@ -205,7 +217,7 @@
         }
 
         drawFace = (vertices) => {
-            ctx.fillStyle = "#0080f0";
+            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${50}%)`;
             ctx.beginPath();
 
             let vertex = world.worldToScreen(vertices[0]);
