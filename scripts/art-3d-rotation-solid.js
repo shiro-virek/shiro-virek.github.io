@@ -14,6 +14,8 @@
         }
 
         draw = () => {
+            this.figures.sort((a, b) => b.getAverageZ() - a.getAverageZ());
+
             this.figures.forEach(figure => {          
                 figure.draw();       
             });
@@ -89,6 +91,14 @@
             this.vertices = [];
             this.edges = [];
             this.hue = Utils.getRandomInt(1, 360);
+        }
+
+        getAverageZ = () => {
+            let sumZ = 0;
+            for (let i = 0; i < this.vertices.length; i++) {
+                sumZ += this.vertices[i][2];
+            }
+            return sumZ / this.vertices.length;
         }
 
         rotateZ = (angle) => {
