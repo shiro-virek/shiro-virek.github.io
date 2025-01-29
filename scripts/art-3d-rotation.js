@@ -1,15 +1,82 @@
-{
-	let clicking = false;
-    let mouseMoved = false;
+{    
+    const figureTypes = [
+        {
+            name: "letterV",
+            vertices: [
+                [0, 0, 0], [30, 0, 0], [60, 0, 0], [90, 0, 0],
+                [45, 35, 0], [45, 75, 0],
+                [0, 0, 20], [30, 0, 20], [60, 0, 20], [90, 0, 20],
+                [45, 35, 20], [45, 75, 20]
+            ],
+            edges: [
+                [6, 7], [7, 10], [10, 8], [8, 9], [6, 11], [11, 9],
+                [0, 6], [1, 7], [2, 8], [3, 9], [4, 10], [5, 11],
+                [0, 1], [1, 4], [4, 2], [2, 3], [0, 5], [5, 3]
+            ]
+        },
+        {
+            name: "cube",
+            vertices: [
+                [0, 0, 0], [30, 0, 0], [0, 30, 0], [30, 30, 0],
+                [0, 0, 30], [30, 0, 30], [0, 30, 30], [30, 30, 30]
+            ],
+            edges: [
+                [0, 1], [1, 3], [2, 3], [0, 2],
+                [4, 5], [5, 7], [7, 6], [4, 6],
+                [0, 4], [1, 5], [3, 7], [2, 6]
+            ]
+        },
+        {
+            name: "pyramid",
+            vertices: [
+                [10, 0, 10], [0, 20, 20], [20, 20, 20], [0, 20, 0], [20, 20, 0]
+            ],
+            edges: [
+                [0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [2, 4], [3, 4], [3, 1]
+            ]
+        },
+        {
+            name: "pyramid2",
+            vertices: [
+                [10, 0, 10], [10, 20, 20], [0, 20, 0], [20, 20, 0]
+            ],
+            edges: [
+                [0, 1], [0, 2], [0, 3], [1, 2], [2, 3], [1, 3]
+            ]
+        },
+        {
+            name: "icosahedron",
+            vertices: [
+                [0, 16, 0], [14.304, 7.152, 0], [4.416, 7.152, 13.616],
+                [-11.584, 7.152, 8.416], [-11.584, 7.152, -8.416], [4.416, 7.152, -13.616],
+                [11.584, -7.152, 8.416], [-4.416, -7.152, 13.616], [-14.304, -7.152, 0],
+                [-4.416, -7.152, -13.616], [11.584, -7.152, -8.416], [0, -16, 0]
+            ],
+            edges: [
+                [0, 1], [0, 2], [0, 3], [0, 4], [0, 5],
+                [1, 2], [1, 5], [1, 6], [2, 3], [2, 7],
+                [3, 4], [3, 8], [4, 5], [4, 9], [5, 10],
+                [6, 7], [6, 10], [6, 11], [7, 8], [7, 11],
+                [8, 9], [8, 11], [9, 10], [9, 11], [10, 11]
+            ]
+        }
+    ];
+
+    const config = {
+        FOV: 10000,
+        drawEdges: Utils.getRandomBool(),
+        figureInfo: figureTypes[Utils.getRandomInt(0, figureTypes.length)],
+        clicking: false,
+        mouseMoved: false,
+    };    
 
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = 2000;
-            this.drawEdges = true;
-            this.figureTypes = [];
-            this.setFigureTypes();
-            this.figureInfo = {};
+            this.FOV = config.FOV;
+            this.drawEdges = config.drawEdges;
+            this.figureTypes = config.figureTypes;
+            this.figureInfo = config.figureInfo;
         }
 
         draw = () => {
@@ -17,176 +84,6 @@
                 this.drawFigures();
             else
                 this.drawFiguresVertices();
-        }
-
-        setFigureTypes = () => {
-            let letterV = {
-                vertices: [
-                    [0, 0, 0],
-                    [30, 0, 0],
-                    [60, 0, 0],
-                    [90, 0, 0],
-
-                    [45, 35, 0],
-                    [45, 75, 0],
-
-                    [0, 0, 20],
-                    [30, 0, 20],
-                    [60, 0, 20],
-                    [90, 0, 20],
-
-                    [45, 35, 20],
-                    [45, 75, 20]
-                ],
-                edges: [
-                    [6, 7],
-                    [7, 10],
-                    [10, 8],
-                    [8, 9],
-                    [6, 11],
-                    [11, 9],
-  
-                    [0, 6],
-                    [1, 7],
-                    [2, 8],
-                    [3, 9],
-                    [4, 10],
-                    [5, 11],
-
-                    [0, 1],
-                    [1, 4],
-                    [4, 2],
-                    [2, 3],
-                    [0, 5],
-                    [5, 3]
-                ]
-
-            };
-
-            this.figureTypes.push(letterV);
-
-            let cube = {
-                vertices: [
-                    [0, 0, 0],
-                    [30, 0, 0],
-                    [0, 30, 0],
-                    [30, 30, 0],
-                    [0, 0, 30],
-                    [30, 0, 30],
-                    [0, 30, 30],
-                    [30, 30, 30],
-                ],
-                edges: [
-
-                    [0, 1],
-                    [1, 3],
-                    [2, 3],
-                    [0, 2],
-
-                    [4, 5],
-                    [5, 7],
-                    [7, 6],
-                    [4, 6],
-
-                    [0, 4],
-                    [1, 5],
-                    [3, 7],
-                    [2, 6]
-                ]
-
-            };
-
-            this.figureTypes.push(cube);
-
-            let pyramid = {
-                vertices: [
-                    [10, 0, 10],
-                    [0, 20, 20],
-                    [20, 20, 20],
-                    [0, 20, 0],
-                    [20, 20, 0]
-                ],
-                edges: [
-
-                    [0, 1],
-                    [0, 2],
-                    [0, 3],
-                    [0, 4],
-                    [1, 2],
-                    [2, 4],
-                    [3, 4],
-                    [3, 1]
-                ]
-
-            };
-
-            this.figureTypes.push(pyramid);
-
-            let pyramid2 = {
-                vertices: [
-                    [10, 0, 10],
-                    [10, 20, 20],
-                    [0, 20, 0],
-                    [20, 20, 0]
-                ],
-                edges: [
-
-                    [0, 1],
-                    [0, 2],
-                    [0, 3],
-                    [1, 2],
-                    [2, 3],
-                    [1, 3]
-                ]
-
-            };
-
-            this.figureTypes.push(pyramid2);
-            let icosahedron = {
-                vertices: [
-                    [0, 16, 0],
-                    [14.304, 7.152, 0],
-                    [4.416, 7.152, 13.616],
-                    [-11.584, 7.152, 8.416],
-                    [-11.584, 7.152, -8.416],
-                    [4.416, 7.152, -13.616],
-                    [11.584, -7.152, 8.416],
-                    [-4.416, -7.152, 13.616],
-                    [-14.304, -7.152, 0],
-                    [-4.416, -7.152, -13.616],
-                    [11.584, -7.152, -8.416],
-                    [0, -16, 0]
-                ],
-                edges: [
-                    [0, 1],
-                    [0, 2],
-                    [0, 3],
-                    [0, 4],
-                    [0, 5],
-                    [1, 2],
-                    [1, 5],
-                    [1, 6],
-                    [2, 3],
-                    [2, 7],
-                    [3, 4],
-                    [3, 8],
-                    [4, 5],
-                    [4, 9],
-                    [5, 10],
-                    [6, 7],
-                    [6, 10],
-                    [6, 11],
-                    [7, 8],
-                    [7, 11],
-                    [8, 9],
-                    [8, 11],
-                    [9, 10],
-                    [9, 11],
-                    [10, 11]
-                ]
-            };
-
-            this.figureTypes.push(icosahedron);
         }
 
         worldToScreen = (point) => {
@@ -385,46 +282,45 @@
     let init = () => {
         initCanvas();
         world = new ThreeDWorld();
-        randomize();
         addEvents();
         window.requestAnimationFrame(loop)
     }
 
     let addEvents = () => {
         canvas.addEventListener('mousemove', e => {
-            mouseMoved = true;
+            config.mouseMoved = true;
 			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
-            mouseMoved = true;
+            config.mouseMoved = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchstart', function (e) {
-            mouseMoved = false;
-			clicking = true;
+            config.mouseMoved = false;
+			config.clicking = true;
 		});
 
 		canvas.addEventListener('mousedown', e => {
-            mouseMoved = false;
-			clicking = true;
+            config.mouseMoved = false;
+			config.clicking = true;
 		}, false);
 
 		canvas.addEventListener('mouseup', e => {
-			clicking = false;
+			config.clicking = false;
 		}, false);
 
 		canvas.addEventListener('touchend', e => {
-            if (!mouseMoved)
+            if (!config.mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 
-			clicking = false;
+			config.clicking = false;
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
-            if (!mouseMoved)
+            if (!config.mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
     }
@@ -436,7 +332,7 @@
         let movX = lastPosX - x;
         let movY = lastPosY - y;
 
-        if (clicking) {    
+        if (config.clicking) {    
             world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
@@ -449,11 +345,6 @@
     
         lastPosX = x;
         lastPosY = y;
-    }
-
-    let randomize = () => {
-        world.drawEdges = Utils.getRandomBool();
-        world.figureInfo = world.figureTypes[Utils.getRandomInt(0, world.figureTypes.length)];
     }
 
     let draw = () => {

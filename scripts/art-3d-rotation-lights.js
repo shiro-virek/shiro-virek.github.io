@@ -242,39 +242,39 @@
 
     let addEvents = () => {
         canvas.addEventListener('mousemove', e => {
-            mouseMoved = true;
+            config.mouseMoved = true;
 			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
-            mouseMoved = true;
+            config.mouseMoved = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchstart', function (e) {
-            mouseMoved = false;
-			clicking = true;
+            config.mouseMoved = false;
+			config.clicking = true;
 		});
 
 		canvas.addEventListener('mousedown', e => {
-            mouseMoved = false;
-			clicking = true;
+            config.mouseMoved = false;
+			config.clicking = true;
 		}, false);
 
 		canvas.addEventListener('mouseup', e => {
-			clicking = false;
+			config.clicking = false;
 		}, false);
 
 		canvas.addEventListener('touchend', e => {
-            if (!mouseMoved)
+            if (!config.mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 
-			clicking = false;
+			config.clicking = false;
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
-            if (!mouseMoved)
+            if (!config.mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
     }
@@ -286,7 +286,7 @@
         let movX = lastPosX - x;
         let movY = lastPosY - y;
 
-        if (clicking) {  
+        if (config.clicking) {  
             world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
