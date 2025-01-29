@@ -1,20 +1,15 @@
 {
-    let clicking = false;
-    let mouseMoved = false;
-    let cubeSize = 20;
-
     const config = {
-        canvasWidth: 800,
-        canvasHeight: 600,
-        backgroundColor: "#FFFFFF",
         cubeSize: 20,
-        FOV: 10000
+        FOV: 10000,
+        clicking: false,
+        mouseMoved: false
     };    
 
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = 10000;
+            this.FOV = config.FOV;
             this.figureTypes = [];
             this.setFigureTypes();
             this.figureInfo = {};
@@ -31,14 +26,14 @@
         setFigureTypes = () => {
             let cube = {
                 vertices: [
-                    [-cubeSize, -cubeSize, -cubeSize],
-                    [cubeSize, -cubeSize, -cubeSize],
-                    [cubeSize, cubeSize, -cubeSize],
-                    [-cubeSize, cubeSize, -cubeSize],
-                    [-cubeSize, -cubeSize, cubeSize],
-                    [cubeSize, -cubeSize, cubeSize],
-                    [cubeSize, cubeSize, cubeSize],
-                    [-cubeSize, cubeSize, cubeSize]
+                    [-config.cubeSize, -config.cubeSize, -config.cubeSize],
+                    [config.cubeSize, -config.cubeSize, -config.cubeSize],
+                    [config.cubeSize, config.cubeSize, -config.cubeSize],
+                    [-config.cubeSize, config.cubeSize, -config.cubeSize],
+                    [-config.cubeSize, -config.cubeSize, config.cubeSize],
+                    [config.cubeSize, -config.cubeSize, config.cubeSize],
+                    [config.cubeSize, config.cubeSize, config.cubeSize],
+                    [-config.cubeSize, config.cubeSize, config.cubeSize]
                 ],
                 faces: [
                     [0, 1, 2, 3],
@@ -98,7 +93,7 @@
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
-                this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); //Y
+                this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); 
                 this.vertices[i][0] = x;
             }
         }
@@ -108,7 +103,7 @@
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
-                this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); //Z
+                this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); 
                 this.vertices[i][0] = x;
             }
         }
@@ -118,7 +113,7 @@
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
-                this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); //Z
+                this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); 
                 this.vertices[i][1] = y;
             }
         }
