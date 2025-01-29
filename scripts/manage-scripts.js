@@ -15,8 +15,7 @@ const art = [
                 "balls-bouncing",
                 "cthulhu",
                 "crt",
-                "ledscreen-tones",
-                "3d-rotation-solid", 
+                "ledscreen-tones", 
                 "rotators-solid",
                 "3d-rotation-lights", 
             ];

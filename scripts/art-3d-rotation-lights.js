@@ -225,8 +225,21 @@
             return Utils.dotProduct(normal, cameraDirection) < 0;
         }
 
+        getLightness = (vertices) =>  {
+            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
+            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
+    
+            const normal = Utils.crossProduct(vector1, vector2);
+    
+            const lightDirection = [0, 0, 1];
+
+            const dotProduct = Utils.dotProduct(normal, lightDirection);
+
+            return Utils.scale(dotProduct, -950, 0, 50, 100);
+        }
+
         drawFace = (vertices) => {
-            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${50}%)`;
+            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${this.getLightness(vertices)}%)`;
             ctx.beginPath();
 
             let vertex = world.worldToScreen(vertices[0]);
