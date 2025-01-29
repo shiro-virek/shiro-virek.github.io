@@ -8,15 +8,13 @@
         canvasHeight: 600,
         backgroundColor: "#FFFFFF",
         cubeSize: 20,
-        FOV: 10000,
-        drawEdges: true,
+        FOV: 10000
     };    
 
     class ThreeDWorld {
         constructor() {
             this.figures = [];
             this.FOV = 10000;
-            this.drawEdges = true;
             this.figureTypes = [];
             this.setFigureTypes();
             this.figureInfo = {};
@@ -41,20 +39,6 @@
                     [cubeSize, -cubeSize, cubeSize],
                     [cubeSize, cubeSize, cubeSize],
                     [-cubeSize, cubeSize, cubeSize]
-                ],
-                edges: [
-                    [0, 1],
-                    [1, 2],
-                    [2, 3],
-                    [3, 0],
-                    [0, 4],
-                    [1, 5],
-                    [2, 6],
-                    [3, 7],
-                    [4, 5],
-                    [5, 6],
-                    [6, 7],
-                    [7, 4]
                 ],
                 faces: [
                     [0, 1, 2, 3],
@@ -85,7 +69,6 @@
             let figure = new Figure();
 
             figure.vertices = Utils.clone(this.figureInfo.vertices);
-            figure.edges = Utils.clone(this.figureInfo.edges);
             figure.faces = Utils.clone(this.figureInfo.faces);
 
             figure.translateX(x);
@@ -324,7 +307,6 @@
     }
 
     let randomize = () => {
-        world.drawEdges = Utils.getRandomBool();
         world.figureInfo = world.figureTypes[Utils.getRandomInt(0, world.figureTypes.length - 1)];
     }
 
