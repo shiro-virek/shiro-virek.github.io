@@ -73,21 +73,17 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = config.FOV;
-            this.drawEdges = config.drawEdges;
-            this.figureTypes = config.figureTypes;
-            this.figureInfo = config.figureInfo;
         }
 
         draw = () => {
-            if (this.drawEdges)
+            if (config.drawEdges)
                 this.drawFigures();
             else
                 this.drawFiguresVertices();
         }
 
         worldToScreen = (point) => {
-            const scaleFactor = this.FOV / (this.FOV + point[2]);
+            const scaleFactor = config.FOV / (config.FOV + point[2]);
             const projectedX = point[0] * scaleFactor;
             const projectedY = point[1] * scaleFactor;
             return [projectedX, projectedY];
@@ -122,8 +118,8 @@
         }
 
         addDistance = (distance) => {
-            if (this.FOV + distance > 0)
-                this.FOV += distance;
+            if (config.FOV + distance > 0)
+                config.FOV += distance;
         }
 
         drawFigures = () => {
@@ -141,8 +137,8 @@
         addFigure(x, y) {
             let figure = new Figure();
 
-            figure.vertices = Utils.clone(this.figureInfo.vertices);
-            figure.edges = Utils.clone(this.figureInfo.edges);
+            figure.vertices = Utils.clone(config.figureInfo.vertices);
+            figure.edges = Utils.clone(config.figureInfo.edges);
 
             figure.translateX(x);
             figure.translateY(y);

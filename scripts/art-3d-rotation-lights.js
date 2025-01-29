@@ -1,7 +1,31 @@
 {
+    const figureTypes = [
+        {
+            name: "cube",
+            vertices: [
+                [-20, -20, -20],
+                [20, -20, -20],
+                [20, 20, -20],
+                [-20, 20, -20],
+                [-20, -20, 20],
+                [20, -20, 20],
+                [20, 20, 20],
+                [-20, 20, 20]
+            ],
+            faces: [
+                [0, 1, 2, 3],
+                [0, 4, 5, 1],
+                [1, 5, 6, 2],
+                [3, 2, 6, 7],
+                [0, 3, 7, 4],
+                [4, 7, 6, 5]
+            ]
+        }
+    ];
+
     const config = {
-        cubeSize: 20,
         FOV: 10000,
+        figureInfo: figureTypes[Utils.getRandomInt(0, figureTypes.length)],
         clicking: false,
         mouseMoved: false
     };    
@@ -9,10 +33,7 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = config.FOV;
-            this.figureTypes = [];
-            this.setFigureTypes();
-            this.figureInfo = {};
+            config.FOV = config.FOV;
         }
 
         draw = () => {
@@ -23,48 +44,23 @@
             });
         }
 
-        setFigureTypes = () => {
-            let cube = {
-                vertices: [
-                    [-config.cubeSize, -config.cubeSize, -config.cubeSize],
-                    [config.cubeSize, -config.cubeSize, -config.cubeSize],
-                    [config.cubeSize, config.cubeSize, -config.cubeSize],
-                    [-config.cubeSize, config.cubeSize, -config.cubeSize],
-                    [-config.cubeSize, -config.cubeSize, config.cubeSize],
-                    [config.cubeSize, -config.cubeSize, config.cubeSize],
-                    [config.cubeSize, config.cubeSize, config.cubeSize],
-                    [-config.cubeSize, config.cubeSize, config.cubeSize]
-                ],
-                faces: [
-                    [0, 1, 2, 3],
-                    [0, 4, 5, 1],
-                    [1, 5, 6, 2],
-                    [3, 2, 6, 7],
-                    [0, 3, 7, 4],
-                    [4, 7, 6, 5]
-                ]
-            };
-
-            this.figureTypes.push(cube);
-        }
-
         worldToScreen = (point) => {
-            const scaleFactor = this.FOV / (this.FOV + point[2]);
+            const scaleFactor = config.FOV / (config.FOV + point[2]);
             const projectedX = point[0] * scaleFactor;
             const projectedY = point[1] * scaleFactor;
             return [projectedX, projectedY];
         }
 
         addDistance = (distance) => {
-            if (this.FOV + distance > 0)
-                this.FOV += distance;
+            if (config.FOV + distance > 0)
+                config.FOV += distance;
         }
 
         addFigure = (x, y) => {
             let figure = new Figure();
 
-            figure.vertices = Utils.clone(this.figureInfo.vertices);
-            figure.faces = Utils.clone(this.figureInfo.faces);
+            figure.vertices = Utils.clone(config.figureInfo.vertices);
+            figure.faces = Utils.clone(config.figureInfo.faces);
 
             figure.translateX(x);
             figure.translateY(y);
@@ -235,7 +231,6 @@
     let init = () => {
         initCanvas();
         world = new ThreeDWorld();
-        randomize();
         addEvents();
         window.requestAnimationFrame(loop)
     }
@@ -300,11 +295,7 @@
         lastPosX = x;
         lastPosY = y;
     }
-
-    let randomize = () => {
-        world.figureInfo = world.figureTypes[Utils.getRandomInt(0, world.figureTypes.length - 1)];
-    }
-
+    
     let draw = () => {
         drawBackground(ctx, canvas);
         world.draw();
