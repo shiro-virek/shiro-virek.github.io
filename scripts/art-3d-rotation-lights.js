@@ -1,83 +1,66 @@
 {
-    let clicking = false;
-    let mouseMoved = false;
-    let cubeSize = 20;
+    const figureTypes = [
+        {
+            name: "cube",
+            vertices: [
+                [-20, -20, -20],
+                [20, -20, -20],
+                [20, 20, -20],
+                [-20, 20, -20],
+                [-20, -20, 20],
+                [20, -20, 20],
+                [20, 20, 20],
+                [-20, 20, 20]
+            ],
+            faces: [
+                [0, 1, 2, 3],
+                [0, 4, 5, 1],
+                [1, 5, 6, 2],
+                [3, 2, 6, 7],
+                [0, 3, 7, 4],
+                [4, 7, 6, 5]
+            ]
+        }
+    ];
+
+    const config = {
+        FOV: 10000,
+        figureInfo: figureTypes[Utils.getRandomInt(0, figureTypes.length)],
+        clicking: false,
+        mouseMoved: false
+    };    
 
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            this.FOV = 10000;
-            this.drawEdges = true;
-            this.figureTypes = [];
-            this.setFigureTypes();
-            this.figureInfo = {};
+            config.FOV = config.FOV;
         }
 
         draw = () => {
-            this.figures.sort((a, b) => b.getAverageZ() - a.getAverageZ());
+            this.figures.sort((a, b) => a.getAverageZ() - b.getAverageZ());
 
             this.figures.forEach(figure => {          
                 figure.draw();       
             });
         }
 
-        setFigureTypes = () => {
-            let cube = {
-                vertices: [
-                    [-cubeSize, -cubeSize, -cubeSize],
-                    [cubeSize, -cubeSize, -cubeSize],
-                    [cubeSize, cubeSize, -cubeSize],
-                    [-cubeSize, cubeSize, -cubeSize],
-                    [-cubeSize, -cubeSize, cubeSize],
-                    [cubeSize, -cubeSize, cubeSize],
-                    [cubeSize, cubeSize, cubeSize],
-                    [-cubeSize, cubeSize, cubeSize]
-                ],
-                edges: [
-                    [0, 1],
-                    [1, 2],
-                    [2, 3],
-                    [3, 0],
-                    [0, 4],
-                    [1, 5],
-                    [2, 6],
-                    [3, 7],
-                    [4, 5],
-                    [5, 6],
-                    [6, 7],
-                    [7, 4]
-                ],
-                faces: [
-                    [0, 1, 2, 3],
-                    [0, 4, 5, 1],
-                    [1, 5, 6, 2],
-                    [3, 2, 6, 7],
-                    [0, 3, 7, 4],
-                    [4, 7, 6, 5]
-                ]
-            };
-
-            this.figureTypes.push(cube);
-        }
-
         worldToScreen = (point) => {
-            const scaleFactor = this.FOV / (this.FOV + point[2]);
+            const scaleFactor = config.FOV / (config.FOV + point[2]);
             const projectedX = point[0] * scaleFactor;
             const projectedY = point[1] * scaleFactor;
             return [projectedX, projectedY];
         }
 
         addDistance = (distance) => {
-            if (this.FOV + distance > 0)
-                this.FOV += distance;
+            if (config.FOV + distance > 0)
+                config.FOV += distance;
         }
 
         addFigure = (x, y) => {
             let figure = new Figure();
 
-            figure.vertices = Utils.clone(this.figureInfo.vertices);
-            figure.edges = Utils.clone(this.figureInfo.edges);
-            figure.faces = Utils.clone(this.figureInfo.faces);
+            figure.vertices = Utils.clone(config.figureInfo.vertices);
+            figure.faces = Utils.clone(config.figureInfo.faces);
 
             figure.translateX(x);
             figure.translateY(y);
@@ -106,7 +89,7 @@
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
-                this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); //Y
+                this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); 
                 this.vertices[i][0] = x;
             }
         }
@@ -116,7 +99,7 @@
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
-                this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); //Z
+                this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); 
                 this.vertices[i][0] = x;
             }
         }
@@ -126,7 +109,7 @@
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
-                this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); //Z
+                this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); 
                 this.vertices[i][1] = y;
             }
         }
@@ -216,8 +199,21 @@
             return Utils.dotProduct(normal, cameraDirection) < 0;
         }
 
+        getLightness = (vertices) =>  {
+            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
+            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
+    
+            const normal = Utils.crossProduct(vector1, vector2);
+    
+            const lightDirection = [0, 0, 1];
+
+            const dotProduct = Utils.dotProduct(normal, lightDirection);
+
+            return Utils.scale(dotProduct, -950, 0, 50, 100);
+        }
+
         drawFace = (vertices) => {
-            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${50}%)`;
+            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${this.getLightness(vertices)}%)`;
             ctx.beginPath();
 
             let vertex = world.worldToScreen(vertices[0]);
@@ -235,46 +231,45 @@
     let init = () => {
         initCanvas();
         world = new ThreeDWorld();
-        randomize();
         addEvents();
         window.requestAnimationFrame(loop)
     }
 
     let addEvents = () => {
         canvas.addEventListener('mousemove', e => {
-            mouseMoved = true;
+            config.mouseMoved = true;
 			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
-            mouseMoved = true;
+            config.mouseMoved = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchstart', function (e) {
-            mouseMoved = false;
-			clicking = true;
+            config.mouseMoved = false;
+			config.clicking = true;
 		});
 
 		canvas.addEventListener('mousedown', e => {
-            mouseMoved = false;
-			clicking = true;
+            config.mouseMoved = false;
+			config.clicking = true;
 		}, false);
 
 		canvas.addEventListener('mouseup', e => {
-			clicking = false;
+			config.clicking = false;
 		}, false);
 
 		canvas.addEventListener('touchend', e => {
-            if (!mouseMoved)
+            if (!config.mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 
-			clicking = false;
+			config.clicking = false;
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
-            if (!mouseMoved)
+            if (!config.mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
     }
@@ -286,7 +281,7 @@
         let movX = lastPosX - x;
         let movY = lastPosY - y;
 
-        if (clicking) {  
+        if (config.clicking) {  
             world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
@@ -300,12 +295,7 @@
         lastPosX = x;
         lastPosY = y;
     }
-
-    let randomize = () => {
-        world.drawEdges = Utils.getRandomBool();
-        world.figureInfo = world.figureTypes[Utils.getRandomInt(0, world.figureTypes.length - 1)];
-    }
-
+    
     let draw = () => {
         drawBackground(ctx, canvas);
         world.draw();
