@@ -4,6 +4,8 @@
         mouseMoved: false
     };    
 
+	let mouseX;
+	let mouseY;
     const img = new Image();
 
     let init = () => {
@@ -69,6 +71,8 @@
         let movY = lastPosY - y;
 
         if (config.clicking) {  
+            mouseX = x;
+			mouseY = y;
         }
 
         lastPosX = x;
@@ -78,15 +82,33 @@
     let draw = () => {
         drawBackground(ctx, canvas);
 
-        ctx.drawImage(img, 0, 0, img.width, img.height);
 
+        let newImgHeight = 0;
+        let newImgWidth = 0;
+        let newOriginX = 0;
+        let newOriginY = 0;
+
+        if (width > height){
+            newImgHeight = height;
+            newImgWidth = newImgHeight * img.width / img.height;
+            newOriginY = 0;
+            newOriginX = halfWidth - (newImgWidth / 2);
+        }else{
+            newImgWidth = width;
+            newImgHeight = newImgWidth * img.height / img.width;
+            newOriginX = 0;
+            newOriginY = halfHeight - (newImgHeight / 2);
+        }
+
+        ctx.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+    
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
 
-        const centerX = lastPosX; //canvas.width / 3;
-        const centerY = lastPosY; //canvas.height / 3;
+        const centerX = mouseX; 
+        const centerY = mouseY; 
         const radius = Math.min(centerX, centerY);
-        const distortionStrength = 2.5; // Ajusta este valor para controlar la intensidad de la distorsión
+        const distortionStrength = 1.5; // Ajusta este valor para controlar la intensidad de la distorsión
 
         const outputImageData = ctx.createImageData(canvas.width, canvas.height);
         const outputData = outputImageData.data;
