@@ -38,7 +38,7 @@
 			rotatorsAngles.push(rotatorsAngle);
 		}
 
-		functionExecute = Utils.getRandomInt(0, 3);
+		functionExecute = Utils.getRandomInt(0, 4);
 	}
 
 	let addEvents = () => {
