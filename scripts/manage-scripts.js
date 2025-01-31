@@ -18,6 +18,7 @@ const art = [
                 "ledscreen-tones", 
                 "rotators-solid",
                 "3d-rotation-lights", 
+                "distortion",
             ];
 const scripts = [];
 
