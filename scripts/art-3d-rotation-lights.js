@@ -204,19 +204,15 @@
             const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
 
             const normal = Utils.crossProduct(vector1, vector2);
-            const normalLength = Math.sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
-            const normalizedNormal = [normal[0] / normalLength, normal[1] / normalLength, normal[2] / normalLength];
-
+           
             const lightDirection = [0, 0, 1]; 
-            const lightDirectionLength = Math.sqrt(lightDirection[0] * lightDirection[0] + lightDirection[1] * lightDirection[1] + lightDirection[2] * lightDirection[2]);
-            const normalizedLightDirection = [lightDirection[0] / lightDirectionLength, lightDirection[1] / lightDirectionLength, lightDirection[2] / lightDirectionLength];
+          
+            const dotProduct = Utils.dotProduct(normal, lightDirection);
 
-            const dotProduct = Utils.dotProduct(normalizedNormal, normalizedLightDirection);
-
-            const clampedDotProduct = Math.max(0, Math.min(1, dotProduct));
             
-            const lightness = Utils.scale(clampedDotProduct, 0, 1, 30, 100);
+            const lightness = Utils.scale(dotProduct, -1000, 0, 50, 100);
 
+            
             return lightness;
         }   
 

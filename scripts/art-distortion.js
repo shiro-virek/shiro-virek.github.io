@@ -3,16 +3,16 @@
         clicking: false,
         mouseMoved: false,
         functions: [barrel, twirl, pincushion, pinch, ripple, wobbly, ripple2]
-    };    
+    };
 
-	let mouseX = 0;
-	let mouseY = 0;
+    let mouseX = 0;
+    let mouseY = 0;
     let randomIndex = 0;
     const img = new Image();
 
-    function pincushion(data, outputData) {  
-        const centerX = mouseX; 
-        const centerY = mouseY; 
+    function pincushion(data, outputData) {
+        const centerX = mouseX;
+        const centerY = mouseY;
         const distortionStrength = 5.5;
         const radius = Math.min(centerX, centerY);
 
@@ -31,13 +31,11 @@
                     const index = (y * width + x) * 4;
                     const newIndex = (Math.round(newY) * width + Math.round(newX)) * 4;
 
-                    // Copia los valores de los píxeles
                     outputData[index] = data[newIndex];         // R
                     outputData[index + 1] = data[newIndex + 1]; // G
                     outputData[index + 2] = data[newIndex + 2]; // B
                     outputData[index + 3] = data[newIndex + 3]; // A
                 } else {
-                    // Si el píxel está fuera del radio, se deja igual
                     const index = (y * width + x) * 4;
                     outputData[index] = data[index];         // R
                     outputData[index + 1] = data[index + 1]; // G
@@ -48,12 +46,12 @@
         }
     }
 
-    function pinch(data, outputData) {  
-        const centerX = mouseX; 
-        const centerY = mouseY; 
+    function pinch(data, outputData) {
+        const centerX = mouseX;
+        const centerY = mouseY;
         const radius = Math.min(centerX, centerY);
         const strength = 1.5;
- 
+
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 const dx = x - centerX;
@@ -61,7 +59,6 @@
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < radius) {
-                    // Aplica la distorsión de pinch
                     const angle = Math.atan2(dy, dx);
                     const distortion = 1 - Math.pow(distance / radius, strength);
                     const newX = centerX + Math.cos(angle) * distortion * distance;
@@ -70,13 +67,11 @@
                     const index = (y * width + x) * 4;
                     const newIndex = (Math.round(newY) * width + Math.round(newX)) * 4;
 
-                    // Copia los valores de los píxeles
                     outputData[index] = data[newIndex];         // R
                     outputData[index + 1] = data[newIndex + 1]; // G
                     outputData[index + 2] = data[newIndex + 2]; // B
                     outputData[index + 3] = data[newIndex + 3]; // A
                 } else {
-                    // Si el píxel está fuera del radio, se deja igual
                     const index = (y * width + x) * 4;
                     outputData[index] = data[index];         // R
                     outputData[index + 1] = data[index + 1]; // G
@@ -86,117 +81,109 @@
             }
         }
     }
-    
 
 
-function ripple(data, outputData) { 
-    const centerX = mouseX; // Centro de la onda en X
-    const centerY = mouseY; // Centro de la onda en Y
-    const amplitude = 10; // Amplitud de la onda (distorsión máxima)
-    const frequency = 0.3; // Frecuencia de la onda (controla el número de ondas)
-    const phase = 1; // Fase inicial de la onda
 
-    for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-            const dx = x - centerX;
-            const dy = y - centerY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+    function ripple(data, outputData) {
+        const centerX = mouseX;
+        const centerY = mouseY;
+        const amplitude = 10;
+        const frequency = 0.3;
+        const phase = 1;
 
-            // Calcular el desplazamiento basado en una onda sinusoidal
-            const displacement = amplitude * Math.sin(frequency * distance - phase);
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Aplicar el desplazamiento a las coordenadas
-            const newX = x + (dx / distance) * displacement;
-            const newY = y + (dy / distance) * displacement;
+                const displacement = amplitude * Math.sin(frequency * distance - phase);
 
-            // Obtener el color del píxel en la nueva posición
-            if (newX >= 0 && newX < canvas.width && newY >= 0 && newY < canvas.height) {
-                const index = (y * canvas.width + x) * 4;
-                const newIndex = (Math.floor(newY) * canvas.width + Math.floor(newX)) * 4;
+                const newX = x + (dx / distance) * displacement;
+                const newY = y + (dy / distance) * displacement;
 
-                outputData[index] = data[newIndex];         // Red
-                outputData[index + 1] = data[newIndex + 1]; // Green
-                outputData[index + 2] = data[newIndex + 2]; // Blue
-                outputData[index + 3] = data[newIndex + 3]; // Alpha
+                if (newX >= 0 && newX < canvas.width && newY >= 0 && newY < canvas.height) {
+                    const index = (y * canvas.width + x) * 4;
+                    const newIndex = (Math.floor(newY) * canvas.width + Math.floor(newX)) * 4;
+
+                    outputData[index] = data[newIndex];         // Red
+                    outputData[index + 1] = data[newIndex + 1]; // Green
+                    outputData[index + 2] = data[newIndex + 2]; // Blue
+                    outputData[index + 3] = data[newIndex + 3]; // Alpha
+                }
             }
         }
     }
 
-}
+    function wobbly(data, outputData) {
+        let amplitude = Utils.scale(mouseX, 0, width, 0, 20);
+        let frequency = Utils.scale(mouseY, 0, height, 0, 1);
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const offsetX = Math.sin(y * frequency) * amplitude;
+                const offsetY = Math.cos(x * frequency) * amplitude;
 
+                const newX = x + offsetX;
+                const newY = y + offsetY;
 
-function wobbly(data, outputData) { 
-    let amplitude = Utils.scale(mouseX, 0, width, 0, 20);
-    let frequency = Utils.scale(mouseY, 0, height, 0, 1);
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            const offsetX = Math.sin(y * frequency) * amplitude;
-            const offsetY = Math.cos(x * frequency) * amplitude;
+                const clampedX = Math.max(0, Math.min(width - 1, Math.round(newX)));
+                const clampedY = Math.max(0, Math.min(height - 1, Math.round(newY)));
 
-            const newX = x + offsetX;
-            const newY = y + offsetY;
+                const index = (y * width + x) * 4;
+                const newIndex = (clampedY * width + clampedX) * 4;
 
-            const clampedX = Math.max(0, Math.min(width - 1, Math.round(newX)));
-            const clampedY = Math.max(0, Math.min(height - 1, Math.round(newY)));
-
-            const index = (y * width + x) * 4;
-            const newIndex = (clampedY * width + clampedX) * 4;
-
-            outputData[index] = data[newIndex];         // R
-            outputData[index + 1] = data[newIndex + 1]; // G
-            outputData[index + 2] = data[newIndex + 2]; // B
-            outputData[index + 3] = data[newIndex + 3]; // A
-        }
-    }
-}
-
-
-function ripple2(data, outputData) {  
-    const centerX = mouseX; 
-    const centerY = mouseY; 
-    const radius = Math.min(centerX, centerY);
-    const distortionStrength = 5.5; 
-
-    for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-            const dx = x - centerX;
-            const dy = y - centerY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < radius) {
-                const angle = Math.atan2(dy, dx);
-                          
-                let RAD_CONST = 0.0175;
-                
-                const newX = x + Math.cos((angle + distance * distortionStrength) * RAD_CONST) * 50;            
-                const newY = y + Math.sin((angle + distance * distortionStrength) * RAD_CONST) * 50;
-                    
-                const index = (y * canvas.width + x) * 4;
-                const newIndex = (Math.round(newY) * canvas.width + Math.round(newX)) * 4;
-
-                // Copia los valores de los píxeles
                 outputData[index] = data[newIndex];         // R
                 outputData[index + 1] = data[newIndex + 1]; // G
                 outputData[index + 2] = data[newIndex + 2]; // B
                 outputData[index + 3] = data[newIndex + 3]; // A
-            } else {
-                // Si el píxel está fuera del radio, se deja igual
-                const index = (y * canvas.width + x) * 4;
-                outputData[index] = data[index];         // R
-                outputData[index + 1] = data[index + 1]; // G
-                outputData[index + 2] = data[index + 2]; // B
-                outputData[index + 3] = data[index + 3]; // A
             }
         }
     }
-}
 
-
-    function barrel(data, outputData) {        
-        const centerX = mouseX; 
-        const centerY = mouseY; 
+    function ripple2(data, outputData) {
+        const centerX = mouseX;
+        const centerY = mouseY;
         const radius = Math.min(centerX, centerY);
-        const distortionStrength = 1.5; 
+        const distortionStrength = 5.5;
+
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < radius) {
+                    const angle = Math.atan2(dy, dx);
+
+                    let RAD_CONST = 0.0175;
+
+                    const newX = x + Math.cos((angle + distance * distortionStrength) * RAD_CONST) * 50;
+                    const newY = y + Math.sin((angle + distance * distortionStrength) * RAD_CONST) * 50;
+
+                    const index = (y * canvas.width + x) * 4;
+                    const newIndex = (Math.round(newY) * canvas.width + Math.round(newX)) * 4;
+
+                    outputData[index] = data[newIndex];         // R
+                    outputData[index + 1] = data[newIndex + 1]; // G
+                    outputData[index + 2] = data[newIndex + 2]; // B
+                    outputData[index + 3] = data[newIndex + 3]; // A
+                } else {
+                    const index = (y * canvas.width + x) * 4;
+                    outputData[index] = data[index];         // R
+                    outputData[index + 1] = data[index + 1]; // G
+                    outputData[index + 2] = data[index + 2]; // B
+                    outputData[index + 3] = data[index + 3]; // A
+                }
+            }
+        }
+    }
+
+
+    function barrel(data, outputData) {
+        const centerX = mouseX;
+        const centerY = mouseY;
+        const radius = Math.min(centerX, centerY);
+        const distortionStrength = 1.5;
 
         for (let y = 0; y < canvas.height; y++) {
             for (let x = 0; x < canvas.width; x++) {
@@ -228,7 +215,7 @@ function ripple2(data, outputData) {
         }
     }
 
-    function twirl(data, outputData){
+    function twirl(data, outputData) {
         let radius = 250;
         let strength = 3.5;
         const centerX = mouseX;
@@ -270,16 +257,16 @@ function ripple2(data, outputData) {
     let init = () => {
         initCanvas();
 
-        randomIndex = Math.floor(Math.random() * config.functions.length)        
+        randomIndex = Math.floor(Math.random() * config.functions.length)
 
-        img.src = '../assets/Picture1.jpg'; 
-        img.crossOrigin = "Anonymous"; 
+        img.src = '../assets/Picture1.jpg';
+        img.crossOrigin = "Anonymous";
 
-        img.onload = function() {
+        img.onload = function () {
             canvas.width = img.width;
             canvas.height = img.height;
 
-            trackMouse(0,0);
+            trackMouse(0, 0);
 
             addEvents();
             window.requestAnimationFrame(loop)
@@ -289,39 +276,39 @@ function ripple2(data, outputData) {
     let addEvents = () => {
         canvas.addEventListener('mousemove', e => {
             config.mouseMoved = true;
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
+            trackMouse(e.offsetX, e.offsetY);
+        }, false);
 
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
+        canvas.addEventListener('touchmove', function (e) {
+            e.preventDefault();
             config.mouseMoved = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
+            trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+        });
 
-		canvas.addEventListener('touchstart', function (e) {
+        canvas.addEventListener('touchstart', function (e) {
             config.mouseMoved = false;
-			config.clicking = true;
-		});
+            config.clicking = true;
+        });
 
-		canvas.addEventListener('mousedown', e => {
+        canvas.addEventListener('mousedown', e => {
             config.mouseMoved = false;
-			config.clicking = true;
-		}, false);
+            config.clicking = true;
+        }, false);
 
-		canvas.addEventListener('mouseup', e => {
-			config.clicking = false;
-		}, false);
+        canvas.addEventListener('mouseup', e => {
+            config.clicking = false;
+        }, false);
 
-		canvas.addEventListener('touchend', e => {
+        canvas.addEventListener('touchend', e => {
             //if (!config.mouseMoved)
-               
-			config.clicking = false;
-		}, false);  
 
-		canvas.addEventListener('click', function (e) {
+            config.clicking = false;
+        }, false);
+
+        canvas.addEventListener('click', function (e) {
             //if (!config.mouseMoved)
-               
-		});
+
+        });
     }
 
     let trackMouse = (x, y) => {
@@ -331,15 +318,15 @@ function ripple2(data, outputData) {
         let movX = lastPosX - x;
         let movY = lastPosY - y;
 
-        if (config.clicking) {  
+        if (config.clicking) {
             mouseX = x;
-			mouseY = y;
+            mouseY = y;
         }
 
         lastPosX = x;
         lastPosY = y;
     }
-    
+
     let draw = () => {
         drawBackground(ctx, canvas);
 
@@ -348,12 +335,12 @@ function ripple2(data, outputData) {
         let newOriginX = 0;
         let newOriginY = 0;
 
-        if (width > height){
+        if (width > height) {
             newImgHeight = height;
             newImgWidth = newImgHeight * img.width / img.height;
             newOriginY = 0;
             newOriginX = halfWidth - (newImgWidth / 2);
-        }else{
+        } else {
             newImgWidth = width;
             newImgHeight = newImgWidth * img.height / img.width;
             newOriginX = 0;
@@ -361,14 +348,14 @@ function ripple2(data, outputData) {
         }
 
         ctx.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
-    
+
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
 
         const outputImageData = ctx.createImageData(canvas.width, canvas.height);
         const outputData = outputImageData.data;
 
-        const randomFunction = config.functions[randomIndex]; 
+        const randomFunction = config.functions[randomIndex];
         randomFunction(data, outputData);
 
         ctx.putImageData(outputImageData, 0, 0);
@@ -385,6 +372,6 @@ function ripple2(data, outputData) {
 
     init();
 
-	window.clearCanvas = () => {		
-	}
+    window.clearCanvas = () => {
+    }
 }
