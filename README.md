@@ -10,20 +10,23 @@ Example: index.html/?art=city
 
 Scenes currently available:
 
-- blurry
-- city
+- bokeh
+- skyscrapers
 - confetti
 - fire
 - metro
-- rotation
+- 3d-rotation
 - rotators
-- tentacles
-- semitone
+- cthulhu
+- chaos
 - ledscreen
 - ledscreen-tones
 - crt
 - conway
 - motion-matrix
 - balls-bouncing
+- 3d-rotation-lights
+- distortion
+- rotators-solid
 
 You can see them in action at https://eapelroso.com 🙃
