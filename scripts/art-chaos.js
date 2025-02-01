@@ -23,7 +23,7 @@
 		Square: Symbol("square"),
 		Circle: Symbol("circle"),
 		Hexagon: Symbol("hexagon"),
-		Triangle: Symbol("trieangle")
+		Triangle: Symbol("triangle")
 	});
 
     class Semitone {
@@ -121,31 +121,7 @@
         static getYPosition6 = (dist, x, y, angle) => {
             return y + Math.sin((angle + dist) * RAD_CONST) * dist;
         }
-                    
-        static getXPosition7 = (dist, x, y, angle) => {
-            return x + Math.cos((angle + dist) * RAD_CONST) * (angle + dist);
-        }
-
-        static getYPosition7 = (dist, x, y, angle) => {
-            return y + Math.sin((angle + dist) * RAD_CONST) * (angle + dist);
-        }
-                            
-        static getXPosition8 = (dist, x, y, angle) => {
-            return x + Math.cos((angle + dist) * RAD_CONST) * (y);
-        }
-
-        static getYPosition8 = (dist, x, y, angle) => {
-            return y + Math.sin((angle + dist) * RAD_CONST) * (x);
-        }
-                                    
-        static getXPosition9 = (dist, x, y, angle) => {
-            return x + Math.cos((angle) * RAD_CONST) * (y);
-        }
-
-        static getYPosition9 = (dist, x, y, angle) => {
-            return y + Math.sin((angle) * RAD_CONST) * (x);
-        }
-
+            
         static getAngle1 = (dist, x, y, angle) => {
             return 0;
         }
@@ -241,9 +217,6 @@
             ModifierFunctions.getXPosition4,
             ModifierFunctions.getXPosition5,
             ModifierFunctions.getXPosition6,
-            ModifierFunctions.getXPosition7,
-            ModifierFunctions.getXPosition8,            
-            ModifierFunctions.getXPosition9,
         ];
         yPositionFunctions = [
             ModifierFunctions.getYPosition1,
@@ -252,9 +225,6 @@
             ModifierFunctions.getYPosition4,
             ModifierFunctions.getYPosition5,
             ModifierFunctions.getYPosition6,
-            ModifierFunctions.getYPosition7,
-            ModifierFunctions.getYPosition8,
-            ModifierFunctions.getYPosition9,
         ];
         angleFunctions = [
             ModifierFunctions.getAngle1,
