@@ -5,8 +5,8 @@
         functions: [barrel, twirl, pincushion, pinch, ripple, wobbly, ripple2]
     };    
 
-	let mouseX;
-	let mouseY;
+	let mouseX = 0;
+	let mouseY = 0;
     let randomIndex = 0;
     const img = new Image();
 
@@ -279,6 +279,7 @@ function ripple2(data, outputData) {
             canvas.width = img.width;
             canvas.height = img.height;
 
+            trackMouse(0,0);
 
             addEvents();
             window.requestAnimationFrame(loop)
