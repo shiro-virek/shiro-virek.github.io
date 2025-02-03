@@ -2,7 +2,14 @@
     const config = {
         clicking: false,
         mouseMoved: false,
+        radius: 250,
+        strength: 3.5,
+        mode: 0,
         functions: [barrel, twirl, pincushion, pinch, ripple, wobbly, ripple2]
+    };
+    
+    const globals = {
+        randomFunctionIndex: 0
     };
 
     let mouseX = 0;
@@ -216,10 +223,10 @@
     }
 
     function twirl(data, outputData) {
-        let radius = 250;
-        let strength = 3.5;
-        const centerX = mouseX;
-        const centerY = mouseY;
+        let radius = config.mode ? Utils.scale(mouseX, 0, width, 0, 500) : config.radius;
+        let strength = config.mode ? Utils.scale(mouseY, 0, height, 0, 20) : config.strength;
+        const centerX =  config.mode ? width / 2 : mouseX;
+        const centerY =  config.mode ? height / 2 : mouseY;
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
@@ -256,8 +263,8 @@
 
     let init = () => {
         initCanvas();
-
-        randomIndex = Math.floor(Math.random() * config.functions.length)
+        
+        randomize();
 
         img.src = '../assets/Picture1.jpg';
         img.crossOrigin = "Anonymous";
@@ -355,10 +362,15 @@
         const outputImageData = ctx.createImageData(canvas.width, canvas.height);
         const outputData = outputImageData.data;
 
-        const randomFunction = config.functions[randomIndex];
+        const randomFunction = config.functions[globals.randomFunctionIndex];
         randomFunction(data, outputData);
 
         ctx.putImageData(outputImageData, 0, 0);
+    }
+    
+    let randomize = () => {
+        config.mode = Utils.getRandomBool();
+        globals.randomFunctionIndex = 1; // Math.floor(Math.random() * config.functions.length)
     }
 
     let loop = (timestamp) => {
