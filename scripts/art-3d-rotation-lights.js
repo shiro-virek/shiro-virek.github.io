@@ -37,8 +37,15 @@
         }
 
         draw = () => {
-            this.figures.sort((a, b) => a.getAverageZ() - b.getAverageZ());
-
+            this.figures.sort((a, b) => {
+                const avgA = a.getAverageZ();
+                const avgB = b.getAverageZ();
+                if (isNaN(avgA) || isNaN(avgB)) {
+                    return 0; 
+                }
+                return avgA - avgB;
+            });
+            
             this.figures.forEach(figure => {          
                 figure.draw();       
             });
@@ -81,7 +88,14 @@
             for (let i = 0; i < this.vertices.length; i++) {
                 sumZ += this.vertices[i][2];
             }
-            return sumZ / this.vertices.length;
+            
+            let result = sumZ / this.vertices.length;
+            
+            if (isNaN(result)) {
+                return 0; 
+            }
+            
+            return result;
         }
 
         rotateZ = (angle) => {
@@ -252,7 +266,8 @@
 		});
 
 		canvas.addEventListener('touchstart', function (e) {
-            config.mouseMoved = false;
+            config.mouseMoved = false;            
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 			config.clicking = true;
 		});
 

@@ -295,7 +295,8 @@
 		});
 
 		canvas.addEventListener('touchstart', function (e) {
-            config.mouseMoved = false;
+            config.mouseMoved = false;            
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 			config.clicking = true;
 		});
 
