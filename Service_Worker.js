@@ -1,4 +1,4 @@
-const CACHE_NAME = 'creative-coding-lab';
+const CACHE_NAME = 'creative-coding-lab-v1';
 
 self.addEventListener('install', (e) => {
     e.waitUntil(
@@ -7,31 +7,6 @@ self.addEventListener('install', (e) => {
                 return cache.addAll([
                     '/',
                     '/index.html',
-                    '/scripts/utils.js',
-                    '/scripts/quadtree.js',
-                    '/scripts/main.js',
-                    '/scripts/manage-scripts.js',
-                    '/icon512_rounded.png',
-                    '/icon512_maskable.png', 
-                    '/scripts/art-3d-rotation-ligths.js',
-                    '/scripts/art-3d-rotation.js',
-                    '/scripts/art-balls-bouncing.js',
-                    '/scripts/art-bokeh.js',
-                    '/scripts/art-cellular-automata.js',
-                    '/scripts/art-chaos.js',
-                    '/scripts/art-confetti.js',
-                    '/scripts/art-conway.js',
-                    '/scripts/art-crt.js',
-                    '/scripts/art-cthulhu.js',
-                    '/scripts/art-distortion.js',
-                    '/scripts/art-fire.js',
-                    '/scripts/art-ledscreen-tones.js',
-                    '/scripts/art-ledscreen.js',
-                    '/scripts/art-metro.js',
-                    '/scripts/art-motion-matrix.js',
-                    '/scripts/art-rotators-solid.js',
-                    '/scripts/art-rotators.js',
-                    '/scripts/art-skyscrapers.js',
                 ]);
             })
             .then(() => self.skipWaiting())
@@ -63,6 +38,7 @@ self.addEventListener('fetch', (e) => {
             })
     );
 });
+
 self.addEventListener('activate', e => {
     const cacheWhitelist = [CACHE_NAME];
     e.waitUntil(
