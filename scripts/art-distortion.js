@@ -3,9 +3,11 @@
         randomize: true,
         radius: 250,
         strength: 3.5,
-        mode: 0,
-        functionIndex: 0,
-        functions: [barrel, twirl, pincushion, pinch, ripple, wobbly, ripple2]
+        amplitude: 10,
+        frequency: 0.3,
+        mode: 1,
+        functionIndex: 3,
+        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2]
     };
     
     const globals = {
@@ -18,10 +20,10 @@
     const img = new Image();
 
     function pincushion(data, outputData) {
-        const centerX = globals.mouseX;
-        const centerY = globals.mouseY;
-        const distortionStrength = 5.5;
-        const radius = Math.min(centerX, centerY);
+        const radius = config.mode ? globals.mouseY : config.radius; 
+        const distortionStrength = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
+        const centerX =  config.mode ? halfWidth : globals.mouseX;
+        const centerY =  config.mode ? halfHeight : globals.mouseY;
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
@@ -53,49 +55,11 @@
         }
     }
 
-    function pinch(data, outputData) {
-        const centerX = globals.mouseX;
-        const centerY = globals.mouseY;
-        const radius = Math.min(centerX, centerY);
-        const strength = 1.5;
-
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const dx = x - centerX;
-                const dy = y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < radius) {
-                    const angle = Math.atan2(dy, dx);
-                    const distortion = 1 - Math.pow(distance / radius, strength);
-                    const newX = centerX + Math.cos(angle) * distortion * distance;
-                    const newY = centerY + Math.sin(angle) * distortion * distance;
-
-                    const index = (y * width + x) * 4;
-                    const newIndex = (Math.round(newY) * width + Math.round(newX)) * 4;
-
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
-                } else {
-                    const index = (y * width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
-                }
-            }
-        }
-    }
-
-
-
     function ripple(data, outputData) {
-        const centerX = globals.mouseX;
-        const centerY = globals.mouseY;
-        const amplitude = 10;
-        const frequency = 0.3;
+        const amplitude = config.mode ? Utils.scale(globals.mouseY, 0, height, 1, 20) : config.amplitude; 
+        const frequency = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.1, 0.5) : config.frequency; 
+        const centerX =  config.mode ? halfWidth : globals.mouseX;
+        const centerY =  config.mode ? halfHeight : globals.mouseY;
         const phase = 1;
 
         for (let y = 0; y < canvas.height; y++) {
@@ -148,10 +112,10 @@
     }
 
     function ripple2(data, outputData) {
-        const centerX = globals.mouseX;
-        const centerY = globals.mouseY;
-        const radius = Math.min(centerX, centerY);
-        const distortionStrength = 5.5;
+        const radius = config.mode ? globals.mouseY : config.radius; 
+        const distortionStrength = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
+        const centerX =  config.mode ? halfWidth : globals.mouseX;
+        const centerY =  config.mode ? halfHeight : globals.mouseY;
 
         for (let y = 0; y < canvas.height; y++) {
             for (let x = 0; x < canvas.width; x++) {
@@ -185,12 +149,11 @@
         }
     }
 
-
     function barrel(data, outputData) {
-        const centerX = globals.mouseX;
-        const centerY = globals.mouseY;
-        const radius = Math.min(centerX, centerY);
-        const distortionStrength = 1.5;
+        const radius = config.mode ? globals.mouseY : config.radius; 
+        const distortionStrength = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
+        const centerX =  config.mode ? halfWidth : globals.mouseX;
+        const centerY =  config.mode ? halfHeight : globals.mouseY;
 
         for (let y = 0; y < canvas.height; y++) {
             for (let x = 0; x < canvas.width; x++) {
@@ -225,8 +188,8 @@
     function twirl(data, outputData) {
         let radius = config.mode ? Utils.scale(globals.mouseX, 0, width, 0, 500) : config.radius;
         let strength = config.mode ? Utils.scale(globals.mouseY, 0, height, 0, 20) : config.strength;
-        const centerX =  config.mode ? width / 2 : globals.mouseX;
-        const centerY =  config.mode ? height / 2 : globals.mouseY;
+        const centerX =  config.mode ? halfWidth : globals.mouseX;
+        const centerY =  config.mode ? halfHeight : globals.mouseY;
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
@@ -259,7 +222,6 @@
             }
         }
     }
-
 
     let init = () => {
         initCanvas();
@@ -369,8 +331,10 @@
     }
     
     let randomize = () => {
-        config.radius = Utils.getRandomInt(100, 250);
-        config.strength = Utils.getRandomFloat(1, 4, 1);
+        config.radius = Utils.getRandomInt(100, Math.min(halfWidth, halfHeight));
+        config.strength = Utils.getRandomFloat(0.1, 10, 1);
+        config.amplitude = Utils.getRandomInt(1, 20);
+        config.frequency = Utils.getRandomFloat(0.1, 0.5, 1);
         config.mode = Utils.getRandomBool();
         config.functionIndex = Math.floor(Math.random() * config.functions.length)
     }
