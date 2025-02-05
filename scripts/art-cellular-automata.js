@@ -6,8 +6,6 @@
     let cellPadding = 0;
     let cellDiameter = 20;
 
-    let hue = 150;
-
     let cellScreen;
     
 	const Attribute = Object.freeze({
@@ -23,11 +21,17 @@
 	});
 
     class Rule {
-        constructor(condition, value, value2, attribute, amount){
-            this.value = value;
-            this.value2 = value2;
-            this.condition = condition;
+        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, attribute, conditionCell, valueCell, value2Cell, amount){
+            this.valueNeighbours = valueNeighbours;
+            this.value2Neighbours = value2Neighbours;
+            this.conditionNeighbours = conditionNeighbours;
+            
             this.attribute = attribute;
+
+            this.valueCell = valueCell;
+            this.value2Cell = value2Cell;
+            this.conditionCell = conditionCell;
+
             this.amount = amount;
         }
     }
@@ -89,19 +93,32 @@
                 }
         }
 
-        ruleFulfilcell = (rule, sum) => {
+        ruleFulfilcell = (rule, neighboursValue, cellValue) => {
             let result = false;
-            switch(rule.condition){
+            switch(rule.conditionNeighbours){
 				case Condition.Lower:
-					result = (sum < rule.value);
+					result = (neighboursValue < rule.valueNeighbours);
 					break;
 				case Condition.Greater:
-					result = (sum > rule.value);
+					result = (neighboursValue > rule.valueNeighbours);
 					break;		
                 case Condition.Between:
-                    result = (sum >= rule.value && sum <= rule.value2);
+                    result = (neighboursValue >= rule.valueNeighbours && neighboursValue <= rule.value2Neighbours);
                     break;		
 			}
+
+            switch(rule.conditionCell){
+				case Condition.Lower:
+					result &= (cellValue < rule.valueCell);
+					break;
+				case Condition.Greater:
+					result &= (cellValue > rule.valueCell);
+					break;		
+                case Condition.Between:
+                    result &= (cellValue >= rule.valueCell && cellValue <= rule.value2Cell);
+                    break;		
+			}
+
             return result;
         }
 
@@ -140,9 +157,11 @@
                 neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
                 neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
 
-                if (this.ruleFulfilcell(rule, neighboursResult))
-                    this.cellsBuffer[x][y] = this.applyRule(rule, this.cellsBuffer[x][y]);
+                neighboursResult /= 8;
 
+                if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
+                    this.cellsBuffer[x][y] = this.applyRule(rule, this.cellsBuffer[x][y]);
+                }
             });      
         }
 
@@ -197,7 +216,7 @@
     let randomize = () => {
         for (let x = 0; x < cellColumns; x++) {
             for (let y = 0; y < cellRows; y++) {
-                cellScreen.cells[x][y].hue =  Utils.getRandomInt(0, 255);
+                cellScreen.cells[x][y].hue = Utils.getRandomInt(0, 255);
                 cellScreen.cells[x][y].saturation =  Utils.getRandomInt(0, 100);
                 cellScreen.cells[x][y].lightness =  Utils.getRandomInt(0, 100);            
             }
@@ -209,38 +228,60 @@
     }
 
     
-    let setRules = () => {         
+    let setRules = () => {           
+        cellScreen.rules.push(new Rule(Condition.Lower, 10, 0, Attribute.Lightness, Condition.Greater, 70, 0, 0.9));     
+        cellScreen.rules.push(new Rule(Condition.Greater, 70, 0, Attribute.Lightness, Condition.Lower, 30, 0, 1.3));  
     }
 
     let getRandomRule = () => {
+        let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
+        
+        let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let attribute = Attribute[Object.keys(Attribute)[randAttribute].toString()];
 
-			let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-			let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
-            
-			let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-			let attribute = Attribute[Object.keys(Attribute)[randAttribute].toString()];
+        let valueNeighbours = 0;
+        let value2Neighbours = 0;
+        switch(attribute){
+            case Attribute.Hue:
+                valueNeighbours = Utils.getRandomInt(0, 255);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 255));  
+                break;
+            case Attribute.Saturation:
+            case Attribute.Lightness:
+                valueNeighbours = Utils.getRandomInt(0, 100);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 100));  
+                break;
+        }            
+        
+        let amount = Utils.getRandomFloat(0.1, 1.99, 2);
 
-            let value = 0;
-            let value2 = 0;
-            switch(attribute){
-                case Attribute.Hue:
-                    value = Utils.getRandomInt(0, 2040);  
-                    value2 = Utils.getRandomInt(value, Utils.getRandomInt(value, 2040));  
-                    break;
-                case Attribute.Saturation:
-                case Attribute.Lightness:
-                    value = Utils.getRandomInt(0, 800);  
-                    value2 = Utils.getRandomInt(value, Utils.getRandomInt(value, 800));  
-                    break;
-            }            
-            
-            let amount = Utils.getRandomFloat(0.1, 1.99, 2);
+        let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let cellCondition = Condition[Object.keys(Condition)[randCellCondition].toString()];
 
-            return new Rule( condition, value, value2 , attribute, amount);
+        let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute].toString()];
+
+        let valueCell = 0;
+        let value2Cell = 0;
+        switch(cellAttribute){
+            case Attribute.Hue:
+                valueCell = Utils.getRandomInt(0, 255);  
+                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 255));  
+                break;
+            case Attribute.Saturation:
+            case Attribute.Lightness:
+                valueCell = Utils.getRandomInt(0, 100);  
+                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 100));  
+                break;
+        }      
+
+
+        return new Rule(condition, valueNeighbours, value2Neighbours , attribute, cellCondition, valueCell, value2Cell, amount);
     }
 
     let setRandomRules = () => {
-        let numberOfRules = Utils.getRandomInt(1, 5);
+        let numberOfRules = Utils.getRandomInt(5, 10);
         for(let i = 0; i < numberOfRules; i++){
             let rule = getRandomRule();    
             cellScreen.rules.push(rule);
@@ -260,7 +301,7 @@
 
         draw();
 
-        Utils.sleep(200);
+        Utils.sleep(50);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
