@@ -20,6 +20,12 @@
         Between: Symbol("between")
 	});
 
+    class Neighborhood {
+        constructor(){
+            this.rules = [];   
+        }
+    }
+
     class Rule {
         constructor(conditionNeighbours, valueNeighbours, value2Neighbours, attribute, conditionCell, valueCell, value2Cell, amount){
             this.valueNeighbours = valueNeighbours;
@@ -40,7 +46,7 @@
         constructor() {
             this.cells = [];
             this.cellsBuffer = [];         
-            this.rules = [];   
+            this.neighborhoods = [];   
             this.generateCells();
         }
 
@@ -138,31 +144,34 @@
             return cell;
         }
 
-        calculateCellStatus = (x, y) => {  
-            this.rules.forEach(rule => {
-                let neighboursResult = 0;
-
-                this.cellsBuffer[x][y].diameter = this.cells[x][y].diameter; 
-                this.cellsBuffer[x][y].radius = this.cells[x][y].radius; 
-                this.cellsBuffer[x][y].hue = this.cells[x][y].hue; 
-                this.cellsBuffer[x][y].saturation = this.cells[x][y].saturation; 
-                this.cellsBuffer[x][y].lightness = this.cells[x][y].lightness; 
-
-                neighboursResult += (this.getCellValueSafe(x, y-1, rule));
-                neighboursResult += (this.getCellValueSafe(x, y+1, rule));
-                neighboursResult += (this.getCellValueSafe(x-1, y-1, rule));
-                neighboursResult += (this.getCellValueSafe(x+1, y-1, rule));
-                neighboursResult += (this.getCellValueSafe(x-1, y, rule));
-                neighboursResult += (this.getCellValueSafe(x+1, y, rule));
-                neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
-                neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
-
-                neighboursResult /= 8;
-
-                if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
-                    this.cellsBuffer[x][y] = this.applyRule(rule, this.cells[x][y]);
-                }
-            });      
+        calculateCellStatus = (x, y) => { 
+        
+            this.neighborhoods.forEach(neighborhood => {
+                neighborhood.rules.forEach(rule => {
+                    let neighboursResult = 0;
+    
+                    this.cellsBuffer[x][y].diameter = this.cells[x][y].diameter; 
+                    this.cellsBuffer[x][y].radius = this.cells[x][y].radius; 
+                    this.cellsBuffer[x][y].hue = this.cells[x][y].hue; 
+                    this.cellsBuffer[x][y].saturation = this.cells[x][y].saturation; 
+                    this.cellsBuffer[x][y].lightness = this.cells[x][y].lightness; 
+    
+                    neighboursResult += (this.getCellValueSafe(x, y-1, rule));
+                    neighboursResult += (this.getCellValueSafe(x, y+1, rule));
+                    neighboursResult += (this.getCellValueSafe(x-1, y-1, rule));
+                    neighboursResult += (this.getCellValueSafe(x+1, y-1, rule));
+                    neighboursResult += (this.getCellValueSafe(x-1, y, rule));
+                    neighboursResult += (this.getCellValueSafe(x+1, y, rule));
+                    neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
+                    neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
+    
+                    neighboursResult /= 8;
+    
+                    if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
+                        this.cellsBuffer[x][y] = this.applyRule(rule, this.cells[x][y]);
+                    }
+                });
+            });   
         }
 
         update = () => {            
@@ -273,10 +282,18 @@
     }
 
     let setRandomRules = () => {
-        let numberOfRules = Utils.getRandomInt(10, 20);
-        for(let i = 0; i < numberOfRules; i++){
-            let rule = getRandomRule();    
-            cellScreen.rules.push(rule);
+        let numberOfNeighborhoods = Utils.getRandomInt(1, 5);
+        for(let j = 0; j < numberOfNeighborhoods; j++){
+            let neighborhood = new Neighborhood();
+
+            let numberOfRules = Utils.getRandomInt(10, 20);
+
+            for(let i = 0; i < numberOfRules; i++){
+                let rule = getRandomRule();    
+                neighborhood.rules.push(rule);
+            }
+
+            cellScreen.neighborhoods.push(neighborhood);
         }
     }
 
