@@ -122,7 +122,7 @@
             return result;
         }
 
-        applyRule = (rule, cell) => {
+        applyRule = (rule, cell) => {            
 			switch(rule.attribute){
 				case Attribute.Hue:
 					cell.hue *= rule.amount;
@@ -160,7 +160,7 @@
                 neighboursResult /= 8;
 
                 if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
-                    this.cellsBuffer[x][y] = this.applyRule(rule, this.cellsBuffer[x][y]);
+                    this.cellsBuffer[x][y] = this.applyRule(rule, this.cells[x][y]);
                 }
             });      
         }
@@ -229,8 +229,16 @@
 
     
     let setRules = () => {           
-        cellScreen.rules.push(new Rule(Condition.Lower, 10, 0, Attribute.Lightness, Condition.Greater, 70, 0, 0.9));     
-        cellScreen.rules.push(new Rule(Condition.Greater, 70, 0, Attribute.Lightness, Condition.Lower, 30, 0, 1.3));  
+        cellScreen.rules.push(new Rule(Condition.Lower, 50, 0, Attribute.Lightness, Condition.Greater, 50, 0, 0.8));         
+        cellScreen.rules.push(new Rule(Condition.Between, 51, 59, Attribute.Lightness, Condition.Greater, 50, 0, 1.5));     
+        cellScreen.rules.push(new Rule(Condition.Greater, 60, 0, Attribute.Lightness, Condition.Lower, 50, 0, 1.65));  
+
+        cellScreen.rules.push(new Rule(Condition.Lower, 50, 0, Attribute.Lightness, Condition.Lower, 50, 0, 1.2));     
+        cellScreen.rules.push(new Rule(Condition.Between, 51, 59, Attribute.Lightness, Condition.Lower, 50, 0, 0.5));    
+        cellScreen.rules.push(new Rule(Condition.Greater, 60, 0, Attribute.Lightness, Condition.Greater, 50, 0, 0.75));  
+
+        cellScreen.rules.push(new Rule(Condition.Lower, 120, 0, Attribute.Hue, Condition.Greater, 120, 0, 0.9));     
+        cellScreen.rules.push(new Rule(Condition.Greater, 120, 0, Attribute.Hue, Condition.Lower, 120, 0, 1.3)); 
     }
 
     let getRandomRule = () => {
@@ -277,11 +285,11 @@
         }      
 
 
-        return new Rule(condition, valueNeighbours, value2Neighbours , attribute, cellCondition, valueCell, value2Cell, amount);
+        return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount);
     }
 
     let setRandomRules = () => {
-        let numberOfRules = Utils.getRandomInt(5, 10);
+        let numberOfRules = Utils.getRandomInt(10, 20);
         for(let i = 0; i < numberOfRules; i++){
             let rule = getRandomRule();    
             cellScreen.rules.push(rule);
@@ -301,7 +309,7 @@
 
         draw();
 
-        Utils.sleep(50);
+        Utils.sleep(200);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
