@@ -1,17 +1,14 @@
 {
-    let ledRows = 50;
-    let ledColumns = 50;
+    let cellRows = 50;
+    let cellColumns = 50;
 
-    let ledMargin = 30;
-    let ledPadding = 30;
-    let ledDiameter = 20;
+    let cellMargin = 0;
+    let cellPadding = 0;
+    let cellDiameter = 20;
 
-    let hue = 150;
-
-    let ledScreen;
+    let cellScreen;
     
 	const Attribute = Object.freeze({
-		Diameter: Symbol("diameter"),
 		Hue: Symbol("hue"),		
 		Saturation: Symbol("saturation"),
 		Lightness: Symbol("lightness")		
@@ -20,167 +17,171 @@
 	const Condition = Object.freeze({
 		Lower: Symbol("lower"),		
 		Greater: Symbol("greater"),
-        Equal: Symbol("equal"),
         Between: Symbol("between")
 	});
 
-    class RuleSet{
-        constructor(localRule, neighboursRule) {
-            this.localRule = localRule;
-            this.neighboursRule = neighboursRule;
-        }
-    }
-
     class Rule {
-        constructor(condition, value, value2, attribute, amount){
-            this.value = value;
-            this.value2 = value2;
-            this.condition = condition;
+        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, attribute, conditionCell, valueCell, value2Cell, amount){
+            this.valueNeighbours = valueNeighbours;
+            this.value2Neighbours = value2Neighbours;
+            this.conditionNeighbours = conditionNeighbours;
+            
             this.attribute = attribute;
+
+            this.valueCell = valueCell;
+            this.value2Cell = value2Cell;
+            this.conditionCell = conditionCell;
+
             this.amount = amount;
         }
     }
 
-    class LedScreen {
+    class CellScreen {
         constructor() {
-            this.leds = [];
-            this.ledsBuffer = [];         
+            this.cells = [];
+            this.cellsBuffer = [];         
             this.rules = [];   
-            this.generateLeds();
+            this.generateCells();
         }
 
-        generateLeds = () => {
-            for (let x = 0; x < ledColumns; x++) {
-                this.leds[x] = new Array(ledRows);
-                this.ledsBuffer[x] = new Array(ledRows);
+        generateCells = () => {
+            for (let x = 0; x < cellColumns; x++) {
+                this.cells[x] = new Array(cellRows);
+                this.cellsBuffer[x] = new Array(cellRows);
             }
 
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    let led = new Led(x, y);
-                    this.leds[x][y] = led;
-                    let ledBuffer = new Led(x, y);
-                    this.ledsBuffer[x][y] = ledBuffer;
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
+                    let cell = new Cell(x, y);
+                    this.cells[x][y] = cell;
+                    let cellBuffer = new Cell(x, y);
+                    this.cellsBuffer[x][y] = cellBuffer;
                 }
             }
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    this.ledsBuffer[x][y].draw(ctx);
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
+                    this.cellsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
         copyBuffer = () => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    this.leds[x][y].diameter =  this.ledsBuffer[x][y].diameter;
-                    this.leds[x][y].hue =  this.ledsBuffer[x][y].hue;
-                    this.leds[x][y].saturation =  this.ledsBuffer[x][y].saturation;
-                    this.leds[x][y].lightness =  this.ledsBuffer[x][y].lightness;
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
+                    this.cells[x][y].diameter =  this.cellsBuffer[x][y].diameter;
+                    this.cells[x][y].hue =  this.cellsBuffer[x][y].hue;
+                    this.cells[x][y].saturation =  this.cellsBuffer[x][y].saturation;
+                    this.cells[x][y].lightness =  this.cellsBuffer[x][y].lightness;
                 }
             }    
         }
 
-        getLedValueSafe = (x, y, rule) => {
-            if (x < 0 || y < 0 || x >= ledColumns || y >= ledRows)
+        getCellValueSafe = (x, y, rule) => {
+            if (x < 0 || y < 0 || x >= cellColumns || y >= cellRows)
                 return 0
             else
                 switch(rule.attribute){
-                    case Attribute.Diameter:
-                        return this.leds[x][y].diameter;
                     case Attribute.Hue:
-                        return this.leds[x][y].hue;
+                        return this.cells[x][y].hue;
                     case Attribute.Saturation:
-                        return this.leds[x][y].saturation;
+                        return this.cells[x][y].saturation;
                     case Attribute.Lightness:
-                        return this.leds[x][y].lightness;
+                        return this.cells[x][y].lightness;
                 }
         }
 
-        ruleFulfilled = (rule, sum) => {
+        ruleFulfilcell = (rule, neighboursValue, cellValue) => {
             let result = false;
-            switch(rule.condition){
+            switch(rule.conditionNeighbours){
 				case Condition.Lower:
-					result = (sum < rule.value);
+					result = (neighboursValue < rule.valueNeighbours);
 					break;
 				case Condition.Greater:
-					result = (sum > rule.value);
+					result = (neighboursValue > rule.valueNeighbours);
 					break;		
-                case Condition.Equal:
-                    result = (sum == rule.value);
-                    break;		
                 case Condition.Between:
-                    result = (sum >= rule.value && sum <= rule.value2);
+                    result = (neighboursValue >= rule.valueNeighbours && neighboursValue <= rule.value2Neighbours);
                     break;		
 			}
+
+            switch(rule.conditionCell){
+				case Condition.Lower:
+					result &= (cellValue < rule.valueCell);
+					break;
+				case Condition.Greater:
+					result &= (cellValue > rule.valueCell);
+					break;		
+                case Condition.Between:
+                    result &= (cellValue >= rule.valueCell && cellValue <= rule.value2Cell);
+                    break;		
+			}
+
             return result;
         }
 
-        applyRule = (rule, led) => {
+        applyRule = (rule, cell) => {            
 			switch(rule.attribute){
-				case Attribute.Diameter:
-					led.diameter *= rule.amount;
-                    led.radius = led.diameter / 2;
-					break;
 				case Attribute.Hue:
-					led.hue *= rule.amount;
+					cell.hue *= rule.amount;
 					break;
 				case Attribute.Saturation:
-					led.saturation *= rule.amount;
+					cell.saturation *= rule.amount;
 					break;					
                 case Attribute.Lightness:
-					led.lightness *= rule.amount;
+					cell.lightness *= rule.amount;
 					break;				
 			}
+
+            return cell;
         }
 
-        calculateLedStatus = (x, y) => {  
+        calculateCellStatus = (x, y) => {  
             this.rules.forEach(rule => {
                 let neighboursResult = 0;
 
-                this.ledsBuffer[x][y].diameter = this.leds[x][y].diameter; 
-                this.ledsBuffer[x][y].radius = this.leds[x][y].radius; 
-                this.ledsBuffer[x][y].hue = this.leds[x][y].hue; 
-                this.ledsBuffer[x][y].saturation = this.leds[x][y].saturation; 
-                this.ledsBuffer[x][y].lightness = this.leds[x][y].lightness; 
+                this.cellsBuffer[x][y].diameter = this.cells[x][y].diameter; 
+                this.cellsBuffer[x][y].radius = this.cells[x][y].radius; 
+                this.cellsBuffer[x][y].hue = this.cells[x][y].hue; 
+                this.cellsBuffer[x][y].saturation = this.cells[x][y].saturation; 
+                this.cellsBuffer[x][y].lightness = this.cells[x][y].lightness; 
 
-                neighboursResult += (this.getLedValueSafe(x, y-1, rule.neighboursRule));
-                neighboursResult += (this.getLedValueSafe(x, y+1, rule.neighboursRule));
-                neighboursResult += (this.getLedValueSafe(x-1, y-1, rule.neighboursRule));
-                neighboursResult += (this.getLedValueSafe(x+1, y-1, rule.neighboursRule));
-                neighboursResult += (this.getLedValueSafe(x-1, y, rule.neighboursRule));
-                neighboursResult += (this.getLedValueSafe(x+1, y, rule.neighboursRule));
-                neighboursResult += (this.getLedValueSafe(x-1, y+1, rule.neighboursRule));
-                neighboursResult += (this.getLedValueSafe(x+1, y+1, rule.neighboursRule));
+                neighboursResult += (this.getCellValueSafe(x, y-1, rule));
+                neighboursResult += (this.getCellValueSafe(x, y+1, rule));
+                neighboursResult += (this.getCellValueSafe(x-1, y-1, rule));
+                neighboursResult += (this.getCellValueSafe(x+1, y-1, rule));
+                neighboursResult += (this.getCellValueSafe(x-1, y, rule));
+                neighboursResult += (this.getCellValueSafe(x+1, y, rule));
+                neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
+                neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
 
-                //neighboursResult /= 8;
+                neighboursResult /= 8;
 
-                if (this.ruleFulfilled(rule.localRule, this.getLedValueSafe(x, y, rule.localRule)) && this.ruleFulfilled(rule.neighboursRule, neighboursResult))
-                    this.applyRule(rule.neighboursRule, this.ledsBuffer[x][y]);
-
+                if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
+                    this.cellsBuffer[x][y] = this.applyRule(rule, this.cells[x][y]);
+                }
             });      
         }
 
         update = () => {            
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
-                    this.calculateLedStatus(x, y);
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
+                    this.calculateCellStatus(x, y);
                 }
             }                  
         }
     }
 
-    class Led {
+    class Cell {
         constructor(column, row) {
-            this.diameter = ledDiameter;
-            this.radius = ledDiameter / 2;
+            this.diameter = cellDiameter;
+            this.radius = cellDiameter / 2;
             this.row = row;
             this.column = column;
-            this.x = ledMargin + column * ledPadding + column * this.diameter;
-            this.y = ledMargin + row * ledPadding + row * this.diameter;            
+            this.x = cellMargin + column * cellPadding + column * this.diameter;
+            this.y = cellMargin + row * cellPadding + row * this.diameter;            
             
         }
 
@@ -189,20 +190,18 @@
         }
 
         draw = (ctx) => {
-            Utils.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, this.getColor(), this.getColor())
+            Utils.drawSquare(ctx, this.x, this.y, this.diameter, 0, this.getColor(), this.getColor())
         }
     }
 
     let init = () => {       
 		initCanvas();
 
-        ledDiameter = Utils.getRandomInt(5, 20);        
-        ledPadding = Utils.getRandomInt(0, 20);
-        ledMargin = ledPadding;
+        cellDiameter = Utils.getRandomInt(5, 20);        
 
-        ledRows = Math.floor((height - ledMargin)/ (ledDiameter + ledPadding));
-        ledColumns = Math.floor((width - ledMargin)/ (ledDiameter + ledPadding));
-        ledScreen = new LedScreen();
+        cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
+        cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
+        cellScreen = new CellScreen();
         
         randomize();
 
@@ -215,96 +214,98 @@
     }
 
     let randomize = () => {
-        for (let x = 0; x < ledColumns; x++) {
-            for (let y = 0; y < ledRows; y++) {
-                //ledScreen.leds[x][y].diameter =  Utils.getRandomInt(0, 20);
-                //ledScreen.leds[x][y].radius = ledScreen.leds[x][y].diameter / 2;
-                ledScreen.leds[x][y].hue =  Utils.getRandomInt(0, 255);
-                ledScreen.leds[x][y].saturation =  Utils.getRandomInt(0, 100);
-                ledScreen.leds[x][y].lightness =  Utils.getRandomInt(0, 100);
-
-                /*
-                ledScreen.ledsBuffer[x][y].diameter =  ledScreen.leds[x][y].diameter;
-                ledScreen.ledsBuffer[x][y].radius = ledScreen.leds[x][y].diameter / 2;
-                ledScreen.ledsBuffer[x][y].hue = ledScreen.leds[x][y].radius;
-                ledScreen.ledsBuffer[x][y].saturation =  ledScreen.leds[x][y].saturation;
-                ledScreen.ledsBuffer[x][y].lightness =  ledScreen.leds[x][y].lightness;
-                */
-            
+        for (let x = 0; x < cellColumns; x++) {
+            for (let y = 0; y < cellRows; y++) {
+                cellScreen.cells[x][y].hue = Utils.getRandomInt(0, 255);
+                cellScreen.cells[x][y].saturation =  Utils.getRandomInt(0, 100);
+                cellScreen.cells[x][y].lightness =  Utils.getRandomInt(0, 100);            
             }
         }    
 
-        //setRandomRules();
+        setRandomRules();
         
-        setRules();
+        //setRules();
     }
 
     
-    let setRules = () => {    
-        let rule1L = new Rule(Condition.Greater, 50, 0, Attribute.Lightness, 0);    
-        let rule1N = new Rule(Condition.Lower, 200, 0, Attribute.Lightness, 0); 
-        let ruleSet1 = new RuleSet(rule1L, rule1N);
-        ledScreen.rules.push(ruleSet1); 
+    let setRules = () => {           
+        cellScreen.rules.push(new Rule(Condition.Lower, 50, 0, Attribute.Lightness, Condition.Greater, 50, 0, 0.8));         
+        cellScreen.rules.push(new Rule(Condition.Between, 51, 59, Attribute.Lightness, Condition.Greater, 50, 0, 1.5));     
+        cellScreen.rules.push(new Rule(Condition.Greater, 60, 0, Attribute.Lightness, Condition.Lower, 50, 0, 1.65));  
+
+        cellScreen.rules.push(new Rule(Condition.Lower, 50, 0, Attribute.Lightness, Condition.Lower, 50, 0, 1.2));     
+        cellScreen.rules.push(new Rule(Condition.Between, 51, 59, Attribute.Lightness, Condition.Lower, 50, 0, 0.5));    
+        cellScreen.rules.push(new Rule(Condition.Greater, 60, 0, Attribute.Lightness, Condition.Greater, 50, 0, 0.75));  
+
+        cellScreen.rules.push(new Rule(Condition.Lower, 120, 0, Attribute.Hue, Condition.Greater, 120, 0, 0.9));     
+        cellScreen.rules.push(new Rule(Condition.Greater, 120, 0, Attribute.Hue, Condition.Lower, 120, 0, 1.3)); 
+    }
+
+    let getRandomRule = () => {
+        let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
         
-        let rule2L = new Rule(Condition.Greater, 50, 0, Attribute.Lightness, 0);    
-        let rule2N = new Rule(Condition.Greater, 300, 0, Attribute.Lightness, 0); 
-        let ruleSet2 = new RuleSet(rule2L, rule2N);
-        ledScreen.rules.push(ruleSet2); 
+        let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let attribute = Attribute[Object.keys(Attribute)[randAttribute].toString()];
 
-        let rule3L = new Rule(Condition.Greater, 50, 0, Attribute.Lightness, 0);
-        let rule3N = new Rule(Condition.Between, 200, 300, Attribute.Lightness, 50);
-        let ruleSet3 = new RuleSet(rule3L, rule3N);
-        ledScreen.rules.push(ruleSet3);
+        let valueNeighbours = 0;
+        let value2Neighbours = 0;
+        switch(attribute){
+            case Attribute.Hue:
+                valueNeighbours = Utils.getRandomInt(0, 255);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 255));  
+                break;
+            case Attribute.Saturation:
+            case Attribute.Lightness:
+                valueNeighbours = Utils.getRandomInt(0, 100);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 100));  
+                break;
+        }            
+        
+        let amount = Utils.getRandomFloat(0.1, 1.99, 2);
 
-        let rule4L = new Rule(Condition.Lower, 51, 0, Attribute.Lightness, 0);
-        let rule4N = new Rule(Condition.Between, 301, 350, Attribute.Lightness, 50);
-        let ruleSet4 = new RuleSet(rule4L, rule4N);
-        ledScreen.rules.push(ruleSet4);       
+        let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let cellCondition = Condition[Object.keys(Condition)[randCellCondition].toString()];
+
+        let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute].toString()];
+
+        let valueCell = 0;
+        let value2Cell = 0;
+        switch(cellAttribute){
+            case Attribute.Hue:
+                valueCell = Utils.getRandomInt(0, 255);  
+                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 255));  
+                break;
+            case Attribute.Saturation:
+            case Attribute.Lightness:
+                valueCell = Utils.getRandomInt(0, 100);  
+                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 100));  
+                break;
+        }      
+
+
+        return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount);
     }
 
     let setRandomRules = () => {
-        let numberOfRules = Utils.getRandomInt(1, 5);
+        let numberOfRules = Utils.getRandomInt(10, 20);
         for(let i = 0; i < numberOfRules; i++){
-
-			let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-			let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
-            
-			let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-			let attribute = Attribute[Object.keys(Attribute)[randAttribute].toString()];
-
-            let value = 0;
-            switch(attribute){
-                case Attribute.Diameter:
-                    value = Utils.getRandomInt(0, 50);  
-                    break;
-                case Attribute.Hue:
-                    value = Utils.getRandomInt(0, 255);  
-                    break;
-                case Attribute.Saturation:
-                    value = Utils.getRandomInt(0, 100);  
-                    break;
-                case Attribute.Lightness:
-                    value = Utils.getRandomInt(0, 300);  
-                    break;
-            }            
-            
-            let amount = Utils.getRandomFloat(0, 2, 2);
-
-            let rule = new Rule( condition, value, 0, attribute, amount);
-            ledScreen.rules.push(rule);
+            let rule = getRandomRule();    
+            cellScreen.rules.push(rule);
         }
     }
 
     let draw = () => {
         drawBackground(ctx, canvas);
-        ledScreen.draw(ctx);
-        ledScreen.copyBuffer();
+        cellScreen.draw(ctx);
+        cellScreen.copyBuffer();
     }
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
-        ledScreen.update();
+        cellScreen.update();
 
         draw();
 
