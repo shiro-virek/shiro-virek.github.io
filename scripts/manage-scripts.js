@@ -19,6 +19,7 @@ const art = [
                 "rotators-solid",
                 "3d-rotation-lights", 
                 "distortion",
+                "cellular-automata"
             ];
 const scripts = [];
 

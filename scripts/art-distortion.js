@@ -15,6 +15,8 @@
         mouseY: 0,
         clicking: false,
         mouseMoved: false,
+        lastPosX: 0,
+        lastPosY: 0
     };
 
     const img = new Image();
@@ -281,19 +283,20 @@
     }
 
     let trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
+        if (globals.lastPosX == 0) globals.lastPosX = x;
+        if (globals.lastPosY == 0) globals.lastPosY = y;
 
-        let movX = lastPosX - x;
-        let movY = lastPosY - y;
+        let movX = globals.lastPosX - x;
+        let movY = globals.lastPosY - y;
 
         if (globals.clicking) {
             globals.mouseX = x;
             globals.mouseY = y;
         }
 
-        lastPosX = x;
-        lastPosY = y;
+        globals
+        .lastPosX = x;
+        globals.lastPosY = y;
     }
 
     let draw = () => {
