@@ -206,6 +206,12 @@
 				ctx.strokeStyle = this.heliport.color;
 				ctx.ellipse(this.x, this.y - this.height - this.heightFactor, this.heliport.width / 2, this.heliport.height / 2, Math.PI, 0, 2 * Math.PI);
 				ctx.stroke();
+
+				ctx.font = "8px sans-serif";
+				ctx.fillStyle = this.heliport.color;
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.fillText("H", this.x, this.y - this.height - this.heightFactor);
 			}
 		}
 
@@ -602,7 +608,7 @@
 	init();
 
 	window.clearCanvas = () => {
-		objects = []; 
-		buildingsCount = 0;
+		city.buildings = []; 
+		city.buildingsCount = 0;
 	}
 }
