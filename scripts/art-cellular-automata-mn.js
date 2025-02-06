@@ -7,17 +7,12 @@
     let cellDiameter = 20;
 
     let cellScreen;
-    
-	const Attribute = Object.freeze({
-		Hue: Symbol("hue"),		
-		Saturation: Symbol("saturation"),
-		Lightness: Symbol("lightness")		
-	});
-        
+            
 	const Condition = Object.freeze({
 		Lower: Symbol("lower"),		
 		Greater: Symbol("greater"),
-        Between: Symbol("between")
+        Between: Symbol("between"),
+        Equal: Symbol("equal")
 	});
 
 	const NeighborhoodType = Object.freeze({
@@ -33,18 +28,14 @@
     }
 
     class Rule {
-        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, attribute, conditionCell, valueCell, value2Cell, amount){
+        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, newValueCell, alive){
             this.valueNeighbours = valueNeighbours;
             this.value2Neighbours = value2Neighbours;
             this.conditionNeighbours = conditionNeighbours;
-            
-            this.attribute = attribute;
+    
+            this.newValueCell = newValueCell;
 
-            this.valueCell = valueCell;
-            this.value2Cell = value2Cell;
-            this.conditionCell = conditionCell;
-
-            this.amount = amount;
+            this.alive = alive;
         }
     }
 
@@ -83,126 +74,83 @@
         copyBuffer = () => {
             for (let x = 0; x < cellColumns; x++) {
                 for (let y = 0; y < cellRows; y++) {
-                    this.cells[x][y].diameter =  this.cellsBuffer[x][y].diameter;
-                    this.cells[x][y].hue =  this.cellsBuffer[x][y].hue;
-                    this.cells[x][y].saturation =  this.cellsBuffer[x][y].saturation;
-                    this.cells[x][y].lightness =  this.cellsBuffer[x][y].lightness;
+                    this.cells[x][y].alive =  this.cellsBuffer[x][y].alive;
                 }
             }    
         }
-
-        getCellValueSafe = (x, y, rule) => {
+        getCellValue
+        isCellAliveSafe = (x, y) => {
             if (x < 0 || y < 0 || x >= cellColumns || y >= cellRows)
                 return 0
             else
-                switch(rule.attribute){
-                    case Attribute.Hue:
-                        return this.cells[x][y].hue;
-                    case Attribute.Saturation:
-                        return this.cells[x][y].saturation;
-                    case Attribute.Lightness:
-                        return this.cells[x][y].lightness;
-                }
+                return this.cells[x][y].alive;
         }
 
-        getRuleResult = (neighborhood, rule, x, y) => {
-            let neighboursResult = 0;
+        getNeighboursCount = (neighborhood, x, y) => {
+            let neighboursCount = 0;
             let size = 2;
 
-            switch(neighborhood){
+            switch(neighborhood.neighborhoodType){
                 case NeighborhoodType.Extended:
                     for(let h=-size; h<=size; h++){
                         for(let v=-size; v<=size; v++){
-                            if (h!=x || v!=y) neighboursResult += (this.getCellValueSafe(h, v, rule));
+                            if ((h!=x || v!=y) && (this.isCellAliveSafe(h, v))) neighboursCount++;
                         }
                     }
                     break;
                 case NeighborhoodType.Moore:
-                    neighboursResult += (this.getCellValueSafe(x, y-1, rule));
-                    neighboursResult += (this.getCellValueSafe(x, y+1, rule));
-                    neighboursResult += (this.getCellValueSafe(x-1, y, rule));
-                    neighboursResult += (this.getCellValueSafe(x+1, y, rule));
-                    neighboursResult /= 4;
+                    if (this.isCellAliveSafe(x, y-1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x, y+1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x-1, y)) neighboursCount++;
+                    if (this.isCellAliveSafe(x+1, y)) neighboursCount++;
                     break;
                 case NeighborhoodType.VonNeumann:
-                    neighboursResult += (this.getCellValueSafe(x, y-1, rule));
-                    neighboursResult += (this.getCellValueSafe(x, y+1, rule));
-                    neighboursResult += (this.getCellValueSafe(x-1, y-1, rule));
-                    neighboursResult += (this.getCellValueSafe(x+1, y-1, rule));
-                    neighboursResult += (this.getCellValueSafe(x-1, y, rule));
-                    neighboursResult += (this.getCellValueSafe(x+1, y, rule));
-                    neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
-                    neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
-                    neighboursResult /= 8;
+                    if (this.isCellAliveSafe(x, y-1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x, y+1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x-1, y-1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x+1, y-1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x-1, y)) neighboursCount++;
+                    if (this.isCellAliveSafe(x+1, y)) neighboursCount++;
+                    if (this.isCellAliveSafe(x-1, y+1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x+1, y+1)) neighboursCount++;
                     break;
             }
 
-            return neighboursResult;
+            return neighboursCount;
         }
 
-        ruleFulfilcell = (rule, neighboursValue, cellValue) => {
+        ruleFulfilcell = (rule, neighboursCount, cellValue) => {
             let result = false;
             switch(rule.conditionNeighbours){
 				case Condition.Lower:
-					result = (neighboursValue < rule.valueNeighbours);
+					result = (neighboursCount < rule.valueNeighbours);
 					break;
 				case Condition.Greater:
-					result = (neighboursValue > rule.valueNeighbours);
+					result = (neighboursCount > rule.valueNeighbours);
 					break;		
                 case Condition.Between:
-                    result = (neighboursValue >= rule.valueNeighbours && neighboursValue <= rule.value2Neighbours);
+                    result = (neighboursCount >= rule.valueNeighbours && neighboursCount <= rule.value2Neighbours);
                     break;		
+                case Condition.Equal:
+                    result = (neighboursCount == rule.valueNeighbours);
+                    break;	
 			}
 
-            switch(rule.conditionCell){
-				case Condition.Lower:
-					result &= (cellValue < rule.valueCell);
-					break;
-				case Condition.Greater:
-					result &= (cellValue > rule.valueCell);
-					break;		
-                case Condition.Between:
-                    result &= (cellValue >= rule.valueCell && cellValue <= rule.value2Cell);
-                    break;		
-			}
+            result = result && (rule.alive == cellValue);
 
             return result;
         }
 
-        applyRule = (rule, cell) => {            
-			switch(rule.attribute){
-				case Attribute.Hue:
-					cell.hue *= rule.amount;
-					break;
-				case Attribute.Saturation:
-					cell.saturation *= rule.amount;
-					break;					
-                case Attribute.Lightness:
-					cell.lightness *= rule.amount;
-					break;				
-			}
-
-            return cell;
-        }
-
-        calculateCellStatus = (x, y) => { 
-        
+        calculateCellStatus = (x, y) => {         
             this.neighborhoods.forEach(neighborhood => {
-                
-
                 neighborhood.rules.forEach(rule => {
-                    let neighboursResult = 0;
+                    let neighboursCount = 0;
     
-                    this.cellsBuffer[x][y].diameter = this.cells[x][y].diameter; 
-                    this.cellsBuffer[x][y].radius = this.cells[x][y].radius; 
-                    this.cellsBuffer[x][y].hue = this.cells[x][y].hue; 
-                    this.cellsBuffer[x][y].saturation = this.cells[x][y].saturation; 
-                    this.cellsBuffer[x][y].lightness = this.cells[x][y].lightness; 
+                    neighboursCount = this.getNeighboursCount(neighborhood, x, y);
+                    let cellAlive = this.isCellAliveSafe(x, y);
 
-                    neighboursResult = this.getRuleResult(neighborhood, rule, x, y);
-                        
-                    if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
-                        this.cellsBuffer[x][y] = this.applyRule(rule, this.cells[x][y]);
+                    if (this.ruleFulfilcell(rule, neighboursCount, cellAlive)) {
+                        this.cellsBuffer[x][y].alive = rule.newValueCell;
                     }
                 });
             });   
@@ -225,11 +173,10 @@
             this.column = column;
             this.x = cellMargin + column * cellPadding + column * this.diameter;
             this.y = cellMargin + row * cellPadding + row * this.diameter;            
-            
         }
 
         getColor = () => {
-            return `hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%)`;
+            return `hsl(${0}, ${100}%, ${this.alive ? 100 : 0}%)`;
         }
 
         draw = (ctx) => {
@@ -240,7 +187,7 @@
     let init = () => {       
 		initCanvas();
 
-        cellDiameter = Utils.getRandomInt(5, 20);        
+        cellDiameter = Utils.getRandomInt(5, 15);        
 
         cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
         cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
@@ -259,12 +206,9 @@
     let randomize = () => {
         for (let x = 0; x < cellColumns; x++) {
             for (let y = 0; y < cellRows; y++) {
-                cellScreen.cells[x][y].hue = Utils.getRandomInt(0, 255);
-                cellScreen.cells[x][y].saturation =  Utils.getRandomInt(0, 100);
-                cellScreen.cells[x][y].lightness =  Utils.getRandomInt(0, 100);            
+                cellScreen.cells[x][y].alive = Utils.getRandomBool();            
             }
         }    
-
         setRandomRules();
     }
 
@@ -272,51 +216,20 @@
         let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
         let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
         
-        let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-        let attribute = Attribute[Object.keys(Attribute)[randAttribute].toString()];
-
         let valueNeighbours = 0;
         let value2Neighbours = 0;
-        switch(attribute){
-            case Attribute.Hue:
-                valueNeighbours = Utils.getRandomInt(0, 255);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 255));  
-                break;
-            case Attribute.Saturation:
-            case Attribute.Lightness:
-                valueNeighbours = Utils.getRandomInt(0, 100);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 100));  
-                break;
-        }            
-        
-        let amount = Utils.getRandomFloat(0.1, 1.99, 2);
 
-        let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-        let cellCondition = Condition[Object.keys(Condition)[randCellCondition].toString()];
+        valueNeighbours = Utils.getRandomInt(1, 8);  
+        value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 8));  
 
-        let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute].toString()];
+        let newValueCell = Utils.getRandomBool();  
+        let alive = Utils.getRandomBool();
 
-        let valueCell = 0;
-        let value2Cell = 0;
-        switch(cellAttribute){
-            case Attribute.Hue:
-                valueCell = Utils.getRandomInt(0, 255);  
-                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 255));  
-                break;
-            case Attribute.Saturation:
-            case Attribute.Lightness:
-                valueCell = Utils.getRandomInt(0, 100);  
-                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 100));  
-                break;
-        }      
-
-
-        return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount);
+        return new Rule(condition, valueNeighbours, value2Neighbours, newValueCell, alive);
     }
 
     let setRandomRules = () => {
-        let numberOfNeighborhoods = Utils.getRandomInt(2, 5);
+        let numberOfNeighborhoods = Utils.getRandomInt(1, 10);
         for(let j = 0; j < numberOfNeighborhoods; j++){
             let neighborhood = new Neighborhood();
 
@@ -324,7 +237,7 @@
             let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType].toString()];            
             neighborhood.neighborhoodType = type;
 
-            let numberOfRules = Utils.getRandomInt(1, 3);
+            let numberOfRules = Utils.getRandomInt(10, 20);
 
             for(let i = 0; i < numberOfRules; i++){
                 let rule = getRandomRule();    

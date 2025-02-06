@@ -21,7 +21,6 @@ const art = [
                 "distortion",
                 "cellular-automata",
                 "cellular-automata-mn",
-                "cellular-automata-bool",
             ];
 const scripts = [];
 
