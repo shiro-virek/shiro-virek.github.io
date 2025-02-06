@@ -6,6 +6,8 @@
     let cellPadding = 0;
     let cellDiameter = 20;
 
+    let extendedSize = 2;
+
     let cellScreen;
             
 	const Condition = Object.freeze({
@@ -88,12 +90,11 @@
 
         getNeighboursCount = (neighborhood, x, y) => {
             let neighboursCount = 0;
-            let size = 2;
 
             switch(neighborhood.neighborhoodType){
                 case NeighborhoodType.Extended:
-                    for(let h=-size; h<=size; h++){
-                        for(let v=-size; v<=size; v++){
+                    for(let h=x-extendedSize; h<=x+extendedSize; h++){
+                        for(let v=y-extendedSize; v<=y+extendedSize; v++){
                             if ((h!=x || v!=y) && (this.isCellAliveSafe(h, v))) neighboursCount++;
                         }
                     }
@@ -217,15 +218,27 @@
         setRandomRules();
     }
 
-    let getRandomRule = () => {
+    let getRandomRule = (neighborhood) => {
         let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
         let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
         
         let valueNeighbours = 0;
         let value2Neighbours = 0;
 
-        valueNeighbours = Utils.getRandomInt(1, 8);  
-        value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 8));  
+        switch(neighborhood.neighborhoodType){
+            case NeighborhoodType.Extended:
+                valueNeighbours = Utils.getRandomInt(1, extendedSize * 2);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, extendedSize * 2)); 
+                break;
+            case NeighborhoodType.Moore:
+                valueNeighbours = Utils.getRandomInt(1, 4);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 4)); 
+                break;
+            case NeighborhoodType.VonNeumann:
+                valueNeighbours = Utils.getRandomInt(1, 8);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 8)); 
+                break;
+        } 
 
         let newValueCell = Utils.getRandomBool();  
         let alive = Utils.getRandomBool();
@@ -245,7 +258,7 @@
             let numberOfRules = Utils.getRandomInt(2, 5);
 
             for(let i = 0; i < numberOfRules; i++){
-                let rule = getRandomRule();    
+                let rule = getRandomRule(neighborhood);    
                 neighborhood.rules.push(rule);
             }
 
