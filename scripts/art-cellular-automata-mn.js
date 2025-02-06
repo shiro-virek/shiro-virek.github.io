@@ -141,19 +141,24 @@
             return result;
         }
 
-        calculateCellStatus = (x, y) => {         
+        calculateCellStatus = (x, y) => {  
+            let cellAlive = this.isCellAliveSafe(x, y);
+            
+            let cellFinalStatus = true;
+            
             this.neighborhoods.forEach(neighborhood => {
                 neighborhood.rules.forEach(rule => {
                     let neighboursCount = 0;
     
                     neighboursCount = this.getNeighboursCount(neighborhood, x, y);
-                    let cellAlive = this.isCellAliveSafe(x, y);
 
                     if (this.ruleFulfilcell(rule, neighboursCount, cellAlive)) {
-                        this.cellsBuffer[x][y].alive = rule.newValueCell;
+                        cellFinalStatus = cellFinalStatus && rule.newValueCell;
                     }
                 });
             });   
+
+            this.cellsBuffer[x][y].alive = cellFinalStatus;
         }
 
         update = () => {            
@@ -229,7 +234,7 @@
     }
 
     let setRandomRules = () => {
-        let numberOfNeighborhoods = Utils.getRandomInt(1, 10);
+        let numberOfNeighborhoods = Utils.getRandomInt(2, 5);
         for(let j = 0; j < numberOfNeighborhoods; j++){
             let neighborhood = new Neighborhood();
 
@@ -237,7 +242,7 @@
             let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType].toString()];            
             neighborhood.neighborhoodType = type;
 
-            let numberOfRules = Utils.getRandomInt(10, 20);
+            let numberOfRules = Utils.getRandomInt(2, 5);
 
             for(let i = 0; i < numberOfRules; i++){
                 let rule = getRandomRule();    
