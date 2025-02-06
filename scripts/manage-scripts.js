@@ -19,7 +19,8 @@ const art = [
                 "rotators-solid",
                 "3d-rotation-lights", 
                 "distortion",
-                "cellular-automata"
+                "cellular-automata",
+                "cellular-automata-mn",
             ];
 const scripts = [];
 

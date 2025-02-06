@@ -223,22 +223,6 @@
         }    
 
         setRandomRules();
-        
-        //setRules();
-    }
-
-    
-    let setRules = () => {           
-        cellScreen.rules.push(new Rule(Condition.Lower, 50, 0, Attribute.Lightness, Condition.Greater, 50, 0, 0.8));         
-        cellScreen.rules.push(new Rule(Condition.Between, 51, 59, Attribute.Lightness, Condition.Greater, 50, 0, 1.5));     
-        cellScreen.rules.push(new Rule(Condition.Greater, 60, 0, Attribute.Lightness, Condition.Lower, 50, 0, 1.65));  
-
-        cellScreen.rules.push(new Rule(Condition.Lower, 50, 0, Attribute.Lightness, Condition.Lower, 50, 0, 1.2));     
-        cellScreen.rules.push(new Rule(Condition.Between, 51, 59, Attribute.Lightness, Condition.Lower, 50, 0, 0.5));    
-        cellScreen.rules.push(new Rule(Condition.Greater, 60, 0, Attribute.Lightness, Condition.Greater, 50, 0, 0.75));  
-
-        cellScreen.rules.push(new Rule(Condition.Lower, 120, 0, Attribute.Hue, Condition.Greater, 120, 0, 0.9));     
-        cellScreen.rules.push(new Rule(Condition.Greater, 120, 0, Attribute.Hue, Condition.Lower, 120, 0, 1.3)); 
     }
 
     let getRandomRule = () => {
