@@ -246,7 +246,7 @@
                 break;
         }            
         
-        let amount = Utils.getRandomFloat(0.01, 1.5, 2);
+        let amount = Utils.getRandomFloat(0.01, 1.99, 2);
 
         let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
         let cellCondition = Condition[Object.keys(Condition)[randCellCondition].toString()];
