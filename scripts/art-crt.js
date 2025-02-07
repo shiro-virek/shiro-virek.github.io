@@ -43,9 +43,9 @@
                     const b = imgData[i * 4 + 2];
                     const a = imgData[i * 4 + 3];
 
-                    let newR = Utils.scale(r, 0, 255, 0, 50);
-                    let newG = Utils.scale(g, 0, 255, 0, 50);
-                    let newB = Utils.scale(b, 0, 255, 0, 50);
+                    let newR = Utils.scale(r, 0, 255, 0, 100);
+                    let newG = Utils.scale(g, 0, 255, 0, 100);
+                    let newB = Utils.scale(b, 0, 255, 0, 100);
 
                     this.crts[x][y].draw(ctx, newR, newG, newB);
                 }
@@ -89,9 +89,26 @@
         img.src = '../assets/Picture1.jpg';
 
         img.onload = function () {
-            ctxImg.drawImage(img, 0, 0, canvasImg.width, canvasImg.height);
-            
-            imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
+            let newImgHeight = 0;
+            let newImgWidth = 0;
+            let newOriginX = 0;
+            let newOriginY = 0;
+
+            if (canvasImg.width > canvasImg.height) {
+                newImgHeight = canvasImg.height;
+                newImgWidth = canvasImg.height * img.width / img.height;
+                newOriginY = 0;
+                newOriginX = canvasImg.width / 2 - (newImgWidth / 2);
+            } else {
+                newImgWidth = canvasImg.width;
+                newImgHeight = newImgWidth * img.height / img.width;
+                newOriginX = 0;
+                newOriginY = canvasImg.height / 2 - (newImgHeight / 2);
+            }
+
+            ctxImg.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            imgData = ctxImg.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
 
             initCanvas(); 
             crtScreen = new CrtScreen();
