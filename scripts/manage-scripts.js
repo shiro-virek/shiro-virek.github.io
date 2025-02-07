@@ -138,7 +138,7 @@ window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(queryString);
     if (urlParams.has('art')){
         loadScriptByUrl();
-    } else {					
+    } else {				setRandomRu	
         loadRandomScript();
     }
 });
