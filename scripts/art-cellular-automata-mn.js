@@ -30,14 +30,14 @@
     }
 
     class Rule {
-        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, newValueCell, alive){
+        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, newValueCell, aliveStatusRequired){
             this.valueNeighbours = valueNeighbours;
             this.value2Neighbours = value2Neighbours;
             this.conditionNeighbours = conditionNeighbours;
     
             this.newValueCell = newValueCell;
 
-            this.alive = alive;
+            this.aliveStatusRequired = aliveStatusRequired;
         }
     }
 
@@ -76,11 +76,11 @@
         copyBuffer = () => {
             for (let x = 0; x < cellColumns; x++) {
                 for (let y = 0; y < cellRows; y++) {
-                    this.cells[x][y].alive =  this.cellsBuffer[x][y].alive;
+                    this.cells[x][y].alive = this.cellsBuffer[x][y].alive;
                 }
             }    
         }
-        getCellValue
+        
         isCellAliveSafe = (x, y) => {
             if (x < 0 || y < 0 || x >= cellColumns || y >= cellRows)
                 return 0
@@ -137,15 +137,15 @@
                     break;	
 			}
 
-            result = result && (rule.alive == cellValue);
+            result = result && (rule.aliveStatusRequired == cellValue);
 
             return result;
         }
 
         calculateCellStatus = (x, y) => {  
-            let cellAlive = this.isCellAliveSafe(x, y);
+            let cellStatus = this.isCellAliveSafe(x, y);
             
-            let cellFinalStatus = true;
+            let cellFinalStatus = false;
             
             this.neighborhoods.forEach(neighborhood => {
                 neighborhood.rules.forEach(rule => {
@@ -153,8 +153,8 @@
     
                     neighboursCount = this.getNeighboursCount(neighborhood, x, y);
 
-                    if (this.ruleFulfilcell(rule, neighboursCount, cellAlive)) {
-                        cellFinalStatus = cellFinalStatus && rule.newValueCell;
+                    if (this.ruleFulfilcell(rule, neighboursCount, cellStatus)) {
+                        cellFinalStatus = cellFinalStatus || rule.newValueCell;
                     }
                 });
             });   
@@ -216,6 +216,26 @@
             }
         }    
         setRandomRules();
+        //setRules();
+    }
+
+    let setRules = () => {
+        //Conway rules
+        
+        let neighborhood = new Neighborhood();
+        neighborhood.neighborhoodType = NeighborhoodType.VonNeumann;
+
+        let rule1 = new Rule(Condition.Lower, 2, 0, false, true);
+        let rule2 = new Rule(Condition.Between, 2, 3, true, true);
+        let rule3 = new Rule(Condition.Greater, 3, 0, false, true);
+        let rule4 = new Rule(Condition.Equal, 3, 0, true, false);
+
+        neighborhood.rules.push(rule1);
+        neighborhood.rules.push(rule2);
+        neighborhood.rules.push(rule3);
+        neighborhood.rules.push(rule4);
+
+        cellScreen.neighborhoods.push(neighborhood);
     }
 
     let getRandomRule = (neighborhood) => {
@@ -247,7 +267,7 @@
     }
 
     let setRandomRules = () => {
-        let numberOfNeighborhoods = Utils.getRandomInt(2, 5);
+        let numberOfNeighborhoods = Utils.getRandomInt(1, 5);
         for(let j = 0; j < numberOfNeighborhoods; j++){
             let neighborhood = new Neighborhood();
 
@@ -255,7 +275,7 @@
             let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType].toString()];            
             neighborhood.neighborhoodType = type;
 
-            let numberOfRules = Utils.getRandomInt(2, 5);
+            let numberOfRules = Utils.getRandomInt(1, 5);
 
             for(let i = 0; i < numberOfRules; i++){
                 let rule = getRandomRule(neighborhood);    
@@ -279,7 +299,7 @@
 
         draw();
 
-        Utils.sleep(200);
+        Utils.sleep(300);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
