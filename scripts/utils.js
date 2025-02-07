@@ -224,5 +224,4 @@ class Utils {
         const normal = Utils.crossProduct(u, v);
         return Utils.normalizeVector(normal);
     }
-
 }

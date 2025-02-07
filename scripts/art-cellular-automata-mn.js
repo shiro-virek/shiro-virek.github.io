@@ -6,7 +6,8 @@
     let cellPadding = 0;
     let cellDiameter = 20;
 
-    let extendedSize = 2;
+    let extendedSize = 3;
+    let circleRadius = 3;
 
     let cellScreen;
             
@@ -20,7 +21,10 @@
 	const NeighborhoodType = Object.freeze({
 		VonNeumann: Symbol("vonneumann"),		
 		Moore: Symbol("moore"),
-        Extended: Symbol("extended")
+        Extended: Symbol("extended"),
+        Diagonal: Symbol("diagonal"),
+        Circle: Symbol("circle"),
+        Circunference: Symbol("circunference"),
 	});
 
     class Neighborhood {
@@ -88,6 +92,43 @@
                 return this.cells[x][y].alive;
         }
 
+
+        getNeighboursCountCircunference = (x, y, radius) => {
+            let neighboursCount = 0;
+            let i = 0;
+            let j = radius;
+            let d = 3 - 2 * radius; //Bresenham
+        
+            while (i <= j) {
+                const points = [
+                    [x + i, y + j],
+                    [x + j, y + i],
+                    [x - i, y + j],
+                    [x - j, y + i],
+                    [x + i, y - j],
+                    [x + j, y - i],
+                    [x - i, y - j],
+                    [x - j, y - i],
+                ];
+            
+                points.forEach(([px, py]) => {
+                    if (px >= 0 && px < this.cells.length && py >= 0 && py < this.cells[0].length) {
+                        if (this.isCellAliveSafe(px, py)) neighboursCount++;
+                    }
+                });
+        
+                if (d < 0) {
+                    d = d + 4 * i + 6;
+                } else {
+                    d = d + 4 * (i - j) + 10;
+                    j--;
+                }
+                i++;
+            }
+
+            return neighboursCount;
+        }
+
         getNeighboursCount = (neighborhood, x, y) => {
             let neighboursCount = 0;
 
@@ -113,6 +154,26 @@
                     if (this.isCellAliveSafe(x-1, y)) neighboursCount++;
                     if (this.isCellAliveSafe(x+1, y)) neighboursCount++;
                     if (this.isCellAliveSafe(x-1, y+1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x+1, y+1)) neighboursCount++;
+                    break;
+                case NeighborhoodType.Circunference:
+                    neighboursCount = this.getNeighboursCountCircunference(x, y, circleRadius);
+                    break;
+                case NeighborhoodType.Circle:
+                    for (let i = 0; i < this.cells.length; i++) {
+                        for (let j = 0; j < this.cells[i].length; j++) {
+                            let squareDistance = (i - x) ** 2 + (j - y) ** 2;
+                            
+                            if (squareDistance <= circleRadius ** 2) {
+                                if (this.isCellAliveSafe(i, j)) neighboursCount++;
+                            }
+                        }
+                    }
+                    break;
+                case NeighborhoodType.Diagonal:
+                    if (this.isCellAliveSafe(x-1, y-1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x-1, y+1)) neighboursCount++;
+                    if (this.isCellAliveSafe(x+1, y-1)) neighboursCount++;
                     if (this.isCellAliveSafe(x+1, y+1)) neighboursCount++;
                     break;
             }
@@ -193,7 +254,7 @@
     let init = () => {       
 		initCanvas();
 
-        cellDiameter = Utils.getRandomInt(5, 15);        
+        cellDiameter = Utils.getRandomInt(3, 15);        
 
         cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
         cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
@@ -250,6 +311,7 @@
                 valueNeighbours = Utils.getRandomInt(1, extendedSize * 2);  
                 value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, extendedSize * 2)); 
                 break;
+            case NeighborhoodType.Diagonal:
             case NeighborhoodType.Moore:
                 valueNeighbours = Utils.getRandomInt(1, 4);  
                 value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 4)); 
@@ -257,6 +319,11 @@
             case NeighborhoodType.VonNeumann:
                 valueNeighbours = Utils.getRandomInt(1, 8);  
                 value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 8)); 
+                break;
+            case NeighborhoodType.Circunference:
+            case NeighborhoodType.Circle:
+                valueNeighbours = Utils.getRandomInt(1, circleRadius * 2);  
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, circleRadius * 2)); 
                 break;
         } 
 
