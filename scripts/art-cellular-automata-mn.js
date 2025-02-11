@@ -315,7 +315,7 @@
     }
 
     let setRandomRules = () => {
-        let numberOfNeighborhoods = Utils.getRandomInt(1, 5);
+        let numberOfNeighborhoods = Utils.getRandomInt(1, 3);
         for(let j = 0; j < numberOfNeighborhoods; j++){
             let neighborhood = new Neighborhood();
 
@@ -323,7 +323,7 @@
             let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType].toString()];            
             neighborhood.neighborhoodType = type;
 
-            let numberOfRules = Utils.getRandomInt(1, 5);
+            let numberOfRules = Utils.getRandomInt(1, 3);
 
             for(let i = 0; i < numberOfRules; i++){
                 let rule = getRandomRule(neighborhood);    
