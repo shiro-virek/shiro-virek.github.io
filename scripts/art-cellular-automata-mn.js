@@ -356,5 +356,6 @@
     init();
 
 	window.clearCanvas = () => {  
-	}
+        randomize();
+    }
 }

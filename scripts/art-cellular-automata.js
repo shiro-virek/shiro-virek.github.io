@@ -302,5 +302,6 @@
     init();
 
 	window.clearCanvas = () => {  
+        randomize();
 	}
 }
