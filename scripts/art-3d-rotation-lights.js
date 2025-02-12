@@ -25,7 +25,7 @@
 
     const config = {
         FOV: 10000,
-        figureInfo: figureTypes[Utils.getRandomInt(0, figureTypes.length)],
+        figureInfo: figureTypes[Utils.getRandomInt(0, figureTypes.length - 1)],
         clicking: false,
         mouseMoved: false
     };    
