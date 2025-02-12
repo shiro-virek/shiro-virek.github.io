@@ -29,7 +29,7 @@
     class Semitone {
         constructor() {
             this.dots = [];
-			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);  
+			let rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);  
 			this.shape = Figures[Object.keys(Figures)[rand]];
             this.generateDots();
         }

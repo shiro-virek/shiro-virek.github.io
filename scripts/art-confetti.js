@@ -31,7 +31,7 @@
 			this.speed = Utils.getRandomInt(1, MAXIMUM_SPEED);
 			this.life = Utils.getRandomInt(MINIMUM_LIFE, MAXIMUM_LIFE);
 			this.xCenter = Utils.getRandomInt(1, width);
-			var rand = Utils.getRandomInt(0, Object.keys(Figures).length);
+			var rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);
 			this.shape = Figures[Object.keys(Figures)[rand]];
 			this.hue = Utils.getRandomInt(0, 255);
 			this.angle = Utils.getRandomInt(0, 360);

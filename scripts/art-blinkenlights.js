@@ -326,10 +326,10 @@
     }
 
     let getRandomRule = () => {
-        let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length - 1);
         let condition = Condition[Object.keys(Condition)[randCondition]];
         
-        let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length - 1);
         let attribute = Attribute[Object.keys(Attribute)[randAttribute]];
 
         let valueNeighbours = 0;
@@ -351,10 +351,10 @@
         
         let amount = Utils.getRandomFloat(0.01, 1.99, 2);
 
-        let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length - 1);
         let cellCondition = Condition[Object.keys(Condition)[randCellCondition]];
 
-        let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length - 1);
         let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute]];
 
         let valueCell = 0;
@@ -374,7 +374,7 @@
                 break;
         }      
 
-        let randNeighbourhoodType = Utils.getRandomInt(0, Object.keys(NeighbourhoodType).length);
+        let randNeighbourhoodType = Utils.getRandomInt(0, Object.keys(NeighbourhoodType).length - 1);
         let neighbourhoodType = NeighbourhoodType[Object.keys(NeighbourhoodType)[randNeighbourhoodType]];
 
         return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount, neighbourhoodType);

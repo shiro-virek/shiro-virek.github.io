@@ -29,7 +29,7 @@
         constructor() {
             this.leds = [];
             this.generateLeds();
-            let rand = Utils.getRandomInt(0, Object.keys(Figures).length);
+            let rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);
             this.shape = Figures[Object.keys(Figures)[rand]];
         }
 
