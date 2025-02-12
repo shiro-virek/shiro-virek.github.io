@@ -54,13 +54,13 @@
         }
 
         generateCells = () => {
-            for (let x = 0; x < cellColumns; x++) {
+            for (let x = 0; x <= cellColumns; x++) {
                 this.cells[x] = new Array(cellRows);
                 this.cellsBuffer[x] = new Array(cellRows);
             }
 
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     let cell = new Cell(x, y);
                     this.cells[x][y] = cell;
                     let cellBuffer = new Cell(x, y);
@@ -70,16 +70,16 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     this.cellsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
         copyBuffer = () => {
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     this.cells[x][y].alive = this.cellsBuffer[x][y].alive;
                 }
             }    
@@ -224,8 +224,8 @@
         }
 
         update = () => {            
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     this.calculateCellStatus(x, y);
                 }
             }                  
@@ -271,8 +271,8 @@
     }
 
     let randomize = () => {
-        for (let x = 0; x < cellColumns; x++) {
-            for (let y = 0; y < cellRows; y++) {
+        for (let x = 0; x <= cellColumns; x++) {
+            for (let y = 0; y <= cellRows; y++) {
                 cellScreen.cells[x][y].alive = Utils.getRandomBool();            
             }
         }    

@@ -34,12 +34,12 @@
         }
 
         generateLeds = () => {
-            for (let x = 0; x < ledColumns; x++) {
+            for (let x = 0; x <= ledColumns; x++) {
                 this.leds[x] = new Array(ledRows);
             }
 
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x <= ledColumns; x++) {
+                for (let y = 0; y <= ledRows; y++) {
                     let led = new Led(x, y);
                     this.leds[x][y] = led;
                 }
@@ -72,16 +72,16 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x <= ledColumns; x++) {
+                for (let y = 0; y <= ledRows; y++) {
                     this.leds[x][y].draw(ctx);
                 }
             }
         }
 
         update = () => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x <= ledColumns; x++) {
+                for (let y = 0; y <= ledRows; y++) {
                     this.movePixel(x, y);
                 }
             }
@@ -110,10 +110,10 @@
             let opacity = transparent ? this.diameter / maxSize : 1;
             switch (ledScreen.shape) {
                 case Figures.Circle:
-                    Utils.drawCircle(ctx, this.x + ledRadius, this.y + ledRadius, this.radius, this.getColor(), this.getColor(opacity));
+                    Utils.drawCircle(ctx, this.x + ledRadius, this.y + ledRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, rotate ? this.angle : 0, this.getColor(), this.getColor(opacity));
+                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
                     break;
             }
         }

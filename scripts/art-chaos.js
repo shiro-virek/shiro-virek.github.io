@@ -35,12 +35,12 @@
         }
 
         generateDots = () => {
-            for (let x = 0; x < dotsColumns; x++) {
+            for (let x = 0; x <= dotsColumns; x++) {
                 this.dots[x] = new Array(dotsRows);
             }
 
-            for (let x = 0; x < dotsColumns; x++) {
-                for (let y = 0; y < dotsRows; y++) {
+            for (let x = 0; x <= dotsColumns; x++) {
+                for (let y = 0; y <= dotsRows; y++) {
                     let dot = new Dot(x, y);
                     this.dots[x][y] = dot;
                 }
@@ -48,8 +48,8 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < dotsColumns; x++) {
-                for (let y = 0; y < dotsRows; y++) {
+            for (let x = 0; x <= dotsColumns; x++) {
+                for (let y = 0; y <= dotsRows; y++) {
                     this.dots[x][y].draw(ctx);
                 }
             }
