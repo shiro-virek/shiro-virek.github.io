@@ -428,7 +428,7 @@
 		maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
 		alphabeticLineSymbol = Utils.getRandomBool();
-		angleSegmentRange = Utils.getRandomInt(1, 3);
+		angleSegmentRange = Utils.getRandomInt(0, 1);
 		drawIcons = Utils.getRandomBool();
 		drawStreets = Utils.getRandomBool();
 	}

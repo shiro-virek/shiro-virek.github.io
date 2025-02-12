@@ -19,17 +19,17 @@
         constructor() {
             this.leds = [];       
             this.generateLeds();          
-			let rand = Utils.getRandomInt(0, Object.keys(Figures).length);  
+			let rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);  
 			this.shape = Figures[Object.keys(Figures)[rand]];
         }
 
         generateLeds = () => {
-            for (let x = 0; x < ledColumns; x++) {
+            for (let x = 0; x <= ledColumns; x++) {
                 this.leds[x] = new Array(ledRows);
             }
 
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x <= ledColumns; x++) {
+                for (let y = 0; y <= ledRows; y++) {
                     let led = new Led(x, y);
                     this.leds[x][y] = led;
                 }
@@ -43,8 +43,8 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x <= ledColumns; x++) {
+                for (let y = 0; y <= ledRows; y++) {
                     this.leds[x][y].draw(ctx);
                 }
             }

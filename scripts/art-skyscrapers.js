@@ -73,7 +73,7 @@
 			
 			this.calculateProps();
 
-			var rand = Utils.getRandomInt(0, Object.keys(WindowTypes).length);
+			var rand = Utils.getRandomInt(0, Object.keys(WindowTypes).length - 1);
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 
 			this.randomizeExtraModules();
@@ -83,7 +83,7 @@
 		}
 
 		randomizeTop = () => {
-			var rand = Utils.getRandomInt(0, Object.keys(TopTypes).length);
+			var rand = Utils.getRandomInt(0, Object.keys(TopTypes).length - 1);
 			this.topType = TopTypes[Object.keys(TopTypes)[rand]];
 
 			switch (this.topType) {

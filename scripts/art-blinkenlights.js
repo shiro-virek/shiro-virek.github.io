@@ -59,13 +59,13 @@
         }
 
         generateCells = () => {
-            for (let x = 0; x < cellColumns; x++) {
+            for (let x = 0; x <= cellColumns; x++) {
                 this.cells[x] = new Array(cellRows);
                 this.cellsBuffer[x] = new Array(cellRows);
             }
 
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     let cell = new Cell(x, y);
                     this.cells[x][y] = cell;
                     let cellBuffer = new Cell(x, y);
@@ -75,16 +75,16 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     this.cellsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
         copyBuffer = () => {
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     this.cells[x][y].diameter =  this.cellsBuffer[x][y].diameter;
                     this.cells[x][y].hue =  this.cellsBuffer[x][y].hue;
                     this.cells[x][y].saturation =  this.cellsBuffer[x][y].saturation;
@@ -266,8 +266,8 @@
         }
 
         update = () => {            
-            for (let x = 0; x < cellColumns; x++) {
-                for (let y = 0; y < cellRows; y++) {
+            for (let x = 0; x <= cellColumns; x++) {
+                for (let y = 0; y <= cellRows; y++) {
                     this.calculateCellStatus(x, y);
                 }
             }                  
@@ -314,8 +314,8 @@
     }
 
     let randomize = () => {
-        for (let x = 0; x < cellColumns; x++) {
-            for (let y = 0; y < cellRows; y++) {
+        for (let x = 0; x <= cellColumns; x++) {
+            for (let y = 0; y <= cellRows; y++) {
                 cellScreen.cells[x][y].hue = Utils.getRandomInt(0, 255);
                 cellScreen.cells[x][y].saturation =  Utils.getRandomInt(0, 100);
                 cellScreen.cells[x][y].lightness =  Utils.getRandomInt(0, 100);            
@@ -326,10 +326,10 @@
     }
 
     let getRandomRule = () => {
-        let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length - 1);
         let condition = Condition[Object.keys(Condition)[randCondition]];
         
-        let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length - 1);
         let attribute = Attribute[Object.keys(Attribute)[randAttribute]];
 
         let valueNeighbours = 0;
@@ -351,10 +351,10 @@
         
         let amount = Utils.getRandomFloat(0.01, 1.99, 2);
 
-        let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
+        let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length - 1);
         let cellCondition = Condition[Object.keys(Condition)[randCellCondition]];
 
-        let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
+        let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length - 1);
         let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute]];
 
         let valueCell = 0;
@@ -374,7 +374,7 @@
                 break;
         }      
 
-        let randNeighbourhoodType = Utils.getRandomInt(0, Object.keys(NeighbourhoodType).length);
+        let randNeighbourhoodType = Utils.getRandomInt(0, Object.keys(NeighbourhoodType).length - 1);
         let neighbourhoodType = NeighbourhoodType[Object.keys(NeighbourhoodType)[randNeighbourhoodType]];
 
         return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount, neighbourhoodType);
