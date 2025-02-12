@@ -6,8 +6,8 @@
     let cellPadding = 0;
     let cellDiameter = 20;
 
-    let extendedSize = 3;
-    let circleRadius = 3;
+    let extendedSize = 2;
+    let circleRadius = 2;
 
     let cellScreen;
             
@@ -34,7 +34,7 @@
     }
 
     class Rule {
-        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, newValueCell, aliveStatusRequired){
+        constructor(aliveStatusRequired, conditionNeighbours, valueNeighbours, value2Neighbours, newValueCell){
             this.valueNeighbours = valueNeighbours;
             this.value2Neighbours = value2Neighbours;
             this.conditionNeighbours = conditionNeighbours;
@@ -254,7 +254,7 @@
     let init = () => {       
 		initCanvas();
 
-        cellDiameter = Utils.getRandomInt(3, 15);        
+        cellDiameter = Utils.getRandomInt(5, 15);        
 
         cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
         cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
@@ -280,28 +280,9 @@
         //setRules();
     }
 
-    let setRules = () => {
-        //Conway rules
-        
-        let neighborhood = new Neighborhood();
-        neighborhood.neighborhoodType = NeighborhoodType.VonNeumann;
-
-        let rule1 = new Rule(Condition.Lower, 2, 0, false, true);
-        let rule2 = new Rule(Condition.Between, 2, 3, true, true);
-        let rule3 = new Rule(Condition.Greater, 3, 0, false, true);
-        let rule4 = new Rule(Condition.Equal, 3, 0, true, false);
-
-        neighborhood.rules.push(rule1);
-        neighborhood.rules.push(rule2);
-        neighborhood.rules.push(rule3);
-        neighborhood.rules.push(rule4);
-
-        cellScreen.neighborhoods.push(neighborhood);
-    }
-
     let getRandomRule = (neighborhood) => {
         let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-        let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
+        let condition = Condition[Object.keys(Condition)[randCondition]];            
         
         let valueNeighbours = 0;
         let value2Neighbours = 0;
@@ -330,19 +311,19 @@
         let newValueCell = Utils.getRandomBool();  
         let alive = Utils.getRandomBool();
 
-        return new Rule(condition, valueNeighbours, value2Neighbours, newValueCell, alive);
+        return new Rule(alive, condition, valueNeighbours, value2Neighbours, newValueCell);
     }
 
     let setRandomRules = () => {
-        let numberOfNeighborhoods = Utils.getRandomInt(1, 5);
+        let numberOfNeighborhoods = Utils.getRandomInt(1, 3);
         for(let j = 0; j < numberOfNeighborhoods; j++){
             let neighborhood = new Neighborhood();
 
             let randType = Utils.getRandomInt(0, Object.keys(NeighborhoodType).length);
-            let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType].toString()];            
+            let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType]];            
             neighborhood.neighborhoodType = type;
 
-            let numberOfRules = Utils.getRandomInt(1, 5);
+            let numberOfRules = Utils.getRandomInt(1, 3);
 
             for(let i = 0; i < numberOfRules; i++){
                 let rule = getRandomRule(neighborhood);    
@@ -366,7 +347,7 @@
 
         draw();
 
-        Utils.sleep(300);
+        Utils.sleep(200);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
@@ -375,5 +356,6 @@
     init();
 
 	window.clearCanvas = () => {  
-	}
+        randomize();
+    }
 }

@@ -63,9 +63,9 @@ class Utils {
     }	
             
     static getRandomInt = (min, max) => {
-        return Math.floor(Math.random() * max) + min;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-
+    
     static getRandomFloat = (min, max, decimals) => {
         const str = (Math.random() * (max - min) + min).toFixed(
             decimals,

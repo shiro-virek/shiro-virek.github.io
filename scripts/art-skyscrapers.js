@@ -389,9 +389,6 @@
 				case WindowTypes.MiniWindowCenter:
 					this.drawMiniWindowCenter(ctx, wx, wy, wx1, wy1);
 					break;
-				case WindowTypes.BorderWindow:
-					this.drawBorderWindow(ctx, wx, wy, wx1, wy1);
-					break;
 			}
 		}
 

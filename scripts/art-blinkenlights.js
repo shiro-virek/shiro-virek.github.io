@@ -6,6 +6,9 @@
     let cellPadding = 0;
     let cellDiameter = 20;
 
+    let extendedSize = 2;
+    let circleRadius = 2;
+
     let cellScreen;
     
 	const Attribute = Object.freeze({
@@ -20,8 +23,17 @@
         Between: Symbol("between")
 	});
 
+	const NeighbourhoodType = Object.freeze({
+		VonNeumann: Symbol("vonneumann"),		
+		Moore: Symbol("moore"),
+        Extended: Symbol("extended"),
+        Diagonal: Symbol("diagonal"),
+        Circle: Symbol("circle"),
+        Circunference: Symbol("circunference"),
+	});
+
     class Rule {
-        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, attribute, conditionCell, valueCell, value2Cell, amount){
+        constructor(conditionNeighbours, valueNeighbours, value2Neighbours, attribute, conditionCell, valueCell, value2Cell, amount, neighbourhoodType){
             this.valueNeighbours = valueNeighbours;
             this.value2Neighbours = value2Neighbours;
             this.conditionNeighbours = conditionNeighbours;
@@ -33,6 +45,8 @@
             this.conditionCell = conditionCell;
 
             this.amount = amount;
+
+            this.neighbourhoodType = neighbourhoodType;
         }
     }
 
@@ -138,6 +152,44 @@
             return cell;
         }
 
+        getNeighboursResultCircunference = (x, y, radius, rule) => {
+            let neighboursResult = 0;
+            let i = 0;
+            let j = radius;
+            let d = 3 - 2 * radius; //Bresenham
+            let neighboursCount = 0;
+        
+            while (i <= j) {
+                const points = [
+                    [x + i, y + j],
+                    [x + j, y + i],
+                    [x - i, y + j],
+                    [x - j, y + i],
+                    [x + i, y - j],
+                    [x + j, y - i],
+                    [x - i, y - j],
+                    [x - j, y - i],
+                ];
+            
+                points.forEach(([px, py]) => {
+                    if (px >= 0 && px < this.cells.length && py >= 0 && py < this.cells[0].length) {
+                        neighboursResult += (this.getCellValueSafe(px, py, rule));
+                        neighboursCount++;
+                    }
+                });
+        
+                if (d < 0) {
+                    d = d + 4 * i + 6;
+                } else {
+                    d = d + 4 * (i - j) + 10;
+                    j--;
+                }
+                i++;
+            }
+
+            return neighboursResult / neighboursCount;
+        }
+
         calculateCellStatus = (x, y) => {  
             this.rules.forEach(rule => {
                 let neighboursResult = 0;
@@ -148,16 +200,64 @@
                 this.cellsBuffer[x][y].saturation = this.cells[x][y].saturation; 
                 this.cellsBuffer[x][y].lightness = this.cells[x][y].lightness; 
 
-                neighboursResult += (this.getCellValueSafe(x, y-1, rule));
-                neighboursResult += (this.getCellValueSafe(x, y+1, rule));
-                neighboursResult += (this.getCellValueSafe(x-1, y-1, rule));
-                neighboursResult += (this.getCellValueSafe(x+1, y-1, rule));
-                neighboursResult += (this.getCellValueSafe(x-1, y, rule));
-                neighboursResult += (this.getCellValueSafe(x+1, y, rule));
-                neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
-                neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
+                let circleCount = 0;
 
-                neighboursResult /= 8;
+                switch(rule.NeighbourhoodType){
+                    case NeighbourhoodType.Extended:
+                        for(let h=x-extendedSize; h<=x+extendedSize; h++){
+                            for(let v=y-extendedSize; v<=y+extendedSize; v++){
+                                if (h!=x || v!=y) neighboursResult += (this.getCellValueSafe(h, v, rule));
+                            }
+                        }
+
+                        neighboursResult /= (extendedSize * extendedSize) - 1;
+                        break;
+                    case NeighbourhoodType.Moore:
+                        neighboursResult += (this.getCellValueSafe(x, y-1, rule));
+                        neighboursResult += (this.getCellValueSafe(x, y+1, rule));
+                        neighboursResult += (this.getCellValueSafe(x-1, y, rule));
+                        neighboursResult += (this.getCellValueSafe(x+1, y, rule));
+
+                        neighboursResult /= 4;
+                        break;
+                    case NeighbourhoodType.VonNeumann:
+                        neighboursResult += (this.getCellValueSafe(x, y-1, rule));
+                        neighboursResult += (this.getCellValueSafe(x, y+1, rule));
+                        neighboursResult += (this.getCellValueSafe(x-1, y-1, rule));
+                        neighboursResult += (this.getCellValueSafe(x+1, y-1, rule));
+                        neighboursResult += (this.getCellValueSafe(x-1, y, rule));
+                        neighboursResult += (this.getCellValueSafe(x+1, y, rule));
+                        neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
+                        neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
+
+                        neighboursResult /= 8;
+                        break;
+                    case NeighbourhoodType.Circunference:
+                        neighboursResult = this.getNeighboursResultCircunference(x, y, circleRadius, rule);
+                        break;
+                    case NeighbourhoodType.Circle:                        
+                        for (let i = 0; i < this.cells.length; i++) {
+                            for (let j = 0; j < this.cells[i].length; j++) {
+                                let squareDistance = (i - x) ** 2 + (j - y) ** 2;
+                                
+                                if (squareDistance <= circleRadius ** 2) {
+                                    circleCount++;
+                                    neighboursResult += (this.getCellValueSafe(i, j, rule));
+                                }
+                            }
+                        }
+                        neighboursResult /= circleCount;
+                        break;
+                    case NeighbourhoodType.Diagonal:
+                        neighboursResult += (this.getCellValueSafe(x-1, y-1, rule));
+                        neighboursResult += (this.getCellValueSafe(x-1, y+1, rule));
+                        neighboursResult += (this.getCellValueSafe(x+1, y-1, rule));
+                        neighboursResult += (this.getCellValueSafe(x+1, y+1, rule));
+
+                        neighboursResult /= 4;
+                        break;
+                }
+
 
                 if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
                     this.cellsBuffer[x][y] = this.applyRule(rule, this.cells[x][y]);
@@ -227,53 +327,61 @@
 
     let getRandomRule = () => {
         let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-        let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
+        let condition = Condition[Object.keys(Condition)[randCondition]];
         
         let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-        let attribute = Attribute[Object.keys(Attribute)[randAttribute].toString()];
+        let attribute = Attribute[Object.keys(Attribute)[randAttribute]];
 
         let valueNeighbours = 0;
         let value2Neighbours = 0;
+        let valueMax = 0;
         switch(attribute){
             case Attribute.Hue:
                 valueNeighbours = Utils.getRandomInt(0, 255);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 255));  
+                valueMax = Utils.getRandomInt(valueNeighbours, 255);
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, valueMax);  
                 break;
             case Attribute.Saturation:
             case Attribute.Lightness:
-                valueNeighbours = Utils.getRandomInt(0, 100);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 100));  
+                valueNeighbours = Utils.getRandomInt(0, 100);   
+                valueMax = Utils.getRandomInt(valueNeighbours, 100);
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, valueMax);  
                 break;
         }            
         
         let amount = Utils.getRandomFloat(0.01, 1.99, 2);
 
         let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-        let cellCondition = Condition[Object.keys(Condition)[randCellCondition].toString()];
+        let cellCondition = Condition[Object.keys(Condition)[randCellCondition]];
 
         let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute].toString()];
+        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute]];
 
         let valueCell = 0;
         let value2Cell = 0;
+        let valueCellMax = 0;
         switch(cellAttribute){
             case Attribute.Hue:
-                valueCell = Utils.getRandomInt(0, 255);  
-                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 255));  
+                valueCell = Utils.getRandomInt(0, 255);   
+                valueCellMax = Utils.getRandomInt(valueCell, 255);
+                value2Cell = Utils.getRandomInt(valueCell, valueCellMax);  
                 break;
             case Attribute.Saturation:
             case Attribute.Lightness:
                 valueCell = Utils.getRandomInt(0, 100);  
-                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 100));  
+                valueCellMax = Utils.getRandomInt(valueCell, 100);
+                value2Cell = Utils.getRandomInt(valueCell, valueCellMax);  
                 break;
         }      
 
+        let randNeighbourhoodType = Utils.getRandomInt(0, Object.keys(NeighbourhoodType).length);
+        let neighbourhoodType = NeighbourhoodType[Object.keys(NeighbourhoodType)[randNeighbourhoodType]];
 
-        return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount);
+        return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount, neighbourhoodType);
     }
 
     let setRandomRules = () => {
-        let numberOfRules = Utils.getRandomInt(10, 20);
+        let numberOfRules = Utils.getRandomInt(5, 20);
         for(let i = 0; i < numberOfRules; i++){
             let newRule = getRandomRule();   
             cellScreen.rules.push(newRule);
@@ -302,5 +410,6 @@
     init();
 
 	window.clearCanvas = () => {  
+        randomize();
 	}
 }
