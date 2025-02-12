@@ -327,49 +327,55 @@
 
     let getRandomRule = () => {
         let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-        let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
+        let condition = Condition[Object.keys(Condition)[randCondition]];
         
         let randAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-        let attribute = Attribute[Object.keys(Attribute)[randAttribute].toString()];
+        let attribute = Attribute[Object.keys(Attribute)[randAttribute]];
 
         let valueNeighbours = 0;
         let value2Neighbours = 0;
+        let valueMax = 0;
         switch(attribute){
             case Attribute.Hue:
                 valueNeighbours = Utils.getRandomInt(0, 255);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 255));  
+                valueMax = Utils.getRandomInt(valueNeighbours, 255);
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, valueMax);  
                 break;
             case Attribute.Saturation:
             case Attribute.Lightness:
-                valueNeighbours = Utils.getRandomInt(0, 100);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 100));  
+                valueNeighbours = Utils.getRandomInt(0, 100);   
+                valueMax = Utils.getRandomInt(valueNeighbours, 100);
+                value2Neighbours = Utils.getRandomInt(valueNeighbours, valueMax);  
                 break;
         }            
         
         let amount = Utils.getRandomFloat(0.01, 1.99, 2);
 
         let randCellCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-        let cellCondition = Condition[Object.keys(Condition)[randCellCondition].toString()];
+        let cellCondition = Condition[Object.keys(Condition)[randCellCondition]];
 
         let randCellAttribute = Utils.getRandomInt(0, Object.keys(Attribute).length);
-        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute].toString()];
+        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute]];
 
         let valueCell = 0;
         let value2Cell = 0;
+        let valueCellMax = 0;
         switch(cellAttribute){
             case Attribute.Hue:
-                valueCell = Utils.getRandomInt(0, 255);  
-                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 255));  
+                valueCell = Utils.getRandomInt(0, 255);   
+                valueCellMax = Utils.getRandomInt(valueCell, 255);
+                value2Cell = Utils.getRandomInt(valueCell, valueCellMax);  
                 break;
             case Attribute.Saturation:
             case Attribute.Lightness:
                 valueCell = Utils.getRandomInt(0, 100);  
-                value2Cell = Utils.getRandomInt(valueCell, Utils.getRandomInt(valueCell, 100));  
+                valueCellMax = Utils.getRandomInt(valueCell, 100);
+                value2Cell = Utils.getRandomInt(valueCell, valueCellMax);  
                 break;
         }      
 
         let randNeighbourhoodType = Utils.getRandomInt(0, Object.keys(NeighbourhoodType).length);
-        let neighbourhoodType = NeighbourhoodType[Object.keys(NeighbourhoodType)[randNeighbourhoodType].toString()];
+        let neighbourhoodType = NeighbourhoodType[Object.keys(NeighbourhoodType)[randNeighbourhoodType]];
 
         return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount, neighbourhoodType);
     }

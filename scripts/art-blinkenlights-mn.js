@@ -282,7 +282,7 @@
 
     let getRandomRule = (neighborhood) => {
         let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length);
-        let condition = Condition[Object.keys(Condition)[randCondition].toString()];            
+        let condition = Condition[Object.keys(Condition)[randCondition]];            
         
         let valueNeighbours = 0;
         let value2Neighbours = 0;
@@ -320,7 +320,7 @@
             let neighborhood = new Neighborhood();
 
             let randType = Utils.getRandomInt(0, Object.keys(NeighborhoodType).length);
-            let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType].toString()];            
+            let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType]];            
             neighborhood.neighborhoodType = type;
 
             let numberOfRules = Utils.getRandomInt(1, 3);
