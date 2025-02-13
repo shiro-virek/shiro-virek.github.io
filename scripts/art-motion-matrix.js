@@ -1,35 +1,31 @@
 {
+    const config = {
+        randomize: true,
+        pixelMargin: 30,
+        pixelPadding: 30,
+        pixelDiameter: 20,
+        growSpeed: 0.5,
+        shrinkSpeed: 0.3,
+        maxSize: 100,
+        transparent: false,
+        rotate: false,
+        slowDown: false,
+        stopOnBlur: false,
+        hue: 100,
+    };
+
     const globals = {
         mouseX: 0,
         mouseY: 0,
         clicking: false,
         mouseMoved: false,
         lastPosX: 0,
-        lastPosY: 0
+        lastPosY: 0,
+        pixelRows: 50,
+        pixelColumns: 50,
+        pixelScreen: null,
+        pixelRadius: config.pixelDiameter / 2,
     };
-
-    let pixelRows = 50;
-    let pixelColumns = 50;
-
-    let pixelMargin = 30;
-    let pixelPadding = 30;
-    let pixelDiameter = 20;
-    let pixelRadius = pixelDiameter / 2;
-
-    let growSpeed = 0.5;
-    let shrinkSpeed = 0.3;
-    let maxSize = 100;
-
-    let transparent = false;
-    let rotate = false;
-    let slowDown = false;
-    let stopOnBlur = false
-
-    let hue = 100;
-
-    let pixelScreen;
-
-    let clicking = false;
 
     const Figures = Object.freeze({
         Square: Symbol("square"),
@@ -45,12 +41,12 @@
         }
 
         generatePixels = () => {
-            for (let x = 0; x <= pixelColumns; x++) {
-                this.pixels[x] = new Array(pixelRows);
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                this.pixels[x] = new Array(globals.pixelRows);
             }
 
-            for (let x = 0; x <= pixelColumns; x++) {
-                for (let y = 0; y <= pixelRows; y++) {
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                for (let y = 0; y <= globals.pixelRows; y++) {
                     let pixel = new Pixel(x, y);
                     this.pixels[x][y] = pixel;
                 }
@@ -58,8 +54,8 @@
         }
 
         getPixelByMousePosition = (x, y) => {
-            let col = Math.round((x - pixelMargin) / ((pixelDiameter) + pixelPadding));
-            let row = Math.round((y - pixelMargin) / ((pixelDiameter) + pixelPadding));
+            let col = Math.round((x - config.pixelMargin) / ((config.pixelDiameter) + config.pixelPadding));
+            let row = Math.round((y - config.pixelMargin) / ((config.pixelDiameter) + config.pixelPadding));
             return { col: col, row: row };
 
         }
@@ -71,8 +67,8 @@
 
         activatePixel = (x, y) => {
             let pixelPos = this.getPixelByMousePosition(x, y);
-            this.pixels[pixelPos.col][pixelPos.row].growing = growSpeed;
-            this.pixels[pixelPos.col][pixelPos.row].rotating = growSpeed;
+            this.pixels[pixelPos.col][pixelPos.row].growing = config.growSpeed;
+            this.pixels[pixelPos.col][pixelPos.row].rotating = config.growSpeed;
         }
 
         movePixel = (col, row) => {        
@@ -80,21 +76,21 @@
             this.pixels[col][row].radius = this.pixels[col][row].diameter / 2;
             this.pixels[col][row].angle += this.pixels[col][row].rotating;
 
-            if ((!this.isPixelClicked(col, row) && stopOnBlur)    
-                || (this.pixels[col][row].diameter > maxSize) && !stopOnBlur){
-                this.pixels[col][row].growing = -shrinkSpeed;
-                this.pixels[col][row].rotating = -shrinkSpeed      
+            if ((!this.isPixelClicked(col, row) && config.stopOnBlur)    
+                || (this.pixels[col][row].diameter > config.maxSize) && !config.stopOnBlur){
+                this.pixels[col][row].growing = -config.shrinkSpeed;
+                this.pixels[col][row].rotating = -config.shrinkSpeed      
             }else{
-                if (slowDown){
+                if (config.slowDown){
                     this.pixels[col][row].growing -= 0.005;  
                     this.pixels[col][row].rotating -= 0.005;                      
                 }
             }
 
-            if (this.pixels[col][row].diameter <= pixelDiameter)
+            if (this.pixels[col][row].diameter <= config.pixelDiameter)
             {
                 this.pixels[col][row].growing = 0;
-                this.pixels[col][row].diameter = pixelDiameter;
+                this.pixels[col][row].diameter = config.pixelDiameter;
             }
 
             if (this.pixels[col][row].angle <= 0){
@@ -104,16 +100,16 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= pixelColumns; x++) {
-                for (let y = 0; y <= pixelRows; y++) {
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                for (let y = 0; y <= globals.pixelRows; y++) {
                     this.pixels[x][y].draw(ctx);
                 }
             }
         }
 
         update = () => {
-            for (let x = 0; x <= pixelColumns; x++) {
-                for (let y = 0; y <= pixelRows; y++) {
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                for (let y = 0; y <= globals.pixelRows; y++) {
                     this.movePixel(x, y);
                 }
             }
@@ -122,13 +118,13 @@
 
     class Pixel {
         constructor(column, row) {
-            this.diameter = pixelDiameter;
-            this.radius = pixelRadius;
+            this.diameter = config.pixelDiameter;
+            this.radius = globals.pixelRadius;
             this.row = row;
             this.column = column;
-            this.x = pixelMargin + column * pixelPadding + column * this.diameter;
-            this.y = pixelMargin + row * pixelPadding + row * this.diameter;            
-            this.hue = hue;
+            this.x = config.pixelMargin + column * config.pixelPadding + column * this.diameter;
+            this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;            
+            this.hue = config.hue;
             this.growing = 0;
             this.angle = 0;
             this.rotating = 0;
@@ -139,13 +135,13 @@
         }
 
         draw = (ctx) => {
-            let opacity = transparent ? this.diameter / maxSize : 1;
-            switch (pixelScreen.shape) {
+            let opacity = config.transparent ? this.diameter / config.maxSize : 1;
+            switch (globals.pixelScreen.shape) {
                 case Figures.Circle:
-                    Utils.drawCircle(ctx, this.x + pixelRadius, this.y + pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
+                    Utils.drawCircle(ctx, this.x + globals.pixelRadius, this.y + globals.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
+                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
                     break;
             }
         }
@@ -153,11 +149,12 @@
 
     let init = () => {
         initCanvas();
-        randomize();
+        
+        if (config.randomize) randomize();
 
-        pixelRows = Math.floor((height - pixelMargin) / (pixelDiameter + pixelPadding));
-        pixelColumns = Math.floor((width - pixelMargin) / (pixelDiameter + pixelPadding));
-        pixelScreen = new PixelScreen();
+        globals.pixelRows = Math.floor((height - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
+        globals.pixelColumns = Math.floor((width - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
+        globals.pixelScreen = new PixelScreen();
 
         addEvents();
         window.requestAnimationFrame(loop)
@@ -203,7 +200,7 @@
         globals.mouseY = y;
 
         if (globals.clicking) {
-            pixelScreen.activatePixel(x, y);
+            globals.pixelScreen.activatePixel(x, y);
         }
 
         globals.lastPosX = x;
@@ -211,31 +208,31 @@
     }
 
     let randomize = () => {
-        slowDown = Utils.getRandomBool();
-        stopOnBlur = Utils.getRandomBool();
-        transparent = Utils.getRandomBool();
-        pixelDiameter = Utils.getRandomInt(5, 20);
-        pixelPadding = Utils.getRandomInt(0, 20);
-        pixelMargin = pixelPadding;
-        hue = Utils.getRandomInt(0, 255);
-        if (stopOnBlur)
-            growSpeed = Utils.getRandomFloat(5.0, 10.0, 1)
+        config.slowDown = Utils.getRandomBool();
+        config.stopOnBlur = Utils.getRandomBool();
+        config.transparent = Utils.getRandomBool();
+        config.pixelDiameter = Utils.getRandomInt(5, 20);
+        config.pixelPadding = Utils.getRandomInt(0, 20);
+        config.pixelMargin = config.pixelPadding;
+        config.hue = Utils.getRandomInt(0, 255);
+        if (config.stopOnBlur)
+            config.growSpeed = Utils.getRandomFloat(5.0, 10.0, 1)
         else
-            growSpeed = Utils.getRandomFloat(0.5, 2.0, 1);
-        shrinkSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
-        maxSize = Utils.getRandomInt(pixelDiameter + 1, 255);
-        rotate = Utils.getRandomBool();
+            config.growSpeed = Utils.getRandomFloat(0.5, 2.0, 1);
+        config.shrinkSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
+        config.maxSize = Utils.getRandomInt(config.pixelDiameter + 1, 255);
+        config.rotate = Utils.getRandomBool();
     }
 
     let draw = () => {
         drawBackground(ctx, canvas);
-        pixelScreen.draw(ctx);
+        globals.pixelScreen.draw(ctx);
     }
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
-        pixelScreen.update();
+        globals.pixelScreen.update();
 
         draw();
 
