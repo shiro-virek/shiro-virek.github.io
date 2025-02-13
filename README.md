@@ -28,5 +28,7 @@ Scenes currently available:
 - 3d-rotation-lights
 - distortion
 - rotators-solid
+- blinkenlights
+- blinkenlights-mn
 
 You can see them in action at https://eapelroso.com 🙃
