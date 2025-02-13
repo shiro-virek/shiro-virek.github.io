@@ -1,102 +1,130 @@
 {
-    let ledRows = 50;
-    let ledColumns = 50;
+    const config = {
+        randomize: true,
+        pixelMargin: 30,
+        pixelPadding: 30,
+        pixelDiameter: 20,
+        growSpeed: 0.5,
+        shrinkSpeed: 0.3,
+        maxSize: 100,
+        transparent: false,
+        rotate: false,
+        slowDown: false,
+        stopOnBlur: false,
+        hue: 100,
+    };
 
-    let ledMargin = 30;
-    let ledPadding = 30;
-    let ledDiameter = 20;
-    let ledRadius = ledDiameter / 2;
-
-    let growSpeed = 0.5;
-    let shrinkSpeed = 0.3;
-    let maxSize = 100;
-
-    let transparent = false;
-    let rotate = false;
-
-    let hue = 100;
-
-    let ledScreen;
-
-    let clicking = false;
+    const globals = {
+        mouseX: 0,
+        mouseY: 0,
+        clicking: false,
+        mouseMoved: false,
+        lastPosX: 0,
+        lastPosY: 0,
+        pixelRows: 50,
+        pixelColumns: 50,
+        pixelScreen: null,
+        pixelRadius: config.pixelDiameter / 2,
+    };
 
     const Figures = Object.freeze({
         Square: Symbol("square"),
         Circle: Symbol("circle")
     });
 
-    class LedScreen {
+    class PixelScreen {
         constructor() {
-            this.leds = [];
-            this.generateLeds();
+            this.pixels = [];
+            this.generatePixels();
             let rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);
             this.shape = Figures[Object.keys(Figures)[rand]];
         }
 
-        generateLeds = () => {
-            for (let x = 0; x <= ledColumns; x++) {
-                this.leds[x] = new Array(ledRows);
+        generatePixels = () => {
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                this.pixels[x] = new Array(globals.pixelRows);
             }
 
-            for (let x = 0; x <= ledColumns; x++) {
-                for (let y = 0; y <= ledRows; y++) {
-                    let led = new Led(x, y);
-                    this.leds[x][y] = led;
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                for (let y = 0; y <= globals.pixelRows; y++) {
+                    let pixel = new Pixel(x, y);
+                    this.pixels[x][y] = pixel;
                 }
             }
         }
 
-        activatePixel = (x, y) => {
-            let col = Math.round((x - ledMargin) / ((ledDiameter) + ledPadding));
-            let row = Math.round((y - ledMargin) / ((ledDiameter) + ledPadding));
-            this.leds[col][row].growing = growSpeed;
-            this.leds[col][row].rotating = growSpeed;
+        getPixelByMousePosition = (x, y) => {
+            let col = Math.round((x - config.pixelMargin) / ((config.pixelDiameter) + config.pixelPadding));
+            let row = Math.round((y - config.pixelMargin) / ((config.pixelDiameter) + config.pixelPadding));
+            return { col: col, row: row };
+
         }
 
-        movePixel = (col, row) => {
-            this.leds[col][row].diameter += this.leds[col][row].growing;
-            this.leds[col][row].radius = this.leds[col][row].diameter / 2;
-            this.leds[col][row].angle += this.leds[col][row].rotating;
+        isPixelClicked = (col, row) => {
+            let pixelPos = this.getPixelByMousePosition(globals.mouseX, globals.mouseY);
+            return (pixelPos.col == col && pixelPos.row == row && globals.clicking);
+        }
 
-            if (this.leds[col][row].diameter > maxSize){
-                this.leds[col][row].growing = -shrinkSpeed;
-                this.leds[col][row].rotating = -shrinkSpeed;
+        activatePixel = (x, y) => {
+            let pixelPos = this.getPixelByMousePosition(x, y);
+            this.pixels[pixelPos.col][pixelPos.row].growing = config.growSpeed;
+            this.pixels[pixelPos.col][pixelPos.row].rotating = config.growSpeed;
+        }
+
+        movePixel = (col, row) => {        
+            this.pixels[col][row].diameter += this.pixels[col][row].growing;
+            this.pixels[col][row].radius = this.pixels[col][row].diameter / 2;
+            this.pixels[col][row].angle += this.pixels[col][row].rotating;
+
+            if ((!this.isPixelClicked(col, row) && config.stopOnBlur)    
+                || (this.pixels[col][row].diameter > config.maxSize) && !config.stopOnBlur){
+                this.pixels[col][row].growing = -config.shrinkSpeed;
+                this.pixels[col][row].rotating = -config.shrinkSpeed      
+            }else{
+                if (config.slowDown){
+                    this.pixels[col][row].growing -= 0.005;  
+                    this.pixels[col][row].rotating -= 0.005;                      
+                }
             }
 
-            if (this.leds[col][row].diameter <= ledDiameter)
-                this.leds[col][row].growing = 0;
+            if (this.pixels[col][row].diameter <= config.pixelDiameter)
+            {
+                this.pixels[col][row].growing = 0;
+                this.pixels[col][row].diameter = config.pixelDiameter;
+            }
 
-            if (this.leds[col][row].angle <= 0)
-                this.leds[col][row].rotating = 0;
-
+            if (this.pixels[col][row].angle <= 0){
+                this.pixels[col][row].rotating = 0;                
+                this.pixels[col][row].angle = 0;
+            }
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= ledColumns; x++) {
-                for (let y = 0; y <= ledRows; y++) {
-                    this.leds[x][y].draw(ctx);
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                for (let y = 0; y <= globals.pixelRows; y++) {
+                    this.pixels[x][y].draw(ctx);
                 }
             }
         }
 
         update = () => {
-            for (let x = 0; x <= ledColumns; x++) {
-                for (let y = 0; y <= ledRows; y++) {
+            for (let x = 0; x <= globals.pixelColumns; x++) {
+                for (let y = 0; y <= globals.pixelRows; y++) {
                     this.movePixel(x, y);
                 }
             }
         }
     }
 
-    class Led {
+    class Pixel {
         constructor(column, row) {
-            this.diameter = ledDiameter;
-            this.radius = ledRadius;
+            this.diameter = config.pixelDiameter;
+            this.radius = globals.pixelRadius;
             this.row = row;
             this.column = column;
-            this.x = ledMargin + column * ledPadding + column * this.diameter;
-            this.y = ledMargin + row * ledPadding + row * this.diameter;            
-            this.hue = hue;
+            this.x = config.pixelMargin + column * config.pixelPadding + column * this.diameter;
+            this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;            
+            this.hue = config.hue;
             this.growing = 0;
             this.angle = 0;
             this.rotating = 0;
@@ -107,13 +135,13 @@
         }
 
         draw = (ctx) => {
-            let opacity = transparent ? this.diameter / maxSize : 1;
-            switch (ledScreen.shape) {
+            let opacity = config.transparent ? this.diameter / config.maxSize : 1;
+            switch (globals.pixelScreen.shape) {
                 case Figures.Circle:
-                    Utils.drawCircle(ctx, this.x + ledRadius, this.y + ledRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
+                    Utils.drawCircle(ctx, this.x + globals.pixelRadius, this.y + globals.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
+                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
                     break;
             }
         }
@@ -121,11 +149,12 @@
 
     let init = () => {
         initCanvas();
-        randomize();
+        
+        if (config.randomize) randomize();
 
-        ledRows = Math.floor((height - ledMargin) / (ledDiameter + ledPadding));
-        ledColumns = Math.floor((width - ledMargin) / (ledDiameter + ledPadding));
-        ledScreen = new LedScreen();
+        globals.pixelRows = Math.floor((height - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
+        globals.pixelColumns = Math.floor((width - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
+        globals.pixelScreen = new PixelScreen();
 
         addEvents();
         window.requestAnimationFrame(loop)
@@ -133,58 +162,77 @@
 
     let addEvents = () => {
         canvas.addEventListener('mousemove', e => {
+            globals.mouseMoved = true;
 			trackMouse(e.offsetX, e.offsetY);
 		}, false);
 
 		canvas.addEventListener('touchstart', function (e) {
-			clicking = true;
+            globals.mouseMoved = false;
+			globals.clicking = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
+            globals.mouseMoved = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('mousedown', e => {
-			clicking = true;
+			globals.clicking = true;
+            globals.mouseMoved = false;
 		}, false);
 
 		canvas.addEventListener('mouseup', e => {
-			clicking = false;
+			globals.clicking = false;
 		}, false);
 
 		canvas.addEventListener('touchend', e => {
-			clicking = false;
+			globals.clicking = false;
 		}, false);   
     }
 
-    let trackMouse = (xMouse, yMouse) => {
-        if (clicking) 
-            ledScreen.activatePixel(xMouse, yMouse);
+    let trackMouse = (x, y) => {
+        if (globals.lastPosX == 0) globals.lastPosX = x;
+        if (globals.lastPosY == 0) globals.lastPosY = y;
+
+        globals.mouseX = x;
+        globals.mouseY = y;
+
+        if (globals.clicking) {
+            globals.pixelScreen.activatePixel(x, y);
+        }
+
+        globals.lastPosX = x;
+        globals.lastPosY = y;
     }
 
     let randomize = () => {
-        transparent = Utils.getRandomBool();
-        ledDiameter = Utils.getRandomInt(5, 20);
-        ledPadding = Utils.getRandomInt(0, 20);
-        ledMargin = ledPadding;
-        hue = Utils.getRandomInt(0, 255);
-        growSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
-        shrinkSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
-        maxSize = Utils.getRandomInt(ledDiameter + 1, 255);
-        rotate = Utils.getRandomBool();
+        config.slowDown = Utils.getRandomBool();
+        config.stopOnBlur = Utils.getRandomBool();
+        config.transparent = Utils.getRandomBool();
+        config.pixelDiameter = Utils.getRandomInt(5, 20);
+        config.pixelPadding = Utils.getRandomInt(0, 20);
+        config.pixelMargin = config.pixelPadding;
+        config.hue = Utils.getRandomInt(0, 255);
+        if (config.stopOnBlur)
+            config.growSpeed = Utils.getRandomFloat(5.0, 10.0, 1)
+        else
+            config.growSpeed = Utils.getRandomFloat(0.5, 2.0, 1);
+        config.shrinkSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
+        config.maxSize = Utils.getRandomInt(config.pixelDiameter + 1, 255);
+        config.rotate = Utils.getRandomBool();
     }
 
     let draw = () => {
         drawBackground(ctx, canvas);
-        ledScreen.draw(ctx);
+        globals.pixelScreen.draw(ctx);
     }
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
-        ledScreen.update();
+        globals.pixelScreen.update();
 
         draw();
 

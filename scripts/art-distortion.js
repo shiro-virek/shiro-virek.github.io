@@ -294,8 +294,7 @@
             globals.mouseY = y;
         }
 
-        globals
-        .lastPosX = x;
+        globals.lastPosX = x;
         globals.lastPosY = y;
     }
 
