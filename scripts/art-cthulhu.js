@@ -143,6 +143,8 @@
 		}, false);
 
 		canvas.addEventListener('touchstart', function (e) {
+			e.preventDefault();
+			
 			clicking = true;
 
 			globals.touches = e.touches;
