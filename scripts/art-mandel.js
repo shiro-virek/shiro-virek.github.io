@@ -1,14 +1,16 @@
 {
-    let canvasShader = null;
-    let gl = null;
-    let vertexShader = null;
-    let fragmentShader = null;
-    let program = null;
-    let positionBuffer = null;
-    let positionAttributeLocation = null;
-    let resolutionUniformLocation = null;
-    let timeUniformLocation = null;
-    let startTime = null;
+    const globals = {
+        gl: null,
+        vertexShader: null,
+        fragmentShader: null,
+        program: null,
+        positionBuffer: null,
+        positionAttributeLocation: null,
+        resolutionUniformLocation: null,
+        timeUniformLocation: null,
+        startTime: null,
+        canvasShader: null,
+    }
 
     const vertexShaderSource = `
       attribute vec4 a_position;
@@ -73,57 +75,56 @@
     ];
     
     function animate() {
-        const currentTime = (Date.now() - startTime) / 1000;
-        gl.uniform1f(timeUniformLocation, currentTime);
+        const currentTime = (Date.now() - globals.startTime) / 1000;
+        globals.gl.uniform1f(globals.timeUniformLocation, currentTime);
 
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        globals.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        globals.gl.clear(globals.gl.COLOR_BUFFER_BIT);
+        globals.gl.drawArrays(globals.gl.TRIANGLE_STRIP, 0, 4);
 
         requestAnimationFrame(animate);
     }
 
 	let init = () => {
-		canvasShader = document.getElementById("canvasShader");
+		globals.canvasShader = document.getElementById("canvasShader");
 
-        gl = canvasShader.getContext('webgl');
+        globals.gl = globals.canvasShader.getContext('webgl');
 
-        if (!gl) {
-        console.error('WebGL no está disponible en tu navegador.');
-        throw new Error('WebGL no está disponible.');
+        if (!globals.gl) {
+            console.error('WebGL no está disponible en tu navegador.');
+            throw new Error('WebGL no está disponible.');
         }
 
 
-        vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-        fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+        globals.vertexShader = compileShader(globals.gl, vertexShaderSource, globals.gl.VERTEX_SHADER);
+        globals.fragmentShader = compileShader(globals.gl, fragmentShaderSource, globals.gl.FRAGMENT_SHADER);
 
-        program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
+        globals.program = globals.gl.createProgram();
+        globals.gl.attachShader(globals.program, globals.vertexShader);
+        globals.gl.attachShader(globals.program, globals.fragmentShader);
+        globals.gl.linkProgram(globals.program);
 
-
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            console.error('Error enlazando el programa:', gl.getProgramInfoLog(program));
+        if (!globals.gl.getProgramParameter(globals.program, globals.gl.LINK_STATUS)) {
+            console.error('Error enlazando el programa:', globals.gl.getProgramInfoLog(globals.program));
         }
     
-        gl.useProgram(program);
+        globals.gl.useProgram(globals.program);
     
-        positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        globals.positionBuffer = globals.gl.createBuffer();
+        globals.gl.bindBuffer(globals.gl.ARRAY_BUFFER, globals.positionBuffer);
+        globals.gl.bufferData(globals.gl.ARRAY_BUFFER, new Float32Array(positions), globals.gl.STATIC_DRAW);
 
-        positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
-        gl.enableVertexAttribArray(positionAttributeLocation);
-        gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+        globals.positionAttributeLocation = globals.gl.getAttribLocation(globals.program, 'a_position');
+        globals.gl.enableVertexAttribArray(globals.positionAttributeLocation);
+        globals.gl.vertexAttribPointer(globals.positionAttributeLocation, 2, globals.gl.FLOAT, false, 0, 0);
     
-        resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
-        timeUniformLocation = gl.getUniformLocation(program, 'u_time');
+        globals.resolutionUniformLocation = globals.gl.getUniformLocation(globals.program, 'u_resolution');
+        globals.timeUniformLocation = globals.gl.getUniformLocation(globals.program, 'u_time');
         
-        gl.viewport(0, 0, canvasShader.width, canvasShader.height);
-        gl.uniform2f(resolutionUniformLocation, canvasShader.width, canvasShader.height);
+        globals.gl.viewport(0, 0, globals.canvasShader.width, globals.canvasShader.height);
+        globals.gl.uniform2f(globals.resolutionUniformLocation, globals.canvasShader.width, canvasShader.height);
 
-        startTime = Date.now();
+        globals.startTime = Date.now();
 	}
 
     init();
