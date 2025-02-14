@@ -55,7 +55,6 @@
 			if (globals.touches){				
 				let fingersCount = globals.touches.length;
 				let fingerIndex = Math.floor(this.tentacle % fingersCount);
-				tentaclesPerFinger = Math.floor(TENTACLES_COUNT / fingersCount);
 				
 				this.deltaX = globals.touches[fingerIndex].clientX - this.x;
 				this.deltaY = globals.touches[fingerIndex].clientY - this.y;				
