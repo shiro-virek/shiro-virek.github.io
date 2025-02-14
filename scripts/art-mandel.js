@@ -27,6 +27,7 @@
       #define TWO_PI 6.28318530718
 
       uniform vec2 u_resolution;
+      uniform vec2 u_mouse;
       uniform float u_time;
 
       vec3 hsb2rgb(in vec3 c) {
@@ -36,6 +37,7 @@
       }
 
       void main() {
+        vec2 mouse = u_mouse/u_resolution;
         vec2 st = gl_FragCoord.xy / u_resolution;
         vec3 color = vec3(0.0);
 
