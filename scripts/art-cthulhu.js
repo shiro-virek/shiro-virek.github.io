@@ -55,8 +55,7 @@
 			if (globals.touches){				
 				let fingersCount = globals.touches.length;
 				let fingerIndex = Math.floor(this.tentacle % fingersCount);
-				tentaclesPerFinger = Math.ceil(TENTACLES_COUNT / fingersCount);
-				//if (fingerIndex == 0) tentaclesPerFinger--;
+				tentaclesPerFinger = Math.floor(TENTACLES_COUNT / fingersCount);
 				
 				this.deltaX = globals.touches[fingerIndex].clientX - this.x;
 				this.deltaY = globals.touches[fingerIndex].clientY - this.y;				
@@ -176,10 +175,11 @@
 	let init = () => {
 		initCanvas();
 		randomize();
+		console.log(TENTACLES_COUNT);
 		addSlices();
 		addEvents();
 		drawBackground(ctx, canvas);
-		simulateTouchEvent();
+		//simulateTouchEvent();
 		window.requestAnimationFrame(loop);
 	}
 
@@ -233,14 +233,12 @@
 			clientY: 250,
 		});
 
-
 		const touch3 = new Touch({
 			identifier: 3,
 			target: canvas,
 			clientX: 300,
 			clientY: 350,
 		});
-
 
 		Utils.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
 	}
