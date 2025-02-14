@@ -1,4 +1,9 @@
 {
+
+    const globals = {
+    	touches: null,
+    };
+
 	let SLICES_COUNT = 60;
 	let RINGS_DISTANCE = 20;
 	let RINGS_SPEED = 1;
@@ -45,10 +50,22 @@
 			this.x = this.x ? this.x : 0;
 			this.y = this.y ? this.y : 0;
 
-			this.deltaX = mouseX - this.x;
-			this.deltaY = mouseY - this.y;
+			let tentaclesPerFinger = TENTACLES_COUNT; 
 
-			let speedAxes = Utils.polarToCartesian(this.speed + distanceToCenter, (this.tentacle * Utils.degToRad(360) / TENTACLES_COUNT) + Utils.degToRad(ROTATION_ANGLE));
+			if (globals.touches){				
+				let fingersCount = globals.touches.length;
+				let fingerIndex = Math.floor(this.tentacle % fingersCount);
+				tentaclesPerFinger = Math.ceil(TENTACLES_COUNT / fingersCount);
+				//if (fingerIndex == 0) tentaclesPerFinger--;
+				
+				this.deltaX = globals.touches[fingerIndex].clientX - this.x;
+				this.deltaY = globals.touches[fingerIndex].clientY - this.y;				
+			}else{
+				this.deltaX = mouseX - this.x;
+				this.deltaY = mouseY - this.y;
+			}
+
+			let speedAxes = Utils.polarToCartesian(this.speed + distanceToCenter, (this.tentacle * Utils.degToRad(360) / tentaclesPerFinger) + Utils.degToRad(ROTATION_ANGLE));
 
 			this.deltaX += speedAxes.x;
 			this.deltaY += speedAxes.y;
@@ -129,11 +146,17 @@
 
 		canvas.addEventListener('touchstart', function (e) {
 			clicking = true;
+
+			globals.touches = e.touches;
+
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
+
+			global.touches = e.touches;
+
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
@@ -156,7 +179,8 @@
 		addSlices();
 		addEvents();
 		drawBackground(ctx, canvas);
-		window.requestAnimationFrame(loop)
+		simulateTouchEvent();
+		window.requestAnimationFrame(loop);
 	}
 
 	let isRing = (indexSlice) => {
@@ -192,6 +216,33 @@
 		if (TENTACLES_MOVEMENT) updateDistanceToCenter();
 
 		timeCounter++;
+	}
+
+	let simulateTouchEvent = () => {
+		const touch1 = new Touch({
+			identifier: 1,
+			target: canvas,
+			clientX: 100,
+			clientY: 150,
+		});
+
+		const touch2 = new Touch({
+			identifier: 2,
+			target: canvas,
+			clientX: 200,
+			clientY: 250,
+		});
+
+
+		const touch3 = new Touch({
+			identifier: 3,
+			target: canvas,
+			clientX: 300,
+			clientY: 350,
+		});
+
+
+		Utils.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
 	}
 
 	let trackMouse = (x, y) => {
