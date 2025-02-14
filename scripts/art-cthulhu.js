@@ -154,7 +154,7 @@
 		canvas.addEventListener('touchmove', function (e) {
 			e.preventDefault();
 
-			global.touches = e.touches;
+			globals.touches = e.touches;
 
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
