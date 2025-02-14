@@ -1,6 +1,6 @@
 {
     const config = {
-        randomize: true,
+        randomize: false,
         pixelMargin: 30,
         pixelPadding: 30,
         pixelDiameter: 20,
