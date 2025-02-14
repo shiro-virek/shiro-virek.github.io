@@ -169,6 +169,8 @@
 
 		canvas.addEventListener('touchend', e => {
 			clicking = false;
+			
+			globals.touches = e.touches;
 		}, false);
 	}
 
