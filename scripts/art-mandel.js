@@ -8,6 +8,7 @@
         positionAttributeLocation: null,
         resolutionUniformLocation: null,
         timeUniformLocation: null,
+        mouseUniformLocation: null,
         startTime: null,
         canvasShader: null,
     }
@@ -19,40 +20,20 @@
       }
     `;
 
-    const fragmentShaderSource = `
-      #ifdef GL_ES
-      precision mediump float;
-      #endif
+    const fragmentShaderSource = `            
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
 
-      #define TWO_PI 6.28318530718
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
+        uniform float u_time;
 
-      uniform vec2 u_resolution;
-      uniform vec2 u_mouse;
-      uniform float u_time;
-
-      vec3 hsb2rgb(in vec3 c) {
-        vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
-        rgb = rgb * rgb * (3.0 - 2.0 * rgb);
-        return c.z * mix(vec3(1.0), rgb, c.y);
-      }
-
-      void main() {
-        vec2 mouse = u_mouse/u_resolution;
-        vec2 st = gl_FragCoord.xy / u_resolution;
-        vec3 color = vec3(0.0);
-
-        vec2 toCenter = vec2(0.5) - st;
-        float angle = atan(toCenter.y, toCenter.x) + u_time;
-        float radius = length(toCenter) * 2.0;
-
-        color = hsb2rgb(vec3((angle / TWO_PI) + 0.5, radius, 1.0));
-
-        if (radius < 1.0) {
-          gl_FragColor = vec4(color, 1.0);
-        } else {
-          gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        void main() {
+            vec2 st = gl_FragCoord.xy/u_resolution;
+            vec2 mouse = u_mouse/u_resolution;
+            gl_FragColor = vec4(st.x,mouse.y,mouse.x,1.0);
         }
-      }
     `;
 
     function compileShader(gl, source, type) {
@@ -67,7 +48,6 @@
       }
       return shader;
     }
-
 
     const positions = [
       -1.0, -1.0,
@@ -87,8 +67,8 @@
         requestAnimationFrame(animate);
     }
 
-	let init = () => {
-		globals.canvasShader = document.getElementById("canvasShader");
+    let init = () => {
+        globals.canvasShader = document.getElementById("canvasShader");
 
         globals.gl = globals.canvasShader.getContext('webgl');
 
@@ -96,7 +76,6 @@
             console.error('WebGL no está disponible en tu navegador.');
             throw new Error('WebGL no está disponible.');
         }
-
 
         globals.vertexShader = compileShader(globals.gl, vertexShaderSource, globals.gl.VERTEX_SHADER);
         globals.fragmentShader = compileShader(globals.gl, fragmentShaderSource, globals.gl.FRAGMENT_SHADER);
@@ -122,12 +101,20 @@
     
         globals.resolutionUniformLocation = globals.gl.getUniformLocation(globals.program, 'u_resolution');
         globals.timeUniformLocation = globals.gl.getUniformLocation(globals.program, 'u_time');
+        globals.mouseUniformLocation = globals.gl.getUniformLocation(globals.program, 'u_mouse');
         
         globals.gl.viewport(0, 0, globals.canvasShader.width, globals.canvasShader.height);
-        globals.gl.uniform2f(globals.resolutionUniformLocation, globals.canvasShader.width, canvasShader.height);
+        globals.gl.uniform2f(globals.resolutionUniformLocation, globals.canvasShader.width, globals.canvasShader.height);
 
         globals.startTime = Date.now();
-	}
+
+        globals.canvasShader.addEventListener('mousemove', (event) => {
+            const rect = globals.canvasShader.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = globals.canvasShader.height - (event.clientY - rect.top);
+            globals.gl.uniform2f(globals.mouseUniformLocation, mouseX, mouseY);
+        });
+    }
 
     init();
     animate();
