@@ -51,8 +51,38 @@
 					position: fixed; 
 					bottom: 10px; 
 					left: 10px;
-					opacity: 0.5;
 				}
+			}
+
+			html, body {
+				margin: 0;
+				padding: 0;
+				overflow: hidden; 
+				width: 100%;
+				height: 100%;
+			}
+
+			#myCanvas {
+				margin:0; 
+				padding:0; 
+				position:absolute; 
+				top:0; 
+				left:0;
+			}
+			
+			#canvasShader {
+				display: block; 
+				width: 100%; 
+				height: 100%;
+			}
+			
+			#auxCanvas {
+				margin:0; 
+				padding:0; 
+				position:absolute; 
+				top:0; 
+				left:0; 
+				display: none;
 			}
 			
 		</style>
@@ -63,8 +93,9 @@
 		<script src="./scripts/main.js"></script>
 		<script src="./scripts/manage-scripts.js"></script>
 		<div>
-			<canvas id="myCanvas" style="margin:0; padding:0; position:absolute; top:0; left:0" ></canvas>
-			<canvas id="auxCanvas" style="margin:0; padding:0; position:absolute; top:0; left:0; display: none;" ></canvas>
+			<canvas id="myCanvas"></canvas>
+			<canvas id="canvasShader"></canvas>
+			<canvas id="auxCanvas"></canvas>
 		</div>	
 		<div id="buttons">
 			<!--<button onclick="loadPreviousScript()" id="previousButton"><</button>-->
