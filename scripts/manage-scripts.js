@@ -21,7 +21,7 @@ const art = [
                 "distortion",
                 "blinkenlights",
                 "blinkenlights-mn",
-                "mandel"
+                "shader"
             ];
 const scripts = [];
 
