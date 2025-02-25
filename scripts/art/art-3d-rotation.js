@@ -1,4 +1,8 @@
-{    
+{        
+    const globals = {
+        random: null
+    };
+
     const figureTypes = [
         {
             name: "letterV",

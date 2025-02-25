@@ -48,11 +48,3 @@ class Random {
       */ 
   
 }
-
-// Uso del generador con semilla
-/*
-const rng = new Random(12345); // Semilla fija
-console.log(rng.next());       // Número aleatorio entre 0 y 1
-console.log(rng.nextRange(10, 20)); // Número aleatorio entre 10 y 20
-console.log(rng.nextInt(1, 100));   // Entero aleatorio entre 1 y 100
-*/
