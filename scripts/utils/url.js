@@ -1,4 +1,4 @@
-class URL {
+class Url {
     static getUrlParam = (param) => {
         const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);

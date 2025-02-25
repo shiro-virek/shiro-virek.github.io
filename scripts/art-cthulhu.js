@@ -121,7 +121,9 @@
 	let randomize = () => {
 
 		let seed = null;
-		
+
+		seed = 10;
+		/*
 		let seedParam = URL.getUrlParam('seed');
 
 		if (seedParam){
@@ -130,6 +132,11 @@
 			seed = Date.now();
 			URL.setUrlParam('seed', seed);
 		}
+*/
+
+let url = new URL(window.location.href);
+url.searchParams.set('seed', seed);
+window.history.pushState({}, '', url);
 
 		const random = new Random(seed);
 		HUE = random.nextInt(1, 360);
