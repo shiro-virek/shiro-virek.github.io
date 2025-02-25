@@ -34,7 +34,7 @@ let reloadParams = () => {
 }
 
 let goToRepo = () => {
-    window.open('https://github.com/shiro-virek/creative-coding-lab', '_blank');
+    window.open('https://github.com/shiro-virek/shiro-virek.github.io', '_blank');
 }
 
 let downloadPicture = () => {
@@ -48,7 +48,7 @@ let downloadPicture = () => {
 
 let initScripts = () =>{	
     art.forEach(element => {					
-        scripts.push(`scripts/art-${element}.js`);
+        scripts.push(`scripts/art/art-${element}.js`);
     });											
         
     scriptCount = scripts.length;				
