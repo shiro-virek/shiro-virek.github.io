@@ -45,39 +45,10 @@ class Utils {
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
-    static getRandomFromArray = (array) => {
-        return array[(Math.floor(Math.random() * array.length))];
-    }
-
     static scale = (number, inMin, inMax, outMin, outMax) => {
         return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     }
 
-    static shuffleArray = (array) => {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
-        }
-    }	
-            
-    static getRandomInt = (min, max) => {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    
-    static getRandomFloat = (min, max, decimals) => {
-        const str = (Math.random() * (max - min) + min).toFixed(
-            decimals,
-        );
-
-        return parseFloat(str);
-    }
-
-    static getRandomBool = () => {
-        return Math.random() < 0.5;
-    }
-    
     static nextCharacter = (c) => {
         return String.fromCharCode(c.charCodeAt(0) + 1);
     }    

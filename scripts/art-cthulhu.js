@@ -119,20 +119,21 @@
 	}
 
 	let randomize = () => {
-		HUE = Utils.getRandomInt(1, 360);
-		LIGHTNESS_FACTOR = Utils.getRandomInt(0, 100);
-		SATURATION = Utils.getRandomInt(0, 100);
-		SHOW_RINGS = Utils.getRandomBool();
-		TENTACLES_COUNT = Utils.getRandomInt(1, 8);
-		ROTATE_AUTO = Utils.getRandomBool();
-		ROTATION_ANGLE = Utils.getRandomInt(0, 360);
-		ROTATION_INCREMENT = Utils.getRandomFloat(-1.0, 1.0, 1);
-		SLICES_COUNT = Utils.getRandomInt(10, 60);
-		RINGS_DISTANCE = Utils.getRandomInt(10, 20); 
-		RINGS_SPEED = Utils.getRandomInt(1, 5);
-		CENTER_MOVEMENT_SPEED = Utils.getRandomInt(1, 5);
-		MAX_DISTANCE_TO_CENTER = Utils.getRandomInt(0, 60);
-		TENTACLES_MOVEMENT = Utils.getRandomBool();
+		const random = new Random(Date.now());
+		HUE = random.nextInt(1, 360);
+		LIGHTNESS_FACTOR = random.nextInt(0, 100);
+		SATURATION = random.nextInt(0, 100);
+		SHOW_RINGS = random.nextBool();
+		TENTACLES_COUNT = random.nextInt(1, 8);
+		ROTATE_AUTO = random.nextBool();
+		ROTATION_ANGLE = random.nextInt(0, 360);
+		ROTATION_INCREMENT = random.nextRange(-1.0, 1.0);
+		SLICES_COUNT = random.nextInt(10, 60);
+		RINGS_DISTANCE = random.nextInt(10, 20); 
+		RINGS_SPEED = random.nextInt(1, 5);
+		CENTER_MOVEMENT_SPEED = random.nextInt(1, 5);
+		MAX_DISTANCE_TO_CENTER = random.nextInt(0, 60);
+		TENTACLES_MOVEMENT = random.nextBool();
 
 		ringIterations = SLICES_COUNT / RINGS_DISTANCE * TENTACLES_COUNT;
 	}
