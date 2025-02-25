@@ -135,9 +135,7 @@ let loadScriptByUrl = () => {
 window.addEventListener('load', () => {
     initScripts();			
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    if (urlParams.has('art')){
+    if (Url.hasUrlParam('art')){
         loadScriptByUrl();
     } else {			
         loadRandomScript();
