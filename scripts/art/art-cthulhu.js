@@ -119,17 +119,7 @@
 	}
 
 	let randomize = () => {
-
-		let seed = null;
-
-		if (Url.hasUrlParam('seed')){
-			seed = Url.getUrlParam('seed');
-		}else{
-			seed = Date.now();
-			Url.setUrlParam('seed', seed);
-		}
-
-		const random = new Random(seed);
+		const random = Utils.getRandomObject();
 		HUE = random.nextInt(1, 360);
 		LIGHTNESS_FACTOR = random.nextInt(0, 100);
 		SATURATION = random.nextInt(0, 100);

@@ -207,4 +207,11 @@ class Utils {
 		});
 		touchArea.dispatchEvent(touchEvent);
 	}
+
+    static getRandomObject = () => {
+        if (!Url.hasUrlParam('seed')){
+			Url.setUrlParam('seed', Date.now());
+		}
+		return new Random(Url.getUrlParam('seed'));
+    } 
 }
