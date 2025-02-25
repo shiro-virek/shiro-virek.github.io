@@ -68,13 +68,10 @@ let removePreviousScript = () =>{
 }
 
 let setScriptIndexByURL = () =>{					
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    let artItem = urlParams.get("art");					
+    let artItem = Url.getUrlParam("art");					
     let artItemIndex = art.indexOf(artItem);
     if (artItemIndex >= 0){						
         let randomButton = document.getElementById("randomButton");
-        //randomButton.innerHTML = '🔄';
         currentScript = artItemIndex;
     } else {					
         randomScriptIndex();
@@ -126,6 +123,8 @@ let loadPreviousScript = () =>{
 
 let loadRandomScript = () =>{
     loadScript(randomScriptIndex());
+
+    Url.setUrlParam('art', art[currentScript]);
 }
 
 let loadScriptByUrl = () => {				
