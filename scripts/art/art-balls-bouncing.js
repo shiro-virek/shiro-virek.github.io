@@ -1,4 +1,7 @@
 {
+	const globals = {
+		random: null
+	}
 
 	let DRAW_QUADTREE = false;
 	
@@ -12,8 +15,8 @@
 			this.y = y;
 			this.radius = radius;
 			this.mass = this.radius * 2;
-			this.speedY = Utils.getRandomFloat(1, 5, 2);
-			this.speedX = Utils.getRandomFloat(1, 5, 2);
+			this.speedY = globals.random.nextRange(1, 5);
+			this.speedX = globals.random.nextRange(1, 5);
 		}
 
 		draw = (ctx) => {
@@ -164,8 +167,10 @@
 	}
 
 	let randomize = () => {
-		hue = Utils.getRandomInt(0, 255);
-		radius = Utils.getRandomInt(5, 25);
+		globals.random = Utils.getRandomObject();
+
+		hue = globals.random.nextInt(0, 255);
+		radius = globals.random.nextInt(5, 25);
 	}
 
 	let draw = () => {

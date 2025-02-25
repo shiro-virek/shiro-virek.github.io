@@ -2,6 +2,7 @@
 
     const globals = {
     	touches: null,
+		random: null
     };
 
 	let SLICES_COUNT = 60;
@@ -119,21 +120,21 @@
 	}
 
 	let randomize = () => {
-		const random = Utils.getRandomObject();
-		HUE = random.nextInt(1, 360);
-		LIGHTNESS_FACTOR = random.nextInt(0, 100);
-		SATURATION = random.nextInt(0, 100);
-		SHOW_RINGS = random.nextBool();
-		TENTACLES_COUNT = random.nextInt(1, 8);
-		ROTATE_AUTO = random.nextBool();
-		ROTATION_ANGLE = random.nextInt(0, 360);
-		ROTATION_INCREMENT = random.nextRange(-1.0, 1.0);
-		SLICES_COUNT = random.nextInt(10, 60);
-		RINGS_DISTANCE = random.nextInt(10, 20); 
-		RINGS_SPEED = random.nextInt(1, 5);
-		CENTER_MOVEMENT_SPEED = random.nextInt(1, 5);
-		MAX_DISTANCE_TO_CENTER = random.nextInt(0, 60);
-		TENTACLES_MOVEMENT = random.nextBool();
+		globals.random = Utils.getRandomObject();
+		HUE = globals.random.nextInt(1, 360);
+		LIGHTNESS_FACTOR = globals.random.nextInt(0, 100);
+		SATURATION = globals.random.nextInt(0, 100);
+		SHOW_RINGS = globals.random.nextBool();
+		TENTACLES_COUNT = globals.random.nextInt(1, 8);
+		ROTATE_AUTO = globals.random.nextBool();
+		ROTATION_ANGLE = globals.random.nextInt(0, 360);
+		ROTATION_INCREMENT = globals.random.nextRange(-1.0, 1.0);
+		SLICES_COUNT = globals.random.nextInt(10, 60);
+		RINGS_DISTANCE = globals.random.nextInt(10, 20); 
+		RINGS_SPEED = globals.random.nextInt(1, 5);
+		CENTER_MOVEMENT_SPEED = globals.random.nextInt(1, 5);
+		MAX_DISTANCE_TO_CENTER = globals.random.nextInt(0, 60);
+		TENTACLES_MOVEMENT = globals.random.nextBool();
 
 		ringIterations = SLICES_COUNT / RINGS_DISTANCE * TENTACLES_COUNT;
 	}

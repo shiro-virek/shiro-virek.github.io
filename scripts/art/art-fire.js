@@ -1,4 +1,8 @@
 {
+    const globals = {
+		random: null
+    };
+
 	let PARTICLES_COUNT = 500;
 	let MINIMUM_LIFE = 20;
 	let MAXIMUM_LIFE = 100;
@@ -30,13 +34,13 @@
 
 		setNewFireObject(notFirstTime) {
 			this.notFirstTime = notFirstTime;
-			this.sin = Utils.getRandomBool();
-			this.yCenter = height + 100 - Utils.getRandomInt(1, 50);
+			this.sin = globals.random.nextBool();
+			this.yCenter = height + 100 - globals.random.nextInt(1, 50);
 			this.diameter = MAXIMUM_DIAMETER;
 			this.radius = this.diameter / 2;
 			this.speed = 5;
-			this.life = Utils.getRandomInt(MINIMUM_LIFE, MAXIMUM_LIFE);
-			this.xCenter = Utils.getRandomInt(1, width);
+			this.life = globals.random.nextInt(MINIMUM_LIFE, MAXIMUM_LIFE);
+			this.xCenter = globals.random.nextInt(1, width);
 		}
 
 		getColor() {
@@ -68,13 +72,14 @@
 	}
 
 	let randomize = () => {
-		PARTICLES_COUNT = Utils.getRandomInt(50, screen.height * screen.width / 1000);
-		MINIMUM_LIFE = Utils.getRandomInt(10, 90)
-		MAXIMUM_LIFE = Utils.getRandomInt(100, 200);
-		MINIMUM_DIAMETER = Utils.getRandomInt(1, 10);
-		MAXIMUM_DIAMETER = Utils.getRandomInt(12, 20);
-		AMPLITUDE = Utils.getRandomInt(10, 100);
-		ALL_SIN = Utils.getRandomBool();
+		globals.random = Utils.getRandomObject();
+		PARTICLES_COUNT = globals.random.nextInt(50, screen.height * screen.width / 1000);
+		MINIMUM_LIFE = globals.random.nextInt(10, 90)
+		MAXIMUM_LIFE = globals.random.nextInt(100, 200);
+		MINIMUM_DIAMETER = globals.random.nextInt(1, 10);
+		MAXIMUM_DIAMETER = globals.random.nextInt(12, 20);
+		AMPLITUDE = globals.random.nextInt(10, 100);
+		ALL_SIN = globals.random.nextBool();
 	}
 
 	let addFire = (mouseX, mouseY, keepSameSize = false) => {
