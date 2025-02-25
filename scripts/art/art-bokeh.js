@@ -1,4 +1,8 @@
 {
+	const globals = {
+		random: null
+    };
+
 	let ENTROPY_1 = 2;
 	let CIRCLES = 5;
 	let colorShift = 0;
@@ -49,14 +53,16 @@
 	}
 
 	let randomize = () => {
-		saturation = Utils.getRandomInt(20, 100);
-		lightness = Utils.getRandomInt(20, 100);
-		size = Utils.getRandomInt(5, 15);
-		CIRCLES = Utils.getRandomInt(5, 15);
-		colorShift = Utils.getRandomInt(0, 359);
-		ENTROPY_1 = Utils.getRandomInt(1, 250);
-		colorMapMax = Utils.getRandomInt(1, 10000);
-		opacity = Utils.getRandomFloat(0.003, 0.03, 3);
+		globals.random = Utils.getRandomObject();
+
+		saturation = globals.random.nextInt(20, 100);
+		lightness = globals.random.nextInt(20, 100);
+		size = globals.random.nextInt(5, 15);
+		CIRCLES = globals.random.nextInt(5, 15);
+		colorShift = globals.random.nextInt(0, 359);
+		ENTROPY_1 = globals.random.nextInt(1, 250);
+		colorMapMax = globals.random.nextInt(1, 10000);
+		opacity = globals.random.nextRange(0.003, 0.03, 3);
 	}
 
 	let trackMouse = (xPointer, yPointer) => {
@@ -108,8 +114,8 @@
 				yMod = parseInt((size * i) * Math.sin(angleCart));
 			}
 
-			let entropyX = Utils.getRandomFloat(-1, 1, 3) * ENTROPY_1;
-			let entropyY = Utils.getRandomFloat(-1, 1, 3) * ENTROPY_1;
+			let entropyX = globals.random.nextRange(-1, 1, 3) * ENTROPY_1;
+			let entropyY = globals.random.nextRange(-1, 1, 3) * ENTROPY_1;
 
 			x = (lastPosX + xMod) + entropyX;
 			y = (lastPosY + yMod) + entropyY;
