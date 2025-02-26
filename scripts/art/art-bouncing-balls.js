@@ -1,19 +1,22 @@
 {
-	const globals = {
-		random: null
-	}
+	const config = {
+        randomize: true,
+		randomSize: true,		
+		hue: 20,
+		radius: 20,
+		drawQuadtree: false,
+    };
 
-	let DRAW_QUADTREE = false;
-	
-	let hue = 20;
-	let radius = 20;
-	let ballCollection;
+	const globals = {
+		random: null,
+		ballCollection: null,
+	}
 
 	class Ball {
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
-			this.radius = radius;
+			this.radius = config.radius;
 			this.mass = this.radius * 2;
 			this.speedY = globals.random.nextRange(1, 5);
 			this.speedX = globals.random.nextRange(1, 5);
@@ -21,14 +24,14 @@
 
 		draw = (ctx) => {
 			let value = Numbers.scale(Math.abs(this.speedX) + Math.abs(this.speedY), 0, 10, 0, 100);
-			let color = `hsl(${hue}, ${100}%, ${value}%)`;
+			let color = `hsl(${config.hue}, ${100}%, ${value}%)`;
 
 			let angle = Trigonometry.angleBetweenTwoPoints(this.prevX, this.prevY, this.x, this.y);
 			let distance = Trigonometry.distanceBetweenTwoPoints(this.x, this.y, this.prevX, this.prevY);
 
 			for (let index = 1; index < 5; index++) {
 
-				let color2 = `hsl(${hue}, ${100}%, ${value}%, ${1.0 / index})`;
+				let color2 = `hsl(${config.hue}, ${100}%, ${value}%, ${1.0 / index})`;
 
 				let trailPoint = Trigonometry.polarToCartesian(distance + ((index - 1) * 5), angle * RAD_CONST);
 
@@ -48,7 +51,7 @@
 		checkCollisionsBalls() {
 			let returnObjects = [];
 
-			ballCollection.quad.retrieve(returnObjects, this);
+			globals.ballCollection.quad.retrieve(returnObjects, this);
 
 			for (const element of returnObjects) {
 				let ball = element;
@@ -121,7 +124,7 @@
 		}
 
 		drawBalls = (ctx) => {
-			for (const ball of ballCollection.balls) {
+			for (const ball of globals.ballCollection.balls) {
 				ball.move();
 				ball.checkCollisionsBalls();
 				ball.checkCollisionsWalls();
@@ -132,19 +135,19 @@
 		addBall = (x, y) => {
 			let ball = new Ball(x, y);
 
-			ballCollection.balls.push(ball);
+			globals.ballCollection.balls.push(ball);
 		}
 
 		populateQuadTree = () => {
 			this.quad.clear();
-			for (const ball of ballCollection.balls) {
+			for (const ball of globals.ballCollection.balls) {
 				this.quad.insert(ball);
 			}
 		}
 
 		draw = (ctx) => {
 			if (this.balls.length > 0) {
-				if (DRAW_QUADTREE)
+				if (config.drawQuadtree)
 					this.quad.drawQuadtree(ctx, this.quad);
 				this.drawBalls(ctx);
 				this.populateQuadTree();
@@ -154,28 +157,27 @@
 
 	let init = () => {
 		initCanvas();
-		ballCollection = new BallCollection()
-		randomize();
+		globals.ballCollection = new BallCollection()
+		globals.random = Objects.getRandomObject();
+		if (config.randomize) randomize();
 		addEvents();
 		window.requestAnimationFrame(loop);
 	}
 
 	let addEvents = () => {
 		canvas.addEventListener('click', e => {
-			ballCollection.addBall(e.offsetX, e.offsetY);
+			globals.ballCollection.addBall(e.offsetX, e.offsetY);
 		}, false);
 	}
 
 	let randomize = () => {
-		globals.random = Objects.getRandomObject();
-
-		hue = globals.random.nextInt(0, 255);
-		radius = globals.random.nextInt(5, 25);
+		config.hue = globals.random.nextInt(0, 255);
+		config.radius = globals.random.nextInt(5, 25);
 	}
 
 	let draw = () => {
 		drawBackground(ctx, canvas);
-		ballCollection.draw(ctx);
+		globals.ballCollection.draw(ctx);
 	}
 
 	let loop = (timestamp) => {
@@ -190,6 +192,6 @@
 	init();
 
 	window.clearCanvas = () => {		
-		ballCollection = new BallCollection();
+		globals.ballCollection = new BallCollection();
 	}
 }

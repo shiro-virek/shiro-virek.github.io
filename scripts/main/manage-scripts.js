@@ -12,7 +12,7 @@ const art = [
                 "ledscreen", 
                 "conway", 
                 "motion-matrix",
-                "balls-bouncing",
+                "bouncing-balls",
                 "cthulhu",
                 "crt",
                 "ledscreen-tones", 
