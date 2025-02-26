@@ -1,4 +1,8 @@
 {
+    const globals = {
+		random: null
+    };
+
     let dotsRows = 50;
     let dotsColumns = 50;
 
@@ -29,7 +33,7 @@
     class Semitone {
         constructor() {
             this.dots = [];
-			let rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);  
+			let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
 			this.shape = Figures[Object.keys(Figures)[rand]];
             this.generateDots();
         }
@@ -193,6 +197,7 @@
         initCanvas();
         dotsRows = Math.floor(height / (dotRadio + dotPadding));
         dotsColumns = Math.floor(width / (dotRadio + dotPadding));
+		globals.random = Utils.getRandomObject();
         semitone = new Semitone();
         addModifierFunctions();
         randomize();
@@ -285,13 +290,13 @@
     }
 
     let randomize = () => {
-        hue = Utils.getRandomInt(0, 360);
-        semitone.radioFunction = Utils.getRandomFromArray(radioFunctions);
-        semitone.colorFunction = Utils.getRandomFromArray(colorFunctions);
-        semitone.xPositionFunction = Utils.getRandomFromArray(xPositionFunctions);  
-        semitone.yPositionFunction = Utils.getRandomFromArray(yPositionFunctions);          
-        semitone.angleFunction = Utils.getRandomFromArray(angleFunctions);        
-        semitone.alphaFunction = Utils.getRandomFromArray(alphaFunctions);
+        hue = globals.random.nextInt(0, 360);
+        semitone.radioFunction = globals.random.getRandomFromArray(radioFunctions);
+        semitone.colorFunction = globals.random.getRandomFromArray(colorFunctions);
+        semitone.xPositionFunction = globals.random.getRandomFromArray(xPositionFunctions);  
+        semitone.yPositionFunction = globals.random.getRandomFromArray(yPositionFunctions);          
+        semitone.angleFunction = globals.random.getRandomFromArray(angleFunctions);        
+        semitone.alphaFunction = globals.random.getRandomFromArray(alphaFunctions);
     }
 
     let draw = () => {

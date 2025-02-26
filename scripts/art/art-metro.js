@@ -1,4 +1,8 @@
 {
+    const globals = {
+		random: null
+    };
+
 	let LINE_THICKNESS = 10;
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
 	let HSL_MAX_HUE = 360;
@@ -262,15 +266,15 @@
 		randomizeColor = () => {
 			this.hue = palette.pop();
 			this.saturation = 100;
-			this.light = Utils.getRandomInt(20, 50);
+			this.light = globals.random.nextInt(20, 50);
 		}
 
 		randomizeSegments = () => {
 			let lastX = this.x;
 			let lastY = this.y;
 			let lastDirection = 0;
-			let baseDirection = 45 * Utils.getRandomInt(0, 7);
-			let numberOfSegments = Utils.getRandomInt(3, 12);
+			let baseDirection = 45 * globals.random.nextInt(0, 7);
+			let numberOfSegments = globals.random.nextInt(3, 12);
 
 			let firstSegment = new Segment(this.x, this.y, 0);
 			this.segments.push(firstSegment);
@@ -286,7 +290,7 @@
 				let newY;
 				let segment;
 
-				length = Utils.getRandomInt(20, 200);
+				length = globals.random.nextInt(20, 200);
 				direction = baseDirection + this.getDirection(lastDirection);
 
 				let deltaX = Math.cos(direction * RAD_CONST) * length;
@@ -345,7 +349,7 @@
 		}
 
 		addStreet = (startX, startY, angle) => {
-			if (Utils.getRandomInt(1, 5) == 1) {
+			if (globals.random.nextInt(1, 5) == 1) {
 				let street = new Street(startX, startY, angle);
 				this.streets.push(street);
 			}
@@ -359,7 +363,7 @@
 		}
 
 		getDirection = (lastDirection) => {
-			return 45 * Utils.getRandomInt(-angleSegmentRange, angleSegmentRange);
+			return 45 * globals.random.nextInt(-angleSegmentRange, angleSegmentRange);
 		}
 
 		drawMetroLine = (ctx) => {
@@ -409,7 +413,7 @@
 	}
 
 	let generatePalette = () => {
-		let seed = Utils.getRandomInt(0, HSL_MAX_HUE);
+		let seed = globals.random.nextInt(0, HSL_MAX_HUE);
 		let increment = Math.floor(HSL_MAX_HUE / maxNumberOfLines);
 		for (let i = 1; i <= maxNumberOfLines; i++) {
 			let color = seed + i * increment;
@@ -418,19 +422,20 @@
 			palette.push(color);
 		}
 
-		Utils.shuffleArray(palette);
+		globals.random.shuffleArray(palette);
 	}
 
 	let randomize = () => {
-		LINE_THICKNESS = Utils.getRandomInt(LINE_THICKNESS, LINE_THICKNESS * 2)
-		stationColorBorder = Utils.getRandomBool();
-		stationRadio = Utils.getRandomInt(3,10);
+		globals.random = Utils.getRandomObject();
+		LINE_THICKNESS = globals.random.nextInt(LINE_THICKNESS, LINE_THICKNESS * 2)
+		stationColorBorder = globals.random.nextBool();
+		stationRadio = globals.random.nextInt(3,10);
 		maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
-		alphabeticLineSymbol = Utils.getRandomBool();
-		angleSegmentRange = Utils.getRandomInt(0, 1);
-		drawIcons = Utils.getRandomBool();
-		drawStreets = Utils.getRandomBool();
+		alphabeticLineSymbol = globals.random.nextBool();
+		angleSegmentRange = globals.random.nextBool();
+		drawIcons = globals.random.nextBool();
+		drawStreets = globals.random.nextBool();
 	}
 
 	let draw = () => {

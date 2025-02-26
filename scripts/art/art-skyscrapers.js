@@ -1,4 +1,8 @@
 {
+    const globals = {
+		random: null
+    };
+
 	let MINIMUM_HEIGHT = 40;
 	let MAXIMUM_HEIGHT = 360;
 	let FIRST_FLOOR_HEIGHT = 20;
@@ -44,7 +48,8 @@
 		}
 
 		randomize = () => {
-			this.angle = Utils.getRandomInt(0, 40);
+			globals.random = Utils.getRandomObject();
+			this.angle = globals.random.nextInt(0, 40);
 		}
 	}
 
@@ -57,23 +62,23 @@
 		}
 
 		randomize = () => {
-			this.height = Utils.getRandomInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
+			this.height = globals.random.nextInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
 			this.rows = this.randomizeRowsNumber();
-			this.cols = Utils.getRandomInt(1, 5);
-			this.margin = Utils.getRandomInt(0, 15);
-			this.width = Utils.getRandomInt(40, 60);
+			this.cols = globals.random.nextInt(1, 5);
+			this.margin = globals.random.nextInt(0, 15);
+			this.width = globals.random.nextInt(40, 60);
 			this.CWHue = CWHues[(Math.floor(Math.random() * CWHues.length))];
-			this.CWLight = Utils.getRandomInt(10, 50);
-			this.CWSaturation = Utils.getRandomInt(0, 100);
-			this.hue = Utils.getRandomInt(1, 360);
-			this.saturation = Utils.getRandomInt(0, 100);
-			this.light = Utils.getRandomInt(20, 80);
+			this.CWLight = globals.random.nextInt(10, 50);
+			this.CWSaturation = globals.random.nextInt(0, 100);
+			this.hue = globals.random.nextInt(1, 360);
+			this.saturation = globals.random.nextInt(0, 100);
+			this.light = globals.random.nextInt(20, 80);
 			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
-			this.horizontalLines = Utils.getRandomInt(0, 3);
+			this.horizontalLines = globals.random.nextInt(0, 3);
 			
 			this.calculateProps();
 
-			var rand = Utils.getRandomInt(0, Object.keys(WindowTypes).length - 1);
+			var rand = globals.random.nextInt(0, Object.keys(WindowTypes).length - 1);
 			this.windowType = WindowTypes[Object.keys(WindowTypes)[rand]];
 
 			this.randomizeExtraModules();
@@ -83,12 +88,12 @@
 		}
 
 		randomizeTop = () => {
-			var rand = Utils.getRandomInt(0, Object.keys(TopTypes).length - 1);
+			var rand = globals.random.nextInt(0, Object.keys(TopTypes).length);
 			this.topType = TopTypes[Object.keys(TopTypes)[rand]];
 
 			switch (this.topType) {
 				case TopTypes.Pinnacle:
-					this.pinnacle = new Pinnacle(Utils.getRandomInt(2, this.width / 2), Utils.getRandomInt(5, this.width * 2));
+					this.pinnacle = new Pinnacle(globals.random.nextInt(2, this.width / 2), globals.random.nextInt(5, this.width * 2));
 					break;
 				case TopTypes.Heliport:
 					let heliportColor = HeliportColors[(Math.floor(Math.random() * HeliportColors.length))];
@@ -111,12 +116,12 @@
 
 			if (this.numberOfModules > 1) {
 				for (let i = 1; i <= this.numberOfModules; i++) {
-					let widthDecrement = lastModule.width * Utils.getRandomFloat(0.05, 0.3, 2);
+					let widthDecrement = lastModule.width * globals.random.nextRange(0.05, 0.3, 2);
 
 					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i);
 					newModule.numberOfModules = this.numberOfModules;
 
-					let heightDecrement = lastModule.height * Utils.getRandomFloat(0, 0.7, 2);
+					let heightDecrement = lastModule.height * globals.random.nextRange(0, 0.7, 2);
 					newModule.width = lastModule.width - widthDecrement;
 					newModule.height = lastModule.height - heightDecrement;
 					newModule.firstFloorHeight = 0;
@@ -534,16 +539,16 @@
 		}
 
 		randomizeRowsNumber = () => {
-			return Utils.getRandomInt(1, Math.floor(this.height / 20));
+			return globals.random.nextInt(1, Math.floor(this.height / 20));
 		}
 
 		randomizenumberOfModules = () => {
-			let dice = Utils.getRandomInt(1, 6);
+			let dice = globals.random.nextInt(1, 6);
 
 			if (dice > 4)
-				return Utils.getRandomInt(1, 3);
+				return globals.random.nextInt(1, 3);
 			else
-				return Utils.getRandomInt(1, 10);
+				return globals.random.nextInt(1, 10);
 		}
 
 

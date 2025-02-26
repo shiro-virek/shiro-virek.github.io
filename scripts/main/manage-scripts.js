@@ -34,7 +34,7 @@ let reloadParams = () => {
 }
 
 let goToRepo = () => {
-    window.open('https://github.com/shiro-virek/creative-coding-lab', '_blank');
+    window.open('https://github.com/shiro-virek/shiro-virek.github.io', '_blank');
 }
 
 let downloadPicture = () => {
@@ -48,7 +48,7 @@ let downloadPicture = () => {
 
 let initScripts = () =>{	
     art.forEach(element => {					
-        scripts.push(`scripts/art-${element}.js`);
+        scripts.push(`scripts/art/art-${element}.js`);
     });											
         
     scriptCount = scripts.length;				
@@ -68,13 +68,10 @@ let removePreviousScript = () =>{
 }
 
 let setScriptIndexByURL = () =>{					
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    let artItem = urlParams.get("art");					
+    let artItem = Url.getUrlParam("art");					
     let artItemIndex = art.indexOf(artItem);
     if (artItemIndex >= 0){						
         let randomButton = document.getElementById("randomButton");
-        //randomButton.innerHTML = '🔄';
         currentScript = artItemIndex;
     } else {					
         randomScriptIndex();
@@ -126,6 +123,8 @@ let loadPreviousScript = () =>{
 
 let loadRandomScript = () =>{
     loadScript(randomScriptIndex());
+
+    Url.setUrlParam('art', art[currentScript]);
 }
 
 let loadScriptByUrl = () => {				
@@ -135,9 +134,7 @@ let loadScriptByUrl = () => {
 window.addEventListener('load', () => {
     initScripts();			
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    if (urlParams.has('art')){
+    if (Url.hasUrlParam('art')){
         loadScriptByUrl();
     } else {			
         loadRandomScript();

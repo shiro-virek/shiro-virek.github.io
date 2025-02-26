@@ -16,7 +16,8 @@
         clicking: false,
         mouseMoved: false,
         lastPosX: 0,
-        lastPosY: 0
+        lastPosY: 0,
+        random: null
     };
 
     const img = new Image();
@@ -228,6 +229,7 @@
     let init = () => {
         initCanvas();
         
+		globals.random = Utils.getRandomObject();
         if (config.randomize) randomize();
 
         img.src = '../assets/Picture1.jpg';
@@ -333,11 +335,11 @@
     }
     
     let randomize = () => {
-        config.radius = Utils.getRandomInt(100, Math.min(halfWidth, halfHeight));
-        config.strength = Utils.getRandomFloat(0.1, 10, 1);
-        config.amplitude = Utils.getRandomInt(1, 20);
-        config.frequency = Utils.getRandomFloat(0.1, 0.5, 1);
-        config.mode = Utils.getRandomBool();
+        config.radius = globals.random.nextInt(100, Math.min(halfWidth, halfHeight));
+        config.strength = globals.random.nextRange(0.1, 10, 1);
+        config.amplitude = globals.random.nextInt(1, 20);
+        config.frequency = globals.random.nextRange(0.1, 0.5, 1);
+        config.mode = globals.random.nextBool();
         config.functionIndex = Math.floor(Math.random() * config.functions.length)
     }
 

@@ -1,4 +1,8 @@
 {
+	const globals = {
+		random: null
+    };
+
 	let angle = 0;
 
 	let colorShift = 0;
@@ -14,31 +18,30 @@
 	let COLOR_MAP_MAX = 500;
 	let ROTATORS = 3;
 
-	let functionExecute;
-
 	let clicking = false;
 
+
 	let randomize = () => {
-		OPACITY = Utils.getRandomFloat(0.01, 0.1, 2);
-		THICKNESS = Utils.getRandomInt(1, 20);
-		ANGLE_ROTATION = Utils.getRandomInt(0, 20);
-		COLOR_MAP_MAX = Utils.getRandomInt(1, 10000);
+		globals.random = Utils.getRandomObject();
 
-		colorShift = Utils.getRandomInt(0, 359);
+		OPACITY = globals.random.nextRange(0.03, 0.1, 2);
+		THICKNESS = globals.random.nextInt(1, 20);
+		ANGLE_ROTATION = globals.random.nextInt(0, 20);
+		COLOR_MAP_MAX = globals.random.nextInt(1, 10000);
 
-		ROTATORS = Utils.getRandomInt(2, 5);
+		colorShift = globals.random.nextInt(0, 359);
+
+		ROTATORS = globals.random.nextInt(0, 100);
 
 		let rotatorsLength = 0
 		let rotatorsAngle = 0;
 
 		for (let i = 0; i < ROTATORS - 1; i++) {
-			rotatorsLength += Utils.getRandomInt(300, 1000)
-			rotatorsAngle += Utils.getRandomInt(0, 180);
+			rotatorsLength += globals.random.nextInt(300, 1000)
+			rotatorsAngle += globals.random.nextInt(0, 180);
 			rotatorsLengths.push(rotatorsLength);
 			rotatorsAngles.push(rotatorsAngle);
 		}
-
-		functionExecute = Utils.getRandomInt(0, 4);
 	}
 
 	let addEvents = () => {
@@ -96,25 +99,25 @@
 		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
-		
+
+		let lineWidth = Utils.scale(distance, 1, 400, 1, THICKNESS);
+
+		Utils.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
+
 		let angleRad = angle * RAD_CONST;
+
+		Utils.drawLine(ctx, xPointer, yPointer,
+			xPointer + parseInt(distance * Math.cos(angleRad)),
+			yPointer + parseInt(distance * Math.sin(angleRad)),
+			lineWidth, color);
 
 		if (ROTATORS > 0)
 			for (let i = 0; i < ROTATORS - 1; i++) {
 				let angleRad2 = (angle + rotatorsAngles[i]) * RAD_CONST;
-				ctx.beginPath();
-
-				ctx.moveTo(lastPosX, lastPosY);
-				ctx.lineTo(xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad)), yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)));
-				ctx.lineTo(xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)), yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)));
-				
-				if (functionExecute == 0) ctx.lineTo(xPointer, yPointer);
-				if (functionExecute == 1) ctx.lineTo(yPointer, yPointer);
-				if (functionExecute == 2) ctx.lineTo(yPointer, xPointer);
-				if (functionExecute == 3) ctx.lineTo(xPointer, xPointer);
-				
-				ctx.fillStyle = color;
-				ctx.fill();
+				Utils.drawLine(ctx, xPointer, yPointer,
+					xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)),
+					yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)),
+					lineWidth, color);
 			}
 
 		angle += ANGLE_ROTATION;

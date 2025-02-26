@@ -1,4 +1,8 @@
 {
+    const globals = {
+		random: null
+    };
+    
     let COLOR_OFF = "#222";
 
     let ledRows = 50;
@@ -17,7 +21,7 @@
     class LedScreen {
         constructor() {            
             this.generateLeds();     
-			let rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);
+			let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);
 			this.shape = Figures[Object.keys(Figures)[rand]];     
         }
 
@@ -35,7 +39,7 @@
                     this.leds[x][y] = led;
                     let ledBuffer = new Led(x, y);
                     this.ledsBuffer[x][y] = ledBuffer;
-                    this.leds[x][y].on =  Utils.getRandomBool();
+                    this.leds[x][y].on =  globals.random.nextBool();
                 }
             }  
         }
@@ -127,8 +131,9 @@
 
     let init = () => {
 		initCanvas();
-        ledDiameter = Utils.getRandomInt(5, 20);        
-        ledPadding = Utils.getRandomInt(0, 20);
+        globals.random = Utils.getRandomObject();
+        ledDiameter = globals.random.nextInt(5, 20);        
+        ledPadding = globals.random.nextInt(0, 20);
         ledMargin = ledPadding;
 
         ledRows = Math.floor((height - ledMargin)/ (ledDiameter + ledPadding));
@@ -147,7 +152,7 @@
     }
 
     let randomize = () => {        
-        hue = Utils.getRandomInt(0, 255); 
+        hue = globals.random.nextInt(0, 255); 
         ledScreen = new LedScreen();
     }
 

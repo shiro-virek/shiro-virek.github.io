@@ -1,4 +1,8 @@
 {
+    const globals = {
+		random: null
+    };
+
     let cellRows = 50;
     let cellColumns = 50;
 
@@ -253,12 +257,6 @@
 
     let init = () => {       
 		initCanvas();
-
-        cellDiameter = Utils.getRandomInt(5, 15);        
-
-        cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
-        cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
-        cellScreen = new CellScreen();
         
         randomize();
 
@@ -271,9 +269,17 @@
     }
 
     let randomize = () => {
+		globals.random = Utils.getRandomObject();
+
+        cellDiameter = globals.random.nextInt(5, 15);        
+
+        cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
+        cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
+        cellScreen = new CellScreen();
+        
         for (let x = 0; x <= cellColumns; x++) {
             for (let y = 0; y <= cellRows; y++) {
-                cellScreen.cells[x][y].alive = Utils.getRandomBool();            
+                cellScreen.cells[x][y].alive = globals.random.nextBool();            
             }
         }    
         setRandomRules();
@@ -281,7 +287,7 @@
     }
 
     let getRandomRule = (neighborhood) => {
-        let randCondition = Utils.getRandomInt(0, Object.keys(Condition).length - 1);
+        let randCondition = globals.random.nextInt(0, Object.keys(Condition).length - 1);
         let condition = Condition[Object.keys(Condition)[randCondition]];            
         
         let valueNeighbours = 0;
@@ -289,41 +295,41 @@
 
         switch(neighborhood.neighborhoodType){
             case NeighborhoodType.Extended:
-                valueNeighbours = Utils.getRandomInt(1, extendedSize * 2);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, extendedSize * 2)); 
+                valueNeighbours = globals.random.nextInt(1, extendedSize * 2);  
+                value2Neighbours = globals.random.nextInt(valueNeighbours, globals.random.nextInt(valueNeighbours, extendedSize * 2)); 
                 break;
             case NeighborhoodType.Diagonal:
             case NeighborhoodType.Moore:
-                valueNeighbours = Utils.getRandomInt(1, 4);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 4)); 
+                valueNeighbours = globals.random.nextInt(1, 4);  
+                value2Neighbours = globals.random.nextInt(valueNeighbours, globals.random.nextInt(valueNeighbours, 4)); 
                 break;
             case NeighborhoodType.VonNeumann:
-                valueNeighbours = Utils.getRandomInt(1, 8);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, 8)); 
+                valueNeighbours = globals.random.nextInt(1, 8);  
+                value2Neighbours = globals.random.nextInt(valueNeighbours, globals.random.nextInt(valueNeighbours, 8)); 
                 break;
             case NeighborhoodType.Circunference:
             case NeighborhoodType.Circle:
-                valueNeighbours = Utils.getRandomInt(1, circleRadius * 2);  
-                value2Neighbours = Utils.getRandomInt(valueNeighbours, Utils.getRandomInt(valueNeighbours, circleRadius * 2)); 
+                valueNeighbours = globals.random.nextInt(1, circleRadius * 2);  
+                value2Neighbours = globals.random.nextInt(valueNeighbours, globals.random.nextInt(valueNeighbours, circleRadius * 2)); 
                 break;
         } 
 
-        let newValueCell = Utils.getRandomBool();  
-        let alive = Utils.getRandomBool();
+        let newValueCell = globals.random.nextBool();  
+        let alive = globals.random.nextBool();
 
         return new Rule(alive, condition, valueNeighbours, value2Neighbours, newValueCell);
     }
 
     let setRandomRules = () => {
-        let numberOfNeighborhoods = Utils.getRandomInt(1, 3);
+        let numberOfNeighborhoods = globals.random.nextInt(1, 3);
         for(let j = 0; j < numberOfNeighborhoods; j++){
             let neighborhood = new Neighborhood();
 
-            let randType = Utils.getRandomInt(0, Object.keys(NeighborhoodType).length - 1);
+            let randType = globals.random.nextInt(0, Object.keys(NeighborhoodType).length - 1);
             let type = NeighborhoodType[Object.keys(NeighborhoodType)[randType]];            
             neighborhood.neighborhoodType = type;
 
-            let numberOfRules = Utils.getRandomInt(1, 3);
+            let numberOfRules = globals.random.nextInt(1, 3);
 
             for(let i = 0; i < numberOfRules; i++){
                 let rule = getRandomRule(neighborhood);    
