@@ -6,22 +6,20 @@
 		drawTrail: true,
 		hue: 20,
 		radius: 20,
-		drawQuadtree: false,
-        ball: null,
+		drawQuadtree: false,        
+        gravity: 0.5,
+        damping: 0.7, 
+        ballRadius: 20, 
     };
 
 	const globals = {
 		random: null,
-		ballCollection: null,
+        ball: null,
 	}
-
-    const gravity = 0.5;
-    const damping = 0.7; 
-    const ballRadius = 20; 
 
     function drawBall() {
         ctx.beginPath();
-        ctx.arc(globals.ball.x, globals.ball.y, ballRadius, 0, Math.PI * 2);
+        ctx.arc(globals.ball.x, globals.ball.y, config.ballRadius, 0, Math.PI * 2);
         ctx.fillStyle = '#007bff';
         ctx.fill();
         ctx.closePath();
@@ -32,11 +30,11 @@
 
         globals.ball = {
             x: canvas.width / 2,
-            y: ballRadius,
-            dy: 0 // Velocidad vertical
+            y: config.ballRadius,
+            dy: 0
         };
-
-        loop();
+        
+		window.requestAnimationFrame(loop);
 	}
 
     let draw = () => {
@@ -44,16 +42,15 @@
         drawBall();
     }
 
-
 	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
 
-        globals.ball.dy += gravity;
+        globals.ball.dy += config.gravity;
         globals.ball.y += globals.ball.dy;
 
-        if (globals.ball.y + ballRadius > canvas.height) {
-            globals.ball.y = canvas.height - ballRadius;
-            globals.ball.dy = -globals.ball.dy * damping; 
+        if (globals.ball.y + config.ballRadius > canvas.height) {
+            globals.ball.y = canvas.height - config.ballRadius;
+            globals.ball.dy = -globals.ball.dy * config.damping; 
 
             if (Math.abs(globals.ball.dy) < 1) {
                 globals.ball.dy = 0;
