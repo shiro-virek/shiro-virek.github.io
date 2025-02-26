@@ -104,7 +104,7 @@
 
 		Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
 
-		let angleRad = angle * RAD_CONST;
+		let angleRad = angle * Trigonometry.RAD_CONST;
 
 		Drawing.drawLine(ctx, xPointer, yPointer,
 			xPointer + parseInt(distance * Math.cos(angleRad)),
@@ -113,7 +113,7 @@
 
 		if (ROTATORS > 0)
 			for (let i = 0; i < ROTATORS - 1; i++) {
-				let angleRad2 = (angle + rotatorsAngles[i]) * RAD_CONST;
+				let angleRad2 = (angle + rotatorsAngles[i]) * Trigonometry.RAD_CONST;
 				Drawing.drawLine(ctx, xPointer, yPointer,
 					xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)),
 					yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)),

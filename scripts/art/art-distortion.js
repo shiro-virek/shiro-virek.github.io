@@ -127,12 +127,10 @@
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < radius) {
-                    const angle = Math.atan2(dy, dx);
+                    const angle = Math.atan2(dy, dx);                    
 
-                    let RAD_CONST = 0.0175;
-
-                    const newX = x + Math.cos((angle + distance * distortionStrength) * RAD_CONST) * 50;
-                    const newY = y + Math.sin((angle + distance * distortionStrength) * RAD_CONST) * 50;
+                    const newX = x + Math.cos((angle + distance * distortionStrength) * Trigonometry.RAD_CONST) * 50;
+                    const newY = y + Math.sin((angle + distance * distortionStrength) * Trigonometry.RAD_CONST) * 50;
 
                     const index = (y * canvas.width + x) * 4;
                     const newIndex = (Math.round(newY) * canvas.width + Math.round(newX)) * 4;

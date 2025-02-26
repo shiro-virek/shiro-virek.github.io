@@ -1,4 +1,6 @@
 class Trigonometry {
+    static RAD_CONST = 0.0175;
+
     static degToRad = (deg) => {
 	    return deg * (Math.PI / 180.0);
 	}

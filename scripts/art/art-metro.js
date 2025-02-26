@@ -221,11 +221,11 @@
 			ctx.lineWidth = 6;
 			ctx.lineCap = "square";
 			ctx.beginPath();
-			let newStartX = this.x - Math.cos(this.angle * RAD_CONST) * (1000);
-			let newStartY = this.y - Math.sin(this.angle * RAD_CONST) * (1000);
+			let newStartX = this.x - Math.cos(this.angle * Trigonometry.RAD_CONST) * (1000);
+			let newStartY = this.y - Math.sin(this.angle * Trigonometry.RAD_CONST) * (1000);
 			ctx.moveTo(newStartX, newStartY);
-			let newEndX = newStartX + Math.cos(this.angle * RAD_CONST) * (2000);
-			let newEndY = newStartY + Math.sin(this.angle * RAD_CONST) * (2000);
+			let newEndX = newStartX + Math.cos(this.angle * Trigonometry.RAD_CONST) * (2000);
+			let newEndY = newStartY + Math.sin(this.angle * Trigonometry.RAD_CONST) * (2000);
 			ctx.lineTo(newEndX, newEndY);
 			ctx.stroke();
 		}
@@ -293,8 +293,8 @@
 				length = globals.random.nextInt(20, 200);
 				direction = baseDirection + this.getDirection(lastDirection);
 
-				let deltaX = Math.cos(direction * RAD_CONST) * length;
-				let deltaY = Math.sin(direction * RAD_CONST) * length;
+				let deltaX = Math.cos(direction * Trigonometry.RAD_CONST) * length;
+				let deltaY = Math.sin(direction * Trigonometry.RAD_CONST) * length;
 
 				newX = lastX + deltaX;
 				newY = lastY + deltaY;
@@ -330,8 +330,8 @@
 					newStationX = newX;
 					newStationY = newY;
 				} else {
-					newStationX = lastX + Math.cos(segmentAngle * RAD_CONST) * (segmentLength / 2);
-					newStationY = lastY + Math.sin(segmentAngle * RAD_CONST) * (segmentLength / 2);
+					newStationX = lastX + Math.cos(segmentAngle * Trigonometry.RAD_CONST) * (segmentLength / 2);
+					newStationY = lastY + Math.sin(segmentAngle * Trigonometry.RAD_CONST) * (segmentLength / 2);
 				}
 
 				let newStation = new Station(newStationX, newStationY, this.symbol);

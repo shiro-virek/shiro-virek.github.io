@@ -103,11 +103,11 @@
 
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
 		
-		let angleRad = angle * RAD_CONST;
+		let angleRad = angle * Trigonometry.RAD_CONST;
 
 		if (ROTATORS > 0)
 			for (let i = 0; i < ROTATORS - 1; i++) {
-				let angleRad2 = (angle + rotatorsAngles[i]) * RAD_CONST;
+				let angleRad2 = (angle + rotatorsAngles[i]) * Trigonometry.RAD_CONST;
 				ctx.beginPath();
 
 				ctx.moveTo(lastPosX, lastPosY);
