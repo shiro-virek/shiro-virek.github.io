@@ -62,28 +62,28 @@
 
     class ModifierFunctions {
         static getRadio1 = (dist, x, y, angle) => {
-            return Utils.scale(dist, 0, 500, 5, 15);
+            return Numbers.scale(dist, 0, 500, 5, 15);
         }
 
         static getRadio2 = (dist, x, y, angle) => {
-            let decrement = Utils.scale(dist, 0, 500, 5, 15);
+            let decrement = Numbers.scale(dist, 0, 500, 5, 15);
             return decrement < 20 ? 20 - decrement : 1;
         }
 
         static getColor1 = (dist, x, y, angle) => {
-            return `hsla(${hue}, ${Utils.scale(dist, 0, 500, 0, 100)}%, 50%, ${semitone.alphaFunction(dist, x, y, angle)})`;
+            return `hsla(${hue}, ${Numbers.scale(dist, 0, 500, 0, 100)}%, 50%, ${semitone.alphaFunction(dist, x, y, angle)})`;
         }
 
         static getColor2 = (dist, x, y, angle) => {
-            return `hsla(${hue}, 100%, ${Utils.scale(dist, 0, 500, 0, 100)}%, ${semitone.alphaFunction(dist, x, y, angle)})`;
+            return `hsla(${hue}, 100%, ${Numbers.scale(dist, 0, 500, 0, 100)}%, ${semitone.alphaFunction(dist, x, y, angle)})`;
         }
 
         static getXPosition1 = (dist, x, y, angle) => {
-            return x - Utils.scale(dist, 0, 500, -50, 50);
+            return x - Numbers.scale(dist, 0, 500, -50, 50);
         }
 
         static getYPosition1 = (dist, x, y, angle) => {
-            return y - Utils.scale(dist, 0, 500, -50, 50);
+            return y - Numbers.scale(dist, 0, 500, -50, 50);
         }
 
         static getXPosition2 = (dist, x, y, angle) => {
@@ -139,11 +139,11 @@
         }
 
         static getAlpha2 = (dist, x, y, angle) => {
-            return Utils.scale(dist, 0, 500, 0, 1);
+            return Numbers.scale(dist, 0, 500, 0, 1);
         }
 
         static getAlpha3 = (dist, x, y, angle) => {
-            return Utils.scale(dist, 0, 500, 1, 0);
+            return Numbers.scale(dist, 0, 500, 1, 0);
         }
     }
 
@@ -162,16 +162,16 @@
             if (this.on)
                 switch(semitone.shape){
                     case Figures.Circle:
-                        Utils.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color);
+                        Drawing.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color);
                         break;
                     case Figures.Square:             
-                        Utils.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color, this.color);
+                        Drawing.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color, this.color);
                         break; 
                     case Figures.Hexagon:                    
-                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.angle, this.color, this.color);
+                        Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.angle, this.color, this.color);
                         break;
                     case Figures.Triangle:                    
-                        Utils.drawPolygon(ctx, this.x, this.y, this.radio, 3, this.angle, this.color, this.color);
+                        Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 3, this.angle, this.color, this.color);
                         break;
                 }                
         }
@@ -181,7 +181,7 @@
             let yDot = dotMargin + this.row * dotPadding + this.row * dotRadio;
 
             let dist = Math.sqrt(Math.pow(xDot - xMouse, 2) + Math.pow(yDot - yMouse, 2));
-            let angle = Utils.angleBetweenTwoPoints(xDot, yDot, xMouse, yMouse);
+            let angle = Trigonometry.angleBetweenTwoPoints(xDot, yDot, xMouse, yMouse);
 
             this.radio = semitone.radioFunction(dist, xDot, yDot, angle);
             this.color = semitone.colorFunction(dist, xDot, yDot, angle);
@@ -197,7 +197,7 @@
         initCanvas();
         dotsRows = Math.floor(height / (dotRadio + dotPadding));
         dotsColumns = Math.floor(width / (dotRadio + dotPadding));
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
         semitone = new Semitone();
         addModifierFunctions();
         randomize();

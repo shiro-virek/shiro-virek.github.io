@@ -1,6 +1,6 @@
 {        
     const globals = {
-        random: Utils.getRandomObject()
+        random: Objects.getRandomObject()
     };
 
     const figureTypes = [
@@ -141,8 +141,8 @@
         addFigure(x, y) {
             let figure = new Figure();
 
-            figure.vertices = Utils.clone(config.figureInfo.vertices);
-            figure.edges = Utils.clone(config.figureInfo.edges);
+            figure.vertices = Objects.clone(config.figureInfo.vertices);
+            figure.edges = Objects.clone(config.figureInfo.edges);
 
             figure.translateX(x);
             figure.translateY(y);
@@ -255,15 +255,15 @@
             let point2d0 = world.worldToScreen(p0);
             let point2d1 = world.worldToScreen(p1);
 
-            Utils.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
+            Drawing.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
         }
 
         drawVertex = (point, color) => {
             let vertex = world.worldToScreen(point);
 
-            let newColor = `hsl(${Utils.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
+            let newColor = `hsl(${Numbers.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
 
-            Utils.drawDot(ctx, vertex[0], vertex[1], newColor);
+            Drawing.drawDot(ctx, vertex[0], vertex[1], newColor);
         }
 
         drawFigure = () => {

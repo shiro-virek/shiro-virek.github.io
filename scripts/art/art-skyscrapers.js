@@ -48,7 +48,7 @@
 		}
 
 		randomize = () => {
-			globals.random = Utils.getRandomObject();
+			globals.random = Objects.getRandomObject();
 			this.angle = globals.random.nextInt(0, 40);
 		}
 	}

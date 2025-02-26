@@ -53,7 +53,7 @@
 	}
 
 	let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 
 		saturation = globals.random.nextInt(20, 100);
 		lightness = globals.random.nextInt(20, 100);
@@ -81,7 +81,7 @@
 
 		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))
 
-		let hue = Utils.scale(parseInt(distance), 0, 360, 0, colorMapMax);
+		let hue = Numbers.scale(parseInt(distance), 0, 360, 0, colorMapMax);
 
 		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 
@@ -121,7 +121,7 @@
 			y = (lastPosY + yMod) + entropyY;
 
 			for (let i = 0; i <= CIRCLES; i++) {
-				Utils.drawCircle(ctx, x, y, size * (CIRCLES / i), color, color);
+				Drawing.drawCircle(ctx, x, y, size * (CIRCLES / i), color, color);
 			}
 		}
 	}

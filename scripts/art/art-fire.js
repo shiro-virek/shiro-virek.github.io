@@ -58,9 +58,9 @@
 			this.yCenter -= this.speed;
 
 			if (this.sin || ALL_SIN)
-				this.xMovement = (AMPLITUDE * (Math.sin(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
 			else
-				this.xMovement = (AMPLITUDE * (Math.cos(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
 
 
 			if (this.life > 0)
@@ -72,7 +72,7 @@
 	}
 
 	let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 		PARTICLES_COUNT = globals.random.nextInt(50, screen.height * screen.width / 1000);
 		MINIMUM_LIFE = globals.random.nextInt(10, 90)
 		MAXIMUM_LIFE = globals.random.nextInt(100, 200);
@@ -142,7 +142,7 @@
 			objects[i].update();
 
 			if (objects[i].notFirstTime)
-				Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor().getRGBA(), objects[i].getColor().getRGBA());
+				Drawing.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor().getRGBA(), objects[i].getColor().getRGBA());
 		}
 	}
 

@@ -120,10 +120,10 @@
 
             switch(ledScreen.shape){
                 case Figures.Circle:
-                    Utils.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, color, color)
+                    Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, color, color)
                     break;
                 case Figures.Square:                    
-                    Utils.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color, color);
+                    Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color, color);
                     break;
             }
         }
@@ -131,7 +131,7 @@
 
     let init = () => {
 		initCanvas();
-        globals.random = Utils.getRandomObject();
+        globals.random = Objects.getRandomObject();
         ledDiameter = globals.random.nextInt(5, 20);        
         ledPadding = globals.random.nextInt(0, 20);
         ledMargin = ledPadding;
@@ -169,7 +169,7 @@
 
         draw();
 
-        Utils.sleep(200);
+        Browser.sleep(200);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);

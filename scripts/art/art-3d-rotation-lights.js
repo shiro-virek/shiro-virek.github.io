@@ -24,7 +24,7 @@
     ];
 
     const globals = {
-        random: Utils.getRandomObject()
+        random: Objects.getRandomObject()
     }
 
     const config = {
@@ -70,8 +70,8 @@
         addFigure = (x, y) => {
             let figure = new Figure();
 
-            figure.vertices = Utils.clone(config.figureInfo.vertices);
-            figure.faces = Utils.clone(config.figureInfo.faces);
+            figure.vertices = Objects.clone(config.figureInfo.vertices);
+            figure.faces = Objects.clone(config.figureInfo.faces);
 
             figure.translateX(x);
             figure.translateY(y);
@@ -103,7 +103,7 @@
         }
 
         rotateZ = (angle) => {
-            angle = Utils.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
@@ -113,7 +113,7 @@
         }
 
         rotateY = (angle) => {
-            angle = Utils.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
@@ -123,7 +123,7 @@
         }
 
         rotateX = (angle) => {
-            angle = Utils.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
@@ -207,28 +207,28 @@
         }
 
         shouldDrawFace = (vertices) => {
-            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
-            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
+            const vector1 = Trigonometry.subtractVectors(vertices[1], vertices[0]);
+            const vector2 = Trigonometry.subtractVectors(vertices[2], vertices[0]);
     
-            const normal = Utils.crossProduct(vector1, vector2);
+            const normal = Trigonometry.crossProduct(vector1, vector2);
     
             const cameraDirection = [0, 0, 1];
     
-            return Utils.dotProduct(normal, cameraDirection) < 0;
+            return Trigonometry.dotProduct(normal, cameraDirection) < 0;
         }
 
         getLightness = (vertices) => {
-            const vector1 = Utils.subtractVectors(vertices[1], vertices[0]);
-            const vector2 = Utils.subtractVectors(vertices[2], vertices[0]);
+            const vector1 = Trigonometry.subtractVectors(vertices[1], vertices[0]);
+            const vector2 = Trigonometry.subtractVectors(vertices[2], vertices[0]);
 
-            const normal = Utils.crossProduct(vector1, vector2);
+            const normal = Trigonometry.crossProduct(vector1, vector2);
            
             const lightDirection = [0, 0, 1]; 
           
-            const dotProduct = Utils.dotProduct(normal, lightDirection);
+            const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
 
             
-            const lightness = Utils.scale(dotProduct, -1000, 0, 50, 100);
+            const lightness = Numbers.scale(dotProduct, -1000, 0, 50, 100);
 
             
             return lightness;
