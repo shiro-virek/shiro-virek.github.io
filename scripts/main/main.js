@@ -4,10 +4,8 @@ let halfWidth = 0;
 let halfHeight = 0;
 let lastPosY = 0;
 let lastPosX = 0;
-let CANVAS_ID = "myCanvas"
 let canvas;
 let ctx;
-let RAD_CONST = 0.0175;
 let lastRender = 0;
 
 width = window.innerWidth;
@@ -30,7 +28,7 @@ let drawBackground = (ctx, canvas) => {
 }
 
 let initCanvas = () => {
-    canvas = document.getElementById(CANVAS_ID);
+    canvas = document.getElementById(Screen.CANVAS_ID);
     if (canvas.getContext) {
         ctx = canvas.getContext('2d')
         drawBackground(ctx, canvas);

@@ -87,11 +87,11 @@
         }
 
         static getXPosition2 = (dist, x, y, angle) => {
-            return x + Math.cos((angle + 180) * RAD_CONST) * 50;
+            return x + Math.cos((angle + 180) * Trigonometry.RAD_CONST) * 50;
         }
 
         static getYPosition2 = (dist, x, y, angle) => {
-            return y + Math.sin((angle + 180) * RAD_CONST) * 50;
+            return y + Math.sin((angle + 180) * Trigonometry.RAD_CONST) * 50;
         }
 
         static getXPosition3 = (dist, x, y, angle) => {
@@ -103,27 +103,27 @@
         }
         
         static getXPosition4 = (dist, x, y, angle) => {
-            return x + Math.cos((angle + 90) * RAD_CONST) * 100;
+            return x + Math.cos((angle + 90) * Trigonometry.RAD_CONST) * 100;
         }
 
         static getYPosition4 = (dist, x, y, angle) => {
-            return y + Math.sin((angle + 90) * RAD_CONST) * 100;
+            return y + Math.sin((angle + 90) * Trigonometry.RAD_CONST) * 100;
         }
 
         static getXPosition5 = (dist, x, y, angle) => {
-            return x + Math.cos((angle + dist) * RAD_CONST) * 100;
+            return x + Math.cos((angle + dist) * Trigonometry.RAD_CONST) * 100;
         }
 
         static getYPosition5 = (dist, x, y, angle) => {
-            return y + Math.sin((angle + dist) * RAD_CONST) * 100;
+            return y + Math.sin((angle + dist) * Trigonometry.RAD_CONST) * 100;
         }
             
         static getXPosition6 = (dist, x, y, angle) => {
-            return x + Math.cos((angle + dist) * RAD_CONST) * dist;
+            return x + Math.cos((angle + dist) * Trigonometry.RAD_CONST) * dist;
         }
 
         static getYPosition6 = (dist, x, y, angle) => {
-            return y + Math.sin((angle + dist) * RAD_CONST) * dist;
+            return y + Math.sin((angle + dist) * Trigonometry.RAD_CONST) * dist;
         }
             
         static getAngle1 = (dist, x, y, angle) => {

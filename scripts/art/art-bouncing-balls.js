@@ -37,7 +37,7 @@
 
 					let color2 = `hsl(${this.hue}, ${100}%, ${value}%, ${1.0 / index})`;
 
-					let trailPoint = Trigonometry.polarToCartesian(distance + ((index - 1) * 5), angle * RAD_CONST);
+					let trailPoint = Trigonometry.polarToCartesian(distance + ((index - 1) * 5), angle * Trigonometry.RAD_CONST);
 
 					Drawing.drawCircle(ctx, this.x - trailPoint.x, this.y - trailPoint.y, this.radius * (1.0 - (index / 30)), color2, color2);
 				}
