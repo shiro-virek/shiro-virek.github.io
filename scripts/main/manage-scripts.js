@@ -21,7 +21,8 @@ const art = [
                 "distortion",
                 "blinkenlights",
                 "blinkenlights-mn",
-                "shader"
+                "shader",
+                "gravity-balls"
             ];
 const scripts = [];
 
