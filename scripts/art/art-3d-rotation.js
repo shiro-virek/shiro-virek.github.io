@@ -1,6 +1,6 @@
 {        
     const globals = {
-        random: null
+        random: Utils.getRandomObject()
     };
 
     const figureTypes = [
@@ -68,8 +68,8 @@
 
     const config = {
         FOV: 10000,
-        drawEdges: Utils.getRandomBool(),
-        figureInfo: figureTypes[Utils.getRandomInt(0, figureTypes.length - 1)],
+        drawEdges: globals.random.nextBool(),
+        figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
         clicking: false,
         mouseMoved: false,
     };    

@@ -23,9 +23,13 @@
         }
     ];
 
+    const globals = {
+        random: Utils.getRandomObject()
+    }
+
     const config = {
         FOV: 10000,
-        figureInfo: figureTypes[Utils.getRandomInt(0, figureTypes.length - 1)],
+        figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
         clicking: false,
         mouseMoved: false
     };    
@@ -80,7 +84,7 @@
         constructor() {
             this.vertices = [];
             this.edges = [];
-            this.hue = Utils.getRandomInt(1, 360);
+            this.hue = globals.random.nextInt(1, 360);
         }
 
         getAverageZ = () => {
