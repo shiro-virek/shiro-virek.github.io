@@ -23,7 +23,7 @@
 	let clicking = false;
 
 	let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 
 		OPACITY = globals.random.nextRange(0.01, 0.1, 2);
 		THICKNESS = globals.random.nextInt(1, 20);
@@ -96,8 +96,8 @@
 
 	let draw = (xPointer, yPointer) => {
 
-		let distance = Utils.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
-		let hue = Utils.scale(distance, 0, 360, 0, COLOR_MAP_MAX);
+		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
+		let hue = Numbers.scale(distance, 0, 360, 0, COLOR_MAP_MAX);
 
 		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 

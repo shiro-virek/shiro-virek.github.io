@@ -68,7 +68,7 @@
 
 			ctx.lineWidth = 1;
 			for (let i = 0; i < metroNetwork.lines.length; i++) {
-				Utils.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', metroNetwork.lines[i].colorBase());
+				Drawing.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', metroNetwork.lines[i].colorBase());
 				ctx.fillStyle = "#000";
 				ctx.fillText(`Line ${metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
 			}
@@ -153,7 +153,7 @@
 		}
 
 		drawStation = (ctx, color) => {
-			Utils.drawCircle(ctx, this.x, this.y, stationRadio, stationColorBorder ? color : "#000", "#FFF");
+			Drawing.drawCircle(ctx, this.x, this.y, stationRadio, stationColorBorder ? color : "#000", "#FFF");
 		}
 
 		addTransfers = (metroNetwork) => {
@@ -252,7 +252,7 @@
 		randomizeSymbol = () => {
 			if (metroNetwork.lines.length > 0)
 				if (alphabeticLineSymbol) {
-					let nextSymbol = Utils.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol);
+					let nextSymbol = Text.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol);
 					if (nextSymbol == '[') {
 						this.symbol = 1;
 						alphabeticLineSymbol = false;
@@ -426,7 +426,7 @@
 	}
 
 	let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 		LINE_THICKNESS = globals.random.nextInt(LINE_THICKNESS, LINE_THICKNESS * 2)
 		stationColorBorder = globals.random.nextBool();
 		stationRadio = globals.random.nextInt(3,10);

@@ -64,7 +64,7 @@
 				this.deltaY = mouseY - this.y;
 			}
 
-			let speedAxes = Utils.polarToCartesian(this.speed + distanceToCenter, (this.tentacle * Utils.degToRad(360) / tentaclesPerFinger) + Utils.degToRad(ROTATION_ANGLE));
+			let speedAxes = Trigonometry.polarToCartesian(this.speed + distanceToCenter, (this.tentacle * Trigonometry.degToRad(360) / tentaclesPerFinger) + Trigonometry.degToRad(ROTATION_ANGLE));
 
 			this.deltaX += speedAxes.x;
 			this.deltaY += speedAxes.y;
@@ -120,7 +120,7 @@
 	}
 
 	let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 		HUE = globals.random.nextInt(1, 360);
 		LIGHTNESS_FACTOR = globals.random.nextInt(0, 100);
 		SATURATION = globals.random.nextInt(0, 100);
@@ -204,14 +204,14 @@
 		for (let i = 0; i < SLICES_COUNT * TENTACLES_COUNT; i++) {
 			slices[i].update();
 
-			let lightness = Utils.scale(SLICES_COUNT-slices[i].index, 0, SLICES_COUNT, 0, LIGHTNESS_FACTOR); 
+			let lightness = Numbers.scale(SLICES_COUNT-slices[i].index, 0, SLICES_COUNT, 0, LIGHTNESS_FACTOR); 
 
 			if (SHOW_RINGS && isRing(i))
 				color = `hsl(${HUE}, ${SATURATION}%, ${lightness + 10}%)`;
 			else
 				color = `hsl(${HUE}, ${SATURATION}%, ${lightness}%)`;
 
-			Utils.drawCircle(ctx, slices[i].x, slices[i].y, slices[i].diameter, color, color);
+			Drawing.drawCircle(ctx, slices[i].x, slices[i].y, slices[i].diameter, color, color);
 		}
 
 		updateRingShift();
@@ -243,7 +243,7 @@
 			clientY: 350,
 		});
 
-		Utils.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
+		Objects.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
 	}
 
 	let trackMouse = (x, y) => {

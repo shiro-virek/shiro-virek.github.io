@@ -22,7 +22,7 @@
 
 
 	let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 
 		OPACITY = globals.random.nextRange(0.03, 0.1, 2);
 		THICKNESS = globals.random.nextInt(1, 20);
@@ -93,20 +93,20 @@
 
 	let draw = (xPointer, yPointer) => {
 
-		let distance = Utils.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
-		let hue = Utils.scale(distance, 0, 360, 0, COLOR_MAP_MAX);
+		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
+		let hue = Numbers.scale(distance, 0, 360, 0, COLOR_MAP_MAX);
 
 		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 
 		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
 
-		let lineWidth = Utils.scale(distance, 1, 400, 1, THICKNESS);
+		let lineWidth = Numbers.scale(distance, 1, 400, 1, THICKNESS);
 
-		Utils.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
+		Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
 
 		let angleRad = angle * RAD_CONST;
 
-		Utils.drawLine(ctx, xPointer, yPointer,
+		Drawing.drawLine(ctx, xPointer, yPointer,
 			xPointer + parseInt(distance * Math.cos(angleRad)),
 			yPointer + parseInt(distance * Math.sin(angleRad)),
 			lineWidth, color);
@@ -114,7 +114,7 @@
 		if (ROTATORS > 0)
 			for (let i = 0; i < ROTATORS - 1; i++) {
 				let angleRad2 = (angle + rotatorsAngles[i]) * RAD_CONST;
-				Utils.drawLine(ctx, xPointer, yPointer,
+				Drawing.drawLine(ctx, xPointer, yPointer,
 					xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)),
 					yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)),
 					lineWidth, color);

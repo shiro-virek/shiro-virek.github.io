@@ -57,9 +57,9 @@
 			this.yCenter += this.speed;
 
 			if (this.sin || ALL_SIN)
-				this.xMovement = (AMPLITUDE * (Math.sin(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
 			else
-				this.xMovement = (AMPLITUDE * (Math.cos(Utils.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (AMPLITUDE * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
 
 			this.angle++;
 
@@ -72,7 +72,7 @@
 	}
 
 	let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 
 		PARTICLES_COUNT = globals.random.nextInt(50, screen.height * screen.width / 1000);
 		MINIMUM_LIFE = globals.random.nextInt(10, 90)
@@ -145,10 +145,10 @@
 			if (objects[i].notFirstTime) {
 				switch (objects[i].shape) {
 					case Figures.Circle:
-						Utils.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor(), objects[i].getColor());
+						Drawing.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor(), objects[i].getColor());
 						break;
 					case Figures.Square:
-						Utils.drawSquare(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].angle, objects[i].getColor());
+						Drawing.drawSquare(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].angle, objects[i].getColor());
 						break;
 				}
 			}

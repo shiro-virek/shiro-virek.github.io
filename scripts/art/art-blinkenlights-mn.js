@@ -251,7 +251,7 @@
         }
 
         draw = (ctx) => {
-            Utils.drawSquare(ctx, this.x, this.y, this.diameter, 0, this.getColor(), this.getColor())
+            Drawing.drawSquare(ctx, this.x, this.y, this.diameter, 0, this.getColor(), this.getColor())
         }
     }
 
@@ -269,7 +269,7 @@
     }
 
     let randomize = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
 
         cellDiameter = globals.random.nextInt(5, 15);        
 
@@ -353,7 +353,7 @@
 
         draw();
 
-        Utils.sleep(200);
+        Browser.sleep(200);
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);

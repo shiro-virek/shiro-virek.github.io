@@ -47,9 +47,9 @@
                     const b = imgData[i * 4 + 2];
                     const a = imgData[i * 4 + 3];
 
-                    let newR = Utils.scale(r, 0, 255, 0, 50);
-                    let newG = Utils.scale(g, 0, 255, 0, 50);
-                    let newB = Utils.scale(b, 0, 255, 0, 50);
+                    let newR = Numbers.scale(r, 0, 255, 0, 50);
+                    let newG = Numbers.scale(g, 0, 255, 0, 50);
+                    let newB = Numbers.scale(b, 0, 255, 0, 50);
 
                     this.crts[x][y].draw(ctx, newR, newG, newB);
                 }
@@ -79,9 +79,9 @@
             let colorR = `hsl(${0}, 100%, ${lightnessR}%)`;
             let colorG = `hsl(${120}, 100%, ${lightnessG}%)`;
             let colorB = `hsl(${255}, 100%, ${lightnessB}%)`;
-            Utils.drawRectangle(ctx, this.x, this.y, third, this.diameter, borderColor, colorR)
-            Utils.drawRectangle(ctx, this.x + third, this.y, third, this.diameter, borderColor, colorG)
-            Utils.drawRectangle(ctx, this.x + third * 2, this.y, third, this.diameter, borderColor, colorB)
+            Drawing.drawRectangle(ctx, this.x, this.y, third, this.diameter, borderColor, colorR)
+            Drawing.drawRectangle(ctx, this.x + third, this.y, third, this.diameter, borderColor, colorG)
+            Drawing.drawRectangle(ctx, this.x + third * 2, this.y, third, this.diameter, borderColor, colorB)
         }
     }
 
@@ -122,7 +122,7 @@
     }
 
     let init = () => {
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
         canvasImg = document.getElementById('auxCanvas');
         ctxImg = canvasImg.getContext("2d");
         crtColumns = globals.random.nextInt(30, 100); 

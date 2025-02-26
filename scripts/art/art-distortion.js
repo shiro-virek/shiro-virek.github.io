@@ -24,7 +24,7 @@
 
     function pincushion(data, outputData) {
         const radius = config.mode ? globals.mouseY : config.radius; 
-        const distortionStrength = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
+        const distortionStrength = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
@@ -59,8 +59,8 @@
     }
 
     function ripple(data, outputData) {
-        const amplitude = config.mode ? Utils.scale(globals.mouseY, 0, height, 1, 20) : config.amplitude; 
-        const frequency = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.1, 0.5) : config.frequency; 
+        const amplitude = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 20) : config.amplitude; 
+        const frequency = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.1, 0.5) : config.frequency; 
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
         const phase = 1;
@@ -90,8 +90,8 @@
     }
 
     function wobbly(data, outputData) {
-        let amplitude = Utils.scale(globals.mouseX, 0, width, 0, 20);
-        let frequency = Utils.scale(globals.mouseY, 0, height, 0, 1);
+        let amplitude = Numbers.scale(globals.mouseX, 0, width, 0, 20);
+        let frequency = Numbers.scale(globals.mouseY, 0, height, 0, 1);
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 const offsetX = Math.sin(y * frequency) * amplitude;
@@ -116,7 +116,7 @@
 
     function ripple2(data, outputData) {
         const radius = config.mode ? globals.mouseY : config.radius; 
-        const distortionStrength = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
+        const distortionStrength = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
@@ -154,7 +154,7 @@
 
     function barrel(data, outputData) {
         const radius = config.mode ? globals.mouseY : config.radius; 
-        const distortionStrength = config.mode ? Utils.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
+        const distortionStrength = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.5, 10) : config.strength; 
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
@@ -189,8 +189,8 @@
     }
 
     function twirl(data, outputData) {
-        let radius = config.mode ? Utils.scale(globals.mouseX, 0, width, 0, 500) : config.radius;
-        let strength = config.mode ? Utils.scale(globals.mouseY, 0, height, 0, 20) : config.strength;
+        let radius = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0, 500) : config.radius;
+        let strength = config.mode ? Numbers.scale(globals.mouseY, 0, height, 0, 20) : config.strength;
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
@@ -229,7 +229,7 @@
     let init = () => {
         initCanvas();
         
-		globals.random = Utils.getRandomObject();
+		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 
         img.src = '../assets/Picture1.jpg';

@@ -140,10 +140,10 @@
             let opacity = config.transparent ? this.diameter / config.maxSize : 1;
             switch (globals.pixelScreen.shape) {
                 case Figures.Circle:
-                    Utils.drawCircle(ctx, this.x + globals.pixelRadius, this.y + globals.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
+                    Drawing.drawCircle(ctx, this.x + globals.pixelRadius, this.y + globals.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Utils.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
+                    Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
                     break;
             }
         }
@@ -152,7 +152,7 @@
     let init = () => {
         initCanvas();
 
-        globals.random = Utils.getRandomObject();
+        globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 
         globals.pixelRows = Math.floor((height - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
