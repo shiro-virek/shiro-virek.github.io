@@ -88,7 +88,7 @@
 		}
 
 		randomizeTop = () => {
-			var rand = globals.random.nextInt(0, Object.keys(TopTypes).length - 1);
+			var rand = globals.random.nextInt(0, Object.keys(TopTypes).length);
 			this.topType = TopTypes[Object.keys(TopTypes)[rand]];
 
 			switch (this.topType) {

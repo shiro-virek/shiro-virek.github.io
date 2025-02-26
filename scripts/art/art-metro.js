@@ -433,7 +433,7 @@
 		maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
 		alphabeticLineSymbol = globals.random.nextBool();
-		angleSegmentRange = globals.random.nextInt(0, 1);
+		angleSegmentRange = globals.random.nextBool();
 		drawIcons = globals.random.nextBool();
 		drawStreets = globals.random.nextBool();
 	}
