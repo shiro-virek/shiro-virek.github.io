@@ -1,3 +1,4 @@
+
 {
     const config = {
         randomize: true,
@@ -25,6 +26,7 @@
         pixelColumns: 50,
         pixelScreen: null,
         pixelRadius: config.pixelDiameter / 2,
+        random: null
     };
 
     const Figures = Object.freeze({
@@ -36,7 +38,7 @@
         constructor() {
             this.pixels = [];
             this.generatePixels();
-            let rand = Utils.getRandomInt(0, Object.keys(Figures).length - 1);
+            let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);
             this.shape = Figures[Object.keys(Figures)[rand]];
         }
 
@@ -149,7 +151,8 @@
 
     let init = () => {
         initCanvas();
-        
+
+        globals.random = Utils.getRandomObject();
         if (config.randomize) randomize();
 
         globals.pixelRows = Math.floor((height - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
@@ -208,20 +211,20 @@
     }
 
     let randomize = () => {
-        config.slowDown = Utils.getRandomBool();
-        config.stopOnBlur = Utils.getRandomBool();
-        config.transparent = Utils.getRandomBool();
-        config.pixelDiameter = Utils.getRandomInt(5, 20);
-        config.pixelPadding = Utils.getRandomInt(0, 20);
+        config.slowDown = globals.random.nextBool();
+        config.stopOnBlur = globals.random.nextBool();
+        config.transparent = globals.random.nextBool();
+        config.pixelDiameter = globals.random.nextInt(5, 20);
+        config.pixelPadding = globals.random.nextInt(0, 20);
         config.pixelMargin = config.pixelPadding;
-        config.hue = Utils.getRandomInt(0, 255);
+        config.hue = globals.random.nextInt(0, 255);
         if (config.stopOnBlur)
-            config.growSpeed = Utils.getRandomFloat(5.0, 10.0, 1)
+            config.growSpeed = globals.random.nextRange(5.0, 10.0, 1)
         else
-            config.growSpeed = Utils.getRandomFloat(0.5, 2.0, 1);
-        config.shrinkSpeed = Utils.getRandomFloat(0.1, 2.0, 1);
-        config.maxSize = Utils.getRandomInt(config.pixelDiameter + 1, 255);
-        config.rotate = Utils.getRandomBool();
+            config.growSpeed = globals.random.nextRange(0.5, 2.0, 1);
+        config.shrinkSpeed = globals.random.nextRange(0.1, 2.0, 1);
+        config.maxSize = globals.random.nextInt(config.pixelDiameter + 1, 255);
+        config.rotate = globals.random.nextBool();
     }
 
     let draw = () => {

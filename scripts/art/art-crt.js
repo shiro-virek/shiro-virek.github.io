@@ -1,5 +1,9 @@
 
-{
+{    
+    const globals = {
+        random: null
+    };
+    
     let crtRows = 0
     let crtColumns = 0;
     let crtDiameter = 0;
@@ -118,9 +122,10 @@
     }
 
     let init = () => {
+		globals.random = Utils.getRandomObject();
         canvasImg = document.getElementById('auxCanvas');
         ctxImg = canvasImg.getContext("2d");
-        crtColumns = Utils.getRandomInt(30, 100); 
+        crtColumns = globals.random.nextInt(30, 100); 
         crtDiameter = Math.floor(width / crtColumns);
         crtRows = Math.floor(height / crtDiameter);              
         loadImage();

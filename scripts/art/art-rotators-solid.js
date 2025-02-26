@@ -1,4 +1,8 @@
 {
+    const globals = {
+		random: null
+    };
+
 	let angle = 0;
 
 	let colorShift = 0;
@@ -19,26 +23,28 @@
 	let clicking = false;
 
 	let randomize = () => {
-		OPACITY = Utils.getRandomFloat(0.01, 0.1, 2);
-		THICKNESS = Utils.getRandomInt(1, 20);
-		ANGLE_ROTATION = Utils.getRandomInt(0, 20);
-		COLOR_MAP_MAX = Utils.getRandomInt(1, 10000);
+		globals.random = Utils.getRandomObject();
 
-		colorShift = Utils.getRandomInt(0, 359);
+		OPACITY = globals.random.nextRange(0.01, 0.1, 2);
+		THICKNESS = globals.random.nextInt(1, 20);
+		ANGLE_ROTATION = globals.random.nextInt(0, 20);
+		COLOR_MAP_MAX = globals.random.nextInt(1, 10000);
 
-		ROTATORS = Utils.getRandomInt(2, 5);
+		colorShift = globals.random.nextInt(0, 359);
+
+		ROTATORS = globals.random.nextInt(2, 5);
 
 		let rotatorsLength = 0
 		let rotatorsAngle = 0;
 
 		for (let i = 0; i < ROTATORS - 1; i++) {
-			rotatorsLength += Utils.getRandomInt(300, 1000)
-			rotatorsAngle += Utils.getRandomInt(0, 180);
+			rotatorsLength += globals.random.nextInt(300, 1000)
+			rotatorsAngle += globals.random.nextInt(0, 180);
 			rotatorsLengths.push(rotatorsLength);
 			rotatorsAngles.push(rotatorsAngle);
 		}
 
-		functionExecute = Utils.getRandomInt(0, 4);
+		functionExecute = globals.random.nextInt(0, 4);
 	}
 
 	let addEvents = () => {
