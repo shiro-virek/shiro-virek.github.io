@@ -3,13 +3,11 @@
         randomize: true,
         randomSize: true,
         randomHue: true,
-        drawTrail: true,
         hue: 20,
         radius: 20,
         gravity: 0.5,
         damping: 0.7,
-        ballRadius: 20,
-        drawQuadtree: true,
+        drawQuadtree: false,
     };
 
     const globals = {
@@ -22,21 +20,20 @@
         constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.radius = config.radius;
-            this.dy = 0;
-            this.dx = 0;
+            this.radius = config.randomSize ? globals.random.nextInt(0, 25) : config.radius;
+            this.hue = config.randomHue ? globals.random.nextInt(0, 255) : config.hue;
+            this.dy =  (globals.random.next() - 0.5) * 5;
+            this.dx =  (globals.random.next() - 0.5) * 5;
             this.mass = Math.pow(this.radius, 3) * Math.PI * 4 / 3;
         }
 
         draw = () => {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#007bff';
-            ctx.fill();
-            ctx.closePath();
+            let color = `hsl(${this.hue}, ${100}%, ${50}%)`;
+
+			Drawing.drawCircle(ctx, this.x, this.y, this.radius, color, color);
         }
 
-        checkCollisionsBalls() {
+        checkCollisionsBalls = () => {
             let returnObjects = [];
         
             globals.quad.retrieve(returnObjects, this);
@@ -82,7 +79,7 @@
             }
         }
 
-        checkCollisionsWalls() {
+        checkCollisionsWalls = () => {
             if ((this.getRight() > width)) {
                 this.dx = -Math.abs(this.dx) * config.damping;
 
@@ -119,7 +116,6 @@
             this.y += this.dy;
             this.x += this.dx;
 
-            // Aplicar amortiguamiento en el eje X
             this.dx *= config.damping;
             if (Math.abs(this.dx) < 0.1) this.dx = 0;
         }
@@ -135,17 +131,14 @@
 
         globals.quad = Quadtree.generateQuadtree(width, height);
 
-        let ball = new Ball(canvas.width / 2, config.ballRadius);
-        globals.balls.push(ball);
-
+		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
         addEvents();
         window.requestAnimationFrame(loop);
     }
 
     let addBall = (x, y) => {
         let ball = new Ball(x, y);
-        ball.dx = (Math.random() - 0.5) * 5; // Velocidad inicial en X
-        ball.dy = (Math.random() - 0.5) * 5; // Velocidad inicial en Y
         globals.balls.push(ball);
     }
 
@@ -165,6 +158,13 @@
             addBall(e.offsetX, e.offsetY);
         }, false);
     }
+
+	let randomize = () => {
+		config.randomSize = globals.random.nextBool();
+		config.randomHue = globals.random.nextBool();
+		config.hue = globals.random.nextInt(0, 255);
+		config.radius = globals.random.nextInt(5, 50);
+	}
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
@@ -189,6 +189,10 @@
 
         requestAnimationFrame(loop);
     }
+
+	window.clearCanvas = () => {		
+		globals.balls = [];
+	}
 
     init();
 }

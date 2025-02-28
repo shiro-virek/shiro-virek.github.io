@@ -18,7 +18,7 @@
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
-			this.radius = config.randomSize ? globals.random.nextInt(0, 25) : config.radius;
+			this.radius = config.randomSize ? globals.random.nextInt(5, 50) : config.radius;
 			this.mass = this.radius * 2;
 			this.speedY = globals.random.nextRange(1, 5);
 			this.speedX = globals.random.nextRange(1, 5);
