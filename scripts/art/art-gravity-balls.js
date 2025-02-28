@@ -80,35 +80,37 @@
         }
 
         checkCollisionsWalls = () => {
-            if ((this.getRight() > width)) {
+            if (this.getRight() > width) {
+                this.x = width - this.radius; 
                 this.dx = -Math.abs(this.dx) * config.damping;
-
+        
                 if (Math.abs(this.dx) < 1) {
                     this.dx = 0;
                 }
             }
-
+        
             if (this.getLeft() < 0) {
+                this.x = this.radius; 
                 this.dx = Math.abs(this.dx) * config.damping;
-
+        
                 if (Math.abs(this.dx) < 1) {
                     this.dx = 0;
                 }
             }
-
+        
             if (this.getBottom() > canvas.height) {
-                this.y = canvas.height - this.radius;
+                this.y = canvas.height - this.radius; 
                 this.dy = -this.dy * config.damping;
-
+        
                 if (Math.abs(this.dy) < 1) {
                     this.dy = 0;
                 }
             }
-
-            if ((this.getTop() < 0)) {
+        
+            if (this.getTop() < 0) {
+                this.y = this.radius; 
                 this.dy = Math.abs(this.dy) * config.damping;
             }
-
         }
 
         move = () => {
