@@ -5,23 +5,24 @@
 		randomHue: true,		
 		drawTrail: true,
 		hue: 20,
-		radius: 20,
-		drawQuadtree: false,        
+		radius: 20,        
         gravity: 0.5,
         damping: 0.7, 
         ballRadius: 20, 
+		drawQuadtree: true,
     };
 
 	const globals = {
 		random: null,
         balls: [],
+        quad: null,
 	}
 
     class Ball {
         constructor(x, y) {
 			this.x = x;
 			this.y = y;
-			this.radius = 20;
+			this.radius = config.radius;
             this.dy = 0;
 
 		}
@@ -33,10 +34,17 @@
             ctx.fill();
             ctx.closePath();
         }
+
+        getTop = () => this.y - this.radius;
+		getBottom = () => this.y + this.radius;
+		getLeft = () => this.x - this.radius;
+		getRight = () => this.x + this.radius;
     }
 
 	let init = () => {
 		initCanvas();
+
+        globals.quad = Quadtree.generateQuadtree(width, height);
 
         let ball = new Ball(canvas.width / 2, config.ballRadius);
         globals.balls.push(ball);     
@@ -49,6 +57,13 @@
         let ball = new Ball(x, y);
 
         globals.balls.push(ball);
+    }
+
+    let populateQuadTree = () => {
+        globals.quad.clear();
+        for (const ball of globals.balls) {
+            globals.quad.insert(ball);
+        }
     }
 
     let draw = () => {
@@ -66,6 +81,9 @@
 
         draw();
 
+        if (config.drawQuadtree)
+            globals.quad.drawQuadtree(ctx, globals.quad);
+
         for (const ball of globals.balls) {
             ball.dy += config.gravity;
             ball.y += ball.dy;
@@ -82,6 +100,8 @@
             ball.draw();
         }
         
+		populateQuadTree();
+
 		lastRender = timestamp;
 		
         requestAnimationFrame(loop);

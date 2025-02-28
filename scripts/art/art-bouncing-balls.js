@@ -29,10 +29,10 @@
 			let value = Numbers.scale(Math.abs(this.speedX) + Math.abs(this.speedY), 0, 10, 0, 100);
 			let color = `hsl(${this.hue}, ${100}%, ${value}%)`;
 
-			let angle = Trigonometry.angleBetweenTwoPoints(this.prevX, this.prevY, this.x, this.y);
-			let distance = Trigonometry.distanceBetweenTwoPoints(this.x, this.y, this.prevX, this.prevY);
+			if (config.drawTrail){
+				let angle = Trigonometry.angleBetweenTwoPoints(this.prevX, this.prevY, this.x, this.y);
+				let distance = Trigonometry.distanceBetweenTwoPoints(this.x, this.y, this.prevX, this.prevY);
 
-			if (config.drawTrail)
 				for (let index = 1; index < 5; index++) {
 
 					let color2 = `hsl(${this.hue}, ${100}%, ${value}%, ${1.0 / index})`;
@@ -41,6 +41,7 @@
 
 					Drawing.drawCircle(ctx, this.x - trailPoint.x, this.y - trailPoint.y, this.radius * (1.0 - (index / 30)), color2, color2);
 				}
+			}
 
 			Drawing.drawCircle(ctx, this.x, this.y, this.radius, color, color);
 		}
