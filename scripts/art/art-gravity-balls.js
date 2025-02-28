@@ -35,21 +35,31 @@
         }
     }
 
-  
-
 	let init = () => {
 		initCanvas();
 
         let ball = new Ball(canvas.width / 2, config.ballRadius);
-
         globals.balls.push(ball);     
-        
+
+        addEvents();
 		window.requestAnimationFrame(loop);
 	}
+
+    let addBall = (x, y) => {
+        let ball = new Ball(x, y);
+
+        globals.balls.push(ball);
+    }
 
     let draw = () => {
         drawBackground(ctx, canvas);
     }
+
+	let addEvents = () => {
+		canvas.addEventListener('click', e => {
+			addBall(e.offsetX, e.offsetY);
+		}, false);
+	}
 
 	let loop = (timestamp) => {
 		let progress = timestamp - lastRender;
