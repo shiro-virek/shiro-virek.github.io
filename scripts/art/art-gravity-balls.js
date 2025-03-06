@@ -6,7 +6,7 @@
         hue: 20,
         radius: 20,
         gravity: 0.5,
-        damping: 0.7,
+        damping: 0.9,
         drawQuadtree: false,
     };
 
