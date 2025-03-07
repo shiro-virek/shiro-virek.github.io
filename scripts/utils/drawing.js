@@ -38,7 +38,7 @@ class Drawing {
 
         ctx.translate(x, y);
 
-        let radAngle = this.sexagesimalToRadian(angle);
+        let radAngle = Trigonometry.sexagesimalToRadian(angle);
     
         for (let i = 0; i < sides; i++) {
             const rotation = ((Math.PI * 2) / sides) * i + radAngle;
