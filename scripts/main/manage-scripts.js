@@ -42,7 +42,8 @@ let downloadPicture = () => {
     var canvas = document.getElementById("myCanvas");
     var image = canvas.toDataURL();
     var aDownloadLink = document.createElement('a');
-    aDownloadLink.download = 'ccl.png';
+    let seed = Url.getUrlParam("seed");
+    aDownloadLink.download = seed ? `${seed}.png` : 'ccl.png';
     aDownloadLink.href = image;
     aDownloadLink.click();
 }
