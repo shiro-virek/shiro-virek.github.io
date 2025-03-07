@@ -28,12 +28,12 @@
 	});
 
 	const NeighbourhoodType = Object.freeze({
-		VonNeumann: Symbol("vonneumann"),		
+		//VonNeumann: Symbol("vonneumann"),		
 		Moore: Symbol("moore"),
-        Extended: Symbol("extended"),
-        Diagonal: Symbol("diagonal"),
-        Circle: Symbol("circle"),
-        Circunference: Symbol("circunference"),
+        //Extended: Symbol("extended"),
+        //Diagonal: Symbol("diagonal"),
+        //Circle: Symbol("circle"),
+        //Circunference: Symbol("circunference"),
 	});
 
     class Rule {
@@ -63,13 +63,13 @@
         }
 
         generateCells = () => {
-            for (let x = 0; x <= cellColumns; x++) {
+            for (let x = 0; x < cellColumns; x++) {
                 this.cells[x] = new Array(cellRows);
                 this.cellsBuffer[x] = new Array(cellRows);
             }
 
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
                     let cell = new Cell(x, y);
                     this.cells[x][y] = cell;
                     let cellBuffer = new Cell(x, y);
@@ -79,16 +79,16 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
                     this.cellsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
         copyBuffer = () => {
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
                     this.cells[x][y].diameter =  this.cellsBuffer[x][y].diameter;
                     this.cells[x][y].hue =  this.cellsBuffer[x][y].hue;
                     this.cells[x][y].saturation =  this.cellsBuffer[x][y].saturation;
@@ -270,8 +270,8 @@
         }
 
         update = () => {            
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x < cellColumns; x++) {
+                for (let y = 0; y < cellRows; y++) {
                     this.calculateCellStatus(x, y);
                 }
             }                  
@@ -320,8 +320,8 @@
         cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
         cellScreen = new CellScreen();
 
-        for (let x = 0; x <= cellColumns; x++) {
-            for (let y = 0; y <= cellRows; y++) {
+        for (let x = 0; x < cellColumns; x++) {
+            for (let y = 0; y < cellRows; y++) {
                 cellScreen.cells[x][y].hue = globals.random.nextInt(0, 255);
                 cellScreen.cells[x][y].saturation =  globals.random.nextInt(0, 100);
                 cellScreen.cells[x][y].lightness =  globals.random.nextInt(0, 100);            
