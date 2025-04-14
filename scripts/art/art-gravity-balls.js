@@ -75,18 +75,27 @@
                     this.y -= correctionY;
                     ball.x += correctionX;
                     ball.y += correctionY;
+
+                    this.dx *= 0.9
+                    this.dy *= 0.9
+                    ball.dx *= 0.9
+                    ball.dy *= 0.9
                 }
             }
         }
 
         checkCollisionsWalls = () => {
+            let collision = false;
+
             if (this.getRight() > width) {
                 this.x = width - this.radius; 
-                this.dx = -Math.abs(this.dx) * config.damping;
+                this.dx = -Math.abs(this.dx) * config.damping;    
         
                 if (Math.abs(this.dx) < 1) {
                     this.dx = 0;
                 }
+
+                collision = true;
             }
         
             if (this.getLeft() < 0) {
@@ -96,6 +105,8 @@
                 if (Math.abs(this.dx) < 1) {
                     this.dx = 0;
                 }
+
+                collision = true;
             }
         
             if (this.getBottom() > canvas.height) {
@@ -105,11 +116,20 @@
                 if (Math.abs(this.dy) < 1) {
                     this.dy = 0;
                 }
+
+                collision = true;
             }
         
             if (this.getTop() < 0) {
                 this.y = this.radius; 
                 this.dy = Math.abs(this.dy) * config.damping;
+
+                collision = true;
+            }
+
+            if (collision){
+                this.dx *= 0.9
+                this.dy *= 0.9
             }
         }
 
@@ -119,7 +139,8 @@
             this.x += this.dx;
 
             this.dx *= config.damping;
-            if (Math.abs(this.dx) < 0.1) this.dx = 0;
+            if (Math.abs(this.dx) < 0.15) this.dx = 0;
+            if (Math.abs(this.dy) < 0.15) this.dy = 0;
         }
 
         getTop = () => this.y - this.radius;
@@ -173,6 +194,8 @@
 
         draw();
 
+        populateQuadTree();
+        
         if (config.drawQuadtree)
             globals.quad.drawQuadtree(ctx, globals.quad);
 
@@ -185,7 +208,6 @@
             ball.draw();
         }
 
-        populateQuadTree();
 
         lastRender = timestamp;
 
