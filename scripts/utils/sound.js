@@ -19,28 +19,23 @@ class Sound {
     }
 
 
-    static ping = () => {
+    static ping = (frequency = 1000) => {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        // Oscilador tipo seno o cuadrada puede funcionar
         const osc = audioCtx.createOscillator();
-        osc.type = 'sine'; // o 'square' para un efecto más "duro"
-        osc.frequency.value = 1000; // frecuencia alta para tono metálico
+        osc.type = 'sine'; 
+        osc.frequency.value = frequency; 
 
-        // Ganancia para controlar la envolvente (volumen)
         const gain = audioCtx.createGain();
 
-        // Conexión
         osc.connect(gain);
         gain.connect(audioCtx.destination);
 
-        // Envolvente rápida (sonido corto)
         const now = audioCtx.currentTime;
-        gain.gain.setValueAtTime(1, now);               // volumen inicial
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2); // decay rápido en 200 ms
+        gain.gain.setValueAtTime(1, now);              
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2); 
 
-        // Iniciar y detener
         osc.start(now);
-        osc.stop(now + 0.3); // corta después de 300 ms
+        osc.stop(now + 0.3); 
     }
 }

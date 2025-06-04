@@ -114,7 +114,7 @@
 					}
 				}
 
-				Sound.ping();
+				Sound.ping(100);
 			}
 		}
 

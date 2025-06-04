@@ -95,25 +95,29 @@
 		}
 
 		checkCollisionsWalls() {
+			let collision = false;
+
 			if ((this.getRight() > width)) {
 				this.speedX = -Math.abs(this.speedX);
-				Sound.ping();
+				collision = true
 			}
 
 			if (this.getLeft() < 0) {
 				this.speedX = Math.abs(this.speedX);
-				Sound.ping();
+				collision = true
 			}
 
 			if ((this.getBottom() > height)) {
 				this.speedY = -Math.abs(this.speedY);
-				Sound.ping();
+				collision = true;
 			}
 
 			if ((this.getTop() < 0)) {
 				this.speedY = Math.abs(this.speedY);
-				Sound.ping();
+				collision = true;
 			}
+
+			if (collision) Sound.ping();
 
 			if (this.speedX > 0 && this.speedX < 1) this.speedX = 1;
 			if (this.speedY > 0 && this.speedY < 1) this.speedY = 1;
@@ -146,7 +150,7 @@
 
 			globals.ballCollection.balls.push(ball);
 
-			Sound.ping();
+			Sound.ping(100);
 		}
 
 		populateQuadTree = () => {

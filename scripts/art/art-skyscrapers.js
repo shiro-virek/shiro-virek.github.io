@@ -38,7 +38,7 @@
 			building.randomize();
 			this.buildings.push(building);
 			this.buildingsCount++;
-			Sound.ping();
+			Sound.ping(100);
 		}
 
 		draw = () => {

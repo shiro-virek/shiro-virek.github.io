@@ -164,7 +164,7 @@
         let ball = new Ball(x, y);
         globals.balls.push(ball);
 
-	    Sound.ping();
+	    Sound.ping(100);
     }
 
     let populateQuadTree = () => {
