@@ -77,6 +77,7 @@
             figure.translateY(y);
 
             this.figures.push(figure);
+			Sound.ping();
         }
     }
 

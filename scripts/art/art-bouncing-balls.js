@@ -88,6 +88,8 @@
 					this.speedY = newVelY1;
 					ball.speedX = newVelX2;
 					ball.speedY = newVelY2;
+				
+					Sound.ping();
 				}
 			}
 		}
@@ -95,18 +97,22 @@
 		checkCollisionsWalls() {
 			if ((this.getRight() > width)) {
 				this.speedX = -Math.abs(this.speedX);
+				Sound.ping();
 			}
 
 			if (this.getLeft() < 0) {
 				this.speedX = Math.abs(this.speedX);
+				Sound.ping();
 			}
 
 			if ((this.getBottom() > height)) {
 				this.speedY = -Math.abs(this.speedY);
+				Sound.ping();
 			}
 
 			if ((this.getTop() < 0)) {
 				this.speedY = Math.abs(this.speedY);
+				Sound.ping();
 			}
 
 			if (this.speedX > 0 && this.speedX < 1) this.speedX = 1;
@@ -139,6 +145,8 @@
 			let ball = new Ball(x, y);
 
 			globals.ballCollection.balls.push(ball);
+
+			Sound.ping();
 		}
 
 		populateQuadTree = () => {

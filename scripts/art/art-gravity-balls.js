@@ -163,6 +163,8 @@
     let addBall = (x, y) => {
         let ball = new Ball(x, y);
         globals.balls.push(ball);
+
+	    Sound.ping();
     }
 
     let populateQuadTree = () => {

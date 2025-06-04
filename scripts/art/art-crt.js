@@ -132,11 +132,12 @@
     }
 
     let addEvents = () => {
-        /*     
+
         canvas.addEventListener('click', e => {
-            crtScreen.setPixel(e.offsetX, e.offsetY);
+            Sound.whiteNoise();
         }, false);
-        
+
+        /*   
         canvas.addEventListener('mousemove', e => {
             crtScreen.setPixel(e.offsetX, e.offsetY);
         }, false);
