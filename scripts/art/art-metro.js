@@ -113,6 +113,8 @@
 						station.addTransfers(this);
 					}
 				}
+
+				Sound.ping(100);
 			}
 		}
 
