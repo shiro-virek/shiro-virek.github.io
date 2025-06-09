@@ -22,7 +22,8 @@ const art = [
                 "blinkenlights",
                 "blinkenlights-mn",
                 "shader",
-                "gravity-balls"
+                "gravity-balls",
+                "webcam"
             ];
 const scripts = [];
 
