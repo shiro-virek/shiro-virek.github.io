@@ -280,7 +280,41 @@
             //if (!globals.mouseMoved)
 
         });
-    }
+
+        const uploader = document.getElementById('uploader');
+        const uploadButton = document.getElementById('uploadButton');
+
+        uploadButton.addEventListener('click', function() {
+            uploader.click();
+        });
+
+        uploader.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {                    
+                    img.onerror = function() {
+                        alert('Error loading image');
+                    };
+                    
+                    img.src = event.target.result;
+                };
+                
+                reader.onerror = function() {
+                    alert('Error reading file');
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+    };
 
     let trackMouse = (x, y) => {
         if (globals.lastPosX == 0) globals.lastPosX = x;
