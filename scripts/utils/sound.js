@@ -1,6 +1,29 @@
 class Sound {
+    static lastPlayed = 0;
+    static minInterval = 10; 
+
+
+    static AudioContext = (() => {
+        let instance;
+        
+        function createInstance() {
+            const object = new (window.AudioContext || window.webkitAudioContext)();
+            return object;
+        }
+        
+        return {
+            getInstance() {
+            if (!instance) {
+                instance = createInstance();
+            }
+            return instance;
+            }
+        };
+    })();
+
+
     static whiteNoise = () => {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audioCtx = Sound.AudioContext.getInstance();
 
         const bufferSize = 2 * audioCtx.sampleRate;
         const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -19,23 +42,39 @@ class Sound {
     }
 
 
-    static ping = (frequency = 1000) => {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    static ping(freq = 1000, duration = 0.1, volume = 0.2) {
+        const ctx = Sound.AudioContext.getInstance();
 
-        const osc = audioCtx.createOscillator();
-        osc.type = 'sine'; 
-        osc.frequency.value = frequency; 
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
 
-        const gain = audioCtx.createGain();
+        const now = performance.now();
+        if (now - Sound.lastPlayed < Sound.minInterval) return;
+
+        Sound.lastPlayed = now;
+
+        const audioNow = ctx.currentTime;
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.frequency.setValueAtTime(freq, audioNow);
+        osc.type = 'square';
+
+        gain.gain.setValueAtTime(volume, audioNow);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioNow + duration);
 
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
 
-        const now = audioCtx.currentTime;
-        gain.gain.setValueAtTime(1, now);              
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2); 
+        osc.start(audioNow);
+        osc.stop(audioNow + duration);
 
-        osc.start(now);
-        osc.stop(now + 0.3); 
+        osc.onended = () => {
+            osc.disconnect();
+            gain.disconnect();
+        };
     }
+
 }

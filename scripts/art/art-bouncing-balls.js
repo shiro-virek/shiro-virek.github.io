@@ -89,7 +89,7 @@
 					ball.speedX = newVelX2;
 					ball.speedY = newVelY2;
 				
-					Sound.ping();
+					Sound.ping(1000);
 				}
 			}
 		}
@@ -117,7 +117,7 @@
 				collision = true;
 			}
 
-			if (collision) Sound.ping();
+			if (collision) Sound.ping(200);
 
 			if (this.speedX > 0 && this.speedX < 1) this.speedX = 1;
 			if (this.speedY > 0 && this.speedY < 1) this.speedY = 1;
