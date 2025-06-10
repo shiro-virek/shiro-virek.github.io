@@ -15,31 +15,25 @@
 
     let addEvents = () => {        
 		canvas.addEventListener('click', async () => {
-            if (globals.streaming) {
-                globals.video.srcObject.getTracks().forEach(track => track.stop());
-                canvas.width = 0;
-                canvas.height = 0;
-                globals.streaming = false;
-                return;
-            }
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                
-                globals.video = document.createElement('video');
-                globals.video.srcObject = stream;
-                globals.video.play();
-                
-                globals.video.addEventListener('loadedmetadata', () => {
-                    canvas.width = globals.video.videoWidth;
-                    canvas.height = globals.video.videoHeight;
-                    globals.streaming = true;
+            if (!globals.streaming) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                     
-                    requestAnimationFrame(loop);
-                });
-            } catch (err) {
-                console.error("The webcam could not be accessed:", err);
-                alert("The webcam could not be accessed. Make sure you allow access.");
+                    globals.video = document.createElement('video');
+                    globals.video.srcObject = stream;
+                    globals.video.play();
+                    
+                    globals.video.addEventListener('loadedmetadata', () => {
+                        canvas.width = globals.video.videoWidth;
+                        canvas.height = globals.video.videoHeight;
+                        globals.streaming = true;
+                        
+                        requestAnimationFrame(loop);
+                    });
+                } catch (err) {
+                    console.error("The webcam could not be accessed:", err);
+                    alert("The webcam could not be accessed. Make sure you allow access.");
+                }
             }
         });
     }
