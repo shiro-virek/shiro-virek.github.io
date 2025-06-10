@@ -9,6 +9,9 @@
     
     let init = () => {
 		globals.random = Objects.getRandomObject();
+        initCanvas();
+        addEvents();
+        window.requestAnimationFrame(loop);
     }
 
     let addEvents = () => {
