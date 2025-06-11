@@ -9,21 +9,23 @@
     const config = {
         randomize: true,
         clicking: false,
-        mouseMoved: false
+        mouseMoved: false, 
+        pow: 2,
+        maxIterations: 50
     };    
 
-    let isInMandelbrotSet = (rc, ic, pow) => {
+    let isInMandelbrotSet = (rc, ic) => {
         let zr = 0;
         let zi = 0;
         
-        for (let iterations = 0; iterations < 50; iterations++) {
+        for (let iterations = 0; iterations < config.maxIterations; iterations++) {
             let zr_pow = zr;
             let zi_pow = zi;
             
             let rTemp = zr;
             let iTemp = zi;
             
-            for (let j = 1; j < pow; j++) {
+            for (let j = 1; j < config.pow; j++) {
                 const newR = rTemp * zr_pow - iTemp * zi_pow;
                 const newI = rTemp * zi_pow + iTemp * zr_pow;
                 rTemp = newR;
@@ -41,22 +43,31 @@
         return true;
     }
 
-    let isInJuliaSet = (zr, zi, cr, ci, maxIterations = 50) => {
-        for (let i = 0; i < maxIterations; i++) {
-            const zrNew = zr * zr - zi * zi + cr;
-            const ziNew = 2 * zr * zi + ci;
-
-            zr = zrNew;
-            zi = ziNew;
-
+    let isInJuliaSet = (zr, zi, cr, ci) => {
+        for (let i = 0; i < config.maxIterations; i++) {
+            let zr_pow = zr;
+            let zi_pow = zi;
+            
+            let rTemp = zr;
+            let iTemp = zi;
+            
+            for (let j = 1; j < config.pow; j++) {
+                const newR = rTemp * zr_pow - iTemp * zi_pow;
+                const newI = rTemp * zi_pow + iTemp * zr_pow;
+                rTemp = newR;
+                iTemp = newI;
+            }
+            
+            zr = rTemp + cr;
+            zi = iTemp + ci;
+            
             if (zr * zr + zi * zi > 4) {
                 return false;
             }
         }
-
+        
         return true;
     }
-
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
@@ -111,7 +122,7 @@
         if (lastPosX == 0) lastPosX = x;
         if (lastPosY == 0) lastPosY = y;
 
-        globals.scale = Numbers.scale(x, 0, width, 0.00005, 0.01);
+        //globals.scale = Numbers.scale(x, 0, width, 0.00005, 0.01);
         globals.cr = Numbers.scale(x, 0, width, -1, 1);
         globals.ci = Numbers.scale(y, 0, height, -1, 1);
 
@@ -136,7 +147,7 @@
                 const zr = x * globals.scale + offsetX;
                 const zi = y * globals.scale + offsetY;
 
-                if (isInMandelbrotSet(rc, ic, 2)){
+                if (isInMandelbrotSet(rc, ic)){
                 //if (isInJuliaSet(zr, zi, globals.cr, globals.ci)){
                     Pixels.setPixelBatch(ctx, data, x, y, 255, 255, 255);
                 }else{
