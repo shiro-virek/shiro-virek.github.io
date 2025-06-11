@@ -1,18 +1,85 @@
 {
     const globals = {
-        random: null
+        random: null,
+        framesCounter: 0,
+        ledScreen: null
     };
 
     const config = {
         randomize: true,
         clicking: false,
         mouseMoved: false, 
+        ledRows: 50,
+        ledColumns: 50,
+        ledMargin: 30,
+        ledPadding: 30,
+        ledDiameter: 20,
+        hue: 50,
     };    
+
+    class LedScreen {
+        constructor() {
+            this.leds = [];       
+            this.generateLeds();
+        }
+
+        generateLeds = () => {
+            for (let x = 0; x <= config.ledColumns; x++) {
+                this.leds[x] = new Array(config.ledRows);
+            }
+
+            for (let x = 0; x <= config.ledColumns; x++) {
+                for (let y = 0; y <= config.ledRows; y++) {
+                    let led = new Led(x, y);
+                    this.leds[x][y] = led;
+                }
+            }
+        }
+
+        draw = (ctx) => {
+            for (let x = 0; x <= config.ledColumns; x++) {
+                for (let y = 0; y <= config.ledRows; y++) {
+                    this.leds[x][y].draw(ctx);
+                }
+            }
+        }
+
+        update = () => {                           
+        }
+    }
+
+    class Led {
+        constructor(column, row) {
+            this.diameter = config.ledDiameter;
+            this.radius = config.ledDiameter / 2;
+            this.row = row;
+            this.column = column;
+            this.x = config.ledMargin + column * config.ledPadding + column * this.diameter;
+            this.y = config.ledMargin + row * config.ledPadding + row * this.diameter;
+            this.color = `hsl(${config.hue}, 100%, 50%)`;
+        }
+
+        draw = (ctx) => {
+            let color = this.color;
+            
+            Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color, color);
+        }
+    }
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();
+        config.ledDiameter = globals.random.nextInt(5, 20);        
+        config.ledPadding = globals.random.nextInt(0, 20);
+        config.ledMargin = config.ledPadding;
+
+        randomize();
+
+        config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
+        config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
+        globals.ledScreen = new LedScreen();
+        
         addEvents();
         window.requestAnimationFrame(loop);
     }
@@ -70,6 +137,26 @@
     
     let draw = () => {
         drawBackground(ctx, canvas);
+        globals.ledScreen.draw(ctx);
+/*
+        for (let y = 0; y < GRID_SIZE; y += num_pixels / GRID_SIZE){
+            for (let x = 0; x < GRID_SIZE; x += num_pixels / GRID_SIZE){
+
+                let v = parseInt(Noise.simplex(x, y, framesCounter) * COLOR_SCALE);
+                
+                ctx.save();
+
+                ctx.translate(x * 100, y * 100);
+
+                ctx.rotate(v * Math.PI / 180);
+                ctx.fillStyle = 'red';
+                ctx.fillRect(0, 0, 8, 3);
+
+                ctx.restore();
+
+            }
+        }
+            */
 
     }
 
@@ -77,6 +164,8 @@
         let progress = timestamp - lastRender;
 
         draw();
+
+        globals.framesCounter += 0.05;
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
