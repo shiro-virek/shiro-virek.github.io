@@ -60,9 +60,7 @@
         }
 
         draw = (ctx) => {
-            let color = this.color;
-            
-            Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color, color);
+            Drawing.drawRectangleR(ctx, this.x, this.y, this.radius, this.diameter, this.color, this.color, 45);
         }
     }
 
@@ -138,26 +136,6 @@
     let draw = () => {
         drawBackground(ctx, canvas);
         globals.ledScreen.draw(ctx);
-/*
-        for (let y = 0; y < GRID_SIZE; y += num_pixels / GRID_SIZE){
-            for (let x = 0; x < GRID_SIZE; x += num_pixels / GRID_SIZE){
-
-                let v = parseInt(Noise.simplex(x, y, framesCounter) * COLOR_SCALE);
-                
-                ctx.save();
-
-                ctx.translate(x * 100, y * 100);
-
-                ctx.rotate(v * Math.PI / 180);
-                ctx.fillStyle = 'red';
-                ctx.fillRect(0, 0, 8, 3);
-
-                ctx.restore();
-
-            }
-        }
-            */
-
     }
 
     let loop = (timestamp) => {

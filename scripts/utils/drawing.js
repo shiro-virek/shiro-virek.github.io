@@ -31,6 +31,18 @@ class Drawing {
         ctx.stroke();
     }
 
+    static drawRectangleR = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00', angle = 0) => {
+        ctx.strokeStyle = color;
+        ctx.fillStyle = fillColor;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle * Math.PI / 180);
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.restore();
+    }
+
     static drawPolygon = (ctx, x, y, r, sides, angle, color = '#00FF00', fillColor = '#00FF00') => {
         ctx.strokeStyle = color;
         ctx.fillStyle = fillColor;
