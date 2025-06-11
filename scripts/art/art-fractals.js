@@ -14,7 +14,9 @@
         maxIterations: 50,
         scale: 0.005,
         cr: -0.7,
-        ci: 0.27
+        ci: 0.27,
+        offsetX: 0,
+        offsetY: 0
     };    
 
     function mandelbrot(rc, ic){
@@ -129,9 +131,11 @@
         if (lastPosY == 0) lastPosY = y;
 
         if (config.clicking) {  
-            //config.scale = Numbers.scale(x, 0, width, 0.00005, 0.01);
-            config.cr = Numbers.scale(x, 0, width, -1, 1);
-            config.ci = Numbers.scale(y, 0, height, -1, 1);
+            config.scale = config.mode ? Numbers.scale(x, 0, width, 0.00005, 0.01) : config.scale;
+            if (!config.mode){
+                config.cr = Numbers.scale(x, 0, width, -1, 1);
+                config.ci = Numbers.scale(y, 0, height, -1, 1);
+            }
         }
 
         lastPosX = x;
@@ -143,14 +147,14 @@
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
-            
-        const offsetX = -width * config.scale / 2;
-        const offsetY = -height * config.scale / 2;
-        
+    
+        config.offsetX = -width * config.scale / 2;
+        config.offsetY = -height * config.scale / 2;
+    
         for (let x=0; x < width; x++){
             for (let y=0; y < height; y++){
-                const rc = x * config.scale + offsetX;
-                const ic = y * config.scale + offsetY;
+                const rc = x * config.scale + config.offsetX;
+                const ic = y * config.scale + config.offsetY;
 
                 const fractalFunction = config.functions[config.functionIndex];
                 let value = fractalFunction(rc, ic);
