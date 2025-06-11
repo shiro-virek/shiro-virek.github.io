@@ -7,8 +7,6 @@
         randomize: true,
     };    
 
- 
-
     let isInMandelbrotSet = (rc, ic, maxIterations = 50) => {
         let zr = 0;
         let zi = 0;
@@ -27,6 +25,24 @@
         
         return true;
     }
+
+
+    let isInJuliaSet = (zr, zi, cr, ci, maxIterations = 50) => {
+        for (let i = 0; i < maxIterations; i++) {
+            const zrNew = zr * zr - zi * zi + cr;
+            const ziNew = 2 * zr * zi + ci;
+
+            zr = zrNew;
+            zi = ziNew;
+
+            if (zr * zr + zi * zi > 4) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
@@ -55,13 +71,20 @@
         const scale = 0.005;
         const offsetX = -width * scale / 2;
         const offsetY = -height * scale / 2;
+
+        const cr = -0.7; 
+        const ci = 0.27; 
         
         for (let x=0; x < width; x++){
             for (let y=0; y < height; y++){
                 const rc = x * scale + offsetX;
                 const ic = y * scale + offsetY;
 
-                if (isInMandelbrotSet(rc, ic)){
+                const zr = x * scale + offsetX;
+                const zi = y * scale + offsetY;
+
+                //if (isInMandelbrotSet(rc, ic)){
+                if (isInJuliaSet(zr, zi, cr, ci)){
                     Pixels.setPixelBatch(ctx, data, x, y, 255, 255, 255);
                 }else{
                     Pixels.setPixelBatch(ctx, data, x, y, 0, 0, 0);
