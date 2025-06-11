@@ -7,6 +7,9 @@
         randomize: true,
         clicking: false,
         mouseMoved: false, 
+        mode: 1,
+        functionIndex: 1,
+        functions: [mandelbrot, julia],
         pow: 2,
         maxIterations: 50,
         scale: 0.005,
@@ -14,7 +17,7 @@
         ci: 0.27
     };    
 
-    let isInMandelbrotSet = (rc, ic) => {
+    function mandelbrot(rc, ic){
         let zr = 0;
         let zi = 0;
         
@@ -43,7 +46,7 @@
         return 0;
     }
 
-    let isInJuliaSet = (zr, zi) => {
+    function julia(zr, zi){
         for (let i = 0; i < config.maxIterations; i++) {
             let zr_pow = zr;
             let zi_pow = zi;
@@ -71,6 +74,7 @@
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);
@@ -113,9 +117,9 @@
     }
 
     let randomize = () => {
-    
+        config.mode = globals.random.nextBool();
+        config.functionIndex = Math.floor(Math.random() * config.functions.length)
     }
-
 
     let trackMouse = (x, y) => {
         if (lastPosX == 0) lastPosX = x;
@@ -145,8 +149,9 @@
                 const rc = x * config.scale + offsetX;
                 const ic = y * config.scale + offsetY;
 
-                //let value = isInMandelbrotSet(rc, ic);
-                let value = isInJuliaSet(rc, ic);
+                const fractalFunction = config.functions[config.functionIndex];
+                let value = fractalFunction(rc, ic);
+                
                 value = Numbers.scale(value, 0, config.maxIterations, 0, 255);
                 Pixels.setPixelBatch(ctx, data, x, y, value, value, value);
             }
