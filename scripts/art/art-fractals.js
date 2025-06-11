@@ -102,8 +102,9 @@
         if (lastPosX == 0) lastPosX = x;
         if (lastPosY == 0) lastPosY = y;
 
-        
-
+        //globals.scale = Numbers.scale(x, 0, width, 0.00005, 0.01);
+        globals.cr = Numbers.scale(x, 0, width, -1, 1);
+        globals.ci = Numbers.scale(y, 0, height, -1, 1);
 
         lastPosX = x;
         lastPosY = y;
