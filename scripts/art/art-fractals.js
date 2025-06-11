@@ -1,10 +1,15 @@
 {    
     const globals = {
-        random: null
+        random: null, 
+        scale: 0.005,
+        cr: -0.7,
+        ci: 0.27
     };
 
     const config = {
         randomize: true,
+        clicking: false,
+        mouseMoved: false
     };    
 
     let isInMandelbrotSet = (rc, ic, maxIterations = 50) => {
@@ -56,35 +61,73 @@
         canvas.addEventListener('click', e => {
             
         }, false);
+
+        canvas.addEventListener('mousemove', e => {
+            config.mouseMoved = true;
+			trackMouse(e.offsetX, e.offsetY);
+		}, false);
+
+		canvas.addEventListener('touchmove', function (e) {
+			e.preventDefault();
+            config.mouseMoved = true;
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		});
+
+		canvas.addEventListener('touchstart', function (e) {
+            config.mouseMoved = false;            
+			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+			config.clicking = true;
+		});
+
+		canvas.addEventListener('mousedown', e => {
+            config.mouseMoved = false;
+			config.clicking = true;
+		}, false);
+
+		canvas.addEventListener('mouseup', e => {
+			config.clicking = false;
+		}, false);
+
+		canvas.addEventListener('touchend', e => {
+			config.clicking = false;
+		}, false);  
     }
 
     let randomize = () => {
     
     }
 
+
+    let trackMouse = (x, y) => {
+        if (lastPosX == 0) lastPosX = x;
+        if (lastPosY == 0) lastPosY = y;
+
+        
+
+
+        lastPosX = x;
+        lastPosY = y;
+    }
+    
     let draw = () => {
         drawBackground(ctx, canvas);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
             
-        const scale = 0.005;
-        const offsetX = -width * scale / 2;
-        const offsetY = -height * scale / 2;
-
-        const cr = -0.7; 
-        const ci = 0.27; 
+        const offsetX = -width * globals.scale / 2;
+        const offsetY = -height * globals.scale / 2;
         
         for (let x=0; x < width; x++){
             for (let y=0; y < height; y++){
-                const rc = x * scale + offsetX;
-                const ic = y * scale + offsetY;
+                const rc = x * globals.scale + offsetX;
+                const ic = y * globals.scale + offsetY;
 
-                const zr = x * scale + offsetX;
-                const zi = y * scale + offsetY;
+                const zr = x * globals.scale + offsetX;
+                const zi = y * globals.scale + offsetY;
 
                 //if (isInMandelbrotSet(rc, ic)){
-                if (isInJuliaSet(zr, zi, cr, ci)){
+                if (isInJuliaSet(zr, zi, globals.cr, globals.ci)){
                     Pixels.setPixelBatch(ctx, data, x, y, 255, 255, 255);
                 }else{
                     Pixels.setPixelBatch(ctx, data, x, y, 0, 0, 0);
