@@ -43,7 +43,7 @@
         return 0;
     }
 
-    let isInJuliaSet = (zr, zi, cr, ci) => {
+    let isInJuliaSet = (zr, zi) => {
         for (let i = 0; i < config.maxIterations; i++) {
             let zr_pow = zr;
             let zi_pow = zi;
@@ -58,8 +58,8 @@
                 iTemp = newI;
             }
             
-            zr = rTemp + cr;
-            zi = iTemp + ci;
+            zr = rTemp + config.cr;
+            zi = iTemp + config.ci;
             
             if (zr * zr + zi * zi > 4) {
                 return i;
@@ -145,11 +145,8 @@
                 const rc = x * config.scale + offsetX;
                 const ic = y * config.scale + offsetY;
 
-                const zr = x * config.scale + offsetX;
-                const zi = y * config.scale + offsetY;
-
                 //let value = isInMandelbrotSet(rc, ic);
-                let value = isInJuliaSet(zr, zi, config.cr, config.ci);
+                let value = isInJuliaSet(rc, ic);
                 value = Numbers.scale(value, 0, config.maxIterations, 0, 255);
                 Pixels.setPixelBatch(ctx, data, x, y, value, value, value);
             }
