@@ -12,9 +12,6 @@
 	let lightness = 0;
 	let opacity = 0.001;
 
-	let lastPosX = 0;
-	let lastPosY = 0;
-
 	let clicking = false;
 
 	let init = () => {
