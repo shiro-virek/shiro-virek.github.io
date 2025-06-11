@@ -18,7 +18,7 @@
         let zr = 0;
         let zi = 0;
         
-        for (let iterations = 0; iterations < config.maxIterations; iterations++) {
+        for (let i = 0; i < config.maxIterations; i++) {
             let zr_pow = zr;
             let zi_pow = zi;
             
@@ -36,11 +36,11 @@
             zi = iTemp + ic;
             
             if (zr * zr + zi * zi > 4) {
-                return false;
+                return i;
             }
         }
         
-        return true;
+        return 0;
     }
 
     let isInJuliaSet = (zr, zi, cr, ci) => {
@@ -62,11 +62,11 @@
             zi = iTemp + ci;
             
             if (zr * zr + zi * zi > 4) {
-                return false;
+                return i;
             }
         }
         
-        return true;
+        return 0;
     }
 
     let init = () => {
@@ -77,7 +77,6 @@
     }
 
     let addEvents = () => {
-
         canvas.addEventListener('click', e => {
             
         }, false);
@@ -122,9 +121,11 @@
         if (lastPosX == 0) lastPosX = x;
         if (lastPosY == 0) lastPosY = y;
 
-        //globals.scale = Numbers.scale(x, 0, width, 0.00005, 0.01);
-        globals.cr = Numbers.scale(x, 0, width, -1, 1);
-        globals.ci = Numbers.scale(y, 0, height, -1, 1);
+        if (config.clicking) {  
+            //globals.scale = Numbers.scale(x, 0, width, 0.00005, 0.01);
+            globals.cr = Numbers.scale(x, 0, width, -1, 1);
+            globals.ci = Numbers.scale(y, 0, height, -1, 1);
+        }
 
         lastPosX = x;
         lastPosY = y;
@@ -147,12 +148,10 @@
                 const zr = x * globals.scale + offsetX;
                 const zi = y * globals.scale + offsetY;
 
-                if (isInMandelbrotSet(rc, ic)){
-                //if (isInJuliaSet(zr, zi, globals.cr, globals.ci)){
-                    Pixels.setPixelBatch(ctx, data, x, y, 255, 255, 255);
-                }else{
-                    Pixels.setPixelBatch(ctx, data, x, y, 0, 0, 0);
-                }                
+                let value = isInMandelbrotSet(rc, ic);
+                //let value = isInJuliaSet(zr, zi, globals.cr, globals.ci);
+                value = Numbers.scale(value, 0, config.maxIterations, 0, 255);
+                Pixels.setPixelBatch(ctx, data, x, y, value, value, value);
             }
         }        
 
