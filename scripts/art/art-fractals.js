@@ -119,6 +119,9 @@
     let randomize = () => {
         config.mode = globals.random.nextBool();
         config.functionIndex = Math.floor(Math.random() * config.functions.length)
+        config.pow = globals.random.nextInt(2, 5);   
+        config.cr = globals.random.nextRange(-1, 1);  
+        config.ci = globals.random.nextRange(-1, 1);  
     }
 
     let trackMouse = (x, y) => {
