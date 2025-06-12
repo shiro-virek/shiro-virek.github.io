@@ -30,5 +30,8 @@ Scenes currently available:
 - rotators-solid
 - blinkenlights
 - blinkenlights-mn
+- webcam
+- noise
+- fractals
 
 You can see them in action at https://eapelroso.com 🙃
