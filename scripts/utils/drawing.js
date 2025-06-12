@@ -30,15 +30,21 @@ class Drawing {
         ctx.fill();
         ctx.stroke();
     }
-
+        
     static drawRectangleR = (ctx, x, y, width, height, color = '#FFF', fillColor = '#00FF00', angle = 0) => {
         ctx.strokeStyle = color;
         ctx.fillStyle = fillColor;
 
         ctx.save();
-        ctx.translate(x, y);
+        
+        const centerX = x + width / 2;
+        const centerY = y + height / 2;
+        ctx.translate(centerX, centerY);
+        
         ctx.rotate(angle * Math.PI / 180);
-        ctx.fillRect(0, 0, width, height);
+        
+        ctx.fillRect(-width / 2, -height / 2, width, height);
+        ctx.strokeRect(-width / 2, -height / 2, width, height);
 
         ctx.restore();
     }

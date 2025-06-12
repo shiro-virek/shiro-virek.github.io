@@ -11,7 +11,7 @@
         mouseMoved: false, 
         ledRows: 50,
         ledColumns: 50,
-        ledMargin: 30,
+        ledMargin: 0,
         ledPadding: 30,
         ledDiameter: 20,
         hue: 50,
@@ -60,7 +60,8 @@
         }
 
         draw = (ctx) => {
-            Drawing.drawRectangleR(ctx, this.x, this.y, this.radius, this.diameter, this.color, this.color, 45);
+            let angle = Numbers.scale(Noise.simplexNoise(this.x, this.y, globals.framesCounter), -1, 1, 0, 360) ;
+            Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);
         }
     }
 
@@ -69,7 +70,7 @@
         if (config.randomize) randomize();
         initCanvas();
         config.ledDiameter = globals.random.nextInt(5, 20);        
-        config.ledPadding = globals.random.nextInt(0, 20);
+        config.ledPadding = globals.random.nextInt(0, 5);
         config.ledMargin = config.ledPadding;
 
         randomize();
@@ -119,6 +120,7 @@
     }
 
     let randomize = () => {
+        config.hue = globals.random.nextInt(0, 255);
     }
 
     let trackMouse = (x, y) => {
@@ -142,7 +144,8 @@
         let progress = timestamp - lastRender;
 
         draw();
-
+        
+        Browser.sleep(200);
         globals.framesCounter += 0.05;
 
         lastRender = timestamp;
