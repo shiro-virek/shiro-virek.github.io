@@ -1,6 +1,5 @@
 class Noise {
     static simplexNoise = (x, y, z) => {
-        // Permutación y gradientes para el ruido Simplex
         const perm = new Uint8Array(512);
         const grad3 = [
             [1,1,0], [-1,1,0], [1,-1,0], [-1,-1,0],
@@ -8,17 +7,14 @@ class Noise {
             [0,1,1], [0,-1,1], [0,1,-1], [0,-1,-1]
         ];
 
-        // Inicializar la tabla de permutación (esto puede ser aleatorio en implementaciones completas)
         for (let i = 0; i < 512; i++) {
             perm[i] = Math.floor(Math.random() * 256);
         }
 
-        // Función para calcular el producto escalar
         function dot(g, x, y, z) {
             return g[0]*x + g[1]*y + g[2]*z;
         }
 
-        // Paso 1: Determinar la celda simplex
         const F3 = 1.0 / 3.0;
         const G3 = 1.0 / 6.0;
 
@@ -35,7 +31,6 @@ class Noise {
         let y0 = y - Y0;
         let z0 = z - Z0;
 
-        // Paso 2: Determinar el orden de los vértices
         let i1, j1, k1, i2, j2, k2;
         
         if (x0 >= y0) {
@@ -48,7 +43,6 @@ class Noise {
             else { i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; }
         }
 
-        // Paso 3: Calcular las contribuciones de los vértices
         let x1 = x0 - i1 + G3;
         let y1 = y0 - j1 + G3;
         let z1 = z0 - k1 + G3;
@@ -59,7 +53,6 @@ class Noise {
         let y3 = y0 - 1.0 + 3.0 * G3;
         let z3 = z0 - 1.0 + 3.0 * G3;
 
-        // Paso 4: Calcular los hashes de los vértices
         let ii = i & 255;
         let jj = j & 255;
         let kk = k & 255;
@@ -69,7 +62,6 @@ class Noise {
         let gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]] % 12;
         let gi3 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]] % 12;
 
-        // Paso 5: Calcular las contribuciones de los vértices
         let t0 = 0.6 - x0*x0 - y0*y0 - z0*z0;
         let n0 = t0 < 0 ? 0.0 : t0 * t0 * t0 * t0 * dot(grad3[gi0], x0, y0, z0);
         
@@ -82,11 +74,9 @@ class Noise {
         let t3 = 0.6 - x3*x3 - y3*y3 - z3*z3;
         let n3 = t3 < 0 ? 0.0 : t3 * t3 * t3 * t3 * dot(grad3[gi3], x3, y3, z3);
 
-        // Paso 6: Combinar las contribuciones y escalar al rango [-1,1]
         return 32.0 * (n0 + n1 + n2 + n3);
     }
 
-    // Función de envoltura para normalizar el resultado a [0,1]
     static simplexNoiseNormalized(x, y, z) {
         return (Noise.simplexNoise(x, y, z) + 1) / 2;
     }

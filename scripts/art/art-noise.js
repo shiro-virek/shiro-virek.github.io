@@ -60,7 +60,8 @@
         }
 
         draw = (ctx) => {
-            let angle = Numbers.scale(Noise.simplexNoise(this.x, this.y, globals.framesCounter), -1, 1, 0, 360) ;
+            let noiseValue = Noise.simplexNoise(this.x, this.y, globals.framesCounter);
+            let angle = Numbers.scale(noiseValue, -1, 1, 0, 360) ;
             Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);
         }
     }
