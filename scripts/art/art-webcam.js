@@ -4,12 +4,20 @@
         streaming: false,
         video: null
     };
+
+    const config = {
+        randomize: true,
+        clicking: false,
+        mouseMoved: false, 
+        mode: 1,
+        functionIndex: 1,
+        functions: [negative]
+    };    
     
     let init = () => {
 		initCanvas();
-        
-        randomize();
-
+        globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
         addEvents();
     }
 
@@ -38,7 +46,17 @@
         });
     }
 
-    let randomize = () => {       
+    let randomize = () => { 
+        config.functionIndex = Math.floor(Math.random() * config.functions.length)      
+    }
+
+    function negative(imageData){
+        const pixels = imageData;
+        for (let i = 0; i < pixels.length; i += 4) {
+            pixels[i] = 255 - pixels[i];       
+            pixels[i + 1] = 255 - pixels[i + 1]; 
+            pixels[i + 2] = 255 - pixels[i + 2];
+        }
     }
 
     let draw = () => {
@@ -47,13 +65,10 @@
         ctx.drawImage(globals.video, 0, 0, canvas.width, canvas.height);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const pixels = imageData.data;
+        
+        const webcamFunction = config.functions[config.functionIndex];
+        let value = webcamFunction(imageData.data);
 
-        for (let i = 0; i < pixels.length; i += 4) {
-            pixels[i] = 255 - pixels[i];       
-            pixels[i + 1] = 255 - pixels[i + 1]; 
-            pixels[i + 2] = 255 - pixels[i + 2];
-        }
 
         ctx.putImageData(imageData, 0, 0);
     }
