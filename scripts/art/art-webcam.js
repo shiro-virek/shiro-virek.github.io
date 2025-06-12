@@ -11,13 +11,13 @@
         mouseMoved: false, 
         mode: 1,
         functionIndex: 1,
-        functions: [negative]
+        functions: [negative,ripple]
     };    
     
     let init = () => {
-		initCanvas();
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
+		initCanvas();
         addEvents();
     }
 
@@ -59,6 +59,41 @@
         }
     }
 
+    function ripple(imageData){
+        var outputData = imageData;
+
+        const amplitude = 10;
+        const frequency = 0.3; 
+        const centerX = halfWidth;
+        const centerY = halfHeight;
+        const phase = 1;
+
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                const displacement = amplitude * Math.sin(frequency * distance - phase);
+
+                const newX = x + (dx / distance) * displacement;
+                const newY = y + (dy / distance) * displacement;
+
+                if (newX >= 0 && newX < canvas.width && newY >= 0 && newY < canvas.height) {
+                    const index = (y * canvas.width + x) * 4;
+                    const newIndex = (Math.floor(newY) * canvas.width + Math.floor(newX)) * 4;
+
+                    outputData[index] = imageData[newIndex];         // Red
+                    outputData[index + 1] = imageData[newIndex + 1]; // Green
+                    outputData[index + 2] = imageData[newIndex + 2]; // Blue
+                    outputData[index + 3] = imageData[newIndex + 3]; // Alpha
+                }
+            }
+        }
+
+        imageData = outputData;    
+    }
+
     let draw = () => {
         drawBackground(ctx, canvas);
 
@@ -67,8 +102,7 @@
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         
         const webcamFunction = config.functions[config.functionIndex];
-        let value = webcamFunction(imageData.data);
-
+        webcamFunction(imageData.data);
 
         ctx.putImageData(imageData, 0, 0);
     }
