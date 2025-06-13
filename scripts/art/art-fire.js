@@ -3,7 +3,7 @@
 		random: null
     };
 
-	let PARTICLES_COUNT = 500;
+	let PARTICLES_COUNT = 300;
 	let MINIMUM_LIFE = 20;
 	let MAXIMUM_LIFE = 100;
 	let MINIMUM_DIAMETER = 5;
@@ -33,6 +33,7 @@
 		}
 
 		setNewFireObject(notFirstTime) {
+			this.previous = [];
 			this.notFirstTime = notFirstTime;
 			this.sin = globals.random.nextBool();
 			this.yCenter = height + 100 - globals.random.nextInt(1, 50);
@@ -44,7 +45,7 @@
 		}
 
 		getColor() {
-			let alpha = this.life * 255 / MAXIMUM_LIFE;
+			let alpha = this.life / MAXIMUM_LIFE;
 			let green = (this.life / 2) * 255 / MAXIMUM_LIFE;
 			let col = new Color(255, green, 0, alpha);
 			return col;
@@ -54,14 +55,19 @@
 			return this.life * MAXIMUM_DIAMETER / MAXIMUM_LIFE;
 		}
 
-		update() {
+		update() {		
+			if (this.previous.length > 5)	
+				this.previous.pop();
+			let copy = Objects.cloneWithMethods(this);
+			copy.previous = [];
+			this.previous.unshift(copy);
+
 			this.yCenter -= this.speed;
 
 			if (this.sin || ALL_SIN)
 				this.xMovement = (AMPLITUDE * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
 			else
 				this.xMovement = (AMPLITUDE * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
-
 
 			if (this.life > 0)
 				this.life--;
@@ -73,7 +79,7 @@
 
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
-		PARTICLES_COUNT = globals.random.nextInt(50, screen.height * screen.width / 1000);
+		PARTICLES_COUNT = globals.random.nextInt(50, screen.height * screen.width / 2000);
 		MINIMUM_LIFE = globals.random.nextInt(10, 90)
 		MAXIMUM_LIFE = globals.random.nextInt(100, 200);
 		MINIMUM_DIAMETER = globals.random.nextInt(1, 10);
@@ -141,8 +147,19 @@
 		for (i = 0; i < PARTICLES_COUNT; i++) {
 			objects[i].update();
 
-			if (objects[i].notFirstTime)
-				Drawing.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor().getRGBA(), objects[i].getColor().getRGBA());
+			let color = objects[i].getColor()
+
+			if (objects[i].notFirstTime){
+				let color2 = Objects.cloneWithMethods(color);
+				
+				objects[i].previous.forEach(function (item) {	
+					color2.alpha *= 0.7;
+					Drawing.drawCircle(ctx, item.xMovement, item.yCenter, item.getDiameter(), color2.getRGBA(), color2.getRGBA());
+				});
+				
+
+				Drawing.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), color.getRGBA(), color.getRGBA());
+			}				
 		}
 	}
 
