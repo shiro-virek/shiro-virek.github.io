@@ -19,6 +19,15 @@
         constructor() {
             this.crts = [];
             this.generateCrts();
+            this.on = false;
+        }
+
+        turnOn = () => {
+            if (!this.on) {
+                
+                this.on = true;
+                Sound.whiteNoise();
+            }
         }
 
         generateCrts = () => {
@@ -40,20 +49,21 @@
         }
 
         draw = (ctx) => {   
-            
-            for (let y = 0; y < crtRows; y++) {
-                for (let x = 0; x < crtColumns; x++) {
-                    let i = y * crtColumns + x;
-                    const r = imgData[i * 4 + 0];
-                    const g = imgData[i * 4 + 1];
-                    const b = imgData[i * 4 + 2];
-                    const a = imgData[i * 4 + 3];
+            if (this.on) {                
+                for (let y = 0; y < crtRows; y++) {
+                    for (let x = 0; x < crtColumns; x++) {
+                        let i = y * crtColumns + x;
+                        const r = imgData[i * 4 + 0];
+                        const g = imgData[i * 4 + 1];
+                        const b = imgData[i * 4 + 2];
+                        const a = imgData[i * 4 + 3];
 
-                    let newR = Numbers.scale(r, 0, 255, 0, 50);
-                    let newG = Numbers.scale(g, 0, 255, 0, 50);
-                    let newB = Numbers.scale(b, 0, 255, 0, 50);
+                        let newR = Numbers.scale(r, 0, 255, 0, 50);
+                        let newG = Numbers.scale(g, 0, 255, 0, 50);
+                        let newB = Numbers.scale(b, 0, 255, 0, 50);
 
-                    this.crts[x][y].draw(ctx, newR, newG, newB);
+                        this.crts[x][y].draw(ctx, newR, newG, newB);
+                    }
                 }
             }
         }
@@ -135,7 +145,7 @@
     let addEvents = () => {
 
         canvas.addEventListener('click', e => {
-            Sound.whiteNoise();
+            crtScreen.turnOn();
         }, false);
 
         /*   
