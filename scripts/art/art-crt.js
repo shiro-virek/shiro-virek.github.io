@@ -97,7 +97,7 @@
         }
     }
 
-    let loadImage = (source = '../assets/Picture1.jpg') => {
+    let loadImage = (source = '../assets/Picture1.jpg', on = false) => {
         canvasImg.width = crtColumns;
         canvasImg.height = crtRows;
 
@@ -126,7 +126,8 @@
             imgData = ctxImg.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
 
             initCanvas(); 
-            crtScreen = new CrtScreen();
+            crtScreen = new CrtScreen();       
+            crtScreen.on = on;     
             addEvents();
             window.requestAnimationFrame(loop);
         };
@@ -186,7 +187,7 @@
                         alert('Error loading image');
                     };
                 
-                    loadImage(event.target.result);
+                    loadImage(event.target.result, true);
                 };
                 
                 reader.onerror = function() {
