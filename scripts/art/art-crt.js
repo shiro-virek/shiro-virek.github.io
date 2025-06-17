@@ -8,7 +8,10 @@
     let crtColumns = 0;
     let crtDiameter = 0;
     let crtScreen;
-    
+        
+    let offsetX = 0;
+    let offsetY = 0;
+
     let canvasImg = document.getElementById('auxCanvas');
     let ctxImg = canvasImg.getContext("2d");
     let imgData;
@@ -43,11 +46,6 @@
             }
         }
 
-        setPixel = (x, y) => {
-            let col = Math.round(x / crtDiameter);
-            let row = Math.round(y / crtDiameter);
-        }
-
         draw = (ctx) => {   
             if (this.on) {                
                 for (let y = 0; y < crtRows; y++) {
@@ -80,8 +78,8 @@
             this.r = 0;
             this.g = 0;
             this.b = 0;
-            this.x = column + column * this.diameter;
-            this.y = row + row * this.diameter;
+            this.x = offsetX + column * this.diameter;
+            this.y = offsetY + row * this.diameter;
         }
 
         draw = (ctx, lightnessR, lightnessG, lightnessB) => {
@@ -104,6 +102,9 @@
         img.src = source;
 
         img.onload = function () {
+            canvasImg.width = crtColumns;
+            canvasImg.height = crtRows;
+
             let newImgHeight = 0;
             let newImgWidth = 0;
             let newOriginX = 0;
@@ -123,9 +124,8 @@
 
             ctxImg.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
-            imgData = ctxImg.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
+            imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
 
-            initCanvas(); 
             crtScreen = new CrtScreen();       
             crtScreen.on = on;     
             addEvents();
@@ -134,17 +134,29 @@
     }
 
     let init = () => {
-		globals.random = Objects.getRandomObject();
+        initCanvas(); 
+
+        canvasImg.width = canvas.width;
+        canvasImg.height = canvas.height;   
+
+        globals.random = Objects.getRandomObject();
         canvasImg = document.getElementById('auxCanvas');
         ctxImg = canvasImg.getContext("2d");
-        crtColumns = globals.random.nextInt(30, 100); 
 
-        canvasImg.width = window.innerWidth;
-        canvasImg.height = window.innerHeight;   
-        crtDiameter = Math.floor(canvasImg.width / crtColumns);
-        crtRows = Math.floor(canvasImg.height / crtDiameter);       
+        crtDiameter = Math.floor(canvas.width / globals.random.nextInt(30, 100));
+
+        crtColumns = Math.floor(canvas.width / crtDiameter);
+        crtRows = Math.floor(canvas.height / crtDiameter);   
+
+        let totalWidth = crtColumns * crtDiameter;
+        let totalHeight = crtRows * crtDiameter;
+
+        offsetX = (canvas.width - totalWidth) / 2;
+        offsetY = (canvas.height - totalHeight) / 2;
+
         loadImage();
     }
+
 
     let addEvents = () => {
 
@@ -152,22 +164,8 @@
             crtScreen.turnOn();
         }, false);
 
-        /*   
-        canvas.addEventListener('mousemove', e => {
-            crtScreen.setPixel(e.offsetX, e.offsetY);
-        }, false);
-
-        canvas.addEventListener('touchstart', function(e){
-            crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-        });
-
-        canvas.addEventListener('touchmove', function(e){
-            e.preventDefault();
-            crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-        });	
-        */
         window.addEventListener('resize', () => {
-            init(); // recalcula todo
+            init(); 
         });
 
         const uploader = document.getElementById('uploader');
