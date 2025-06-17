@@ -3,6 +3,10 @@
     const globals = {
         random: null
     };
+
+    const config = {
+        noiseMax: 10
+    }
     
     let crtRows = 0
     let crtColumns = 0;
@@ -22,13 +26,14 @@
         constructor() {
             this.crts = [];
             this.generateCrts();
-            this.on = false;
+            this.status = 0;
+            this.noiseTime = 0;
         }
 
         turnOn = () => {
-            if (!this.on) {
+            if (this.status == 0) {
                 
-                this.on = true;
+                this.status = 1;
                 Sound.whiteNoise();
             }
         }
@@ -47,7 +52,7 @@
         }
 
         draw = (ctx) => {   
-            if (this.on) {                
+            if (this.status == 2) {                
                 for (let y = 0; y < crtRows; y++) {
                     for (let x = 0; x < crtColumns; x++) {
                         let i = y * crtColumns + x;
@@ -64,9 +69,27 @@
                     }
                 }
             }
+
+            if (this.status == 1) {      
+                for (let y = 0; y < crtRows; y++) {
+                    for (let x = 0; x < crtColumns; x++) {
+                        let value = globals.random.nextBool() ? 255 : 0;
+
+                        this.crts[x][y].draw(ctx, value, value, value);
+                    }
+                }
+            }
         }
 
         update = () => {
+            if (this.status == 1){
+                this.noiseTime++;
+
+                if (this.noiseTime > config.noiseMax){
+                    this.status = 2;
+                    Sound.stopAllSounds();
+                }
+            }                
         }
     }
 
@@ -95,7 +118,7 @@
         }
     }
 
-    let loadImage = (source = '../assets/Picture1.jpg', on = false) => {
+    let loadImage = (source = '../assets/Picture1.jpg', status = 0) => {
         canvasImg.width = crtColumns;
         canvasImg.height = crtRows;
 
@@ -127,7 +150,7 @@
             imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
 
             crtScreen = new CrtScreen();       
-            crtScreen.on = on;     
+            crtScreen.status = status;     
             addEvents();
             window.requestAnimationFrame(loop);
         };
@@ -191,7 +214,7 @@
                         alert('Error loading image');
                     };
                 
-                    loadImage(event.target.result, true);
+                    loadImage(event.target.result, 1);
                 };
                 
                 reader.onerror = function() {
