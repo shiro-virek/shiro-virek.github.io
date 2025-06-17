@@ -12,6 +12,8 @@
     let canvasImg = document.getElementById('auxCanvas');
     let ctxImg = canvasImg.getContext("2d");
     let imgData;
+
+    const img = new Image();
     
     class CrtScreen {
         constructor() {
@@ -85,12 +87,11 @@
         }
     }
 
-    let loadImage = () => {
+    let loadImage = (source = '../assets/Picture1.jpg') => {
         canvasImg.width = crtColumns;
         canvasImg.height = crtRows;
 
-        const img = new Image();
-        img.src = '../assets/Picture1.jpg';
+        img.src = source;
 
         img.onload = function () {
             let newImgHeight = 0;
@@ -151,6 +152,40 @@
             crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
         });	
         */
+
+        const uploader = document.getElementById('uploader');
+        const uploadButton = document.getElementById('uploadButton');
+
+        uploadButton.addEventListener('click', function() {
+            uploader.click();
+        });
+
+        uploader.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {                    
+                    img.onerror = function() {
+                        alert('Error loading image');
+                    };
+                
+                    loadImage(event.target.result);
+                };
+                
+                reader.onerror = function() {
+                    alert('Error reading file');
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
     }
 
     let randomize = () => {

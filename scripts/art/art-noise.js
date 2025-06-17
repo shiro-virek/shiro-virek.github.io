@@ -146,8 +146,8 @@
 
         draw();
         
-        Browser.sleep(200);
-        globals.framesCounter += 0.05;
+        //Browser.sleep(200);
+        globals.framesCounter += 0.0001;
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
