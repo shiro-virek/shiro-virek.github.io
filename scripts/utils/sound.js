@@ -83,4 +83,9 @@ class Sound {
         };
     }
 
+    static stopAllSounds = () => {
+        let ctx = Sound.AudioContext.getInstance();
+        ctx.close();
+    }
+
 }
