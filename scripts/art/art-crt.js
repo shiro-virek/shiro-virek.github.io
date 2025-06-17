@@ -58,9 +58,9 @@
                         const b = imgData[i * 4 + 2];
                         const a = imgData[i * 4 + 3];
 
-                        let newR = Numbers.scale(r, 0, 255, 0, 50);
-                        let newG = Numbers.scale(g, 0, 255, 0, 50);
-                        let newB = Numbers.scale(b, 0, 255, 0, 50);
+                        let newR = Numbers.scale(r, 0, 255, 20, 70);
+                        let newG = Numbers.scale(g, 0, 255, 20, 70);
+                        let newB = Numbers.scale(b, 0, 255, 20, 70);
 
                         this.crts[x][y].draw(ctx, newR, newG, newB);
                     }
@@ -138,8 +138,11 @@
         canvasImg = document.getElementById('auxCanvas');
         ctxImg = canvasImg.getContext("2d");
         crtColumns = globals.random.nextInt(30, 100); 
-        crtDiameter = Math.floor(width / crtColumns);
-        crtRows = Math.floor(height / crtDiameter);              
+
+        canvasImg.width = window.innerWidth;
+        canvasImg.height = window.innerHeight;   
+        crtDiameter = Math.floor(canvasImg.width / crtColumns);
+        crtRows = Math.floor(canvasImg.height / crtDiameter);       
         loadImage();
     }
 
@@ -163,6 +166,9 @@
             crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
         });	
         */
+        window.addEventListener('resize', () => {
+            init(); // recalcula todo
+        });
 
         const uploader = document.getElementById('uploader');
         const uploadButton = document.getElementById('uploadButton');
