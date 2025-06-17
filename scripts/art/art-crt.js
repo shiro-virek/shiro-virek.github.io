@@ -12,11 +12,22 @@
     let canvasImg = document.getElementById('auxCanvas');
     let ctxImg = canvasImg.getContext("2d");
     let imgData;
+
+    const img = new Image();
     
     class CrtScreen {
         constructor() {
             this.crts = [];
             this.generateCrts();
+            this.on = false;
+        }
+
+        turnOn = () => {
+            if (!this.on) {
+                
+                this.on = true;
+                Sound.whiteNoise();
+            }
         }
 
         generateCrts = () => {
@@ -38,20 +49,21 @@
         }
 
         draw = (ctx) => {   
-            
-            for (let y = 0; y < crtRows; y++) {
-                for (let x = 0; x < crtColumns; x++) {
-                    let i = y * crtColumns + x;
-                    const r = imgData[i * 4 + 0];
-                    const g = imgData[i * 4 + 1];
-                    const b = imgData[i * 4 + 2];
-                    const a = imgData[i * 4 + 3];
+            if (this.on) {                
+                for (let y = 0; y < crtRows; y++) {
+                    for (let x = 0; x < crtColumns; x++) {
+                        let i = y * crtColumns + x;
+                        const r = imgData[i * 4 + 0];
+                        const g = imgData[i * 4 + 1];
+                        const b = imgData[i * 4 + 2];
+                        const a = imgData[i * 4 + 3];
 
-                    let newR = Numbers.scale(r, 0, 255, 0, 50);
-                    let newG = Numbers.scale(g, 0, 255, 0, 50);
-                    let newB = Numbers.scale(b, 0, 255, 0, 50);
+                        let newR = Numbers.scale(r, 0, 255, 20, 70);
+                        let newG = Numbers.scale(g, 0, 255, 20, 70);
+                        let newB = Numbers.scale(b, 0, 255, 20, 70);
 
-                    this.crts[x][y].draw(ctx, newR, newG, newB);
+                        this.crts[x][y].draw(ctx, newR, newG, newB);
+                    }
                 }
             }
         }
@@ -85,12 +97,11 @@
         }
     }
 
-    let loadImage = () => {
+    let loadImage = (source = '../assets/Picture1.jpg', on = false) => {
         canvasImg.width = crtColumns;
         canvasImg.height = crtRows;
 
-        const img = new Image();
-        img.src = '../assets/Picture1.jpg';
+        img.src = source;
 
         img.onload = function () {
             let newImgHeight = 0;
@@ -115,7 +126,8 @@
             imgData = ctxImg.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
 
             initCanvas(); 
-            crtScreen = new CrtScreen();
+            crtScreen = new CrtScreen();       
+            crtScreen.on = on;     
             addEvents();
             window.requestAnimationFrame(loop);
         };
@@ -126,15 +138,18 @@
         canvasImg = document.getElementById('auxCanvas');
         ctxImg = canvasImg.getContext("2d");
         crtColumns = globals.random.nextInt(30, 100); 
-        crtDiameter = Math.floor(width / crtColumns);
-        crtRows = Math.floor(height / crtDiameter);              
+
+        canvasImg.width = window.innerWidth;
+        canvasImg.height = window.innerHeight;   
+        crtDiameter = Math.floor(canvasImg.width / crtColumns);
+        crtRows = Math.floor(canvasImg.height / crtDiameter);       
         loadImage();
     }
 
     let addEvents = () => {
 
         canvas.addEventListener('click', e => {
-            Sound.whiteNoise();
+            crtScreen.turnOn();
         }, false);
 
         /*   
@@ -151,6 +166,43 @@
             crtScreen.setPixel(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
         });	
         */
+        window.addEventListener('resize', () => {
+            init(); // recalcula todo
+        });
+
+        const uploader = document.getElementById('uploader');
+        const uploadButton = document.getElementById('uploadButton');
+
+        uploadButton.addEventListener('click', function() {
+            uploader.click();
+        });
+
+        uploader.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {                    
+                    img.onerror = function() {
+                        alert('Error loading image');
+                    };
+                
+                    loadImage(event.target.result, true);
+                };
+                
+                reader.onerror = function() {
+                    alert('Error reading file');
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
     }
 
     let randomize = () => {
