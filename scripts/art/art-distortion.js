@@ -7,7 +7,7 @@
         frequency: 0.3,
         mode: 1,
         functionIndex: 3,
-        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2, tvDistortion] 
+        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2, tvDistortion, water] 
     };
     
     const globals = {
@@ -227,6 +227,23 @@
     function tvDistortion(data, outputData) {
         for (let y = 0; y < height; y++) {
             const offset = Math.floor(Math.sin(y * 0.1 + Date.now() * 0.005) * 5 + (Math.random() - 0.5) * 10);
+
+            for (let x = 0; x < width; x++) {
+                let srcX = Math.min(width - 1, Math.max(0, x + offset));
+                let srcIndex = (y * width + srcX) * 4;
+                let destIndex = (y * width + x) * 4;
+
+                outputData[destIndex] = data[srcIndex];       // R
+                outputData[destIndex + 1] = data[srcIndex + 1]; // G
+                outputData[destIndex + 2] = data[srcIndex + 2]; // B
+                outputData[destIndex + 3] = data[srcIndex + 3]; // A
+            }
+        }
+    }
+
+    function water(data, outputData) {
+        for (let y = 0; y < height; y++) {
+            const offset = Math.floor(Math.sin(y * 0.1 + Date.now() * 0.005) * 5);
 
             for (let x = 0; x < width; x++) {
                 let srcX = Math.min(width - 1, Math.max(0, x + offset));
