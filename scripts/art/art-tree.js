@@ -67,7 +67,7 @@
 
         if (config.clicking) {  
             config.amplitude = Numbers.scale(x, 0, width, 0, 50);
-            config.length = Numbers.scale(y, 0, height, 0, 5);
+            config.length = Numbers.scale(y, 0, height, 0, 10);
         }
 
         lastPosX = x;
@@ -77,8 +77,10 @@
     let draw = () => {
         drawBackground(ctx, canvas);
 
-        drawTree(ctx, halfWidth, halfHeight, -90, config.maxDepth);
+        drawTree(ctx, halfWidth, halfHeight, 0, config.maxDepth);
         drawTree(ctx, halfWidth, halfHeight, 90, config.maxDepth);
+        drawTree(ctx, halfWidth, halfHeight, 180, config.maxDepth);
+        drawTree(ctx, halfWidth, halfHeight, 270, config.maxDepth);
     }
 
     let drawTree = (ctx, x1, y1, angle, depth) => { 
