@@ -17,7 +17,7 @@
     let offsetY = 0;
 
     let canvasImg = document.getElementById('auxCanvas');
-    let ctxImg = canvasImg.getContext("2d");
+    let ctxImg = canvasImg.getContext("2d", { willReadFrequently: true });
     let imgData;
 
     const img = new Image();
@@ -166,7 +166,9 @@
         canvasImg = document.getElementById('auxCanvas');
         ctxImg = canvasImg.getContext("2d");
 
+        const minDiameter = Utils.isMobile() ? 12 : 4;
         crtDiameter = Math.floor(canvas.width / globals.random.nextInt(30, 100));
+        crtDiameter = Math.max(crtDiameter, minDiameter);
 
         crtColumns = Math.floor(canvas.width / crtDiameter);
         crtRows = Math.floor(canvas.height / crtDiameter);   
@@ -179,7 +181,6 @@
 
         loadImage();
     }
-
 
     let addEvents = () => {
 
