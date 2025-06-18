@@ -25,7 +25,8 @@ const art = [
                 "gravity-balls",
                 "webcam",
                 "fractals", 
-                "noise"
+                "noise",
+                "tree"
             ];
 const scripts = [];
 
