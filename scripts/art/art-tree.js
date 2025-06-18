@@ -9,7 +9,8 @@
         mouseMoved: false, 
         amplitude: 10,
         hue: 0,
-        maxDepth: 10
+        maxDepth: 10, 
+        length: 5,
     };    
 
     let init = () => {
@@ -66,6 +67,7 @@
 
         if (config.clicking) {  
             config.amplitude = Numbers.scale(x, 0, width, 0, 50);
+            config.length = Numbers.scale(y, 0, height, 0, 5);
         }
 
         lastPosX = x;
@@ -81,8 +83,8 @@
 
     let drawTree = (ctx, x1, y1, angle, depth) => { 
         if (depth != 0){
-            var x2 = x1 + (Math.cos(angle * Trigonometry.RAD_CONST) * depth * 5.0);
-            var y2 = y1 + (Math.sin(angle * Trigonometry.RAD_CONST) * depth * 5.0);
+            var x2 = x1 + (Math.cos(angle * Trigonometry.RAD_CONST) * depth * config.length);
+            var y2 = y1 + (Math.sin(angle * Trigonometry.RAD_CONST) * depth * config.length);
 
             let brightness = Numbers.scale(depth, 0, config.maxDepth, 0, 50);
             let color = `hsl(${config.hue}, ${100}%, ${brightness}%)`
