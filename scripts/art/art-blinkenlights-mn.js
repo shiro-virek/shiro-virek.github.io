@@ -275,8 +275,14 @@
         }
 
         getColor = () => {
-            let intensity = Math.min(100, Math.floor(this.energy));
-            return `hsl(0, 0%, ${intensity}%)`;
+            let e = this.energy;
+            e = Math.max(0, Math.min(100, e));
+
+            let hue = (240 - (e * 2.4)) % 360;
+            let saturation = 100;
+            let lightness = 50;
+
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
         draw = (ctx) => {
