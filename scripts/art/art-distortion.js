@@ -7,7 +7,7 @@
         frequency: 0.3,
         mode: 1,
         functionIndex: 3,
-        functions: [tvDistortion] //barrel, twirl, pincushion, ripple, wobbly, ripple2, 
+        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2, tvDistortion] 
     };
     
     const globals = {
