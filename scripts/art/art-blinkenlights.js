@@ -17,6 +17,8 @@
 
     let mutationCounter = 0;
     
+    let lastHash = "";
+    
 	const Attribute = Object.freeze({
 		Hue: Symbol("hue"),		
 		Saturation: Symbol("saturation"),
@@ -264,9 +266,22 @@
                         break;
                 }
 
-
                 if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
-                    this.cellsBuffer[x][y] = this.applyRule(rule, this.cells[x][y]);
+                    let updatedCell = this.applyRule(rule, this.cells[x][y]);
+
+                    switch (rule.attribute) {
+                        case Attribute.Hue:
+                            updatedCell.hue = (updatedCell.hue + this.cells[x][y].hue * 2) / 3;
+                            break;
+                        case Attribute.Saturation:
+                            updatedCell.saturation = (updatedCell.saturation + this.cells[x][y].saturation * 2) / 3;
+                            break;
+                        case Attribute.Lightness:
+                            updatedCell.lightness = (updatedCell.lightness + this.cells[x][y].lightness * 2) / 3;
+                            break;
+                    }
+
+                    this.cellsBuffer[x][y] = updatedCell;
                 }
             });      
         }
@@ -317,48 +332,49 @@
     }
 
     let randomize = () => {
-		globals.random = Objects.getRandomObject();
-        
-        cellDiameter = globals.random.nextInt(5, 20);        
+        globals.random = Objects.getRandomObject();
 
+        cellDiameter = globals.random.nextInt(5, 20);        
         cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
         cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
         cellScreen = new CellScreen();
 
-        for (let x = 0; x < cellColumns; x++) {
-            for (let y = 0; y < cellRows; y++) {
-                cellScreen.cells[x][y].hue = globals.random.nextInt(0, 255);
-                cellScreen.cells[x][y].saturation =  globals.random.nextInt(0, 100);
-                cellScreen.cells[x][y].lightness =  globals.random.nextInt(0, 100);            
+        for (let x = 0; x <= cellColumns; x++) {
+            for (let y = 0; y <= cellRows; y++) {
+                if (x >= 0 && y >= 0 && x < cellColumns && y < cellRows) {
+                    cellScreen.cells[x][y].hue = globals.random.nextInt(0, 360);
+                    cellScreen.cells[x][y].saturation = globals.random.nextInt(60, 100);
+                    cellScreen.cells[x][y].lightness = globals.random.nextInt(40, 60);
+                }
             }
-        }    
+        }
 
         setRandomRules();
-    }
+    };
 
     let getRandomRule = () => {
-        let attribute = globals.random.next() > 0.7 ? 
-            Attribute[Object.keys(Attribute)[globals.random.nextInt(0, 2)]] : 
-            Attribute.Lightness;
+        let attribute = globals.random.next() > 0.6 ? 
+            Attribute.Lightness : 
+            Attribute[Object.keys(Attribute)[globals.random.nextInt(0, 3)]];
 
         let condition = globals.random.next() > 0.5 ? Condition.Lower : Condition.Greater;
 
         let valueNeighbours, valueCell;
         switch(attribute) {
             case Attribute.Hue:
-                valueNeighbours = globals.random.nextInt(30, 200);
-                valueCell = globals.random.nextInt(30, 200);
+                valueNeighbours = globals.random.nextInt(60, 180);
+                valueCell = globals.random.nextInt(60, 180);
                 break;
             case Attribute.Saturation:
             case Attribute.Lightness:
-                valueNeighbours = globals.random.nextInt(20, 80); 
-                valueCell = globals.random.nextInt(20, 80);
+                valueNeighbours = globals.random.nextInt(30, 70); 
+                valueCell = globals.random.nextInt(30, 70);
                 break;
         }
 
-        let amount = globals.random.nextRange(0.9, 1.1, 2);
+        let amount = globals.random.nextRange(0.95, 1.05, 2);
 
-        let neighbourhoodType = globals.random.next() > 0.25 ? 
+        let neighbourhoodType = globals.random.next() > 0.5 ? 
             NeighbourhoodType.Moore : 
             NeighbourhoodType[Object.keys(NeighbourhoodType)[globals.random.nextInt(0, 5)]];
 
@@ -367,6 +383,7 @@
             condition, valueCell, 0, amount, neighbourhoodType
         );
     };
+
 
     let setRandomRules = () => {
         cellScreen.neighborhoods = [];
@@ -390,17 +407,23 @@
         cellScreen.update();
 
         draw();
-        
         mutationCounter++;
-        if (mutationCounter % 50 === 0) {
+
+        let currentHash = cellScreen.cells.flat().map(c => c.lightness.toFixed(1)).join("");
+        if (currentHash === lastHash) {
+            randomize();
+            mutationCounter = 0;
+        }
+        lastHash = currentHash;
+
+        if (mutationCounter % 100 === 0) {
             setRandomRules();
         }
 
-        Browser.sleep(200);
-
+        Browser.sleep(globals.random.nextInt(50, 200));
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
-    }
+    };
 
     init();
 

@@ -13,6 +13,8 @@
     let extendedSize = 2;
     let circleRadius = 2;
 
+    let mutationCounter = 0;
+
     let cellScreen;
             
 	const Condition = Object.freeze({
@@ -386,7 +388,6 @@
         }
     }
 
-
     let draw = () => {
         drawBackground(ctx, canvas);
         cellScreen.draw(ctx);
@@ -400,7 +401,12 @@
 
         draw();
 
-        Browser.sleep(200);
+        mutationCounter++;
+        if (mutationCounter % 50 === 0) {
+            setRandomRules();
+        }
+
+        Browser.sleep(globals.random.nextInt(50, 200));
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
