@@ -14,6 +14,8 @@
     let circleRadius = 2;
 
     let cellScreen;
+
+    let mutationCounter = 0;
     
 	const Attribute = Object.freeze({
 		Hue: Symbol("hue"),		
@@ -335,59 +337,36 @@
     }
 
     let getRandomRule = () => {
-        let randCondition = globals.random.nextInt(0, Object.keys(Condition).length - 1);
-        let condition = Condition[Object.keys(Condition)[randCondition]];
-        
-        let randAttribute = globals.random.nextInt(0, Object.keys(Attribute).length - 1);
-        let attribute = Attribute[Object.keys(Attribute)[randAttribute]];
+        let attribute = globals.random.next() > 0.7 ? 
+            Attribute[Object.keys(Attribute)[globals.random.nextInt(0, 2)]] : 
+            Attribute.Lightness;
 
-        let valueNeighbours = 0;
-        let value2Neighbours = 0;
-        let valueMax = 0;
-        switch(attribute){
+        let condition = globals.random.next() > 0.5 ? Condition.Lower : Condition.Greater;
+
+        let valueNeighbours, valueCell;
+        switch(attribute) {
             case Attribute.Hue:
-                valueNeighbours = globals.random.nextInt(0, 255);  
-                valueMax = globals.random.nextInt(valueNeighbours, 255);
-                value2Neighbours = globals.random.nextInt(valueNeighbours, valueMax);  
+                valueNeighbours = globals.random.nextInt(30, 200);
+                valueCell = globals.random.nextInt(30, 200);
                 break;
             case Attribute.Saturation:
             case Attribute.Lightness:
-                valueNeighbours = globals.random.nextInt(0, 100);   
-                valueMax = globals.random.nextInt(valueNeighbours, 100);
-                value2Neighbours = globals.random.nextInt(valueNeighbours, valueMax);  
+                valueNeighbours = globals.random.nextInt(20, 80); 
+                valueCell = globals.random.nextInt(20, 80);
                 break;
-        }            
-        
-        let amount = globals.random.nextRange(0.01, 1.99, 2);
+        }
 
-        let randCellCondition = globals.random.nextInt(0, Object.keys(Condition).length - 1);
-        let cellCondition = Condition[Object.keys(Condition)[randCellCondition]];
+        let amount = globals.random.nextRange(0.9, 1.1, 2);
 
-        let randCellAttribute = globals.random.nextInt(0, Object.keys(Attribute).length - 1);
-        let cellAttribute = Attribute[Object.keys(Attribute)[randCellAttribute]];
+        let neighbourhoodType = globals.random.next() > 0.25 ? 
+            NeighbourhoodType.Moore : 
+            NeighbourhoodType[Object.keys(NeighbourhoodType)[globals.random.nextInt(0, 5)]];
 
-        let valueCell = 0;
-        let value2Cell = 0;
-        let valueCellMax = 0;
-        switch(cellAttribute){
-            case Attribute.Hue:
-                valueCell = globals.random.nextInt(0, 255);   
-                valueCellMax = globals.random.nextInt(valueCell, 255);
-                value2Cell = globals.random.nextInt(valueCell, valueCellMax);  
-                break;
-            case Attribute.Saturation:
-            case Attribute.Lightness:
-                valueCell = globals.random.nextInt(0, 100);  
-                valueCellMax = globals.random.nextInt(valueCell, 100);
-                value2Cell = globals.random.nextInt(valueCell, valueCellMax);  
-                break;
-        }      
-
-        let randNeighbourhoodType = globals.random.nextInt(0, Object.keys(NeighbourhoodType).length - 1);
-        let neighbourhoodType = NeighbourhoodType[Object.keys(NeighbourhoodType)[randNeighbourhoodType]];
-
-        return new Rule(condition, valueNeighbours, value2Neighbours, attribute, cellCondition, valueCell, value2Cell, amount, neighbourhoodType);
-    }
+        return new Rule(
+            condition, valueNeighbours, 0, attribute,
+            condition, valueCell, 0, amount, neighbourhoodType
+        );
+    };
 
     let setRandomRules = () => {
         cellScreen.neighborhoods = [];
@@ -411,6 +390,11 @@
         cellScreen.update();
 
         draw();
+        
+        mutationCounter++;
+        if (mutationCounter % 50 === 0) {
+            setRandomRules();
+        }
 
         Browser.sleep(200);
 

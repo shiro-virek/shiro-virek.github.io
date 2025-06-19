@@ -14,6 +14,8 @@
     let circleRadius = 2;
 
     let cellScreen;
+    
+    let mutationCounter = 0;
             
     const Condition = Object.freeze({
         Lower: Symbol("lower"),        
@@ -371,9 +373,6 @@
         cellScreen.draw(ctx);
         cellScreen.copyBuffer();
     }
-
-    let lastRender = 0;
-    let mutationCounter = 0;
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
