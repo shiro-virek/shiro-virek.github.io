@@ -28,12 +28,12 @@
 	});
 
 	const NeighbourhoodType = Object.freeze({
-		//VonNeumann: Symbol("vonneumann"),		
+		VonNeumann: Symbol("vonneumann"),		
 		Moore: Symbol("moore"),
-        //Extended: Symbol("extended"),
-        //Diagonal: Symbol("diagonal"),
-        //Circle: Symbol("circle"),
-        //Circunference: Symbol("circunference"),
+        Extended: Symbol("extended"),
+        Diagonal: Symbol("diagonal"),
+        Circle: Symbol("circle"),
+        Circunference: Symbol("circunference"),
 	});
 
     class Rule {
@@ -308,7 +308,10 @@
         window.requestAnimationFrame(loop);
     }
 
-    let addEvents = () => {      
+    let addEvents = () => {  
+		canvas.addEventListener('click', e => {
+            randomize();
+        });
     }
 
     let randomize = () => {
@@ -387,6 +390,8 @@
     }
 
     let setRandomRules = () => {
+        cellScreen.neighborhoods = [];
+
         let numberOfRules = globals.random.nextInt(5, 20);
         for(let i = 0; i < numberOfRules; i++){
             let newRule = getRandomRule();   
