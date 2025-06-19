@@ -5,13 +5,22 @@ class Noise {
 
     randVect = () => {
         let theta = Math.random() * 2 * Math.PI;
-        return { x: Math.cos(theta), y: Math.sin(theta), z: Math.sin(theta * 1.3) };
+        let phi = Math.acos(2 * Math.random() - 1);
+        return {
+            x: Math.sin(phi) * Math.cos(theta),
+            y: Math.sin(phi) * Math.sin(theta),
+            z: Math.cos(phi)
+        };
     }
 
     dotProdGrid = (x, y, z, vx, vy, vz) => {
         const key = `${vx},${vy},${vz}`;
         let gVect;
-        const dVect = { x: x - vx, y: y - vy, z: z - vz };
+        const dVect = {
+            x: x - vx,
+            y: y - vy,
+            z: z - vz
+        };
 
         if (this.gradients[key]) {
             gVect = this.gradients[key];
@@ -41,8 +50,10 @@ class Noise {
     }
 
     get = (x, y, z = 0) => {
+        const useCache = z === 0;
+
         const key = `${x},${y},${z}`;
-        if (this.memory.hasOwnProperty(key)) {
+        if (useCache && this.memory.hasOwnProperty(key)) {
             return this.memory[key];
         }
 
@@ -69,7 +80,8 @@ class Noise {
 
         const v = this.interp(z - zf, y0, y1);
 
-        this.memory[key] = v;
+        if (useCache) this.memory[key] = v;
         return v;
     }
+
 }

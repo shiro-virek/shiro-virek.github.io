@@ -62,7 +62,7 @@
 
         draw = (ctx) => {
             let scale = 0.005; 
-            let value = globals.noise.get(this.x * scale, this.y * scale, globals.time);
+            let value = globals.noise.get(this.x * scale, this.y * scale, globals.time * 20);
             let angle = Numbers.scale(value, -1, 1, 0, 360);
             Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);   
         }
@@ -145,11 +145,8 @@
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
-        globals.noise.seed();
         draw();
         
-        Browser.sleep(200);
-
         globals.time += 0.005;
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
