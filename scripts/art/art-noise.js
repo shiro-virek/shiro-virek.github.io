@@ -74,8 +74,6 @@
         config.ledPadding = globals.random.nextInt(0, 5);
         config.ledMargin = config.ledPadding;
 
-        randomize();
-
         config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
         config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
         globals.ledScreen = new LedScreen();
