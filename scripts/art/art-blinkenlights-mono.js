@@ -14,7 +14,7 @@
     let circleRadius = 2;
 
     let cellScreen;
-    
+
     let mutationCounter = 0;
             
     const Condition = Object.freeze({
@@ -289,33 +289,30 @@
     }
 
     let initializePatterns = () => {
-        if (globals.random.nextBool()) {
-            for (let x = 0; x <= cellColumns; x += globals.random.nextInt(2, 5)) {
-                for (let y = 0; y <= cellRows; y += globals.random.nextInt(2, 5)) {
-                    if (globals.random.nextBool()) {
-                        for (let dx = 0; dx < 2; dx++) {
-                            for (let dy = 0; dy < 2; dy++) {
-                                if (x + dx <= cellColumns && y + dy <= cellRows) {
-                                    cellScreen.cells[x + dx][y + dy].alive = true;
-                                }
+        for (let x = 0; x <= cellColumns; x += globals.random.nextInt(2, 5)) {
+            for (let y = 0; y <= cellRows; y += globals.random.nextInt(2, 5)) {
+                if (globals.random.nextBool()) {
+                    for (let dx = 0; dx < 2; dx++) {
+                        for (let dy = 0; dy < 2; dy++) {
+                            if (x + dx <= cellColumns && y + dy <= cellRows) {
+                                cellScreen.cells[x + dx][y + dy].alive = true;
                             }
                         }
                     }
                 }
             }
-        } 
-        else {
-            for (let i = 0; i < 5; i++) {
-                if (globals.random.nextBool()) {
-                    let y = globals.random.nextInt(0, cellRows);
-                    for (let x = 0; x <= cellColumns; x++) {
-                        cellScreen.cells[x][y].alive = true;
-                    }
-                } else {
-                    let x = globals.random.nextInt(0, cellColumns);
-                    for (let y = 0; y <= cellRows; y++) {
-                        cellScreen.cells[x][y].alive = true;
-                    }
+        }
+
+        for (let i = 0; i < 10; i++) {
+            if (globals.random.nextBool()) {
+                let y = globals.random.nextInt(0, cellRows);
+                for (let x = 0; x <= cellColumns; x++) {
+                    cellScreen.cells[x][y].alive = true;
+                }
+            } else {
+                let x = globals.random.nextInt(0, cellColumns);
+                for (let y = 0; y <= cellRows; y++) {
+                    cellScreen.cells[x][y].alive = true;
                 }
             }
         }
