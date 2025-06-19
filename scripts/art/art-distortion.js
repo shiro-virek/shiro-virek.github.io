@@ -415,7 +415,7 @@
         config.amplitude = globals.random.nextInt(1, 20);
         config.frequency = globals.random.nextRange(0.1, 0.5, 1);
         config.mode = globals.random.nextBool();
-        config.functionIndex = 6; //Math.floor(Math.random() * config.functions.length)
+        config.functionIndex = Math.floor(Math.random() * config.functions.length)
     }
 
     let loop = (timestamp) => {
