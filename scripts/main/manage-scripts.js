@@ -26,7 +26,8 @@ const art = [
                 "webcam",
                 "fractals", 
                 "noise",
-                "tree"
+                "tree",
+                "blinkenlights-mono",
             ];
 const scripts = [];
 

@@ -225,8 +225,13 @@
     }
 
     function tvDistortion(data, outputData) {
+        let amplitude = config.mode ? Numbers.scale(globals.mouseX, 0, width, 1.0, 0.1) : 0.1;
+        let freq = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.001, 0.01) : 0.005;
+        let waves = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 10) : 5;
+        let glitch = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 10) : 10;
+
         for (let y = 0; y < height; y++) {
-            const offset = Math.floor(Math.sin(y * 0.1 + Date.now() * 0.005) * 5 + (Math.random() - 0.5) * 10);
+            const offset = Math.floor(Math.sin(y * amplitude + Date.now() * freq) * waves + (Math.random() - 0.5) * glitch);
 
             for (let x = 0; x < width; x++) {
                 let srcX = Math.min(width - 1, Math.max(0, x + offset));
@@ -242,8 +247,12 @@
     }
 
     function water(data, outputData) {
+        let amplitude = config.mode ? Numbers.scale(globals.mouseX, 0, width, 1.0, 0.1) : 0.1;
+        let freq = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.001, 0.01) : 0.005;
+        let waves = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 10) : 5;
+
         for (let y = 0; y < height; y++) {
-            const offset = Math.floor(Math.sin(y * 0.1 + Date.now() * 0.005) * 5);
+            const offset = Math.floor(Math.sin(y * amplitude + Date.now() * freq) * waves);
 
             for (let x = 0; x < width; x++) {
                 let srcX = Math.min(width - 1, Math.max(0, x + offset));
@@ -406,7 +415,7 @@
         config.amplitude = globals.random.nextInt(1, 20);
         config.frequency = globals.random.nextRange(0.1, 0.5, 1);
         config.mode = globals.random.nextBool();
-        config.functionIndex = Math.floor(Math.random() * config.functions.length)
+        config.functionIndex = 6; //Math.floor(Math.random() * config.functions.length)
     }
 
     let loop = (timestamp) => {
