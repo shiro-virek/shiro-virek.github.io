@@ -1,8 +1,9 @@
 {
     const globals = {
         random: null,
-        framesCounter: 0,
-        ledScreen: null
+        ledScreen: null,
+        noise: null,
+        time: 0
     };
 
     const config = {
@@ -60,13 +61,15 @@
         }
 
         draw = (ctx) => {
-            let noiseValue = Noise.simplexNoise(this.x, this.y, globals.framesCounter);
-            let angle = Numbers.scale(noiseValue, -1, 1, 0, 360) ;
-            Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);
+            let scale = 0.005; 
+            let value = globals.noise.get(this.x * scale, this.y * scale, globals.time);
+            let angle = Numbers.scale(value, -1, 1, 0, 360);
+            Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);   
         }
     }
 
     let init = () => {
+        globals.noise = new Noise();
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();
@@ -142,11 +145,12 @@
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
+        globals.noise.seed();
         draw();
         
-        //Browser.sleep(200);
-        globals.framesCounter += 0.0001;
+        Browser.sleep(200);
 
+        globals.time += 0.005;
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
     }
