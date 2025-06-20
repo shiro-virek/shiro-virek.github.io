@@ -62,7 +62,7 @@
 
         draw = (ctx) => {
             let scale = 0.005; 
-            let value = globals.noise.get(this.x * scale, this.y * scale, globals.time * 20);
+            let value = globals.noise.get(this.x * scale, this.y * scale, globals.time * 10);
             let angle = Numbers.scale(value, -1, 1, 0, 360);
             Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);   
         }
