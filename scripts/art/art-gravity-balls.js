@@ -20,7 +20,7 @@
         constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.radius = config.randomSize ? globals.random.nextInt(5, 50) : config.radius;
+            this.radius = config.randomSize ? globals.random.nextInt(20, 50) : config.radius;
             this.hue = config.randomHue ? globals.random.nextInt(0, 255) : config.hue;
             this.dy =  (globals.random.next() - 0.5) * 5;
             this.dx =  (globals.random.next() - 0.5) * 5;
