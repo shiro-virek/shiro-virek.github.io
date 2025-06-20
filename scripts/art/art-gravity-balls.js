@@ -188,7 +188,7 @@
 		config.randomSize = globals.random.nextBool();
 		config.randomHue = globals.random.nextBool();
 		config.hue = globals.random.nextInt(0, 255);
-		config.radius = globals.random.nextInt(5, 50);
+		config.radius = globals.random.nextInt(20, 50);
 	}
 
     let loop = (timestamp) => {
