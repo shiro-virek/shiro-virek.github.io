@@ -24,10 +24,12 @@
     ];
 
     const globals = {
-        random: Objects.getRandomObject()
+        random: Objects.getRandomObject(),
+        world: null
     }
 
     const config = {
+        randomize: true,
         FOV: 10000,
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
         clicking: false,
@@ -223,9 +225,9 @@
             const vector2 = Trigonometry.subtractVectors(vertices[2], vertices[0]);
 
             const normal = Trigonometry.crossProduct(vector1, vector2);
-           
+        
             const lightDirection = [0, 0, 1]; 
-          
+        
             const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
 
             
@@ -239,10 +241,10 @@
             ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${this.getLightness(vertices)}%)`;
             ctx.beginPath();
 
-            let vertex = world.worldToScreen(vertices[0]);
+            let vertex = globals.world.worldToScreen(vertices[0]);
             ctx.moveTo(vertex[0], vertex[1]);
             for (let i = 1; i < vertices.length; i++) {
-                vertex = world.worldToScreen(vertices[i]);
+                vertex = globals.world.worldToScreen(vertices[i]);
                 ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
@@ -251,10 +253,53 @@
         }
     }
 
-    let init = () => {
+    let setInitialFigures = () => {
+        let figuresCount = globals.random.nextInt(1, 10);
+        let translateX = globals.random.nextBool();
+        let translateY = globals.random.nextBool();
+        let translateZ = globals.random.nextBool();
+        let rotateY = globals.random.nextBool();    
+        let rotateX = globals.random.nextBool();
+        let rotateZ = globals.random.nextBool();
+        let scale = globals.random.nextBool();
+        let scaleX = globals.random.nextBool();
+        let scaleY = globals.random.nextBool();
+        let scaleZ = globals.random.nextBool();
+        let shearX = globals.random.nextBool();
+        let shearY = globals.random.nextBool();
+        let shearZ = globals.random.nextBool();
+
+        for(let i=0; i <= figuresCount; i++){
+            let figure = new Figure();
+
+            figure.vertices = Objects.clone(config.figureInfo.vertices);
+            figure.faces = Objects.clone(config.figureInfo.faces);
+
+            if (translateX) figure.translateX(i*50);
+            if (translateY) figure.translateY(i*50);
+            if (translateZ) figure.translateZ(i*50);
+            if (rotateX) figure.rotateX(i*10);
+            if (rotateY) figure.rotateY(i*10);
+            if (rotateZ) figure.rotateZ(i*10);    
+            if (scale) figure.scale(i*0.1);        
+            if (scaleX) figure.scaleX(i*0.1);
+            if (scaleY) figure.scaleY(i*0.1);
+            if (scaleZ) figure.scaleZ(i*0.1);
+            if (shearX) figure.shearX(i*0.05);
+            if (shearY) figure.shearY(i*0.05);
+            if (shearZ) figure.shearZ(i*0.05);
+
+            globals.world.figures.push(figure);
+        }
+    }
+
+    let init = () => {	
+        globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
         initCanvas();
-        world = new ThreeDWorld();
+        globals.world = new ThreeDWorld();
         addEvents();
+        if (globals.random.nextBool()) setInitialFigures();
         window.requestAnimationFrame(loop)
     }
 
@@ -287,14 +332,14 @@
 
 		canvas.addEventListener('touchend', e => {
             if (!config.mouseMoved)
-                world.addFigure(e.offsetX, e.offsetY);
+                globals.world.addFigure(e.offsetX, e.offsetY);
 
 			config.clicking = false;
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
             if (!config.mouseMoved)
-                world.addFigure(e.offsetX, e.offsetY);
+                globals.world.addFigure(e.offsetX, e.offsetY);
 		});
     }
 
@@ -306,7 +351,7 @@
         let movY = lastPosY - y;
 
         if (config.clicking) {  
-            world.figures.forEach(figure => {
+            globals.world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
                 figure.rotateX(movY);
@@ -322,7 +367,10 @@
     
     let draw = () => {
         drawBackground(ctx, canvas);
-        world.draw();
+        globals.world.draw();
+    }
+
+    let randomize = () => {        
     }
 
     let loop = (timestamp) => {
@@ -337,6 +385,6 @@
     init();
 
 	window.clearCanvas = () => {		
-        world.figures = [];
+        globals.world.figures = [];
 	}
 }

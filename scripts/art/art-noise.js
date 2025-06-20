@@ -1,8 +1,9 @@
 {
     const globals = {
         random: null,
-        framesCounter: 0,
-        ledScreen: null
+        ledScreen: null,
+        noise: null,
+        time: 0
     };
 
     const config = {
@@ -60,21 +61,21 @@
         }
 
         draw = (ctx) => {
-            let noiseValue = Noise.simplexNoise(this.x, this.y, globals.framesCounter);
-            let angle = Numbers.scale(noiseValue, -1, 1, 0, 360) ;
-            Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);
+            let scale = 0.005; 
+            let value = globals.noise.get(this.x * scale, this.y * scale, globals.time * 20);
+            let angle = Numbers.scale(value, -1, 1, 0, 360);
+            Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);   
         }
     }
 
     let init = () => {
+        globals.noise = new Noise();
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();
         config.ledDiameter = globals.random.nextInt(5, 20);        
         config.ledPadding = globals.random.nextInt(0, 5);
         config.ledMargin = config.ledPadding;
-
-        randomize();
 
         config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
         config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
@@ -146,9 +147,7 @@
 
         draw();
         
-        //Browser.sleep(200);
-        globals.framesCounter += 0.0001;
-
+        globals.time += 0.005;
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
     }
