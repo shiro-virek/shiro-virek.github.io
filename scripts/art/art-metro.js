@@ -243,6 +243,23 @@
 			this.symbol = alphabeticLineSymbol ? "A" : 1;
 		}
 
+		getAttractedDirection = (x, y, originalDirection) => {
+			if (urbanAttractors.length == 0) return originalDirection;
+
+			let closest = urbanAttractors.reduce((prev, curr) => {
+				let dPrev = Math.hypot(x - prev.x, y - prev.y);
+				let dCurr = Math.hypot(x - curr.x, y - curr.y);
+				return dCurr < dPrev ? curr : prev;
+			});
+
+			let angleToAttractor = Math.atan2(closest.y - y, closest.x - x) * 180 / Math.PI;
+
+			// Suavizamos hacia el attractor: 70% dirección original, 30% al attractor
+			let newDirection = originalDirection * 0.7 + angleToAttractor * 0.3;
+			return newDirection;
+		}
+
+
 		getLength = () => {
 			let length = 0;
 			for (const segment of this.segments) {
@@ -293,7 +310,7 @@
 				let segment;
 
 				length = globals.random.nextInt(20, 200);
-				direction = baseDirection + this.getDirection(lastDirection);
+				direction = this.getAttractedDirection(lastX, lastY, baseDirection + this.getDirection(lastDirection));
 
 				let deltaX = Math.cos(direction * Trigonometry.RAD_CONST) * length;
 				let deltaY = Math.sin(direction * Trigonometry.RAD_CONST) * length;
@@ -400,6 +417,20 @@
 		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`;
 	}
 
+	let urbanAttractors = [];
+
+	function generateUrbanAttractors(count = 3) {
+		urbanAttractors = [];
+		for (let i = 0; i < count; i++) {
+			let attractor = {
+				x: globals.random.nextInt(width * 0.2, width * 0.8),
+				y: globals.random.nextInt(height * 0.2, height * 0.8)
+			};
+			urbanAttractors.push(attractor);
+		}
+	}
+
+
 	let init = () => {
 		initCanvas();
 		metroNetwork = new MetroNetwork()
@@ -438,6 +469,7 @@
 		angleSegmentRange = globals.random.nextBool();
 		drawIcons = globals.random.nextBool();
 		drawStreets = globals.random.nextBool();
+		generateUrbanAttractors();
 	}
 
 	let draw = () => {
