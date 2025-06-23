@@ -319,8 +319,11 @@
 				newY = lastY + deltaY;
 				segment = new Segment(newX, newY, length);
 
-				if ((newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
-					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin))
+				if (
+					(newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
+					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
+					|| isSegmentTooClose(lastX, lastY, newX, newY)
+				)
 					continue;
 
 				this.addStation(length, direction, newX, newY, lastX, lastY);
@@ -456,6 +459,27 @@
 		}
 
 		globals.random.shuffleArray(palette);
+	}
+		
+	function isSegmentTooClose(x1, y1, x2, y2, threshold = 20) {
+		for (const line of metroNetwork.lines) {
+			for (let i = 1; i < line.segments.length; i++) {
+				let s1 = line.segments[i - 1];
+				let s2 = line.segments[i];
+				let dist = distanceBetweenSegments(x1, y1, x2, y2, s1.x, s1.y, s2.x, s2.y);
+				if (dist < threshold) return true;
+			}
+		}
+		return false;
+	}
+		
+	function distanceBetweenSegments(x1, y1, x2, y2, x3, y3, x4, y4) {
+		// Aprox: distancia mínima entre extremos
+		let d1 = Math.hypot(x1 - x3, y1 - y3);
+		let d2 = Math.hypot(x2 - x4, y2 - y4);
+		let d3 = Math.hypot(x1 - x4, y1 - y4);
+		let d4 = Math.hypot(x2 - x3, y2 - y3);
+		return Math.min(d1, d2, d3, d4);
 	}
 
 	let randomize = () => {
