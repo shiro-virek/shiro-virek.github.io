@@ -16,6 +16,8 @@
         ledPadding: 30,
         ledDiameter: 20,
         hue: 50,
+        functionIndex: 3,
+        functions: [bars, squares, brightness, hues] 
     };    
 
     class LedScreen {
@@ -63,9 +65,32 @@
         draw = (ctx) => {
             let scale = 0.005; 
             let value = globals.noise.get(this.x * scale, this.y * scale, globals.time * 10);
-            let angle = Numbers.scale(value, -1, 1, 0, 360);
-            Drawing.drawRectangleR(ctx, this.x, this.y, this.diameter / 4, this.diameter, this.color, this.color, angle);   
+        
+            const modifierFunction = config.functions[config.functionIndex];
+            modifierFunction(this, value);
         }
+    }
+
+    function bars(led, noiseValue){
+        let angle = Numbers.scale(noiseValue, -1, 1, 0, 360);
+        Drawing.drawRectangleR(ctx, led.x, led.y, led.diameter / 4, led.diameter, led.color, led.color, angle);   
+    }
+
+    function squares(led, noiseValue){
+        let side = Numbers.scale(noiseValue, -1, 1, 0, led.diameter);
+        Drawing.drawSquare(ctx, led.x, led.y, side, 0, led.color, led.color);  
+    }
+
+    function brightness(led, noiseValue){
+        let bright = Numbers.scale(noiseValue, -1, 1, 0, 50);
+        let color = `hsl(${config.hue}, 100%, ${bright}%)`;
+        Drawing.drawCircle(ctx, led.x, led.y, led.radius, color, color); 
+    }
+
+    function hues(led, noiseValue){
+        let newHue = Numbers.scale(noiseValue, -1, 1, 0, 360);
+        let color = `hsl(${newHue}, 100%, 50%)`;
+        Drawing.drawCircle(ctx, led.x, led.y, led.radius, color, color); 
     }
 
     let init = () => {
@@ -123,6 +148,7 @@
 
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 255);
+        config.functionIndex = Math.floor(Math.random() * config.functions.length)
     }
 
     let trackMouse = (x, y) => {
