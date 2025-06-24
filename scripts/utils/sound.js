@@ -83,6 +83,32 @@ class Sound {
         };
     }
 
+    static error = () =>  {
+        const ctx = Sound.AudioContext.getInstance();
+
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+
+        const oscillator = ctx.createOscillator();
+        oscillator.type = 'square'; 
+        oscillator.frequency.setValueAtTime(880, ctx.currentTime); 
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(0.4, ctx.currentTime); 
+
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.12);
+
+        oscillator.onended = () => {
+            oscillator.disconnect();
+            gainNode.disconnect();
+        };
+    }
+
     static stopAllSounds = () => {
         let ctx = Sound.AudioContext.getInstance();
         ctx.close();

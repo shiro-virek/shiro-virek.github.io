@@ -3,6 +3,13 @@
 		random: null
     };
 
+    const config = {
+        randomize: true,
+		restrictAngles: true,
+		showStationNames: true,
+    };    
+
+	let urbanAttractors = [];
 	let LINE_THICKNESS = 10;
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
 	let HSL_MAX_HUE = 360;
@@ -94,6 +101,7 @@
 			for (const line of metroNetwork.lines) {
 				for (const station of line.stations) {
 					station.drawTransferLine(ctx, true, LINE_THICKNESS);
+					if (config.showStationNames) station.drawStationName(ctx);
 				}
 			}
 		}
@@ -152,10 +160,33 @@
 			this.y = y;
 			this.lineSymbol = lineSymbol;
 			this.transfer = null;
+			this.name = this.generateName();
 		}
 
-		drawStation = (ctx, color) => {
+		generateIcon = () => {
+			const icons =  ["✈︎", "⛪", "🚌", "🚆", "🚗", "♿︎", ""];
+			const probabilities = [0.01, 0.02, 0.03, 0.02, 0.02, 0.45, 0.45];
+			
+    		return globals.random.getElementByProbability(icons, probabilities);
+		}
+
+		generateName = () => {
+			let icon = this.generateIcon();
+			return Text.generateName(globals.random, 1, 2) + icon;
+		}
+
+		drawStation = (ctx, color) => {			
 			Drawing.drawCircle(ctx, this.x, this.y, stationRadio, stationColorBorder ? color : "#000", "#FFF");
+		}
+
+		drawStationName = (ctx) => {
+			let margin = 10;
+			ctx.font = "10px Arial";           
+			ctx.fillStyle = "white";             
+			ctx.strokeStyle = "black";         
+			ctx.lineWidth = 3;       
+			ctx.strokeText(this.name, this.x + margin, this.y - margin);
+			ctx.fillText(this.name, this.x + margin, this.y - margin);
 		}
 
 		addTransfers = (metroNetwork) => {
@@ -243,6 +274,21 @@
 			this.symbol = alphabeticLineSymbol ? "A" : 1;
 		}
 
+		getAttractedDirection = (x, y, originalDirection) => {
+			if (urbanAttractors.length == 0) return originalDirection;
+
+			let closest = urbanAttractors.reduce((prev, curr) => {
+				let dPrev = Math.hypot(x - prev.x, y - prev.y);
+				let dCurr = Math.hypot(x - curr.x, y - curr.y);
+				return dCurr < dPrev ? curr : prev;
+			});
+
+			let angleToAttractor = Math.atan2(closest.y - y, closest.x - x) * 180 / Math.PI;
+
+			let newDirection = originalDirection * 0.7 + angleToAttractor * 0.3;
+			return newDirection;
+		}
+
 		getLength = () => {
 			let length = 0;
 			for (const segment of this.segments) {
@@ -293,7 +339,11 @@
 				let segment;
 
 				length = globals.random.nextInt(20, 200);
-				direction = baseDirection + this.getDirection(lastDirection);
+
+				if (config.restrictAngles)
+					direction = baseDirection + this.getDirection(lastDirection)
+				else
+					direction = this.getAttractedDirection(lastX, lastY, baseDirection + this.getDirection(lastDirection));
 
 				let deltaX = Math.cos(direction * Trigonometry.RAD_CONST) * length;
 				let deltaY = Math.sin(direction * Trigonometry.RAD_CONST) * length;
@@ -302,9 +352,14 @@
 				newY = lastY + deltaY;
 				segment = new Segment(newX, newY, length);
 
-				if ((newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
-					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin))
+				if (
+					(newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
+					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
+					|| isSegmentTooClose(lastX, lastY, newX, newY)
+				){
+					if (index == 0) Sound.error();
 					continue;
+				}
 
 				this.addStation(length, direction, newX, newY, lastX, lastY);
 				this.addStreet(lastX, lastY, direction);
@@ -400,10 +455,22 @@
 		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`;
 	}
 
+	let generateUrbanAttractors = (count = 3) => {
+		urbanAttractors = [];
+		for (let i = 0; i < count; i++) {
+			let attractor = {
+				x: globals.random.nextInt(width * 0.2, width * 0.8),
+				y: globals.random.nextInt(height * 0.2, height * 0.8)
+			};
+			urbanAttractors.push(attractor);
+		}
+	}
+
 	let init = () => {
 		initCanvas();
 		metroNetwork = new MetroNetwork()
-		randomize();
+		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
 		addEvents();
 		window.requestAnimationFrame(loop)
 	}
@@ -426,9 +493,31 @@
 
 		globals.random.shuffleArray(palette);
 	}
+		
+	function isSegmentTooClose(x1, y1, x2, y2, threshold = 20) {
+		for (const line of metroNetwork.lines) {
+			for (let i = 1; i < line.segments.length; i++) {
+				let s1 = line.segments[i - 1];
+				let s2 = line.segments[i];
+				let dist = distanceBetweenSegments(x1, y1, x2, y2, s1.x, s1.y, s2.x, s2.y);
+				if (dist < threshold) return true;
+			}
+		}
+		return false;
+	}
+		
+	function distanceBetweenSegments(x1, y1, x2, y2, x3, y3, x4, y4) {
+		let d1 = Math.hypot(x1 - x3, y1 - y3);
+		let d2 = Math.hypot(x2 - x4, y2 - y4);
+		let d3 = Math.hypot(x1 - x4, y1 - y4);
+		let d4 = Math.hypot(x2 - x3, y2 - y3);
+		return Math.min(d1, d2, d3, d4);
+	}
 
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
+		config.restrictAngles = globals.random.nextBool();
+		config.showStationNames = globals.random.nextBool();
 		LINE_THICKNESS = globals.random.nextInt(LINE_THICKNESS, LINE_THICKNESS * 2)
 		stationColorBorder = globals.random.nextBool();
 		stationRadio = globals.random.nextInt(3,10);
@@ -438,6 +527,7 @@
 		angleSegmentRange = globals.random.nextBool();
 		drawIcons = globals.random.nextBool();
 		drawStreets = globals.random.nextBool();
+		generateUrbanAttractors();
 	}
 
 	let draw = () => {
