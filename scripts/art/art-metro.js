@@ -323,8 +323,10 @@
 					(newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
 					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
 					|| isSegmentTooClose(lastX, lastY, newX, newY)
-				)
+				){
+					if (index == 0) Sound.error();
 					continue;
+				}
 
 				this.addStation(length, direction, newX, newY, lastX, lastY);
 				this.addStreet(lastX, lastY, direction);
