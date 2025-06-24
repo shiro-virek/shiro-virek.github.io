@@ -32,4 +32,27 @@ class Random {
   nextBool = () => {
     return this.next() < 0.5;
   }  
+
+  dice = (faces = 6) => {
+    return this.nextInt(1, faces) == 1;
+  }
+
+  getElementByProbability(elements, probabilities) {
+    if (elements.length !== probabilities.length) {
+      throw new Error("Arrays must be the same length!");
+    }
+
+    const r = Math.random();
+    let accumulated = 0;
+
+    for (let i = 0; i < elements.length; i++) {
+      accumulated += probabilities[i];
+      if (r < accumulated) {
+        return elements[i];
+      }
+    }
+
+    return elements[elements.length - 1];
+  }
+
 }
