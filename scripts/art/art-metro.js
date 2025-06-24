@@ -10,27 +10,26 @@
         randomize: true,
 		restrictAngles: true,
 		showStationNames: true,
+		lineThickness: 10,
+		lineTransferMaxDistance: 30,
+		hslMaxHue: 360,
+		minLineLength: 50,
+		infoMarginTop: 10,
+		infoMarginLeft: 10,
+		infoSymbolSide: 15,
+		infoLineHeight: 20,
+		infoHeaderHeight: 100,
+		infoPadding: 10,
+		infoWidth: 120,
+		drawQuadtree: false,
+		linesLimit: true,
+		stationRadio: 10,
+		stationColorBorder: false,
+		drawStreets: false,
+		maxNumberOfLines: 15,
+		angleSegmentRange: 2,
+		alphabeticLineSymbol: false,
     };    
-
-	let LINE_THICKNESS = 10;
-	let LINE_TRANSFER_MAX_DISTANCE = 30;
-	let HSL_MAX_HUE = 360;
-	let MIN_LINE_LENGTH = 50;
-	let INFO_MARGIN_TOP = 10;
-	let INFO_MARGIN_LEFT = 10;
-	let INFO_SYMBOL_SIDE = 15;
-	let INFO_LINE_HEIGHT = 20;
-	let INFO_HEADER_HEIGHT = 100;
-	let INFO_PADDING = 10;
-	let INFO_WIDTH = 120;
-	let DRAW_QUADTREE = false;
-	let LINES_LIMIT = true;
-	let stationRadio = 10;
-	let stationColorBorder = false;
-	let drawStreets = false;
-	let maxNumberOfLines = 15;
-	let angleSegmentRange = 2;
-	let alphabeticLineSymbol = false;
 
 	class metroNetwork {
 		constructor() {
@@ -54,40 +53,40 @@
 
 		drawLinesInfo = (ctx) => {
 			ctx.fillStyle = "#FFF";
-			let infoWidth = INFO_WIDTH;
-			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + globals.metroNetwork.lines.length * INFO_LINE_HEIGHT;
-			ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
+			let infoWidth = config.infoWidth;
+			let infoHeight = config.infoMarginTop + config.infoHeaderHeight + globals.metroNetwork.lines.length * config.infoLineHeight;
+			ctx.fillRect(config.infoMarginLeft, config.infoMarginTop, infoWidth, infoHeight);
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#000000';
-			ctx.strokeRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
+			ctx.strokeRect(config.infoMarginLeft, config.infoMarginTop, infoWidth, infoHeight);
 
 			ctx.font = "10px Arial";
 			ctx.fillStyle = "#000";
-			ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
-			ctx.fillText(`Stations: ${globals.metroNetwork.getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
-			ctx.fillText(`Lines: ${globals.metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
-			ctx.fillText(`Length: ${Math.floor(globals.metroNetwork.getLinesLength() / 100)} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
-			ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
+			ctx.fillText(`City Metro System`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2);
+			ctx.fillText(`Stations: ${globals.metroNetwork.getNumberOfStations()}`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight);
+			ctx.fillText(`Lines: ${globals.metroNetwork.lines.length}`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 2);
+			ctx.fillText(`Length: ${Math.floor(globals.metroNetwork.getLinesLength() / 100)} km.`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 3);
+			ctx.fillText(`Transfer station`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 4);
 
 			metroNetwork.drawTransferIcon(ctx);
 
 			ctx.lineWidth = 1;
 			for (let i = 0; i < globals.metroNetwork.lines.length; i++) {
-				Drawing.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', globals.metroNetwork.lines[i].colorBase());
+				Drawing.drawRectangle(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, '#000', globals.metroNetwork.lines[i].colorBase());
 				ctx.fillStyle = "#000";
-				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
+				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol}`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding * 2 + i * config.infoLineHeight);
 			}
 		}
 
 		static drawTransferIcon = (ctx) => {
-			let station1 = new Station(INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
-			let station2 = new Station(INFO_MARGIN_LEFT + INFO_PADDING + INFO_SYMBOL_SIDE, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4 - 5);
+			let station1 = new Station(config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 4 - 5);
+			let station2 = new Station(config.infoMarginLeft + config.infoPadding + config.infoSymbolSide, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 4 - 5);
 			station1.transfer = station2;
 			station1.drawTransferLine(ctx, true, 10);
 		}
 
 		drawLines = (ctx) => {
-			if (drawStreets)
+			if (config.drawStreets)
 				for (const line of globals.metroNetwork.lines) {
 					line.drawStreets(ctx);
 				}
@@ -98,7 +97,7 @@
 
 			for (const line of globals.metroNetwork.lines) {
 				for (const station of line.stations) {
-					station.drawTransferLine(ctx, true, LINE_THICKNESS);
+					station.drawTransferLine(ctx, true, config.lineThickness);
 				}
 			}
 
@@ -111,11 +110,11 @@
 		}
 
 		addMetroLine = (x, y) => {
-			if ((globals.metroNetwork.lines.length < maxNumberOfLines && LINES_LIMIT) || !LINES_LIMIT) {
+			if ((globals.metroNetwork.lines.length < config.maxNumberOfLines && config.linesLimit) || !config.linesLimit) {
 				let line = new Line(x, y);
 				line.randomize();
 
-				if (line.getLength() > MIN_LINE_LENGTH)
+				if (line.getLength() > config.minLineLength)
 					globals.metroNetwork.lines.push(line);
 				else
 					globals.palette.push(line.hue);
@@ -141,7 +140,7 @@
 
 		draw = (ctx) => {
 			if (this.lines.length > 0) {
-				if (DRAW_QUADTREE)
+				if (config.drawQuadtree)
 					this.quad.drawQuadtree(ctx, this.quad);
 				this.drawLines(ctx);
 				this.drawLinesInfo(ctx);
@@ -169,9 +168,9 @@
 
 		generateIcon = () => {
 			const icons =  ["✈︎", "⛪", "🚌", "🚆", "🚗", "♿︎", ""];
-			const probabilities = [0.01, 0.02, 0.03, 0.02, 0.02, 0.45, 0.45];
+			const probabilities = [0.03, 0.05, 0.05, 0.05, 0.05, 0.31, 0.1];
 			
-    		return globals.random.getElementByProbability(icons, probabilities);
+			return globals.random.getElementByProbability(icons, probabilities);
 		}
 
 		generateName = () => {
@@ -180,7 +179,7 @@
 		}
 
 		drawStation = (ctx, color) => {			
-			Drawing.drawCircle(ctx, this.x, this.y, stationRadio, stationColorBorder ? color : "#000", "#FFF");
+			Drawing.drawCircle(ctx, this.x, this.y, config.stationRadio, config.stationColorBorder ? color : "#000", "#FFF");
 		}
 
 		drawStationName = (ctx) => {
@@ -213,7 +212,7 @@
 			let catY = Math.abs(station2.y - station1.y);
 			let distance = Math.sqrt(catX * catX + catY * catY);
 
-			if (distance < LINE_TRANSFER_MAX_DISTANCE && station1.transfer == null && station2.transfer == null) {
+			if (distance < config.lineTransferMaxDistance && station1.transfer == null && station2.transfer == null) {
 				station1.transfer = station2;
 				station2.transfer = station1;
 			}
@@ -275,7 +274,7 @@
 			this.segments = [];
 			this.stations = [];
 			this.streets = [];
-			this.symbol = alphabeticLineSymbol ? "A" : 1;
+			this.symbol = config.alphabeticLineSymbol ? "A" : 1;
 		}
 
 		getAttractedDirection = (x, y, originalDirection) => {
@@ -303,11 +302,11 @@
 
 		randomizeSymbol = () => {
 			if (globals.metroNetwork.lines.length > 0)
-				if (alphabeticLineSymbol) {
+				if (config.alphabeticLineSymbol) {
 					let nextSymbol = Text.nextCharacter(globals.metroNetwork.lines[globals.metroNetwork.lines.length - 1].symbol);
 					if (nextSymbol == '[') {
 						this.symbol = 1;
-						alphabeticLineSymbol = false;
+						config.alphabeticLineSymbol = false;
 					} else {
 						this.symbol = nextSymbol;
 					}
@@ -332,7 +331,7 @@
 			this.segments.push(firstSegment);
 			let firstStation = new Station(this.x, this.y, this.symbol);
 			this.stations.push(firstStation);
-			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + maxNumberOfLines * INFO_LINE_HEIGHT;
+			let infoHeight = config.infoMarginTop + config.infoHeaderHeight + config.maxNumberOfLines * config.infoLineHeight;
 			let margin = 10;
 
 			for (let index = 0; index < numberOfSegments; index++) {
@@ -357,7 +356,7 @@
 				segment = new Segment(newX, newY, length);
 
 				if (
-					(newX < INFO_MARGIN_LEFT + INFO_WIDTH + margin && newY < INFO_MARGIN_TOP + infoHeight + margin)
+					(newX < config.infoMarginLeft + config.infoWidth + margin && newY < config.infoMarginTop + infoHeight + margin)
 					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
 					|| isSegmentTooClose(lastX, lastY, newX, newY)
 				){
@@ -417,14 +416,14 @@
 		}
 
 		randomize = () => {
-			this.lineThickness = LINE_THICKNESS;
+			this.lineThickness = config.lineThickness;
 			this.randomizeColor();
 			this.randomizeSymbol();
 			this.randomizeSegments();
 		}
 
 		getDirection = (lastDirection) => {
-			return 45 * globals.random.nextInt(-angleSegmentRange, angleSegmentRange);
+			return 45 * globals.random.nextInt(-config.angleSegmentRange, config.angleSegmentRange);
 		}
 
 		drawMetroLine = (ctx) => {
@@ -486,12 +485,12 @@
 	}
 
 	let generatePalette = () => {
-		let seed = globals.random.nextInt(0, HSL_MAX_HUE);
-		let increment = Math.floor(HSL_MAX_HUE / maxNumberOfLines);
-		for (let i = 1; i <= maxNumberOfLines; i++) {
+		let seed = globals.random.nextInt(0, config.hslMaxHue);
+		let increment = Math.floor(config.hslMaxHue / config.maxNumberOfLines);
+		for (let i = 1; i <= config.maxNumberOfLines; i++) {
 			let color = seed + i * increment;
-			if (color > HSL_MAX_HUE)
-				color = color - HSL_MAX_HUE;
+			if (color > config.hslMaxHue)
+				color = color - config.hslMaxHue;
 			globals.palette.push(color);
 		}
 
@@ -522,15 +521,15 @@
 		globals.random = Objects.getRandomObject();
 		config.restrictAngles = globals.random.nextBool();
 		config.showStationNames = globals.random.nextBool();
-		LINE_THICKNESS = globals.random.nextInt(LINE_THICKNESS, LINE_THICKNESS * 2)
-		stationColorBorder = globals.random.nextBool();
-		stationRadio = globals.random.nextInt(3,10);
-		maxNumberOfLines = Math.floor(width * height / 25000);
+		config.lineThickness = globals.random.nextInt(config.lineThickness, config.lineThickness * 2)
+		config.stationColorBorder = globals.random.nextBool();
+		config.stationRadio = globals.random.nextInt(3,10);
+		config.maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
-		alphabeticLineSymbol = globals.random.nextBool();
-		angleSegmentRange = globals.random.nextBool();
+		config.alphabeticLineSymbol = globals.random.nextBool();
+		config.angleSegmentRange = globals.random.nextBool();
 		drawIcons = globals.random.nextBool();
-		drawStreets = globals.random.nextBool();
+		config.drawStreets = globals.random.nextBool();
 		generateUrbanAttractors();
 	}
 
