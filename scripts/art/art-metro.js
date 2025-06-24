@@ -6,6 +6,7 @@
     const config = {
         randomize: true,
 		restrictAngles: true,
+		showStationNames: true,
     };    
 
 	let urbanAttractors = [];
@@ -100,6 +101,7 @@
 			for (const line of metroNetwork.lines) {
 				for (const station of line.stations) {
 					station.drawTransferLine(ctx, true, LINE_THICKNESS);
+					if (config.showStationNames) station.drawStationName(ctx);
 				}
 			}
 		}
@@ -170,7 +172,7 @@
 
 		generateName = () => {
 			let icon = this.generateIcon();
-			return Text.generateName(globals.random) + icon;
+			return Text.generateName(globals.random, 1, 2) + icon;
 		}
 
 		drawStation = (ctx, color) => {			
@@ -441,7 +443,6 @@
 		drawStations = (ctx) => {
 			for (const station of this.stations) {
 				station.drawStation(ctx, this.colorBase());
-				station.drawStationName(ctx);
 			}
 		}
 
@@ -516,6 +517,7 @@
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
 		config.restrictAngles = globals.random.nextBool();
+		config.showStationNames = globals.random.nextBool();
 		LINE_THICKNESS = globals.random.nextInt(LINE_THICKNESS, LINE_THICKNESS * 2)
 		stationColorBorder = globals.random.nextBool();
 		stationRadio = globals.random.nextInt(3,10);
