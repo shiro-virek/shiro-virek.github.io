@@ -1,7 +1,9 @@
 {
     const globals = {
 		random: null,
-		urbanAttractors: []
+		urbanAttractors: [],
+		metroNetwork: null,
+		palette: []
     };
 
     const config = {
@@ -26,14 +28,11 @@
 	let stationRadio = 10;
 	let stationColorBorder = false;
 	let drawStreets = false;
-
 	let maxNumberOfLines = 15;
 	let angleSegmentRange = 2;
 	let alphabeticLineSymbol = false;
-	let metroNetwork;
-	let palette = [];
 
-	class MetroNetwork {
+	class metroNetwork {
 		constructor() {
 			this.lines = [];
 			this.quad = Quadtree.generateQuadtree(width, height);
@@ -47,7 +46,7 @@
 
 		getLinesLength = () => {
 			let linesLength = 0;
-			for (const line of metroNetwork.lines) {
+			for (const line of globals.metroNetwork.lines) {
 				linesLength += line.getLength();
 			}
 			return linesLength;
@@ -56,7 +55,7 @@
 		drawLinesInfo = (ctx) => {
 			ctx.fillStyle = "#FFF";
 			let infoWidth = INFO_WIDTH;
-			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + metroNetwork.lines.length * INFO_LINE_HEIGHT;
+			let infoHeight = INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + globals.metroNetwork.lines.length * INFO_LINE_HEIGHT;
 			ctx.fillRect(INFO_MARGIN_LEFT, INFO_MARGIN_TOP, infoWidth, infoHeight);
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#000000';
@@ -65,18 +64,18 @@
 			ctx.font = "10px Arial";
 			ctx.fillStyle = "#000";
 			ctx.fillText(`City Metro System`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2);
-			ctx.fillText(`Stations: ${metroNetwork.getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
-			ctx.fillText(`Lines: ${metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
-			ctx.fillText(`Length: ${Math.floor(metroNetwork.getLinesLength() / 100)} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
+			ctx.fillText(`Stations: ${globals.metroNetwork.getNumberOfStations()}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT);
+			ctx.fillText(`Lines: ${globals.metroNetwork.lines.length}`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 2);
+			ctx.fillText(`Length: ${Math.floor(globals.metroNetwork.getLinesLength() / 100)} km.`, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 3);
 			ctx.fillText(`Transfer station`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_PADDING * 2 + INFO_LINE_HEIGHT * 4);
 
-			MetroNetwork.drawTransferIcon(ctx);
+			metroNetwork.drawTransferIcon(ctx);
 
 			ctx.lineWidth = 1;
-			for (let i = 0; i < metroNetwork.lines.length; i++) {
-				Drawing.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', metroNetwork.lines[i].colorBase());
+			for (let i = 0; i < globals.metroNetwork.lines.length; i++) {
+				Drawing.drawRectangle(ctx, INFO_MARGIN_LEFT + INFO_PADDING, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING + i * INFO_LINE_HEIGHT, INFO_SYMBOL_SIDE, INFO_SYMBOL_SIDE, '#000', globals.metroNetwork.lines[i].colorBase());
 				ctx.fillStyle = "#000";
-				ctx.fillText(`Line ${metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
+				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol}`, INFO_MARGIN_LEFT + INFO_SYMBOL_SIDE + INFO_PADDING * 2, INFO_MARGIN_TOP + INFO_HEADER_HEIGHT + INFO_PADDING * 2 + i * INFO_LINE_HEIGHT);
 			}
 		}
 
@@ -89,22 +88,22 @@
 
 		drawLines = (ctx) => {
 			if (drawStreets)
-				for (const line of metroNetwork.lines) {
+				for (const line of globals.metroNetwork.lines) {
 					line.drawStreets(ctx);
 				}
 
-			for (const line of metroNetwork.lines) {
+			for (const line of globals.metroNetwork.lines) {
 				line.drawMetroLine(ctx);
 			}
 
-			for (const line of metroNetwork.lines) {
+			for (const line of globals.metroNetwork.lines) {
 				for (const station of line.stations) {
 					station.drawTransferLine(ctx, true, LINE_THICKNESS);
 				}
 			}
 
 			if (config.showStationNames) 
-				for (const line of metroNetwork.lines) {
+				for (const line of globals.metroNetwork.lines) {
 					for (const station of line.stations) {
 						station.drawStationName(ctx);
 					}
@@ -112,16 +111,16 @@
 		}
 
 		addMetroLine = (x, y) => {
-			if ((metroNetwork.lines.length < maxNumberOfLines && LINES_LIMIT) || !LINES_LIMIT) {
+			if ((globals.metroNetwork.lines.length < maxNumberOfLines && LINES_LIMIT) || !LINES_LIMIT) {
 				let line = new Line(x, y);
 				line.randomize();
 
 				if (line.getLength() > MIN_LINE_LENGTH)
-					metroNetwork.lines.push(line);
+					globals.metroNetwork.lines.push(line);
 				else
-					palette.push(line.hue);
+					globals.palette.push(line.hue);
 
-				for (const line of metroNetwork.lines) {
+				for (const line of globals.metroNetwork.lines) {
 					for (const station of line.stations) {
 						station.addTransfers(this);
 					}
@@ -133,7 +132,7 @@
 
 		populateQuadTree = () => {
 			this.quad.clear();
-			for (const line of metroNetwork.lines) {
+			for (const line of globals.metroNetwork.lines) {
 				for (const station of line.stations) {
 					this.quad.insert(station);
 				}
@@ -303,9 +302,9 @@
 		}
 
 		randomizeSymbol = () => {
-			if (metroNetwork.lines.length > 0)
+			if (globals.metroNetwork.lines.length > 0)
 				if (alphabeticLineSymbol) {
-					let nextSymbol = Text.nextCharacter(metroNetwork.lines[metroNetwork.lines.length - 1].symbol);
+					let nextSymbol = Text.nextCharacter(globals.metroNetwork.lines[globals.metroNetwork.lines.length - 1].symbol);
 					if (nextSymbol == '[') {
 						this.symbol = 1;
 						alphabeticLineSymbol = false;
@@ -313,11 +312,11 @@
 						this.symbol = nextSymbol;
 					}
 				} else
-					this.symbol = metroNetwork.lines[metroNetwork.lines.length - 1].symbol + 1;
+					this.symbol = globals.metroNetwork.lines[globals.metroNetwork.lines.length - 1].symbol + 1;
 		}
 
 		randomizeColor = () => {
-			this.hue = palette.pop();
+			this.hue = globals.palette.pop();
 			this.saturation = 100;
 			this.light = globals.random.nextInt(20, 50);
 		}
@@ -473,7 +472,7 @@
 
 	let init = () => {
 		initCanvas();
-		metroNetwork = new MetroNetwork()
+		globals.metroNetwork = new metroNetwork()
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 		addEvents();
@@ -482,7 +481,7 @@
 
 	let addEvents = () => {
 		canvas.addEventListener('click', e => {
-			metroNetwork.addMetroLine(e.offsetX, e.offsetY);
+			globals.metroNetwork.addMetroLine(e.offsetX, e.offsetY);
 		}, false);
 	}
 
@@ -493,14 +492,14 @@
 			let color = seed + i * increment;
 			if (color > HSL_MAX_HUE)
 				color = color - HSL_MAX_HUE;
-			palette.push(color);
+			globals.palette.push(color);
 		}
 
-		globals.random.shuffleArray(palette);
+		globals.random.shuffleArray(globals.palette);
 	}
 		
 	function isSegmentTooClose(x1, y1, x2, y2, threshold = 20) {
-		for (const line of metroNetwork.lines) {
+		for (const line of globals.metroNetwork.lines) {
 			for (let i = 1; i < line.segments.length; i++) {
 				let s1 = line.segments[i - 1];
 				let s2 = line.segments[i];
@@ -537,7 +536,7 @@
 
 	let draw = () => {
 		drawBackground(ctx, canvas);
-		metroNetwork.draw(ctx);
+		globals.metroNetwork.draw(ctx);
 	}
 
 	let loop = (timestamp) => {
@@ -552,6 +551,6 @@
 	init();
 
 	window.clearCanvas = () => {  
-		metroNetwork.lines = [];
+		globals.metroNetwork.lines = [];
 	}
 }
