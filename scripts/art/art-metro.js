@@ -158,10 +158,21 @@
 			this.y = y;
 			this.lineSymbol = lineSymbol;
 			this.transfer = null;
+			this.name = "station";
 		}
 
-		drawStation = (ctx, color) => {
+		drawStation = (ctx, color) => {			
 			Drawing.drawCircle(ctx, this.x, this.y, stationRadio, stationColorBorder ? color : "#000", "#FFF");
+		}
+
+		drawStationName = (ctx) => {
+			let margin = 10;
+			ctx.font = "10px Arial";           
+			ctx.fillStyle = "white";             
+			ctx.strokeStyle = "black";         
+			ctx.lineWidth = 3;       
+			ctx.strokeText(this.name, this.x + margin, this.y - margin);
+			ctx.fillText(this.name, this.x + margin, this.y - margin);
 		}
 
 		addTransfers = (metroNetwork) => {
@@ -419,6 +430,7 @@
 		drawStations = (ctx) => {
 			for (const station of this.stations) {
 				station.drawStation(ctx, this.colorBase());
+				station.drawStationName(ctx);
 			}
 		}
 
