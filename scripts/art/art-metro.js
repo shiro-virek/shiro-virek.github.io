@@ -1,6 +1,7 @@
 {
     const globals = {
-		random: null
+		random: null,
+		urbanAttractors: []
     };
 
     const config = {
@@ -9,7 +10,6 @@
 		showStationNames: true,
     };    
 
-	let urbanAttractors = [];
 	let LINE_THICKNESS = 10;
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
 	let HSL_MAX_HUE = 360;
@@ -280,9 +280,9 @@
 		}
 
 		getAttractedDirection = (x, y, originalDirection) => {
-			if (urbanAttractors.length == 0) return originalDirection;
+			if (globals.urbanAttractors.length == 0) return originalDirection;
 
-			let closest = urbanAttractors.reduce((prev, curr) => {
+			let closest = globals.urbanAttractors.reduce((prev, curr) => {
 				let dPrev = Math.hypot(x - prev.x, y - prev.y);
 				let dCurr = Math.hypot(x - curr.x, y - curr.y);
 				return dCurr < dPrev ? curr : prev;
@@ -461,13 +461,13 @@
 	}
 
 	let generateUrbanAttractors = (count = 3) => {
-		urbanAttractors = [];
+		globals.urbanAttractors = [];
 		for (let i = 0; i < count; i++) {
 			let attractor = {
 				x: globals.random.nextInt(width * 0.2, width * 0.8),
 				y: globals.random.nextInt(height * 0.2, height * 0.8)
 			};
-			urbanAttractors.push(attractor);
+			globals.urbanAttractors.push(attractor);
 		}
 	}
 
