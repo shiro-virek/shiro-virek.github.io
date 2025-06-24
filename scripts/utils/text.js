@@ -21,7 +21,9 @@ class Text {
         let word = ""
         let letters = random.nextInt(minLetters, maxLetters);
         for (let i=0; i<=letters; i++){
-            word += random.nextBool() ? Text.getRandomConsonant(random) : "" + Text.getRandomVowel(random);
+            let putConsonant = random.nextBool();
+            if (putConsonant) word += Text.getRandomConsonant(random); 
+            word += Text.getRandomVowel(random);
         }
         return Text.capitalizeFirstLetter(word);
     }
