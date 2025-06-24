@@ -411,7 +411,6 @@
 		}
 
 		randomize = () => {
-			config.restrictAngles = globals.random.nextBool();
 			this.lineThickness = LINE_THICKNESS;
 			this.randomizeColor();
 			this.randomizeSymbol();
@@ -516,6 +515,7 @@
 
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
+		config.restrictAngles = globals.random.nextBool();
 		LINE_THICKNESS = globals.random.nextInt(LINE_THICKNESS, LINE_THICKNESS * 2)
 		stationColorBorder = globals.random.nextBool();
 		stationRadio = globals.random.nextInt(3,10);
