@@ -26,7 +26,6 @@
 	let stationRadio = 10;
 	let stationColorBorder = false;
 	let drawStreets = false;
-	let drawIcons = false;
 
 	let maxNumberOfLines = 15;
 	let angleSegmentRange = 2;
@@ -101,9 +100,15 @@
 			for (const line of metroNetwork.lines) {
 				for (const station of line.stations) {
 					station.drawTransferLine(ctx, true, LINE_THICKNESS);
-					if (config.showStationNames) station.drawStationName(ctx);
 				}
 			}
+
+			if (config.showStationNames) 
+				for (const line of metroNetwork.lines) {
+					for (const station of line.stations) {
+						station.drawStationName(ctx);
+					}
+				}
 		}
 
 		addMetroLine = (x, y) => {
