@@ -3,6 +3,12 @@
 		random: null
     };
 
+    const config = {
+        randomize: true,
+		restrictAngles: true,
+    };    
+
+	let urbanAttractors = [];
 	let LINE_THICKNESS = 10;
 	let LINE_TRANSFER_MAX_DISTANCE = 30;
 	let HSL_MAX_HUE = 360;
@@ -254,11 +260,9 @@
 
 			let angleToAttractor = Math.atan2(closest.y - y, closest.x - x) * 180 / Math.PI;
 
-			// Suavizamos hacia el attractor: 70% dirección original, 30% al attractor
 			let newDirection = originalDirection * 0.7 + angleToAttractor * 0.3;
 			return newDirection;
 		}
-
 
 		getLength = () => {
 			let length = 0;
@@ -310,7 +314,11 @@
 				let segment;
 
 				length = globals.random.nextInt(20, 200);
-				direction = this.getAttractedDirection(lastX, lastY, baseDirection + this.getDirection(lastDirection));
+
+				if (config.restrictAngles)
+					direction = baseDirection + this.getDirection(lastDirection)
+				else
+					direction = this.getAttractedDirection(lastX, lastY, baseDirection + this.getDirection(lastDirection));
 
 				let deltaX = Math.cos(direction * Trigonometry.RAD_CONST) * length;
 				let deltaY = Math.sin(direction * Trigonometry.RAD_CONST) * length;
@@ -380,6 +388,7 @@
 		}
 
 		randomize = () => {
+			config.restrictAngles = globals.random.nextBool();
 			this.lineThickness = LINE_THICKNESS;
 			this.randomizeColor();
 			this.randomizeSymbol();
@@ -422,9 +431,7 @@
 		colorBase = () => `hsl(${this.hue}, ${this.saturation}%, ${this.light}%)`;
 	}
 
-	let urbanAttractors = [];
-
-	function generateUrbanAttractors(count = 3) {
+	let generateUrbanAttractors = (count = 3) => {
 		urbanAttractors = [];
 		for (let i = 0; i < count; i++) {
 			let attractor = {
@@ -439,7 +446,8 @@
 	let init = () => {
 		initCanvas();
 		metroNetwork = new MetroNetwork()
-		randomize();
+		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
 		addEvents();
 		window.requestAnimationFrame(loop)
 	}

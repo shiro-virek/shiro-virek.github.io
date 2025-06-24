@@ -91,18 +91,22 @@ class Sound {
         }
 
         const oscillator = ctx.createOscillator();
-        oscillator.type = 'square';
-        oscillator.frequency.setValueAtTime(440, ctx.currentTime); 
+        oscillator.type = 'square'; 
+        oscillator.frequency.setValueAtTime(880, ctx.currentTime); 
 
         const gainNode = ctx.createGain();
-        gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2); 
+        gainNode.gain.setValueAtTime(0.4, ctx.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(ctx.destination);
 
         oscillator.start();
-        oscillator.stop(ctx.currentTime + 0.2);
+        oscillator.stop(ctx.currentTime + 0.12);
+
+        oscillator.onended = () => {
+            oscillator.disconnect();
+            gainNode.disconnect();
+        };
     }
 
     static stopAllSounds = () => {
