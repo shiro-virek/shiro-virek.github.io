@@ -19,7 +19,7 @@
         fractalFunctionIndex: 1,
         fractalFunctions: [mandelbrot, julia],
         drawFunctionIndex: 1,
-        drawFunctions: [drawPaletteColor1, drawPaletteGrayscale1, drawPaletteHue],
+        drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
 
     function drawPaletteColor1(value, data, x, y){
@@ -28,7 +28,7 @@
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
-    function drawPaletteHue(value, data, x, y){
+    function drawPaletteHue1(value, data, x, y){
         newValue = Numbers.scale(value, 0, config.maxIterations, 0, 50);
         const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
@@ -36,6 +36,23 @@
 
     function drawPaletteGrayscale1(value, data, x, y){
         newValue = Numbers.scale(value, 0, config.maxIterations, 0, 255);
+        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
+    }
+
+    function drawPaletteColor2(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 360, 0);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
+    }
+
+    function drawPaletteHue2(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 50, 0);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
+    }
+
+    function drawPaletteGrayscale2(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 255, 0);
         Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
     }
 
