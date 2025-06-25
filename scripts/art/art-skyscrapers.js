@@ -35,7 +35,7 @@
 		}
 
 		addBuilding = (x, y) => {
-			let building = new Building(x, y, y);
+			let building = new Building(x, y, 0, y);
 			building.randomize();
 			this.buildings.push(building);
 			this.buildingsCount++;
@@ -43,10 +43,18 @@
 		}
 
 		draw = () => {
-			if (this.buildingsCount > 0)
-				for (let i = 0; i < this.buildingsCount; i++) {	
-					this.buildings[i].drawBuilding(ctx);
-				}
+			if (this.buildingsCount > 0){
+				this.buildings.sort((a, b) => {
+					if (isNaN(a.z) || isNaN(b.z)) {
+						return 0; 
+					}
+					return a.z - b.z;
+				});	
+
+				this.buildings.forEach(building => {          
+					building.drawBuilding(ctx);     
+				});
+			}				
 		}
 
 		randomize = () => {
