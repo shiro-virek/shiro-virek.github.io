@@ -35,7 +35,7 @@
 		}
 
 		addBuilding = (x, y) => {
-			let building = new Building(x, y);
+			let building = new Building(x, y, y);
 			building.randomize();
 			this.buildings.push(building);
 			this.buildingsCount++;
@@ -56,9 +56,10 @@
 	}
 
 	class Building {
-		constructor(x, y, moduleNumber = 0) {
+		constructor(x, y, moduleNumber = 0, z) {
 			this.x = x;
 			this.y = y;
+			this.z = z;
 			this.moduleNumber = moduleNumber;
 			this.modules = [];
 		}
@@ -120,7 +121,7 @@
 				for (let i = 1; i <= this.numberOfModules; i++) {
 					let widthDecrement = lastModule.width * globals.random.nextRange(0.05, 0.3, 2);
 
-					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i);
+					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i, lastModule.z);
 					newModule.numberOfModules = this.numberOfModules;
 
 					let heightDecrement = lastModule.height * globals.random.nextRange(0, 0.7, 2);
