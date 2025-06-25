@@ -112,8 +112,8 @@
                     break;
             }
 
-            drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, depth, modifierX, modifierY);
-            drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, depth, modifierX, modifierY);
+            drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, modifierX, modifierY);
+            drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, modifierX, modifierY);
         }
     }
 
