@@ -112,8 +112,8 @@
                     break;
             }
 
-            drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, Numbers.absoluteSubstraction(modifierX, 10), Numbers.absoluteSubstraction(modifierY, 10));
-            drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, Numbers.absoluteSubstraction(modifierX, 10), Numbers.absoluteSubstraction(modifierY, 10));
+            drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, -Numbers.absoluteSubstraction(modifierX, 10), -Numbers.absoluteSubstraction(modifierY, 10));
+            drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, -Numbers.absoluteSubstraction(modifierX, 10), -Numbers.absoluteSubstraction(modifierY, 10));
         }
     }
 
