@@ -15,15 +15,22 @@
         ci: 0.27,
         offsetX: 0,
         offsetY: 0,
+        hue: 10,
         fractalFunctionIndex: 1,
         fractalFunctions: [mandelbrot, julia],
         drawFunctionIndex: 1,
-        drawFunctions: [drawPaletteColor1, drawPaletteGrayscale1],
+        drawFunctions: [drawPaletteColor1, drawPaletteGrayscale1, drawPaletteHue],
     };    
 
     function drawPaletteColor1(value, data, x, y){
         newValue = Numbers.scale(value, 0, config.maxIterations, 0, 360);
         const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
+    }
+
+    function drawPaletteHue(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 50);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
@@ -91,6 +98,7 @@
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
         config.ci = globals.random.nextRange(-1, 1);  
+        config.hue = globals.random.nextInt(0, 360);
     }
 
     let trackMouse = (x, y) => {
