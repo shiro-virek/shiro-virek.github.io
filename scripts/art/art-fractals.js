@@ -19,59 +19,23 @@
         offsetY: 0
     };    
 
-    function mandelbrot(rc, ic){
-        let zr = 0;
-        let zi = 0;
-        
-        for (let i = 0; i < config.maxIterations; i++) {
-            let zr_pow = zr;
-            let zi_pow = zi;
-            
-            let rTemp = zr;
-            let iTemp = zi;
-            
-            for (let j = 1; j < config.pow; j++) {
-                const newR = rTemp * zr_pow - iTemp * zi_pow;
-                const newI = rTemp * zi_pow + iTemp * zr_pow;
-                rTemp = newR;
-                iTemp = newI;
-            }
-            
-            zr = rTemp + rc;
-            zi = iTemp + ic;
-            
-            if (zr * zr + zi * zi > 4) {
-                return i;
-            }
-        }
-        
-        return 0;
+    function drawPaletteColor1(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 360);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
-    function julia(zr, zi){
-        for (let i = 0; i < config.maxIterations; i++) {
-            let zr_pow = zr;
-            let zi_pow = zi;
-            
-            let rTemp = zr;
-            let iTemp = zi;
-            
-            for (let j = 1; j < config.pow; j++) {
-                const newR = rTemp * zr_pow - iTemp * zi_pow;
-                const newI = rTemp * zi_pow + iTemp * zr_pow;
-                rTemp = newR;
-                iTemp = newI;
-            }
-            
-            zr = rTemp + config.cr;
-            zi = iTemp + config.ci;
-            
-            if (zr * zr + zi * zi > 4) {
-                return i;
-            }
-        }
-        
-        return 0;
+    function drawPaletteGrayscale1(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 255);
+        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
+    }
+
+    function mandelbrot(c, i){
+        return Fractals.mandelbrot(c, i, config.maxIterations, config.pow);
+    }
+
+    function julia(c, i){
+        return Fractals.julia(c, i, config.maxIterations, config.pow, config.cr, config.ci);
     }
 
     let init = () => {
@@ -159,8 +123,7 @@
                 const fractalFunction = config.functions[config.functionIndex];
                 let value = fractalFunction(rc, ic);
                 
-                value = Numbers.scale(value, 0, config.maxIterations, 0, 255);
-                Pixels.setPixelBatch(ctx, data, x, y, value, value, value);
+                drawPaletteColor1(value, data, x, y);
             }
         }        
 
