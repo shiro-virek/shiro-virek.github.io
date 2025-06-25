@@ -62,7 +62,7 @@
     let randomize = () => {
         config.hue = globals.random.nextInt(1, 360);
         config.mode = globals.random.nextInt(0, 2);
-        config.modifAmount = globals.random.nextInt(1, 100);
+        config.modifAmount = globals.random.nextInt(-100, 100);
     }
 
     let trackMouse = (x, y) => {
@@ -112,8 +112,8 @@
                     break;
             }
 
-            drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, modifierX, modifierY);
-            drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, modifierX, modifierY);
+            drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, Numbers.absoluteSubstraction(modifierX, 10), Numbers.absoluteSubstraction(modifierY, 10));
+            drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, Numbers.absoluteSubstraction(modifierX, 10), Numbers.absoluteSubstraction(modifierY, 10));
         }
     }
 
