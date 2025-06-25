@@ -100,7 +100,7 @@ let decreaseScriptIndex = () =>{
 }
 
 let randomScriptIndex = () =>{	
-    currentScript = globals.random.nextInt(0, scriptCount);
+    currentScript = Math.floor(Math.random() * scriptCount);
 }
 
 let setCurrentScript = () => {				
