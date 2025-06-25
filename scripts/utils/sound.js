@@ -95,7 +95,7 @@ class Sound {
         oscillator.frequency.setValueAtTime(880, ctx.currentTime); 
 
         const gainNode = ctx.createGain();
-        gainNode.gain.setValueAtTime(0.4, ctx.currentTime); 
+        gainNode.gain.setValueAtTime(0.05, ctx.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(ctx.destination);

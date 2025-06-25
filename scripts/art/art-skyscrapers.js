@@ -10,6 +10,7 @@
 		firstFloorHeight: 20,
 		CWHues: [232, 203, 189, 173, 162],
 		HeliportColors: ["#FF0000", "#FFFFFF", "#000000"],
+		minimumDistanceBetweenBuildings: 60,
 	}
 
 	const WindowTypes = Object.freeze({
@@ -34,12 +35,25 @@
 			this.buildingsCount = 0;
 		}
 
+		isTooCloseToOtherBuilding = (x, y) => {
+			let result = true;
+			this.buildings.forEach(building => {     
+				if (Trigonometry.distanceBetweenTwoPoints(building.x, building.y, x, y) < config.minimumDistanceBetweenBuildings)
+					result = false;
+			});
+			return result;
+		}
+
 		addBuilding = (x, y) => {
-			let building = new Building(x, y, 0, y);
-			building.randomize();
-			this.buildings.push(building);
-			this.buildingsCount++;
-			Sound.ping(100);
+			if (this.isTooCloseToOtherBuilding(x, y)) {
+				let building = new Building(x, y, 0, y);
+				building.randomize();
+				this.buildings.push(building);
+				this.buildingsCount++;
+				Sound.ping(100);
+			}else{
+				Sound.error();
+			}
 		}
 
 		draw = () => {

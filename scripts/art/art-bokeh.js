@@ -76,7 +76,7 @@
 
 	let draw = (ctx, xPointer, yPointer) => {
 
-		let distance = Math.sqrt(Math.pow(lastPosX - xPointer, 2) + Math.pow(lastPosY - yPointer, 2))
+		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer,  yPointer);
 
 		let hue = Numbers.scale(parseInt(distance), 0, 360, 0, colorMapMax);
 
