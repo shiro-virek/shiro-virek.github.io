@@ -1,15 +1,17 @@
 {
     const globals = {
-		random: null
+		random: null,
+		city: null
     };
 
-	let MINIMUM_HEIGHT = 40;
-	let MAXIMUM_HEIGHT = 360;
-	let FIRST_FLOOR_HEIGHT = 20;
-	let city;
-
-	const CWHues = [232, 203, 189, 173, 162];
-	const HeliportColors = ["#FF0000", "#FFFFFF", "#000000"];
+	const config = {
+		minimumHeight: 40,
+		maximumHeight: 360,
+		firstFloorHeight: 20,
+		CWHues: [232, 203, 189, 173, 162],
+		HeliportColors: ["#FF0000", "#FFFFFF", "#000000"],
+		minimumDistanceBetweenBuildings: 60,
+	}
 
 	const WindowTypes = Object.freeze({
 		Regular: Symbol("regular"),
@@ -33,19 +35,40 @@
 			this.buildingsCount = 0;
 		}
 
+		isTooCloseToOtherBuilding = (x, y) => {
+			let result = true;
+			this.buildings.forEach(building => {     
+				if (Trigonometry.distanceBetweenTwoPoints(building.x, building.y, x, y) < config.minimumDistanceBetweenBuildings)
+					result = false;
+			});
+			return result;
+		}
+
 		addBuilding = (x, y) => {
-			let building = new Building(x, y);
-			building.randomize();
-			this.buildings.push(building);
-			this.buildingsCount++;
-			Sound.ping(100);
+			if (this.isTooCloseToOtherBuilding(x, y)) {
+				let building = new Building(x, y, 0, y);
+				building.randomize();
+				this.buildings.push(building);
+				this.buildingsCount++;
+				Sound.ping(100);
+			}else{
+				Sound.error();
+			}
 		}
 
 		draw = () => {
-			if (this.buildingsCount > 0)
-				for (let i = 0; i < this.buildingsCount; i++) {	
-					this.buildings[i].drawBuilding(ctx);
-				}
+			if (this.buildingsCount > 0){
+				this.buildings.sort((a, b) => {
+					if (isNaN(a.z) || isNaN(b.z)) {
+						return 0; 
+					}
+					return a.z - b.z;
+				});	
+
+				this.buildings.forEach(building => {          
+					building.drawBuilding(ctx);     
+				});
+			}				
 		}
 
 		randomize = () => {
@@ -55,26 +78,27 @@
 	}
 
 	class Building {
-		constructor(x, y, moduleNumber = 0) {
+		constructor(x, y, moduleNumber = 0, z) {
 			this.x = x;
 			this.y = y;
+			this.z = z;
 			this.moduleNumber = moduleNumber;
 			this.modules = [];
 		}
 
 		randomize = () => {
-			this.height = globals.random.nextInt(MINIMUM_HEIGHT, MAXIMUM_HEIGHT);
+			this.height = globals.random.nextInt(config.minimumHeight, config.maximumHeight);
 			this.rows = this.randomizeRowsNumber();
 			this.cols = globals.random.nextInt(1, 5);
 			this.margin = globals.random.nextInt(0, 15);
 			this.width = globals.random.nextInt(40, 60);
-			this.CWHue = CWHues[globals.random.nextInt(0, CWHues.length)];
+			this.CWHue = config.CWHues[globals.random.nextInt(0, config.CWHues.length)];
 			this.CWLight = globals.random.nextInt(10, 50);
 			this.CWSaturation = globals.random.nextInt(0, 100);
 			this.hue = globals.random.nextInt(1, 360);
 			this.saturation = globals.random.nextInt(0, 100);
 			this.light = globals.random.nextInt(20, 80);
-			this.firstFloorHeight = FIRST_FLOOR_HEIGHT;
+			this.firstFloorHeight = config.firstFloorHeight;
 			this.horizontalLines = globals.random.nextInt(0, 3);
 			
 			this.calculateProps();
@@ -97,15 +121,15 @@
 					this.pinnacle = new Pinnacle(globals.random.nextInt(2, this.width / 2), globals.random.nextInt(5, this.width * 2));
 					break;
 				case TopTypes.Heliport:
-					let heliportColor = HeliportColors[globals.random.nextInt(0, HeliportColors.length)];
+					let heliportColor = config.HeliportColors[globals.random.nextInt(0, config.HeliportColors.length)];
 					this.heliport = new Heliport(20, heliportColor);
 					break;				
 			}
 		}
 
 		getAngleDecrement = (widthDecrement) => {
-			if (city.angle <= 3) return 0;
-			if (city.angle > 3 && city.angle < 20)
+			if (globals.city.angle <= 3) return 0;
+			if (globals.city.angle > 3 && globals.city.angle < 20)
 				return widthDecrement / 4;
 			else
 				return widthDecrement / 2;
@@ -119,7 +143,7 @@
 				for (let i = 1; i <= this.numberOfModules; i++) {
 					let widthDecrement = lastModule.width * globals.random.nextRange(0.05, 0.3, 2);
 
-					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i);
+					let newModule = new Building(lastModule.x, lastModule.y - lastModule.height - this.getAngleDecrement(widthDecrement), i, lastModule.z);
 					newModule.numberOfModules = this.numberOfModules;
 
 					let heightDecrement = lastModule.height * globals.random.nextRange(0, 0.7, 2);
@@ -162,8 +186,8 @@
 		calculateProps = () => {
 			this.windowWidth = ((this.width - (this.margin * (this.cols + 1))) / this.cols);
 			this.windowHeight = ((this.height - this.firstFloorHeight - (this.margin * (this.rows + 1))) / this.rows);
-			this.windowWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
-			this.windowHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
+			this.windowWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
+			this.windowHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
 		}
 
 		drawBuilding = (ctx) => {
@@ -175,8 +199,8 @@
 		}
 
 		drawModule = (ctx, firstModule) => {
-			this.widthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * this.width;
-			this.heightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * this.width;
+			this.widthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
+			this.heightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
 
 			this.drawLeftFace(ctx);
 			this.drawRightFace(ctx);
@@ -188,7 +212,7 @@
 			if (firstModule) this.drawDoor(ctx);
 			
 			if (this.pinnacle){
-				let pinnacleWidthFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.pinnacle.width / 2);
+				let pinnacleWidthFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.pinnacle.width / 2);
 
 				ctx.fillStyle = this.colorDark();
 				ctx.beginPath();
@@ -277,13 +301,13 @@
 		drawDoor = (ctx) => {
 			let doorHeight = 10;
 			let doorWidth = 10;
-			let doorWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * (doorWidth);
-			let doorHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * (doorHeight);
+			let doorWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (doorWidth);
+			let doorHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (doorHeight);
 
 			ctx.fillStyle = this.colorDarker();
 			ctx.beginPath();
-			let wx = this.x - Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.width / 2 - doorWidth / 2);
-			let wy = this.y - Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.width / 2 - doorWidth / 2);
+			let wx = this.x - Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.width / 2 - doorWidth / 2);
+			let wy = this.y - Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.width / 2 - doorWidth / 2);
 			ctx.moveTo(wx, wy);
 			ctx.lineTo(wx, wy - doorHeight);
 			ctx.lineTo(wx - doorWidthFactor, wy - doorHeightFactor - doorHeight);
@@ -293,7 +317,7 @@
 
 			ctx.fillStyle = this.colorDarkest();
 			ctx.beginPath();
-			let wx1 = this.x + Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.width / 2 - doorWidth / 2);
+			let wx1 = this.x + Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.width / 2 - doorWidth / 2);
 			ctx.moveTo(wx1, wy);
 			ctx.lineTo(wx1, wy - doorHeight);
 			ctx.lineTo(wx1 + doorWidthFactor, wy - doorHeightFactor - doorHeight);
@@ -339,10 +363,10 @@
 		drawWindows = (ctx) => {
 			for (let ix = 0; ix < this.cols; ix++) {
 				for (let iy = 0; iy < this.rows; iy++) {
-					let wx = this.x - (Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
-					let wy = this.y - this.firstFloorHeight - (Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
-					let wx1 = this.x + (Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
-					let wy1 = this.y - this.firstFloorHeight - (Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
+					let wx = this.x - (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
+					let wy = this.y - this.firstFloorHeight - (Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
+					let wx1 = this.x + (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
+					let wy1 = this.y - this.firstFloorHeight - (Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
 
 					this.drawLeftWindow(ctx, wx, wy);
 					this.drawRightWindow(ctx, wx1, wy1);
@@ -401,8 +425,8 @@
 		drawMiniWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowHeight = (this.windowHeight / 2);
 			let halfWindowWidth = (this.windowWidth / 2);
-			let halfWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
-			let halfHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
+			let halfWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
+			let halfHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
 
 			ctx.strokeStyle = this.colorCWBase();
 			ctx.beginPath();
@@ -436,8 +460,8 @@
 
 		drawSplitVWindow = (ctx, wx, wy, wx1, wy1) => {
 			let halfWindowWidth = (this.windowWidth / 2);
-			let halfHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
-			let halfWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
+			let halfHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
+			let halfWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * halfWindowWidth;
 			ctx.strokeStyle = this.colorCWBase();
 
 			ctx.beginPath();
@@ -453,10 +477,10 @@
 		}
 
 		drawInterlacedWindow = (ctx, wx, wy, wx1, wy1) => {
-			let thirdHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
-			let thirdWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
-			let twoThirdsHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
-			let twoThirdsWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
+			let thirdHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
+			let thirdWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
+			let twoThirdsHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
+			let twoThirdsWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
 			ctx.fillStyle = this.colorCWBase();
@@ -497,10 +521,10 @@
 		}
 
 		drawMiniWindowCenter = (ctx, wx, wy, wx1, wy1) => {
-			let thirdHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
-			let thirdWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
-			let twoThirdsHeightFactor = Math.sin(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
-			let twoThirdsWidthFactor = Math.cos(city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
+			let thirdHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
+			let thirdWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3);
+			let twoThirdsHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
+			let twoThirdsWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.windowWidth / 3 * 2);
 			let thirdWindowHeight = (this.windowHeight / 3);
 
 			ctx.strokeStyle = this.colorCWBase();
@@ -577,15 +601,15 @@
 	class Heliport {
 		constructor(width, color) {
 			this.width = width;
-			this.height = city.angle * width / 45;
+			this.height = globals.city.angle * width / 45;
 			this.color = color;
 		}
 	}
 
 	let init = () => {
 		initCanvas();
-		city = new City()
-		city.randomize();
+		globals.city = new City()
+		globals.city.randomize();
 		addEvents();
 		drawBackground(ctx, canvas);
 		window.requestAnimationFrame(loop);
@@ -593,7 +617,7 @@
 
 	let addEvents = () => {
 		canvas.addEventListener('click', e => {
-			city.addBuilding(e.offsetX, e.offsetY);
+			globals.city.addBuilding(e.offsetX, e.offsetY);
 		}, false);
 	}
 
@@ -602,7 +626,7 @@
 
 		drawBackground(ctx, canvas);
 
-		city.draw();
+		globals.city.draw();
 
 		lastRender = timestamp;
 		window.requestAnimationFrame(loop);
@@ -611,7 +635,7 @@
 	init();
 
 	window.clearCanvas = () => {
-		city.buildings = []; 
-		city.buildingsCount = 0;
+		globals.city.buildings = []; 
+		globals.city.buildingsCount = 0;
 	}
 }
