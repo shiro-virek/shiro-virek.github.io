@@ -8,15 +8,17 @@
         clicking: false,
         mouseMoved: false, 
         mode: 1,
-        functionIndex: 1,
-        functions: [mandelbrot, julia],
         pow: 2,
         maxIterations: 50,
         scale: 0.005,
         cr: -0.7,
         ci: 0.27,
         offsetX: 0,
-        offsetY: 0
+        offsetY: 0,
+        fractalFunctionIndex: 1,
+        fractalFunctions: [mandelbrot, julia],
+        drawFunctionIndex: 1,
+        drawFunctions: [drawPaletteColor1, drawPaletteGrayscale1],
     };    
 
     function drawPaletteColor1(value, data, x, y){
@@ -84,7 +86,8 @@
 
     let randomize = () => {
         config.mode = globals.random.nextBool();
-        config.functionIndex = Math.floor(Math.random() * config.functions.length)
+        config.fractalFunctionIndex = Math.floor(Math.random() * config.fractalFunctions.length)
+        config.drawFunctionIndex = Math.floor(Math.random() * config.drawFunctions.length)
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
         config.ci = globals.random.nextRange(-1, 1);  
@@ -120,10 +123,11 @@
                 const rc = x * config.scale + config.offsetX;
                 const ic = y * config.scale + config.offsetY;
 
-                const fractalFunction = config.functions[config.functionIndex];
+                const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
                 let value = fractalFunction(rc, ic);
                 
-                drawPaletteColor1(value, data, x, y);
+                const drawFunction = config.drawFunctions[config.drawFunctionIndex];
+                drawFunction(value, data, x, y);
             }
         }        
 
