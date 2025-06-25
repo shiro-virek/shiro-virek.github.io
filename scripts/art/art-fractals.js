@@ -8,70 +8,60 @@
         clicking: false,
         mouseMoved: false, 
         mode: 1,
-        functionIndex: 1,
-        functions: [mandelbrot, julia],
         pow: 2,
         maxIterations: 50,
         scale: 0.005,
         cr: -0.7,
         ci: 0.27,
         offsetX: 0,
-        offsetY: 0
+        offsetY: 0,
+        hue: 10,
+        fractalFunctionIndex: 1,
+        fractalFunctions: [mandelbrot, julia],
+        drawFunctionIndex: 1,
+        drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
 
-    function mandelbrot(rc, ic){
-        let zr = 0;
-        let zi = 0;
-        
-        for (let i = 0; i < config.maxIterations; i++) {
-            let zr_pow = zr;
-            let zi_pow = zi;
-            
-            let rTemp = zr;
-            let iTemp = zi;
-            
-            for (let j = 1; j < config.pow; j++) {
-                const newR = rTemp * zr_pow - iTemp * zi_pow;
-                const newI = rTemp * zi_pow + iTemp * zr_pow;
-                rTemp = newR;
-                iTemp = newI;
-            }
-            
-            zr = rTemp + rc;
-            zi = iTemp + ic;
-            
-            if (zr * zr + zi * zi > 4) {
-                return i;
-            }
-        }
-        
-        return 0;
+    function drawPaletteColor1(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 360);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
-    function julia(zr, zi){
-        for (let i = 0; i < config.maxIterations; i++) {
-            let zr_pow = zr;
-            let zi_pow = zi;
-            
-            let rTemp = zr;
-            let iTemp = zi;
-            
-            for (let j = 1; j < config.pow; j++) {
-                const newR = rTemp * zr_pow - iTemp * zi_pow;
-                const newI = rTemp * zi_pow + iTemp * zr_pow;
-                rTemp = newR;
-                iTemp = newI;
-            }
-            
-            zr = rTemp + config.cr;
-            zi = iTemp + config.ci;
-            
-            if (zr * zr + zi * zi > 4) {
-                return i;
-            }
-        }
-        
-        return 0;
+    function drawPaletteHue1(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 50);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
+    }
+
+    function drawPaletteGrayscale1(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 255);
+        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
+    }
+
+    function drawPaletteColor2(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 360, 0);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
+    }
+
+    function drawPaletteHue2(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 50, 0);
+        const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
+        Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
+    }
+
+    function drawPaletteGrayscale2(value, data, x, y){
+        newValue = Numbers.scale(value, 0, config.maxIterations, 255, 0);
+        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
+    }
+
+    function mandelbrot(c, i){
+        return Fractals.mandelbrot(c, i, config.maxIterations, config.pow);
+    }
+
+    function julia(c, i){
+        return Fractals.julia(c, i, config.maxIterations, config.pow, config.cr, config.ci);
     }
 
     let init = () => {
@@ -120,10 +110,12 @@
 
     let randomize = () => {
         config.mode = globals.random.nextBool();
-        config.functionIndex = Math.floor(Math.random() * config.functions.length)
+        config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length);
+        config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
         config.ci = globals.random.nextRange(-1, 1);  
+        config.hue = globals.random.nextInt(0, 360);
     }
 
     let trackMouse = (x, y) => {
@@ -156,11 +148,11 @@
                 const rc = x * config.scale + config.offsetX;
                 const ic = y * config.scale + config.offsetY;
 
-                const fractalFunction = config.functions[config.functionIndex];
+                const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
                 let value = fractalFunction(rc, ic);
                 
-                value = Numbers.scale(value, 0, config.maxIterations, 0, 255);
-                Pixels.setPixelBatch(ctx, data, x, y, value, value, value);
+                const drawFunction = config.drawFunctions[config.drawFunctionIndex];
+                drawFunction(value, data, x, y);
             }
         }        
 

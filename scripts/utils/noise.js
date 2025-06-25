@@ -1,11 +1,12 @@
 class Noise {
-    constructor() {
+    constructor(random) {
+        this.random = random;
         this.seed();
     }
 
     randVect = () => {
-        let theta = Math.random() * 2 * Math.PI;
-        let phi = Math.acos(2 * Math.random() - 1);
+        let theta = this.random.next() * 2 * Math.PI;
+        let phi = Math.acos(2 * this.random.next() - 1);
         return {
             x: Math.sin(phi) * Math.cos(theta),
             y: Math.sin(phi) * Math.sin(theta),

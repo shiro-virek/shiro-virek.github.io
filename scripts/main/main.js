@@ -30,7 +30,7 @@ let drawBackground = (ctx, canvas) => {
 let initCanvas = () => {
     canvas = document.getElementById(Screen.CANVAS_ID);
     if (canvas.getContext) {
-        ctx = canvas.getContext('2d')
+        ctx = canvas.getContext('2d', { willReadFrequently: true })
         drawBackground(ctx, canvas);
     }
 }

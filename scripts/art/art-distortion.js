@@ -231,7 +231,7 @@
         let glitch = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 10) : 10;
 
         for (let y = 0; y < height; y++) {
-            const offset = Math.floor(Math.sin(y * amplitude + Date.now() * freq) * waves + (Math.random() - 0.5) * glitch);
+            const offset = Math.floor(Math.sin(y * amplitude + Date.now() * freq) * waves + (globals.random.next() - 0.5) * glitch);
 
             for (let x = 0; x < width; x++) {
                 let srcX = Math.min(width - 1, Math.max(0, x + offset));
@@ -415,7 +415,7 @@
         config.amplitude = globals.random.nextInt(1, 20);
         config.frequency = globals.random.nextRange(0.1, 0.5, 1);
         config.mode = globals.random.nextBool();
-        config.functionIndex = Math.floor(Math.random() * config.functions.length)
+        config.functionIndex = globals.random.nextInt(0, config.functions.length);
     }
 
     let loop = (timestamp) => {

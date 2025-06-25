@@ -34,7 +34,7 @@
             if (this.status == 0) {
                 
                 this.status = 1;
-                Sound.whiteNoise();
+                Sound.whiteNoise(globals.random);
             }
         }
 

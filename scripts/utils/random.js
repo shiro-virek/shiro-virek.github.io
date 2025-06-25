@@ -42,7 +42,7 @@ class Random {
       throw new Error("Arrays must be the same length!");
     }
 
-    const r = Math.random();
+    const r = this.next();
     let accumulated = 0;
 
     for (let i = 0; i < elements.length; i++) {

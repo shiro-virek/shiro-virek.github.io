@@ -22,7 +22,7 @@ class Sound {
     })();
 
 
-    static whiteNoise = (volume = 0.05) => {
+    static whiteNoise = (random, volume = 0.05) => {
         const audioCtx = Sound.AudioContext.getInstance();
 
         const bufferSize = 2 * audioCtx.sampleRate;
@@ -30,7 +30,7 @@ class Sound {
         const output = buffer.getChannelData(0);
 
         for (let i = 0; i < bufferSize; i++) {
-            output[i] = Math.random() * 2 - 1;
+            output[i] = random.next() * 2 - 1;
         }
 
         const whiteNoise = audioCtx.createBufferSource();
