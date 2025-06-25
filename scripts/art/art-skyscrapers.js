@@ -35,6 +35,19 @@
 			this.buildingsCount = 0;
 		}
 
+		generateCity = () => {
+			let distance = config.minimumDistanceBetweenBuildings * 1.3
+			let buildingCols = Math.floor(width / distance) + 1;
+			let buildingRows = Math.floor(height / distance) + 1;
+			for (let x=0; x < buildingCols; x++) {
+				let tilt = 0;
+				for (let y=0; y < buildingRows; y++) {
+					this.addBuilding(x * distance, y * distance + tilt);
+					tilt += 30;
+				}
+			}
+		}
+
 		isTooCloseToOtherBuilding = (x, y) => {
 			let result = true;
 			this.buildings.forEach(building => {     
@@ -88,15 +101,15 @@
 
 		randomize = () => {
 			this.height = globals.random.nextInt(config.minimumHeight, config.maximumHeight);
-			this.rows = this.randomizeRowsNumber();
-			this.cols = globals.random.nextInt(1, 5);
+			this.windowRows = this.randomizeRowsNumber();
+			this.windowCols = globals.random.nextInt(1, 5);
 			this.margin = globals.random.nextInt(0, 15);
 			this.width = globals.random.nextInt(40, 60);
 			this.CWHue = config.CWHues[globals.random.nextInt(0, config.CWHues.length)];
 			this.CWLight = globals.random.nextInt(10, 50);
 			this.CWSaturation = globals.random.nextInt(0, 100);
 			this.hue = globals.random.nextInt(1, 360);
-			this.saturation = globals.random.nextInt(0, 100);
+			this.saturation = globals.random.nextInt(0, 50);
 			this.light = globals.random.nextInt(20, 80);
 			this.firstFloorHeight = config.firstFloorHeight;
 			this.horizontalLines = globals.random.nextInt(0, 3);
@@ -152,14 +165,14 @@
 					newModule.firstFloorHeight = 0;
 
 					if (newModule.height >= 20)
-						newModule.rows = lastModule.rows > 1 ? lastModule.rows - 1 : 1;
+						newModule.windowRows = lastModule.windowRows > 1 ? lastModule.windowRows - 1 : 1;
 					else
-						newModule.rows = 0;
+						newModule.windowRows = 0;
 
 					if (newModule.width >= 20)
-						newModule.cols = lastModule.cols > 1 ? lastModule.cols - 1 : 1;
+						newModule.windowCols = lastModule.windowCols > 1 ? lastModule.windowCols - 1 : 1;
 					else
-						newModule.cols = 0;
+						newModule.windowCols = 0;
 
 					newModule.windowType = lastModule.windowType;
 					newModule.margin = lastModule.margin;
@@ -184,8 +197,8 @@
 		}
 
 		calculateProps = () => {
-			this.windowWidth = ((this.width - (this.margin * (this.cols + 1))) / this.cols);
-			this.windowHeight = ((this.height - this.firstFloorHeight - (this.margin * (this.rows + 1))) / this.rows);
+			this.windowWidth = ((this.width - (this.margin * (this.windowCols + 1))) / this.windowCols);
+			this.windowHeight = ((this.height - this.firstFloorHeight - (this.margin * (this.windowRows + 1))) / this.windowRows);
 			this.windowWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
 			this.windowHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
 		}
@@ -361,8 +374,8 @@
 		}
 
 		drawWindows = (ctx) => {
-			for (let ix = 0; ix < this.cols; ix++) {
-				for (let iy = 0; iy < this.rows; iy++) {
+			for (let ix = 0; ix < this.windowCols; ix++) {
+				for (let iy = 0; iy < this.windowRows; iy++) {
 					let wx = this.x - (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
 					let wy = this.y - this.firstFloorHeight - (Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
 					let wx1 = this.x + (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
@@ -637,5 +650,10 @@
 	window.clearCanvas = () => {
 		globals.city.buildings = []; 
 		globals.city.buildingsCount = 0;
+	}
+
+	window.magic = () => {  
+		window.clearCanvas();
+		globals.city.generateCity();
 	}
 }

@@ -37,6 +37,17 @@
 			this.quad = Quadtree.generateQuadtree(width, height);
 		}
 
+		generateNetwork = () => {
+			let distance = width / 5;
+			let lineCols = Math.floor(width / distance) + 1;
+			let lineRows = Math.floor(height / distance) + 1;
+			for (let x=0; x < lineCols; x++) {
+				for (let y=0; y < lineRows; y++) {
+					globals.metroNetwork.addMetroLine(x * distance, y * distance);	
+				}
+			}
+		}
+
 		getNumberOfStations = () => {
 			let numberOfStations = 0;
 			this.lines.forEach((element) => numberOfStations += element.stations.length);
@@ -485,6 +496,7 @@
 	}
 
 	let generatePalette = () => {
+		globals.palette = [];
 		let seed = globals.random.nextInt(0, config.hslMaxHue);
 		let increment = Math.floor(config.hslMaxHue / config.maxNumberOfLines);
 		for (let i = 1; i <= config.maxNumberOfLines; i++) {
@@ -551,5 +563,11 @@
 
 	window.clearCanvas = () => {  
 		globals.metroNetwork.lines = [];
+		generatePalette();
+	}
+
+	window.magic = () => {  
+		window.clearCanvas();
+		globals.metroNetwork.generateNetwork();
 	}
 }
