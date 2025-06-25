@@ -68,7 +68,7 @@
 			this.cols = globals.random.nextInt(1, 5);
 			this.margin = globals.random.nextInt(0, 15);
 			this.width = globals.random.nextInt(40, 60);
-			this.CWHue = CWHues[(Math.floor(Math.random() * CWHues.length))];
+			this.CWHue = CWHues[globals.random.nextInt(0, CWHues.length)];
 			this.CWLight = globals.random.nextInt(10, 50);
 			this.CWSaturation = globals.random.nextInt(0, 100);
 			this.hue = globals.random.nextInt(1, 360);
@@ -97,7 +97,7 @@
 					this.pinnacle = new Pinnacle(globals.random.nextInt(2, this.width / 2), globals.random.nextInt(5, this.width * 2));
 					break;
 				case TopTypes.Heliport:
-					let heliportColor = HeliportColors[(Math.floor(Math.random() * HeliportColors.length))];
+					let heliportColor = HeliportColors[globals.random.nextInt(0, HeliportColors.length)];
 					this.heliport = new Heliport(20, heliportColor);
 					break;				
 			}

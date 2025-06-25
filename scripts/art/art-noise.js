@@ -94,8 +94,8 @@
     }
 
     let init = () => {
-        globals.noise = new Noise();
 		globals.random = Objects.getRandomObject();
+        globals.noise = new Noise(globals.random);
         if (config.randomize) randomize();
         initCanvas();
         config.ledDiameter = globals.random.nextInt(5, 20);        
@@ -148,7 +148,7 @@
 
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 255);
-        config.functionIndex = Math.floor(Math.random() * config.functions.length)
+        config.functionIndex = globals.random.nextInt(0, config.functions.length);
     }
 
     let trackMouse = (x, y) => {

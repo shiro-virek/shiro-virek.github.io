@@ -86,8 +86,8 @@
 
     let randomize = () => {
         config.mode = globals.random.nextBool();
-        config.fractalFunctionIndex = Math.floor(Math.random() * config.fractalFunctions.length)
-        config.drawFunctionIndex = Math.floor(Math.random() * config.drawFunctions.length)
+        config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length);
+        config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
         config.ci = globals.random.nextRange(-1, 1);  
