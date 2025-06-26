@@ -45,7 +45,7 @@ let initCanvas = () => {
         window.trackMouse(e.offsetX, e.offsetY);
     }, false);
 
-    canvas.addEventListener('touchstart', function (e) {
+    canvas.addEventListener('touchstart', function (e) {       
         mouseMoved = false; 
 		touches = e.touches;
 		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
