@@ -6,7 +6,7 @@
     };
 
     const config = {
-        randomize: false,
+        randomize: true,
         mode: 1,
         functionIndex: 1,
         functions: [negative, ripple]

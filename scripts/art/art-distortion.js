@@ -91,7 +91,7 @@
     }
         
     function boxBlur(data, outputData) {
-        let radius = Math.floor(Numbers.scale(globals.mouseX, 0, width, 1, 5));
+        let radius = Math.floor(Numbers.scale(globals.mouseX, 0, width, 1, 10));
 
         Effects.boxBlur(data, outputData, radius);
     }
