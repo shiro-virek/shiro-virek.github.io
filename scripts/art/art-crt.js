@@ -1,26 +1,23 @@
 
 {    
     const globals = {
-        random: null
+        random: null,
+        canvasImg: document.getElementById('auxCanvas'),
+        ctxImg: null,
+        imgData: null,
+        img: new Image()
     };
 
     const config = {
-        noiseMax: 10
+        randomize: true,
+        noiseMax: 10,
+        crtRows: 0,
+        crtColumns: 0,
+        crtDiameter: 0,
+        crtScreen: null,
+        offsetX: 0,
+        offsetY: 0,
     }
-    
-    let crtRows = 0
-    let crtColumns = 0;
-    let crtDiameter = 0;
-    let crtScreen;
-        
-    let offsetX = 0;
-    let offsetY = 0;
-
-    let canvasImg = document.getElementById('auxCanvas');
-    let ctxImg = canvasImg.getContext("2d", { willReadFrequently: true });
-    let imgData;
-
-    const img = new Image();
     
     class CrtScreen {
         constructor() {
@@ -39,12 +36,12 @@
         }
 
         generateCrts = () => {
-            for (let x = 0; x < crtColumns; x++) {
-                this.crts[x] = new Array(crtRows);
+            for (let x = 0; x < config.crtColumns; x++) {
+                this.crts[x] = new Array(config.crtRows);
             }
 
-            for (let x = 0; x < crtColumns; x++) {
-                for (let y = 0; y < crtRows; y++) {
+            for (let x = 0; x < config.crtColumns; x++) {
+                for (let y = 0; y < config.crtRows; y++) {
                     let crt = new Crt(x, y);
                     this.crts[x][y] = crt;
                 }
@@ -53,13 +50,13 @@
 
         draw = (ctx) => {   
             if (this.status == 2) {                
-                for (let y = 0; y < crtRows; y++) {
-                    for (let x = 0; x < crtColumns; x++) {
-                        let i = y * crtColumns + x;
-                        const r = imgData[i * 4 + 0];
-                        const g = imgData[i * 4 + 1];
-                        const b = imgData[i * 4 + 2];
-                        const a = imgData[i * 4 + 3];
+                for (let y = 0; y < config.crtRows; y++) {
+                    for (let x = 0; x < config.crtColumns; x++) {
+                        let i = y * config.crtColumns + x;
+                        const r = globals.imgData[i * 4 + 0];
+                        const g = globals.imgData[i * 4 + 1];
+                        const b = globals.imgData[i * 4 + 2];
+                        const a = globals.imgData[i * 4 + 3];
 
                         let newR = Numbers.scale(r, 0, 255, 20, 70);
                         let newG = Numbers.scale(g, 0, 255, 20, 70);
@@ -71,8 +68,8 @@
             }
 
             if (this.status == 1) {      
-                for (let y = 0; y < crtRows; y++) {
-                    for (let x = 0; x < crtColumns; x++) {
+                for (let y = 0; y < config.crtRows; y++) {
+                    for (let x = 0; x < config.crtColumns; x++) {
                         let value = globals.random.nextBool() ? 255 : 0;
 
                         this.crts[x][y].draw(ctx, value, value, value);
@@ -95,14 +92,14 @@
 
     class Crt {
         constructor(column, row) {
-            this.diameter = crtDiameter;
+            this.diameter = config.crtDiameter;
             this.row = row;
             this.column = column;
             this.r = 0;
             this.g = 0;
             this.b = 0;
-            this.x = offsetX + column * this.diameter;
-            this.y = offsetY + row * this.diameter;
+            this.x = config.offsetX + column * this.diameter;
+            this.y = config.offsetY + row * this.diameter;
         }
 
         draw = (ctx, lightnessR, lightnessG, lightnessB) => {
@@ -119,38 +116,38 @@
     }
 
     let loadImage = (source = '../assets/Picture1.jpg', status = 0) => {
-        canvasImg.width = crtColumns;
-        canvasImg.height = crtRows;
+        globals.canvasImg.width = config.crtColumns;
+        globals.canvasImg.height = config.crtRows;
 
-        img.src = source;
+        globals.img.src = source;
 
-        img.onload = function () {
-            canvasImg.width = crtColumns;
-            canvasImg.height = crtRows;
+        globals.img.onload = function () {
+            globals.canvasImg.width = config.crtColumns;
+            globals.canvasImg.height = config.crtRows;
 
             let newImgHeight = 0;
             let newImgWidth = 0;
             let newOriginX = 0;
             let newOriginY = 0;
 
-            if (canvasImg.width > canvasImg.height) {
-                newImgHeight = canvasImg.height;
-                newImgWidth = canvasImg.height * img.width / img.height;
+            if (globals.canvasImg.width > globals.canvasImg.height) {
+                newImgHeight = globals.canvasImg.height;
+                newImgWidth = globals.canvasImg.height * globals.img.width / globals.img.height;
                 newOriginY = 0;
-                newOriginX = canvasImg.width / 2 - (newImgWidth / 2);
+                newOriginX = globals.canvasImg.width / 2 - (newImgWidth / 2);
             } else {
-                newImgWidth = canvasImg.width;
-                newImgHeight = newImgWidth * img.height / img.width;
+                newImgWidth = globals.canvasImg.width;
+                newImgHeight = newImgWidth * globals.img.height / globals.img.width;
                 newOriginX = 0;
-                newOriginY = canvasImg.height / 2 - (newImgHeight / 2);
+                newOriginY = globals.canvasImg.height / 2 - (newImgHeight / 2);
             }
 
-            ctxImg.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+            globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
-            imgData = ctxImg.getImageData(0, 0, crtColumns, crtRows).data;
+            globals.imgData = globals.ctxImg.getImageData(0, 0, config.crtColumns, config.crtRows).data;
 
-            crtScreen = new CrtScreen();       
-            crtScreen.status = status;     
+            config.crtScreen = new CrtScreen();       
+            config.crtScreen.status = status;     
             addEvents();
             window.requestAnimationFrame(loop);
         };
@@ -159,32 +156,36 @@
     let init = () => {
         initCanvas(); 
 
-        canvasImg.width = canvas.width;
-        canvasImg.height = canvas.height;   
+        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
+
+        if (config.randomize) randomize();
+
+        globals.canvasImg.width = canvas.width;
+        globals.canvasImg.height = canvas.height;   
 
         globals.random = Objects.getRandomObject();
-        canvasImg = document.getElementById('auxCanvas');
-        ctxImg = canvasImg.getContext("2d");
+        globals.canvasImg = document.getElementById('auxCanvas');
+        globals.ctxImg = globals.canvasImg.getContext("2d");
 
         const minDiameter = Utils.isMobile() ? 12 : 4;
-        crtDiameter = Math.floor(canvas.width / globals.random.nextInt(30, 100));
-        crtDiameter = Math.max(crtDiameter, minDiameter);
+        config.crtDiameter = Math.floor(canvas.width / globals.random.nextInt(30, 100));
+        config.crtDiameter = Math.max(config.crtDiameter, minDiameter);
 
-        crtColumns = Math.floor(canvas.width / crtDiameter);
-        crtRows = Math.floor(canvas.height / crtDiameter);   
+        config.crtColumns = Math.floor(canvas.width / config.crtDiameter);
+        config.crtRows = Math.floor(canvas.height / config.crtDiameter);   
 
-        let totalWidth = crtColumns * crtDiameter;
-        let totalHeight = crtRows * crtDiameter;
+        let totalWidth = config.crtColumns * config.crtDiameter;
+        let totalHeight = config.crtRows * config.crtDiameter;
 
-        offsetX = (canvas.width - totalWidth) / 2;
-        offsetY = (canvas.height - totalHeight) / 2;
+        config.offsetX = (canvas.width - totalWidth) / 2;
+        config.offsetY = (canvas.height - totalHeight) / 2;
 
         loadImage();
     }
 
     let addEvents = () => {
         canvas.addEventListener('click', e => {
-            crtScreen.turnOn();
+            config.crtScreen.turnOn();
         }, false);
 
         window.addEventListener('resize', () => {
@@ -198,13 +199,13 @@
 
     let draw = () => {
         drawBackground(ctx, canvas);
-        crtScreen.draw(ctx);
+        config.crtScreen.draw(ctx);
     }
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
-        crtScreen.update();
+        config.crtScreen.update();
 
         draw();
 
@@ -234,7 +235,7 @@
             const reader = new FileReader();
             
             reader.onload = function(event) {                    
-                img.onerror = function() {
+                globals.img.onerror = function() {
                     alert('Error loading image');
                 };
             
