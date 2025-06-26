@@ -645,8 +645,9 @@
 		window.requestAnimationFrame(loop);
 	}
 
-	init();
-
+    window.trackMouse = (xMouse, yMouse) => {
+    }
+	
 	window.clearCanvas = () => {
 		globals.city.buildings = []; 
 		globals.city.buildingsCount = 0;
@@ -656,4 +657,10 @@
 		window.clearCanvas();
 		globals.city.generateCity();
 	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

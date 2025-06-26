@@ -1,18 +1,20 @@
 {
     const globals = {
-		random: null
+		random: null,
+        ledScreen: null,
     };
     
-    let COLOR_OFF = "#222";
-
-    let ledRows = 50;
-    let ledColumns = 50;
-    let ledMargin = 30;
-    let ledPadding = 30;
-    let ledDiameter = 20;
-    let hue = 150;
-    let ledScreen;
-
+    const config = {
+        randomize: true,
+        colorOff: "#222",
+        ledRows: 50,
+        ledColumns: 50,
+        ledMargin: 30,
+        ledPadding: 30,
+        ledDiameter: 20,
+        hue: 150,
+    };
+    
     const Figures = Object.freeze({
 		Square: Symbol("square"),
 		Circle: Symbol("circle")
@@ -28,13 +30,13 @@
         generateLeds = () => {
             this.leds = [];
             this.ledsBuffer = [];
-            for (let x = 0; x < ledColumns; x++) {
-                this.leds[x] = new Array(ledRows);
-                this.ledsBuffer[x] = new Array(ledRows);
+            for (let x = 0; x < config.ledColumns; x++) {
+                this.leds[x] = new Array(config.ledRows);
+                this.ledsBuffer[x] = new Array(config.ledRows);
             }
 
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x < config.ledColumns; x++) {
+                for (let y = 0; y < config.ledRows; y++) {
                     let led = new Led(x, y);
                     this.leds[x][y] = led;
                     let ledBuffer = new Led(x, y);
@@ -45,30 +47,30 @@
         }
 
         setPixel = (x, y) => {            
-            let col = Math.round((x - ledMargin) / ((ledDiameter) + ledPadding));
-            let row = Math.round((y - ledMargin) / ((ledDiameter) + ledPadding));
+            let col = Math.round((x - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
+            let row = Math.round((y - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
             this.leds[col][row].on = true;
             this.ledsBuffer[col][row].on = true;
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x < config.ledColumns; x++) {
+                for (let y = 0; y < config.ledRows; y++) {
                     this.ledsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
         copyBuffer = () => {
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x < config.ledColumns; x++) {
+                for (let y = 0; y < config.ledRows; y++) {
                     this.leds[x][y].on =  this.ledsBuffer[x][y].on;
                 }
             }    
         }
 
         getLedValueSafe = (x, y) => {
-            if (x < 0 || y < 0 || x >= ledColumns || y >= ledRows)
+            if (x < 0 || y < 0 || x >= config.ledColumns || y >= config.ledRows)
                 return false
             else
                 return this.leds[x][y];
@@ -95,8 +97,8 @@
         }
 
         update = () => {            
-            for (let x = 0; x < ledColumns; x++) {
-                for (let y = 0; y < ledRows; y++) {
+            for (let x = 0; x < config.ledColumns; x++) {
+                for (let y = 0; y < config.ledRows; y++) {
                     this.ledsBuffer[x][y].on =  this.calculateLedStatus(x, y);
                 }
             }                  
@@ -105,18 +107,18 @@
 
     class Led {
         constructor(column, row) {
-            this.diameter = ledDiameter;
-            this.radius = ledDiameter / 2;
+            this.diameter = config.ledDiameter;
+            this.radius = config.ledDiameter / 2;
             this.row = row;
             this.column = column;
-            this.x = ledMargin + column * ledPadding + column * this.diameter;
-            this.y = ledMargin + row * ledPadding + row * this.diameter;
+            this.x = config.ledMargin + column * config.ledPadding + column * this.diameter;
+            this.y = config.ledMargin + row * config.ledPadding + row * this.diameter;
             this.on = false;
-            this.color = `hsl(${hue}, 100%, 50%)`;
+            this.color = `hsl(${config.hue}, 100%, 50%)`;
         }
 
         draw = (ctx) => {
-            let color = this.on ? this.color : COLOR_OFF;
+            let color = this.on ? this.color : config.colorOff;
 
             switch(ledScreen.shape){
                 case Figures.Circle:
@@ -132,14 +134,14 @@
     let init = () => {
 		initCanvas();
         globals.random = Objects.getRandomObject();
-        ledDiameter = globals.random.nextInt(5, 20);        
-        ledPadding = globals.random.nextInt(0, 20);
-        ledMargin = ledPadding;
+        config.ledDiameter = globals.random.nextInt(5, 20);        
+        config.ledPadding = globals.random.nextInt(0, 20);
+        config.ledMargin = config.ledPadding;
 
-        ledRows = Math.floor((height - ledMargin)/ (ledDiameter + ledPadding));
-        ledColumns = Math.floor((width - ledMargin)/ (ledDiameter + ledPadding));        
+        config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
+        config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));        
         
-        randomize();
+        if (config.randomize) randomize();
 
         addEvents();
         window.requestAnimationFrame(loop)
@@ -152,7 +154,7 @@
     }
 
     let randomize = () => {        
-        hue = globals.random.nextInt(0, 255); 
+        config.hue = globals.random.nextInt(0, 255); 
         ledScreen = new LedScreen();
     }
 
@@ -175,9 +177,20 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
+    window.trackMouse = (xMouse, yMouse) => {
+    }
     
 	window.clearCanvas = () => {         
         ledScreen.generateLeds();  
 	}
+    
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();    
 }

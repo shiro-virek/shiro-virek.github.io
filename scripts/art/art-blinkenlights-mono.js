@@ -388,9 +388,20 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-
+    window.trackMouse = (xMouse, yMouse) => {
+    }
+    
     window.clearCanvas = () => {  
         randomize();
     }
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();
 }

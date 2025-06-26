@@ -216,9 +216,20 @@
         requestAnimationFrame(loop);
     }
 
+    window.trackMouse = (xMouse, yMouse) => {
+    }
+    
 	window.clearCanvas = () => {		
 		globals.balls = [];
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
 
     init();
 }

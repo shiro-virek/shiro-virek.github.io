@@ -3,66 +3,41 @@
 		random: null
     };
 
-	let ENTROPY_1 = 2;
-	let CIRCLES = 5;
-	let colorShift = 0;
-	let colorMapMax = 0;
-	let size = 5;
-	let saturation = 0;
-	let lightness = 0;
-	let opacity = 0.001;
-
-	let clicking = false;
+    const config = { 
+        randomize: true,	
+		entropy: 2,
+		circles: 5,
+		colorShift: 0,
+		colorMapMax: 0,
+		size: 5,
+		saturation: 0,
+		lightness: 0,
+		opacity: 0.003,
+    };
 
 	let init = () => {
-		initCanvas();
-		randomize();
+		initCanvas();		
+
+		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
 		addEvents();	
 	}
 
 	let addEvents = () => {
-
-		canvas.addEventListener('mousemove', e => {
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-			clicking = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('mousedown', e => {
-			clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			clicking = false;
-		}, false);
 	}
 
 	let randomize = () => {
-		globals.random = Objects.getRandomObject();
-
-		saturation = globals.random.nextInt(20, 100);
-		lightness = globals.random.nextInt(20, 100);
-		size = globals.random.nextInt(5, 15);
-		CIRCLES = globals.random.nextInt(5, 15);
-		colorShift = globals.random.nextInt(0, 359);
-		ENTROPY_1 = globals.random.nextInt(1, 250);
-		colorMapMax = globals.random.nextInt(1, 10000);
-		opacity = globals.random.nextRange(0.003, 0.03, 3);
+		config.saturation = globals.random.nextInt(20, 100);
+		config.lightness = globals.random.nextInt(20, 100);
+		config.size = globals.random.nextInt(5, 15);
+		config.circles = globals.random.nextInt(5, 15);
+		config.colorShift = globals.random.nextInt(0, 359);
+		config.entropy = globals.random.nextInt(1, 250);
+		config.colorMapMax = globals.random.nextInt(1, 10000);
+		globals.random.nextRange(0.003, 0.03, 3);
 	}
 
-	let trackMouse = (xPointer, yPointer) => {
+	window.trackMouse = (xPointer, yPointer) => {
 		if (lastPosX == 0) lastPosX = xPointer;
 		if (lastPosY == 0) lastPosY = yPointer;
 
@@ -78,13 +53,13 @@
 
 		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer,  yPointer);
 
-		let hue = Numbers.scale(parseInt(distance), 0, 360, 0, colorMapMax);
+		let hue = Numbers.scale(parseInt(distance), 0, 360, 0, config.colorMapMax);
 
-		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
+		hue = (hue + config.colorShift) < 360 ? hue + config.colorShift : hue + config.colorShift - 360;
 
-		let color = `hsl(${hue}, ${saturation}%, ${lightness}%, ${opacity})`;
+		let color = `hsl(${hue}, ${config.saturation}%, ${config.lightness}%, ${config.opacity})`;
 
-		let steps = parseInt(distance / size)
+		let steps = parseInt(distance / config.size)
 		let xMod = 0;
 		let yMod = 0;
 		let x = 0;
@@ -100,32 +75,40 @@
 
 		for (i = 1; i <= steps; i++) {
 			if (xPointer < lastPosX) {
-				xMod = - parseInt((size * i) * Math.cos(angleCart));
+				xMod = - parseInt((config.size * i) * Math.cos(angleCart));
 			} else {
-				xMod = parseInt((size * i) * Math.cos(angleCart));
+				xMod = parseInt((config.size * i) * Math.cos(angleCart));
 			}
 
 			if (yPointer < lastPosY) {
-				yMod = - parseInt((size * i) * Math.sin(angleCart));
+				yMod = - parseInt((config.size * i) * Math.sin(angleCart));
 			} else {
-				yMod = parseInt((size * i) * Math.sin(angleCart));
+				yMod = parseInt((config.size * i) * Math.sin(angleCart));
 			}
 
-			let entropyX = globals.random.nextRange(-1, 1, 3) * ENTROPY_1;
-			let entropyY = globals.random.nextRange(-1, 1, 3) * ENTROPY_1;
+			let entropyX = globals.random.nextRange(-1, 1, 3) * config.entropy;
+			let entropyY = globals.random.nextRange(-1, 1, 3) * config.entropy;
 
 			x = (lastPosX + xMod) + entropyX;
 			y = (lastPosY + yMod) + entropyY;
 
-			for (let i = 0; i <= CIRCLES; i++) {
-				Drawing.drawCircle(ctx, x, y, size * (CIRCLES / i), color, color);
+			for (let i = 0; i <= config.circles; i++) {
+				Drawing.drawCircle(ctx, x, y, config.size * (config.circles / i), color, color);
 			}
 		}
 	}
 
-	init();
-
 	window.clearCanvas = () => {
 		initCanvas();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

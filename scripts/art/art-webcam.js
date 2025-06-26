@@ -7,8 +7,6 @@
 
     const config = {
         randomize: true,
-        clicking: false,
-        mouseMoved: false, 
         mode: 1,
         functionIndex: 1,
         functions: [negative,ripple]
@@ -117,8 +115,20 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
+    window.trackMouse = (xMouse, yMouse) => {
+    }
     
-	window.clearCanvas = () => {    
+	window.clearCanvas = () => {
+		Sound.error();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+    
+    init();
 }

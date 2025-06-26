@@ -1,36 +1,33 @@
 {
-
     const globals = {
-    	touches: null,
-		random: null
+		random: null,
+		mouseX: 0,
+		mouseY: 0,
+		slices: [],
+		distanceToCenter: 0,
+		movingToCenter: false,
+		ringShift: 0,
+		timeCounter: 0,
+		ringIterations: 0,
     };
 
-	let SLICES_COUNT = 60;
-	let RINGS_DISTANCE = 20;
-	let RINGS_SPEED = 1;
-	let CENTER_MOVEMENT_SPEED = 1;
-	let MAX_DISTANCE_TO_CENTER = 30;
-	let TENTACLES_MOVEMENT = true;
-	let SHOW_RINGS = true;
-	let SATURATION = 50;
-	let LIGHTNESS_FACTOR = 50;
-	let ROTATE_AUTO = false;
-	let ROTATION_ANGLE = 0;
-	let ROTATION_INCREMENT = 0.5;
-	let TENTACLES_COUNT = 5;
-	let HUE = 0;
-
-	let distanceToCenter = 0;
-	let movingToCenter = false;
-	let ringShift = 0;
-	let timeCounter = 0;
-	let slices = [];
-	let ringIterations = 0;
-
-	let mouseX;
-	let mouseY;
-
-	let clicking = false;
+    const config = { 
+        randomize: true,
+		slicesCount: 60,
+		ringsDistance: 20,
+		ringsSpeed: 1,
+		centerMovementSpeed: 1,
+		maxDistanceToCenter: 30,
+		tentaclesMovement: true,
+		showRings: true,
+		saturation: 50,
+		lightnessFactor: 50,
+		rotateAuto: false,
+		rotationAngle: 0,
+		rotationIncrement: 0.5,
+		tentaclesCount: 5,
+		hue: 0,
+    };
 
 	class Slice {
 
@@ -46,12 +43,12 @@
 		}
 
 		update = () => {
-			mouseX = mouseX ? mouseX : 0;
-			mouseY = mouseY ? mouseY : 0;
+			globals.mouseX = globals.mouseX ? globals.mouseX : 0;
+			globals.mouseY = globals.mouseY ? globals.mouseY : 0;
 			this.x = this.x ? this.x : 0;
 			this.y = this.y ? this.y : 0;
 
-			let tentaclesPerFinger = TENTACLES_COUNT; 
+			let tentaclesPerFinger = config.tentaclesCount; 
 
 			if (globals.touches){				
 				let fingersCount = globals.touches.length;
@@ -60,11 +57,11 @@
 				this.deltaX = globals.touches[fingerIndex].clientX - this.x;
 				this.deltaY = globals.touches[fingerIndex].clientY - this.y;				
 			}else{
-				this.deltaX = mouseX - this.x;
-				this.deltaY = mouseY - this.y;
+				this.deltaX = globals.mouseX - this.x;
+				this.deltaY = globals.mouseY - this.y;
 			}
 
-			let speedAxes = Trigonometry.polarToCartesian(this.speed + distanceToCenter, (this.tentacle * Trigonometry.degToRad(360) / tentaclesPerFinger) + Trigonometry.degToRad(ROTATION_ANGLE));
+			let speedAxes = Trigonometry.polarToCartesian(this.speed + globals.distanceToCenter, (this.tentacle * Trigonometry.degToRad(360) / tentaclesPerFinger) + Trigonometry.degToRad(config.rotationAngle));
 
 			this.deltaX += speedAxes.x;
 			this.deltaY += speedAxes.y;
@@ -88,97 +85,64 @@
 	}
 
 	let updateRingShift = () => {
-		if (timeCounter % RINGS_SPEED == 0) {
-			if (ringShift >= RINGS_DISTANCE)
-				ringShift = 1;
+		if (globals.timeCounter % config.ringsSpeed == 0) {
+			if (globals.ringShift >= config.ringsDistance)
+				globals.ringShift = 1;
 			else
-				ringShift += 1;
+				globals.ringShift += 1;
 		}
 	}
 
 	let updateDistanceToCenter = () => {
-		if (timeCounter % CENTER_MOVEMENT_SPEED == 0) {
-			if (distanceToCenter > MAX_DISTANCE_TO_CENTER)
-				movingToCenter = true;
+		if (globals.timeCounter % config.centerMovementSpeed == 0) {
+			if (globals.distanceToCenter > config.maxDistanceToCenter)
+				globals.movingToCenter = true;
 
-			if (distanceToCenter <= 0)
-				movingToCenter = false;
+			if (globals.distanceToCenter <= 0)
+				globals.movingToCenter = false;
 
-			if (movingToCenter)
-				distanceToCenter -= 1;
+			if (globals.movingToCenter)
+				globals.distanceToCenter -= 1;
 			else
-				distanceToCenter += 1;
+				globals.distanceToCenter += 1;
 		}
 	}
 
 	let addSlices = () => {
-		for (let j = SLICES_COUNT; j > 0; j--) {
-			for (let i = 1; i <= TENTACLES_COUNT; i++)	{
-				slices.push(new Slice(i, j, 0, mouseX, mouseY));
+		for (let j = config.slicesCount; j > 0; j--) {
+			for (let i = 1; i <= config.tentaclesCount; i++)	{
+				globals.slices.push(new Slice(i, j, 0, globals.mouseX, globals.mouseY));
 			}
 		}
 	}
 
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
-		HUE = globals.random.nextInt(1, 360);
-		LIGHTNESS_FACTOR = globals.random.nextInt(0, 100);
-		SATURATION = globals.random.nextInt(0, 100);
-		SHOW_RINGS = globals.random.nextBool();
-		TENTACLES_COUNT = globals.random.nextInt(1, 8);
-		ROTATE_AUTO = globals.random.nextBool();
-		ROTATION_ANGLE = globals.random.nextInt(0, 360);
-		ROTATION_INCREMENT = globals.random.nextRange(-1.0, 1.0);
-		SLICES_COUNT = globals.random.nextInt(10, 60);
-		RINGS_DISTANCE = globals.random.nextInt(10, 20); 
-		RINGS_SPEED = globals.random.nextInt(1, 5);
-		CENTER_MOVEMENT_SPEED = globals.random.nextInt(1, 5);
-		MAX_DISTANCE_TO_CENTER = globals.random.nextInt(0, 60);
-		TENTACLES_MOVEMENT = globals.random.nextBool();
+		config.hue = globals.random.nextInt(1, 360);
+		config.lightnessFactor = globals.random.nextInt(0, 100);
+		config.saturation = globals.random.nextInt(0, 100);
+		config.showRings = globals.random.nextBool();
+		config.tentaclesCount = globals.random.nextInt(1, 8);
+		config.rotateAuto = globals.random.nextBool();
+		config.rotationAngle = globals.random.nextInt(0, 360);
+		config.rotationIncrement = globals.random.nextRange(-1.0, 1.0);
+		config.slicesCount = globals.random.nextInt(10, 60);
+		config.ringsDistance = globals.random.nextInt(10, 20); 
+		config.ringsSpeed = globals.random.nextInt(1, 5);
+		config.centerMovementSpeed = globals.random.nextInt(1, 5);
+		config.maxDistanceToCenter = globals.random.nextInt(0, 60);
+		config.tentaclesMovement = globals.random.nextBool();
 
-		ringIterations = SLICES_COUNT / RINGS_DISTANCE * TENTACLES_COUNT;
+		globals.ringIterations = config.slicesCount / config.ringsDistance * config.tentaclesCount;
 	}
 
 	let addEvents = () => {
-		canvas.addEventListener('mousemove', e => {
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-			e.preventDefault();
-			
-			clicking = true;
-
-			globals.touches = e.touches;
-
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-
-			globals.touches = e.touches;
-
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('mousedown', e => {
-			clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			clicking = false;
-		}, false);
 	}
 
 	let init = () => {
 		initCanvas();
-		randomize();
-		console.log(TENTACLES_COUNT);
+        if (config.randomize) randomize();
+		console.log(config.tentaclesCount);
 		addSlices();
 		addEvents();
 		drawBackground(ctx, canvas);
@@ -189,36 +153,36 @@
 	let isRing = (indexSlice) => {
 		let result = false;
 
-		for (let i = 0; i <= ringIterations; i++) {
-			result = result || (indexSlice >= ringShift + (RINGS_DISTANCE * i) && indexSlice < ringShift + (RINGS_DISTANCE * i) + TENTACLES_COUNT);
+		for (let i = 0; i <= globals.ringIterations; i++) {
+			result = result || (indexSlice >= globals.ringShift + (config.ringsDistance * i) && indexSlice < globals.ringShift + (config.ringsDistance * i) + config.tentaclesCount);
 		}
 
 		return result;
 	}
 
 	let draw = () => {
-		if (ROTATE_AUTO) ROTATION_ANGLE += ROTATION_INCREMENT;
+		if (config.rotateAuto) config.rotationAngle += config.rotationIncrement;
 
 		drawBackground(ctx, canvas);
 		
-		for (let i = 0; i < SLICES_COUNT * TENTACLES_COUNT; i++) {
-			slices[i].update();
+		for (let i = 0; i < config.slicesCount * config.tentaclesCount; i++) {
+			globals.slices[i].update();
 
-			let lightness = Numbers.scale(SLICES_COUNT-slices[i].index, 0, SLICES_COUNT, 0, LIGHTNESS_FACTOR); 
+			let lightness = Numbers.scale(config.slicesCount-globals.slices[i].index, 0, config.slicesCount, 0, config.lightnessFactor); 
 
-			if (SHOW_RINGS && isRing(i))
-				color = `hsl(${HUE}, ${SATURATION}%, ${lightness + 10}%)`;
+			if (config.showRings && isRing(i))
+				color = `hsl(${config.hue}, ${config.saturation}%, ${lightness + 10}%)`;
 			else
-				color = `hsl(${HUE}, ${SATURATION}%, ${lightness}%)`;
+				color = `hsl(${config.hue}, ${config.saturation}%, ${lightness}%)`;
 
-			Drawing.drawCircle(ctx, slices[i].x, slices[i].y, slices[i].diameter, color, color);
+			Drawing.drawCircle(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, color, color);
 		}
 
 		updateRingShift();
 
-		if (TENTACLES_MOVEMENT) updateDistanceToCenter();
+		if (config.tentaclesMovement) updateDistanceToCenter();
 
-		timeCounter++;
+		globals.timeCounter++;
 	}
 
 	let simulateTouchEvent = () => {
@@ -246,10 +210,10 @@
 		Objects.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
 	}
 
-	let trackMouse = (x, y) => {
+	window.trackMouse = (x, y) => {
 		if (clicking){
-			mouseX = x;
-			mouseY = y;
+			globals.mouseX = x;
+			globals.mouseY = y;
 		}
 	}
 
@@ -261,9 +225,18 @@
 		lastRender = timestamp;
 		window.requestAnimationFrame(loop);
 	}
+	
+	window.clearCanvas = () => {
+		Sound.error();
+	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
 
 	init();
-
-	window.clearCanvas = () => {  
-	}
 }

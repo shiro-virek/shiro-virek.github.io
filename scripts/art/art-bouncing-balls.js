@@ -206,10 +206,21 @@
 		lastRender = timestamp;
 		window.requestAnimationFrame(loop);
 	}
-
-	init();
+	
+    window.trackMouse = (xMouse, yMouse) => {
+    }
 
 	window.clearCanvas = () => {		
 		globals.ballCollection = new BallCollection();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

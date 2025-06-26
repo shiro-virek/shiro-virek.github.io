@@ -64,7 +64,7 @@
 
         isPixelClicked = (col, row) => {
             let pixelPos = this.getPixelByMousePosition(globals.mouseX, globals.mouseY);
-            return (pixelPos.col == col && pixelPos.row == row && globals.clicking);
+            return (pixelPos.col == col && pixelPos.row == row && clicking);
         }
 
         activatePixel = (x, y) => {
@@ -164,45 +164,16 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('mousemove', e => {
-            globals.mouseMoved = true;
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-            globals.mouseMoved = false;
-			globals.clicking = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-            globals.mouseMoved = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('mousedown', e => {
-			globals.clicking = true;
-            globals.mouseMoved = false;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			globals.clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			globals.clicking = false;
-		}, false);   
     }
 
-    let trackMouse = (x, y) => {
+    window.trackMouse = (x, y) => {
         if (globals.lastPosX == 0) globals.lastPosX = x;
         if (globals.lastPosY == 0) globals.lastPosY = y;
 
         globals.mouseX = x;
         globals.mouseY = y;
 
-        if (globals.clicking) {
+        if (clicking) {
             globals.pixelScreen.activatePixel(x, y);
         }
 
@@ -243,8 +214,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-    
 	window.clearCanvas = () => {
+		Sound.error();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+    
+    init();
 }

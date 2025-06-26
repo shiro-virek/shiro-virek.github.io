@@ -558,8 +558,9 @@
 		lastRender = timestamp;
 		window.requestAnimationFrame(loop);
 	}
-
-	init();
+	
+    window.trackMouse = (xMouse, yMouse) => {
+    }
 
 	window.clearCanvas = () => {  
 		globals.metroNetwork.lines = [];
@@ -570,4 +571,10 @@
 		window.clearCanvas();
 		globals.metroNetwork.generateNetwork();
 	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

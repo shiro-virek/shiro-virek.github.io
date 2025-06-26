@@ -1,20 +1,21 @@
 {
     const globals = {
-		random: null
+		random: null,
+		objects: [],
     };
 
-	let PARTICLES_COUNT = 500;
-	let MINIMUM_LIFE = 20;
-	let MAXIMUM_LIFE = 100;
-	let MINIMUM_DIAMETER = 5;
-	let MAXIMUM_DIAMETER = 15;
-	let MINIMUM_SPEED = 5;
-	let MAXIMUM_SPEED = 10;
-	let AMPLITUDE = 50;
-	let ALL_SIN = false;
-
-	let objects = [];
-	let clicking = false;
+    const config = { 
+        randomize: true,
+		particlesCount: 500,
+		minimumLife: 20,
+		maximumLife: 100,
+		minimumDiameter: 5,
+		maximumDiameter: 15,
+		minimumSpeed: 5,
+		maximumSpeed: 10,
+		amplitude: 50,
+		allSin: false,
+    };
 
 	const Figures = Object.freeze({
 		Square: Symbol("square"),
@@ -30,10 +31,10 @@
 			this.notFirstTime = notFirstTime;
 			this.sin = globals.random.nextBool();
 			this.yCenter = -100 + globals.random.nextInt(1, 50);
-			this.diameter = MAXIMUM_DIAMETER;
+			this.diameter = config.maximumDiameter;
 			this.radius = this.diameter / 2;
-			this.speed = globals.random.nextInt(1, MAXIMUM_SPEED);
-			this.life = globals.random.nextInt(MINIMUM_LIFE, MAXIMUM_LIFE);
+			this.speed = globals.random.nextInt(1, config.maximumSpeed);
+			this.life = globals.random.nextInt(config.minimumLife, config.maximumLife);
 			this.xCenter = globals.random.nextInt(1, width);
 			var rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);
 			this.shape = Figures[Object.keys(Figures)[rand]];
@@ -42,24 +43,24 @@
 		}
 
 		getColor() {
-			let alpha = this.life / MAXIMUM_LIFE;
-			let hue = this.life * 3 * this.hue / MAXIMUM_LIFE;
-			let saturation = this.life * 100 / (MAXIMUM_LIFE * 3);
-			let light = this.life * 100 / (MAXIMUM_LIFE * 3);
+			let alpha = this.life / config.maximumLife;
+			let hue = this.life * 3 * this.hue / config.maximumLife;
+			let saturation = this.life * 100 / (config.maximumLife * 3);
+			let light = this.life * 100 / (config.maximumLife * 3);
 			return `hsl(${hue}, ${saturation}%, ${light}%, ${alpha})`;
 		}
 
 		getDiameter() {
-			return this.life * MAXIMUM_DIAMETER / MAXIMUM_LIFE;
+			return this.life * config.maximumDiameter / config.maximumLife;
 		}
 
 		update() {
 			this.yCenter += this.speed;
 
-			if (this.sin || ALL_SIN)
-				this.xMovement = (AMPLITUDE * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
+			if (this.sin || config.allSin)
+				this.xMovement = (config.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
 			else
-				this.xMovement = (AMPLITUDE * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (config.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
 
 			this.angle++;
 
@@ -74,62 +75,37 @@
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
 
-		PARTICLES_COUNT = globals.random.nextInt(50, screen.height * screen.width / 1000);
-		MINIMUM_LIFE = globals.random.nextInt(10, 90)
-		MAXIMUM_LIFE = globals.random.nextInt(100, 200);
-		MINIMUM_DIAMETER = globals.random.nextInt(1, 10);
-		MAXIMUM_DIAMETER = globals.random.nextInt(12, 20);
-		AMPLITUDE = globals.random.nextInt(10, 100);
-		ALL_SIN = globals.random.nextBool();
+		config.particlesCount = globals.random.nextInt(50, screen.height * screen.width / 1000);
+		config.minimumLife = globals.random.nextInt(10, 90)
+		config.maximumLife = globals.random.nextInt(100, 200);
+		config.minimumDiameter = globals.random.nextInt(1, 10);
+		config.maximumDiameter = globals.random.nextInt(12, 20);
+		config.amplitude = globals.random.nextInt(10, 100);
+		config.allSin = globals.random.nextBool();
 	}
 
 	let addParticle = (mouseX, mouseY, keepSameSize = false) => {
-		if (keepSameSize) objects.shift();
+		if (keepSameSize) globals.objects.shift();
 		let obj = new Particle(true);
 		obj.setNewParticleObject(true);
 		obj.xCenter = mouseX;
 		obj.yCenter = mouseY;
-		objects.push(obj);
+		globals.objects.push(obj);
 	}
 
 	let addParticles = () => {
-		for (i = 0; i < PARTICLES_COUNT; i++) {
+		for (i = 0; i < config.particlesCount; i++) {
 			obj = new Particle(false);
-			objects.push(obj);
+			globals.objects.push(obj);
 		}
 	}
 
 	let addEvents = () => {
-		canvas.addEventListener('mousemove', e => {
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-			clicking = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('mousedown', e => {
-			clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			clicking = false;
-		}, false);
 	}
 
 	let init = () => {
 		initCanvas();
-		randomize();
+		if (config.randomize) randomize();
 		addParticles();
 		addEvents();
 		drawBackground(ctx, canvas);
@@ -139,23 +115,23 @@
 	let draw = () => {
 		drawBackground(ctx, canvas);
 
-		for (i = 0; i < PARTICLES_COUNT; i++) {
-			objects[i].update();
+		for (i = 0; i < config.particlesCount; i++) {
+			globals.objects[i].update();
 
-			if (objects[i].notFirstTime) {
-				switch (objects[i].shape) {
+			if (globals.objects[i].notFirstTime) {
+				switch (globals.objects[i].shape) {
 					case Figures.Circle:
-						Drawing.drawCircle(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].getColor(), objects[i].getColor());
+						Drawing.drawCircle(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), globals.objects[i].getColor(), globals.objects[i].getColor());
 						break;
 					case Figures.Square:
-						Drawing.drawSquare(ctx, objects[i].xMovement, objects[i].yCenter, objects[i].getDiameter(), objects[i].angle, objects[i].getColor());
+						Drawing.drawSquare(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), globals.objects[i].angle, globals.objects[i].getColor());
 						break;
 				}
 			}
 		}
 	}
 
-	let trackMouse = (mouseX, mouseY) => {
+	window.trackMouse = (mouseX, mouseY) => {
 		if (clicking)
 			addParticle(mouseX, mouseY, true);
 	}
@@ -169,10 +145,18 @@
 		window.requestAnimationFrame(loop);
 	}
 
-	init();
-
 	window.clearCanvas = () => {		
-		objects = [];
+		globals.objects = [];
 		addParticles();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+	
+	init();
 }

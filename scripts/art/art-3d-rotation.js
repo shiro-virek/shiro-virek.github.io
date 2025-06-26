@@ -70,8 +70,6 @@
         FOV: 10000,
         drawEdges: globals.random.nextBool(),
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
-        clicking: false,
-        mouseMoved: false,
     };    
 
     class ThreeDWorld {
@@ -288,53 +286,25 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('mousemove', e => {
-            config.mouseMoved = true;
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-            config.mouseMoved = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchstart', function (e) {
-            config.mouseMoved = false;            
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-			config.clicking = true;
-		});
-
-		canvas.addEventListener('mousedown', e => {
-            config.mouseMoved = false;
-			config.clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			config.clicking = false;
-		}, false);
-
 		canvas.addEventListener('touchend', e => {
-            if (!config.mouseMoved)
+            if (!mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
-
-			config.clicking = false;
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
-            if (!config.mouseMoved)
+            if (!mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
     }
 
-    let trackMouse = (x, y) => {
+    window.trackMouse = (x, y) => {
         if (lastPosX == 0) lastPosX = x;
         if (lastPosY == 0) lastPosY = y;
 
         let movX = lastPosX - x;
         let movY = lastPosY - y;
 
-        if (config.clicking) {    
+        if (clicking) {    
             world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
@@ -363,9 +333,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-    
 	window.clearCanvas = () => {		
         world.figures = [];
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();    
 }

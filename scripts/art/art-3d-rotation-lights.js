@@ -32,8 +32,6 @@
         randomize: true,
         FOV: 10000,
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
-        clicking: false,
-        mouseMoved: false
     };    
 
     class ThreeDWorld {
@@ -254,43 +252,7 @@
     }
 
     let setInitialFigures = () => {
-        let figuresCount = globals.random.nextInt(1, 10);
-        let translateX = globals.random.nextBool();
-        let translateY = globals.random.nextBool();
-        let translateZ = globals.random.nextBool();
-        let rotateY = globals.random.nextBool();    
-        let rotateX = globals.random.nextBool();
-        let rotateZ = globals.random.nextBool();
-        let scale = globals.random.nextBool();
-        let scaleX = globals.random.nextBool();
-        let scaleY = globals.random.nextBool();
-        let scaleZ = globals.random.nextBool();
-        let shearX = globals.random.nextBool();
-        let shearY = globals.random.nextBool();
-        let shearZ = globals.random.nextBool();
-
-        for(let i=0; i <= figuresCount; i++){
-            let figure = new Figure();
-
-            figure.vertices = Objects.clone(config.figureInfo.vertices);
-            figure.faces = Objects.clone(config.figureInfo.faces);
-
-            if (translateX) figure.translateX(i*50);
-            if (translateY) figure.translateY(i*50);
-            if (translateZ) figure.translateZ(i*50);
-            if (rotateX) figure.rotateX(i*10);
-            if (rotateY) figure.rotateY(i*10);
-            if (rotateZ) figure.rotateZ(i*10);    
-            if (scale) figure.scale(i*0.1);        
-            if (scaleX) figure.scaleX(i*0.1);
-            if (scaleY) figure.scaleY(i*0.1);
-            if (scaleZ) figure.scaleZ(i*0.1);
-            if (shearX) figure.shearX(i*0.05);
-            if (shearY) figure.shearY(i*0.05);
-            if (shearZ) figure.shearZ(i*0.05);
-
-            globals.world.figures.push(figure);
-        }
+        
     }
 
     let init = () => {	
@@ -304,53 +266,25 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('mousemove', e => {
-            config.mouseMoved = true;
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-            config.mouseMoved = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchstart', function (e) {
-            config.mouseMoved = false;            
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-			config.clicking = true;
-		});
-
-		canvas.addEventListener('mousedown', e => {
-            config.mouseMoved = false;
-			config.clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			config.clicking = false;
-		}, false);
-
 		canvas.addEventListener('touchend', e => {
-            if (!config.mouseMoved)
+            if (!mouseMoved)
                 globals.world.addFigure(e.offsetX, e.offsetY);
-
-			config.clicking = false;
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
-            if (!config.mouseMoved)
+            if (!mouseMoved)
                 globals.world.addFigure(e.offsetX, e.offsetY);
 		});
     }
 
-    let trackMouse = (x, y) => {
+    window.trackMouse = (x, y) => {
         if (lastPosX == 0) lastPosX = x;
         if (lastPosY == 0) lastPosY = y;
 
         let movX = lastPosX - x;
         let movY = lastPosY - y;
 
-        if (config.clicking) {  
+        if (clicking) {  
             globals.world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
@@ -382,9 +316,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-
 	window.clearCanvas = () => {		
         globals.world.figures = [];
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();
 }

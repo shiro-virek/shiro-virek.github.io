@@ -8,8 +8,6 @@
 
     const config = {
         randomize: true,
-        clicking: false,
-        mouseMoved: false, 
         ledRows: 50,
         ledColumns: 50,
         ledMargin: 0,
@@ -111,56 +109,11 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('click', e => {
-            
-        }, false);
-
-        canvas.addEventListener('mousemove', e => {
-            config.mouseMoved = true;
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-            config.mouseMoved = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchstart', function (e) {
-            config.mouseMoved = false;            
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-			config.clicking = true;
-		});
-
-		canvas.addEventListener('mousedown', e => {
-            config.mouseMoved = false;
-			config.clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			config.clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			config.clicking = false;
-		}, false);  
     }
 
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 255);
         config.functionIndex = globals.random.nextInt(0, config.functions.length);
-    }
-
-    let trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
-        if (config.clicking) {  
-
-        }
-
-        lastPosX = x;
-        lastPosY = y;
     }
     
     let draw = () => {
@@ -178,8 +131,20 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
+    window.trackMouse = (xMouse, yMouse) => {
+    }
 
-	window.clearCanvas = () => {  
+	window.clearCanvas = () => {
+		Sound.error();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+    
+    init();
 }

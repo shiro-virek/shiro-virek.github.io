@@ -13,8 +13,6 @@
     const globals = {
         mouseX: 0,
         mouseY: 0,
-        clicking: false,
-        mouseMoved: false,
         lastPosX: 0,
         lastPosY: 0,
         random: null
@@ -288,85 +286,16 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('mousemove', e => {
-            globals.mouseMoved = true;
-            trackMouse(e.offsetX, e.offsetY);
-        }, false);
-
-        canvas.addEventListener('touchmove', function (e) {
-            e.preventDefault();
-            globals.mouseMoved = true;
-            trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-        });
-
-        canvas.addEventListener('touchstart', function (e) {
-            globals.mouseMoved = false;
-            globals.clicking = true;
-        });
-
-        canvas.addEventListener('mousedown', e => {
-            globals.mouseMoved = false;
-            globals.clicking = true;
-        }, false);
-
-        canvas.addEventListener('mouseup', e => {
-            globals.clicking = false;
-        }, false);
-
-        canvas.addEventListener('touchend', e => {
-            //if (!globals.mouseMoved)
-
-            globals.clicking = false;
-        }, false);
-
-        canvas.addEventListener('click', function (e) {
-            //if (!globals.mouseMoved)
-
-        });
-
-        const uploader = document.getElementById('uploader');
-        const uploadButton = document.getElementById('uploadButton');
-
-        uploadButton.addEventListener('click', function() {
-            uploader.click();
-        });
-
-        uploader.addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const file = e.target.files[0];
-                
-                if (!file.type.match('image.*')) {
-                    alert('Please select an image file');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                
-                reader.onload = function(event) {                    
-                    img.onerror = function() {
-                        alert('Error loading image');
-                    };
-                    
-                    img.src = event.target.result;
-                };
-                
-                reader.onerror = function() {
-                    alert('Error reading file');
-                };
-                
-                reader.readAsDataURL(file);
-            }
-        });
     };
 
-    let trackMouse = (x, y) => {
+    window.trackMouse = (x, y) => {
         if (globals.lastPosX == 0) globals.lastPosX = x;
         if (globals.lastPosY == 0) globals.lastPosY = y;
 
         let movX = globals.lastPosX - x;
         let movY = globals.lastPosY - y;
 
-        if (globals.clicking) {
+        if (clicking) {
             globals.mouseX = x;
             globals.mouseY = y;
         }
@@ -427,8 +356,40 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-
     window.clearCanvas = () => {
+		Sound.error();
     }
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                img.onerror = function() {
+                    alert('Error loading image');
+                };
+                
+                img.src = event.target.result;
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
+
+    init();
 }

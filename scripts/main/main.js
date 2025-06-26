@@ -7,6 +7,11 @@ let lastPosX = 0;
 let canvas;
 let ctx;
 let lastRender = 0;
+let uploader;
+let uploadButton;
+let clicking = false;  
+let mouseMoved = false;
+let touches = null;
 
 width = window.innerWidth;
 height = window.innerHeight;
@@ -28,7 +33,45 @@ let drawBackground = (ctx, canvas) => {
 }
 
 let initCanvas = () => {
-    canvas = document.getElementById(Screen.CANVAS_ID);
+    uploader = document.getElementById('uploader');
+    uploadButton = document.getElementById('uploadButton');
+    uploadButton.addEventListener('click', function() {
+        uploader.click();
+    });
+    canvas = document.getElementById("myCanvas");
+
+    canvas.addEventListener('mousemove', e => {
+        mouseMoved = true;
+        window.trackMouse(e.offsetX, e.offsetY);
+    }, false);
+
+    canvas.addEventListener('touchstart', function (e) {
+        mouseMoved = false; 
+		touches = e.touches;
+		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+        clicking = true;
+    });
+
+    canvas.addEventListener('touchmove', function (e) {
+        e.preventDefault();
+        mouseMoved = true;
+		touches = e.touches;
+		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    });
+
+    canvas.addEventListener('mousedown', e => {
+        mouseMoved = false;
+        clicking = true;
+    }, false);
+
+    canvas.addEventListener('mouseup', e => {
+        clicking = false;
+    }, false);
+
+    canvas.addEventListener('touchend', e => {
+        clicking = false;
+    }, false);   
+
     if (canvas.getContext) {
         ctx = canvas.getContext('2d', { willReadFrequently: true })
         drawBackground(ctx, canvas);

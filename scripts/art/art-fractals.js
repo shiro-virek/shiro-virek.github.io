@@ -5,8 +5,6 @@
 
     const config = {
         randomize: true,
-        clicking: false,
-        mouseMoved: false, 
         mode: 1,
         pow: 2,
         maxIterations: 50,
@@ -73,39 +71,6 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('click', e => {
-            
-        }, false);
-
-        canvas.addEventListener('mousemove', e => {
-            config.mouseMoved = true;
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-            config.mouseMoved = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchstart', function (e) {
-            config.mouseMoved = false;            
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-			config.clicking = true;
-		});
-
-		canvas.addEventListener('mousedown', e => {
-            config.mouseMoved = false;
-			config.clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			config.clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			config.clicking = false;
-		}, false);  
     }
 
     let randomize = () => {
@@ -118,11 +83,11 @@
         config.hue = globals.random.nextInt(0, 360);
     }
 
-    let trackMouse = (x, y) => {
+    window.trackMouse = (x, y) => {
         if (lastPosX == 0) lastPosX = x;
         if (lastPosY == 0) lastPosY = y;
 
-        if (config.clicking) {  
+        if (clicking) {  
             config.scale = config.mode ? Numbers.scale(x, 0, width, 0.00005, 0.01) : config.scale;
             if (!config.mode){
                 config.cr = Numbers.scale(x, 0, width, -1, 1);
@@ -168,8 +133,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-
-	window.clearCanvas = () => {  
+	window.clearCanvas = () => {
+		Sound.error();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();
 }
