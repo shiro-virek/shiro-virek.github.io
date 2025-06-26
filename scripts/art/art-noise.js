@@ -15,7 +15,7 @@
         ledDiameter: 20,
         hue: 50,
         functionIndex: 3,
-        functions: [bars, squares, brightness, hues] 
+        functions: [bars, squares, brightness, hues, semitone] 
     };    
 
     class LedScreen {
@@ -77,6 +77,11 @@
     function squares(led, noiseValue){
         let side = Numbers.scale(noiseValue, -1, 1, 0, led.diameter);
         Drawing.drawSquare(ctx, led.x, led.y, side, 0, led.color, led.color);  
+    }
+
+    function semitone(led, noiseValue){
+        let radius = Numbers.scale(noiseValue, -1, 1, 0, led.diameter);
+        Drawing.drawCircle(ctx, led.x, led.y, radius, led.color, led.color); 
     }
 
     function brightness(led, noiseValue){
