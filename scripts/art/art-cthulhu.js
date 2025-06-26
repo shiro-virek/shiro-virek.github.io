@@ -50,12 +50,12 @@
 
 			let tentaclesPerFinger = config.tentaclesCount; 
 
-			if (globals.touches){				
-				let fingersCount = globals.touches.length;
+			if (touches){				
+				let fingersCount = touches.length;
 				let fingerIndex = Math.floor(this.tentacle % fingersCount);
 				
-				this.deltaX = globals.touches[fingerIndex].clientX - this.x;
-				this.deltaY = globals.touches[fingerIndex].clientY - this.y;				
+				this.deltaX = touches[fingerIndex].clientX - this.x;
+				this.deltaY = touches[fingerIndex].clientY - this.y;				
 			}else{
 				this.deltaX = globals.mouseX - this.x;
 				this.deltaY = globals.mouseY - this.y;
