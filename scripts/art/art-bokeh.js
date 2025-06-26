@@ -12,11 +12,13 @@
 		size: 5,
 		saturation: 0,
 		lightness: 0,
-		opacity: 0.001,
+		opacity: 0.003,
     };
 
 	let init = () => {
 		initCanvas();		
+
+		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 		addEvents();	
 	}
@@ -25,8 +27,6 @@
 	}
 
 	let randomize = () => {
-		globals.random = Objects.getRandomObject();
-
 		config.saturation = globals.random.nextInt(20, 100);
 		config.lightness = globals.random.nextInt(20, 100);
 		config.size = globals.random.nextInt(5, 15);
