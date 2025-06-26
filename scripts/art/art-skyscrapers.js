@@ -42,7 +42,7 @@
 			for (let x=0; x < buildingCols; x++) {
 				let tilt = 0;
 				for (let y=0; y < buildingRows; y++) {
-					this.addBuilding(x * distance, y * distance + tilt);
+					this.addBuilding(x * distance + tilt, y * distance + tilt);
 					tilt += 30;
 				}
 			}
