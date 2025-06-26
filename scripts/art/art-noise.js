@@ -1,46 +1,46 @@
 {
     const globals = {
         random: null,
-        ledScreen: null,
+        pixelScreen: null,
         noise: null,
         time: 0
     };
 
     const config = {
         randomize: true,
-        ledRows: 50,
-        ledColumns: 50,
-        ledMargin: 0,
-        ledPadding: 30,
-        ledDiameter: 20,
+        pixelRows: 50,
+        pixelColumns: 50,
+        pixelMargin: 0,
+        pixelPadding: 30,
+        pixelDiameter: 20,
         hue: 50,
         functionIndex: 3,
-        functions: [bars, squares, brightness, hues] 
+        functions: [bars, squares, brightness, hues, semitone] 
     };    
 
-    class LedScreen {
+    class PixelScreen {
         constructor() {
-            this.leds = [];       
-            this.generateLeds();
+            this.pixels = [];       
+            this.generatePixels();
         }
 
-        generateLeds = () => {
-            for (let x = 0; x <= config.ledColumns; x++) {
-                this.leds[x] = new Array(config.ledRows);
+        generatePixels = () => {
+            for (let x = 0; x <= config.pixelColumns; x++) {
+                this.pixels[x] = new Array(config.pixelRows);
             }
 
-            for (let x = 0; x <= config.ledColumns; x++) {
-                for (let y = 0; y <= config.ledRows; y++) {
-                    let led = new Led(x, y);
-                    this.leds[x][y] = led;
+            for (let x = 0; x <= config.pixelColumns; x++) {
+                for (let y = 0; y <= config.pixelRows; y++) {
+                    let pixel = new Pixel(x, y);
+                    this.pixels[x][y] = pixel;
                 }
             }
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= config.ledColumns; x++) {
-                for (let y = 0; y <= config.ledRows; y++) {
-                    this.leds[x][y].draw(ctx);
+            for (let x = 0; x <= config.pixelColumns; x++) {
+                for (let y = 0; y <= config.pixelRows; y++) {
+                    this.pixels[x][y].draw(ctx);
                 }
             }
         }
@@ -49,14 +49,14 @@
         }
     }
 
-    class Led {
+    class Pixel {
         constructor(column, row) {
-            this.diameter = config.ledDiameter;
-            this.radius = config.ledDiameter / 2;
+            this.diameter = config.pixelDiameter;
+            this.radius = config.pixelDiameter / 2;
             this.row = row;
             this.column = column;
-            this.x = config.ledMargin + column * config.ledPadding + column * this.diameter;
-            this.y = config.ledMargin + row * config.ledPadding + row * this.diameter;
+            this.x = config.pixelMargin + column * config.pixelPadding + column * this.diameter;
+            this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;
             this.color = `hsl(${config.hue}, 100%, 50%)`;
         }
 
@@ -69,26 +69,31 @@
         }
     }
 
-    function bars(led, noiseValue){
+    function bars(pixel, noiseValue){
         let angle = Numbers.scale(noiseValue, -1, 1, 0, 360);
-        Drawing.drawRectangleR(ctx, led.x, led.y, led.diameter / 4, led.diameter, led.color, led.color, angle);   
+        Drawing.drawRectangleR(ctx, pixel.x, pixel.y, pixel.diameter / 4, pixel.diameter, pixel.color, pixel.color, angle);   
     }
 
-    function squares(led, noiseValue){
-        let side = Numbers.scale(noiseValue, -1, 1, 0, led.diameter);
-        Drawing.drawSquare(ctx, led.x, led.y, side, 0, led.color, led.color);  
+    function squares(pixel, noiseValue){
+        let side = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
+        Drawing.drawSquare(ctx, pixel.x, pixel.y, side, 0, pixel.color, pixel.color);  
     }
 
-    function brightness(led, noiseValue){
+    function semitone(pixel, noiseValue){
+        let radius = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
+        Drawing.drawCircle(ctx, pixel.x, pixel.y, radius, pixel.color, pixel.color); 
+    }
+
+    function brightness(pixel, noiseValue){
         let bright = Numbers.scale(noiseValue, -1, 1, 0, 50);
         let color = `hsl(${config.hue}, 100%, ${bright}%)`;
-        Drawing.drawCircle(ctx, led.x, led.y, led.radius, color, color); 
+        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color, color); 
     }
 
-    function hues(led, noiseValue){
+    function hues(pixel, noiseValue){
         let newHue = Numbers.scale(noiseValue, -1, 1, 0, 360);
         let color = `hsl(${newHue}, 100%, 50%)`;
-        Drawing.drawCircle(ctx, led.x, led.y, led.radius, color, color); 
+        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color, color); 
     }
 
     let init = () => {
@@ -96,13 +101,13 @@
         globals.noise = new Noise(globals.random);
         if (config.randomize) randomize();
         initCanvas();
-        config.ledDiameter = globals.random.nextInt(5, 20);        
-        config.ledPadding = globals.random.nextInt(0, 5);
-        config.ledMargin = config.ledPadding;
+        config.pixelDiameter = globals.random.nextInt(5, 20);        
+        config.pixelPadding = globals.random.nextInt(0, 5);
+        config.pixelMargin = config.pixelPadding;
 
-        config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
-        config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
-        globals.ledScreen = new LedScreen();
+        config.pixelRows = Math.floor((height - config.pixelMargin)/ (config.pixelDiameter + config.pixelPadding));
+        config.pixelColumns = Math.floor((width - config.pixelMargin)/ (config.pixelDiameter + config.pixelPadding));
+        globals.pixelScreen = new PixelScreen();
         
         addEvents();
         window.requestAnimationFrame(loop);
@@ -118,7 +123,7 @@
     
     let draw = () => {
         drawBackground(ctx, canvas);
-        globals.ledScreen.draw(ctx);
+        globals.pixelScreen.draw(ctx);
     }
 
     let loop = (timestamp) => {

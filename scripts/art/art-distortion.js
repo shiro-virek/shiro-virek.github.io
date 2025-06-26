@@ -6,8 +6,8 @@
         amplitude: 10,
         frequency: 0.3,
         mode: 1,
-        functionIndex: 3,
-        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2, tvDistortion, water] 
+        functionIndex: 1,
+        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2, tvDistortion, water, boxBlur] 
     };
     
     const globals = {
@@ -26,34 +26,7 @@
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const dx = x - centerX;
-                const dy = y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < radius) {
-                    const angle = Math.atan2(dy, dx);
-                    const distortion = 1 - Math.pow(distance / radius, distortionStrength);
-                    const newX = centerX + Math.cos(angle) * distortion * distance;
-                    const newY = centerY + Math.sin(angle) * distortion * distance;
-
-                    const index = (y * width + x) * 4;
-                    const newIndex = (Math.round(newY) * width + Math.round(newX)) * 4;
-
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
-                } else {
-                    const index = (y * width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
-                }
-            }
-        }
+        Effects.pincushion(data, outputData, radius, distortionStrength, centerX, centerY);
     }
 
     function ripple(data, outputData) {
@@ -63,53 +36,14 @@
         const centerY =  config.mode ? halfHeight : globals.mouseY;
         const phase = 1;
 
-        for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-                const dx = x - centerX;
-                const dy = y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                const displacement = amplitude * Math.sin(frequency * distance - phase);
-
-                const newX = x + (dx / distance) * displacement;
-                const newY = y + (dy / distance) * displacement;
-
-                if (newX >= 0 && newX < canvas.width && newY >= 0 && newY < canvas.height) {
-                    const index = (y * canvas.width + x) * 4;
-                    const newIndex = (Math.floor(newY) * canvas.width + Math.floor(newX)) * 4;
-
-                    outputData[index] = data[newIndex];         // Red
-                    outputData[index + 1] = data[newIndex + 1]; // Green
-                    outputData[index + 2] = data[newIndex + 2]; // Blue
-                    outputData[index + 3] = data[newIndex + 3]; // Alpha
-                }
-            }
-        }
+        Effects.ripple(data, outputData, amplitude, frequency, phase, centerX, centerY);
     }
 
     function wobbly(data, outputData) {
         let amplitude = Numbers.scale(globals.mouseX, 0, width, 0, 20);
         let frequency = Numbers.scale(globals.mouseY, 0, height, 0, 1);
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const offsetX = Math.sin(y * frequency) * amplitude;
-                const offsetY = Math.cos(x * frequency) * amplitude;
 
-                const newX = x + offsetX;
-                const newY = y + offsetY;
-
-                const clampedX = Math.max(0, Math.min(width - 1, Math.round(newX)));
-                const clampedY = Math.max(0, Math.min(height - 1, Math.round(newY)));
-
-                const index = (y * width + x) * 4;
-                const newIndex = (clampedY * width + clampedX) * 4;
-
-                outputData[index] = data[newIndex];         // R
-                outputData[index + 1] = data[newIndex + 1]; // G
-                outputData[index + 2] = data[newIndex + 2]; // B
-                outputData[index + 3] = data[newIndex + 3]; // A
-            }
-        }
+        Effects.wobbly(data, outputData, amplitude, frequency);    
     }
 
     function ripple2(data, outputData) {
@@ -118,34 +52,7 @@
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
-        for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-                const dx = x - centerX;
-                const dy = y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < radius) {
-                    const angle = Math.atan2(dy, dx);                    
-
-                    const newX = x + Math.cos((angle + distance * distortionStrength) * Trigonometry.RAD_CONST) * 50;
-                    const newY = y + Math.sin((angle + distance * distortionStrength) * Trigonometry.RAD_CONST) * 50;
-
-                    const index = (y * canvas.width + x) * 4;
-                    const newIndex = (Math.round(newY) * canvas.width + Math.round(newX)) * 4;
-
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
-                } else {
-                    const index = (y * canvas.width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
-                }
-            }
-        }
+        Effects.ripple2(data, outputData, radius, distortionStrength, centerX, centerY);
     }
 
     function barrel(data, outputData) {
@@ -154,34 +61,7 @@
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
-        for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-                const dx = x - centerX;
-                const dy = y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < radius) {
-                    const angle = Math.atan2(dy, dx);
-                    const distortion = Math.pow(distance / radius, distortionStrength);
-                    const newX = centerX + Math.cos(angle) * distortion * radius;
-                    const newY = centerY + Math.sin(angle) * distortion * radius;
-
-                    const index = (y * canvas.width + x) * 4;
-                    const newIndex = (Math.round(newY) * canvas.width + Math.round(newX)) * 4;
-
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
-                } else {
-                    const index = (y * canvas.width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
-                }
-            }
-        }
+        Effects.barrel(data, outputData, radius, distortionStrength, centerX, centerY);
     }
 
     function twirl(data, outputData) {
@@ -190,79 +70,30 @@
         const centerX =  config.mode ? halfWidth : globals.mouseX;
         const centerY =  config.mode ? halfHeight : globals.mouseY;
 
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const dx = x - centerX;
-                const dy = y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < radius) {
-                    const angle = Math.atan2(dy, dx);
-                    const twistAngle = strength * Math.pow((radius - distance) / radius, 2);
-                    const newAngle = angle + twistAngle;
-
-                    const newX = centerX + Math.cos(newAngle) * distance;
-                    const newY = centerY + Math.sin(newAngle) * distance;
-
-                    const index = (y * width + x) * 4;
-                    const newIndex = (Math.round(newY) * width + Math.round(newX)) * 4;
-
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
-                } else {
-                    const index = (y * width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
-                }
-            }
-        }
+        Effects.twirl(data, outputData, radius, strength, centerX, centerY);
     }
 
     function tvDistortion(data, outputData) {
         let amplitude = config.mode ? Numbers.scale(globals.mouseX, 0, width, 1.0, 0.1) : 0.1;
-        let freq = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.001, 0.01) : 0.005;
+        let frequency = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.001, 0.01) : 0.005;
         let waves = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 10) : 5;
         let glitch = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 10) : 10;
 
-        for (let y = 0; y < height; y++) {
-            const offset = Math.floor(Math.sin(y * amplitude + Date.now() * freq) * waves + (globals.random.next() - 0.5) * glitch);
-
-            for (let x = 0; x < width; x++) {
-                let srcX = Math.min(width - 1, Math.max(0, x + offset));
-                let srcIndex = (y * width + srcX) * 4;
-                let destIndex = (y * width + x) * 4;
-
-                outputData[destIndex] = data[srcIndex];       // R
-                outputData[destIndex + 1] = data[srcIndex + 1]; // G
-                outputData[destIndex + 2] = data[srcIndex + 2]; // B
-                outputData[destIndex + 3] = data[srcIndex + 3]; // A
-            }
-        }
+        Effects.tvDistortion(data, outputData, amplitude, frequency, waves, glitch, globals.random);
     }
 
     function water(data, outputData) {
         let amplitude = config.mode ? Numbers.scale(globals.mouseX, 0, width, 1.0, 0.1) : 0.1;
-        let freq = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.001, 0.01) : 0.005;
+        let frequency = config.mode ? Numbers.scale(globals.mouseX, 0, width, 0.001, 0.01) : 0.005;
         let waves = config.mode ? Numbers.scale(globals.mouseY, 0, height, 1, 10) : 5;
 
-        for (let y = 0; y < height; y++) {
-            const offset = Math.floor(Math.sin(y * amplitude + Date.now() * freq) * waves);
+        Effects.water(data, outputData, amplitude, frequency, waves);
+    }
+        
+    function boxBlur(data, outputData) {
+        let radius = Math.floor(Numbers.scale(globals.mouseX, 0, width, 1, 5));
 
-            for (let x = 0; x < width; x++) {
-                let srcX = Math.min(width - 1, Math.max(0, x + offset));
-                let srcIndex = (y * width + srcX) * 4;
-                let destIndex = (y * width + x) * 4;
-
-                outputData[destIndex] = data[srcIndex];       // R
-                outputData[destIndex + 1] = data[srcIndex + 1]; // G
-                outputData[destIndex + 2] = data[srcIndex + 2]; // B
-                outputData[destIndex + 3] = data[srcIndex + 3]; // A
-            }
-        }
+        Effects.boxBlur(data, outputData, radius);
     }
 
     let init = () => {
