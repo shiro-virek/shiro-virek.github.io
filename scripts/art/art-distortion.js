@@ -6,8 +6,8 @@
         amplitude: 10,
         frequency: 0.3,
         mode: 1,
-        functionIndex: 3,
-        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2, tvDistortion, water] 
+        functionIndex: 1,
+        functions: [barrel, twirl, pincushion, ripple, wobbly, ripple2, tvDistortion, water, boxBlur] 
     };
     
     const globals = {
@@ -78,10 +78,10 @@
                     const index = (y * canvas.width + x) * 4;
                     const newIndex = (Math.floor(newY) * canvas.width + Math.floor(newX)) * 4;
 
-                    outputData[index] = data[newIndex];         // Red
-                    outputData[index + 1] = data[newIndex + 1]; // Green
-                    outputData[index + 2] = data[newIndex + 2]; // Blue
-                    outputData[index + 3] = data[newIndex + 3]; // Alpha
+                    outputData[index] = data[newIndex];         
+                    outputData[index + 1] = data[newIndex + 1];
+                    outputData[index + 2] = data[newIndex + 2];
+                    outputData[index + 3] = data[newIndex + 3];
                 }
             }
         }
@@ -104,10 +104,10 @@
                 const index = (y * width + x) * 4;
                 const newIndex = (clampedY * width + clampedX) * 4;
 
-                outputData[index] = data[newIndex];         // R
-                outputData[index + 1] = data[newIndex + 1]; // G
-                outputData[index + 2] = data[newIndex + 2]; // B
-                outputData[index + 3] = data[newIndex + 3]; // A
+                outputData[index] = data[newIndex];        
+                outputData[index + 1] = data[newIndex + 1]; 
+                outputData[index + 2] = data[newIndex + 2];
+                outputData[index + 3] = data[newIndex + 3]; 
             }
         }
     }
@@ -133,16 +133,16 @@
                     const index = (y * canvas.width + x) * 4;
                     const newIndex = (Math.round(newY) * canvas.width + Math.round(newX)) * 4;
 
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
+                    outputData[index] = data[newIndex];       
+                    outputData[index + 1] = data[newIndex + 1]; 
+                    outputData[index + 2] = data[newIndex + 2]; 
+                    outputData[index + 3] = data[newIndex + 3]; 
                 } else {
                     const index = (y * canvas.width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
+                    outputData[index] = data[index];        
+                    outputData[index + 1] = data[index + 1];
+                    outputData[index + 2] = data[index + 2]; 
+                    outputData[index + 3] = data[index + 3];
                 }
             }
         }
@@ -169,16 +169,16 @@
                     const index = (y * canvas.width + x) * 4;
                     const newIndex = (Math.round(newY) * canvas.width + Math.round(newX)) * 4;
 
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
+                    outputData[index] = data[newIndex];         
+                    outputData[index + 1] = data[newIndex + 1]; 
+                    outputData[index + 2] = data[newIndex + 2]; 
+                    outputData[index + 3] = data[newIndex + 3]; 
                 } else {
                     const index = (y * canvas.width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
+                    outputData[index] = data[index];         
+                    outputData[index + 1] = data[index + 1]; 
+                    outputData[index + 2] = data[index + 2];
+                    outputData[index + 3] = data[index + 3]; 
                 }
             }
         }
@@ -207,16 +207,16 @@
                     const index = (y * width + x) * 4;
                     const newIndex = (Math.round(newY) * width + Math.round(newX)) * 4;
 
-                    outputData[index] = data[newIndex];         // R
-                    outputData[index + 1] = data[newIndex + 1]; // G
-                    outputData[index + 2] = data[newIndex + 2]; // B
-                    outputData[index + 3] = data[newIndex + 3]; // A
+                    outputData[index] = data[newIndex];        
+                    outputData[index + 1] = data[newIndex + 1]; 
+                    outputData[index + 2] = data[newIndex + 2]; 
+                    outputData[index + 3] = data[newIndex + 3]; 
                 } else {
                     const index = (y * width + x) * 4;
-                    outputData[index] = data[index];         // R
-                    outputData[index + 1] = data[index + 1]; // G
-                    outputData[index + 2] = data[index + 2]; // B
-                    outputData[index + 3] = data[index + 3]; // A
+                    outputData[index] = data[index];         
+                    outputData[index + 1] = data[index + 1]; 
+                    outputData[index + 2] = data[index + 2]; 
+                    outputData[index + 3] = data[index + 3]; 
                 }
             }
         }
@@ -236,10 +236,10 @@
                 let srcIndex = (y * width + srcX) * 4;
                 let destIndex = (y * width + x) * 4;
 
-                outputData[destIndex] = data[srcIndex];       // R
-                outputData[destIndex + 1] = data[srcIndex + 1]; // G
-                outputData[destIndex + 2] = data[srcIndex + 2]; // B
-                outputData[destIndex + 3] = data[srcIndex + 3]; // A
+                outputData[destIndex] = data[srcIndex];       
+                outputData[destIndex + 1] = data[srcIndex + 1];
+                outputData[destIndex + 2] = data[srcIndex + 2]; 
+                outputData[destIndex + 3] = data[srcIndex + 3]; 
             }
         }
     }
@@ -257,10 +257,44 @@
                 let srcIndex = (y * width + srcX) * 4;
                 let destIndex = (y * width + x) * 4;
 
-                outputData[destIndex] = data[srcIndex];       // R
-                outputData[destIndex + 1] = data[srcIndex + 1]; // G
-                outputData[destIndex + 2] = data[srcIndex + 2]; // B
-                outputData[destIndex + 3] = data[srcIndex + 3]; // A
+                outputData[destIndex] = data[srcIndex];     
+                outputData[destIndex + 1] = data[srcIndex + 1];
+                outputData[destIndex + 2] = data[srcIndex + 2]; 
+                outputData[destIndex + 3] = data[srcIndex + 3]; 
+            }
+        }
+    }
+        
+    function boxBlur(data, outputData) {
+        let radius = Math.floor(Numbers.scale(globals.mouseX, 0, width, 1, 5));
+
+        const src = data;
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0, count = 0;
+
+                for (let dy = -radius; dy <= radius; dy++) {
+                    for (let dx = -radius; dx <= radius; dx++) {
+                        const nx = x + dx;
+                        const ny = y + dy;
+
+                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                            const idx = (ny * width + nx) * 4;
+                            r += src[idx];
+                            g += src[idx + 1];
+                            b += src[idx + 2];
+                            a += src[idx + 3];
+                            count++;
+                        }
+                    }
+                }
+
+                const i = (y * width + x) * 4;
+                outputData[i]     = r / count;
+                outputData[i + 1] = g / count;
+                outputData[i + 2] = b / count;
+                outputData[i + 3] = a / count;
             }
         }
     }
