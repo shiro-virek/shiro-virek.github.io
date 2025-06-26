@@ -12,7 +12,6 @@
 	let ALL_SIN = false;
 
 	let objects = [];
-	let clicking = false;
 	
 	class Color {
 		constructor(r, g, b, a) {
@@ -105,31 +104,6 @@
 	}
 
 	let addEvents = () => {
-		canvas.addEventListener('mousemove', e => {
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-			clicking = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('mousedown', e => {
-			clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			clicking = false;
-		}, false);
 	}
 
 	let init = () => {
@@ -163,7 +137,7 @@
 		}
 	}
 
-	let trackMouse = (mouseX, mouseY) => {
+	window.trackMouse = (mouseX, mouseY) => {
 		if (clicking)
 			addFire(mouseX, mouseY, true);
 	}

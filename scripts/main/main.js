@@ -10,7 +10,8 @@ let lastRender = 0;
 let uploader;
 let uploadButton;
 let clicking = false;  
-let mouseMoved = false
+let mouseMoved = false;
+let touches = null;
 
 width = window.innerWidth;
 height = window.innerHeight;
@@ -46,6 +47,7 @@ let initCanvas = () => {
 
     canvas.addEventListener('touchstart', function (e) {
         mouseMoved = false; 
+		touches = e.touches;
 		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
         clicking = true;
     });
@@ -53,6 +55,7 @@ let initCanvas = () => {
     canvas.addEventListener('touchmove', function (e) {
         e.preventDefault();
         mouseMoved = true;
+		touches = e.touches;
 		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
     });
 

@@ -32,8 +32,6 @@
         randomize: true,
         FOV: 10000,
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
-        clicking: false,
-        mouseMoved: false
     };    
 
     class ThreeDWorld {

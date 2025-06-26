@@ -20,8 +20,6 @@
 
 	let functionExecute;
 
-	let clicking = false;
-
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
 
@@ -48,31 +46,6 @@
 	}
 
 	let addEvents = () => {
-		canvas.addEventListener('mousemove', e => {
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-			clicking = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('mousedown', e => {
-			clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			clicking = false;
-		}, false);   
 	}
 
 	let init = () => {
@@ -82,7 +55,7 @@
 		drawBackground(ctx, canvas);
 	}
 
-	let trackMouse = (xPointer, yPointer) => {
+	window.trackMouse = (xPointer, yPointer) => {
 		if (lastPosX == 0) lastPosX = xPointer;
 		if (lastPosY == 0) lastPosY = yPointer;
 

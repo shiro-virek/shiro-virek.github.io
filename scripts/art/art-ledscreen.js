@@ -11,8 +11,6 @@
     let ledDiameter = 20;
     let hue = 150;
     let ledScreen;
-
-	let clicking = false;
     
     const Figures = Object.freeze({
 		Square: Symbol("square"),
@@ -102,34 +100,9 @@
     }
 
     let addEvents = () => {        
-        canvas.addEventListener('mousemove', e => {
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-			clicking = true;
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('mousedown', e => {
-			clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			clicking = false;
-		}, false);   
     }
 
-    let trackMouse = (xMouse, yMouse) => {
+    window.trackMouse = (xMouse, yMouse) => {
         if (clicking)
             ledScreen.setPixel(xMouse, yMouse);
     }

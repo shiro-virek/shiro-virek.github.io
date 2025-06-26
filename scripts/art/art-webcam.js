@@ -7,8 +7,6 @@
 
     const config = {
         randomize: true,
-        clicking: false,
-        mouseMoved: false, 
         mode: 1,
         functionIndex: 1,
         functions: [negative,ripple]

@@ -70,8 +70,6 @@
         FOV: 10000,
         drawEdges: globals.random.nextBool(),
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
-        clicking: false,
-        mouseMoved: false,
     };    
 
     class ThreeDWorld {
