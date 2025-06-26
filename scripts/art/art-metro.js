@@ -559,8 +559,6 @@
 		window.requestAnimationFrame(loop);
 	}
 
-	init();
-
 	window.clearCanvas = () => {  
 		globals.metroNetwork.lines = [];
 		generatePalette();
@@ -570,4 +568,10 @@
 		window.clearCanvas();
 		globals.metroNetwork.generateNetwork();
 	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

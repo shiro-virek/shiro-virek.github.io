@@ -388,9 +388,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-
     window.clearCanvas = () => {  
         randomize();
     }
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();
 }

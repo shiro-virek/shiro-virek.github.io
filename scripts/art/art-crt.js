@@ -183,47 +183,12 @@
     }
 
     let addEvents = () => {
-
         canvas.addEventListener('click', e => {
             crtScreen.turnOn();
         }, false);
 
         window.addEventListener('resize', () => {
             init(); 
-        });
-
-        const uploader = document.getElementById('uploader');
-        const uploadButton = document.getElementById('uploadButton');
-
-        uploadButton.addEventListener('click', function() {
-            uploader.click();
-        });
-
-        uploader.addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const file = e.target.files[0];
-                
-                if (!file.type.match('image.*')) {
-                    alert('Please select an image file');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                
-                reader.onload = function(event) {                    
-                    img.onerror = function() {
-                        alert('Error loading image');
-                    };
-                
-                    loadImage(event.target.result, 1);
-                };
-                
-                reader.onerror = function() {
-                    alert('Error reading file');
-                };
-                
-                reader.readAsDataURL(file);
-            }
         });
     }
 
@@ -249,6 +214,38 @@
 
     init();
 
-	window.clearCanvas = () => {  
+    window.clearCanvas = () => {
+		Sound.error();
+    }
+
+	window.magic = () => {  
+		Sound.error();
 	}
+
+    window.upload = () => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                img.onerror = function() {
+                    alert('Error loading image');
+                };
+            
+                loadImage(event.target.result, 1);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
 }

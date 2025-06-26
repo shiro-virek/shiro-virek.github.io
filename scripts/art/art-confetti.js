@@ -169,10 +169,18 @@
 		window.requestAnimationFrame(loop);
 	}
 
-	init();
-
 	window.clearCanvas = () => {		
 		objects = [];
 		addParticles();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+	
+	init();
 }

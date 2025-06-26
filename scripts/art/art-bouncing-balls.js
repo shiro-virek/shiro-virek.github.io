@@ -207,9 +207,17 @@
 		window.requestAnimationFrame(loop);
 	}
 
-	init();
-
 	window.clearCanvas = () => {		
 		globals.ballCollection = new BallCollection();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

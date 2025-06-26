@@ -7,6 +7,8 @@ let lastPosX = 0;
 let canvas;
 let ctx;
 let lastRender = 0;
+let uploader;
+let uploadButton;
 
 width = window.innerWidth;
 height = window.innerHeight;
@@ -28,6 +30,12 @@ let drawBackground = (ctx, canvas) => {
 }
 
 let initCanvas = () => {
+    uploader = document.getElementById('uploader');
+    uploadButton = document.getElementById('uploadButton');
+
+    uploadButton.addEventListener('click', function() {
+        uploader.click();
+    });
     canvas = document.getElementById(Screen.CANVAS_ID);
     if (canvas.getContext) {
         ctx = canvas.getContext('2d', { willReadFrequently: true })

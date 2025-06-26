@@ -154,9 +154,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-    
 	window.clearCanvas = () => {		
         ledScreen.generateLeds();  
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();
 }

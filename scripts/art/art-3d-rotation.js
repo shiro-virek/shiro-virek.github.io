@@ -363,9 +363,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-    
 	window.clearCanvas = () => {		
         world.figures = [];
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();    
 }

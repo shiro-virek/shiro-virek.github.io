@@ -123,9 +123,17 @@
 		}
 	}
 
-	init();
-
 	window.clearCanvas = () => {
 		initCanvas();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

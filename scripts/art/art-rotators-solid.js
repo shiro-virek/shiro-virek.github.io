@@ -126,11 +126,17 @@
 		angle += ANGLE_ROTATION;
 	}
 
-	angle = 0;
-
-	init();
-
 	window.clearCanvas = () => {
 		initCanvas();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+	init();
 }

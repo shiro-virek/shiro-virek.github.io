@@ -313,8 +313,17 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-
 	window.clearCanvas = () => {
+		Sound.error();
 	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
+
+    init();
 }

@@ -261,9 +261,18 @@
 		lastRender = timestamp;
 		window.requestAnimationFrame(loop);
 	}
+	
+	window.clearCanvas = () => {
+		Sound.error();
+	}
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = () => {
+		Sound.error();
+    }
 
 	init();
-
-	window.clearCanvas = () => {  
-	}
 }
