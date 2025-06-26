@@ -137,9 +137,6 @@
 	}
 
 	let addEvents = () => {
-		canvas.addEventListener('touchstart', function (e) {
-			e.preventDefault();
-		});
 	}
 
 	let init = () => {
