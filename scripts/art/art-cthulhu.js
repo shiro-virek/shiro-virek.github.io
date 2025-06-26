@@ -137,6 +137,9 @@
 	}
 
 	let addEvents = () => {
+		canvas.addEventListener('touchstart', function (e) {
+			e.preventDefault();
+		});
 	}
 
 	let init = () => {
@@ -207,7 +210,7 @@
 			clientY: 350,
 		});
 
-		Objects.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
+		Touch.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
 	}
 
 	window.trackMouse = (x, y) => {
