@@ -240,20 +240,9 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('mousemove', e => {
-			trackMouse(e.offsetX, e.offsetY);
-		}, false);
-
-		canvas.addEventListener('touchstart', function (e) {
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
-
-		canvas.addEventListener('touchmove', function (e) {
-			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
-		});
     }
 
-    let trackMouse = (xMouse, yMouse) => {
+    window.trackMouse = (xMouse, yMouse) => {
         if (clicking){
             if (lastPosX == 0) lastPosX = xMouse;
             if (lastPosY == 0) lastPosY = yMouse;

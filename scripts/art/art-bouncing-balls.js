@@ -206,6 +206,9 @@
 		lastRender = timestamp;
 		window.requestAnimationFrame(loop);
 	}
+	
+    window.trackMouse = (xMouse, yMouse) => {
+    }
 
 	window.clearCanvas = () => {		
 		globals.ballCollection = new BallCollection();

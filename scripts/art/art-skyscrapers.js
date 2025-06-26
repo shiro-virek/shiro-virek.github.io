@@ -645,6 +645,9 @@
 		window.requestAnimationFrame(loop);
 	}
 
+    window.trackMouse = (xMouse, yMouse) => {
+    }
+	
 	window.clearCanvas = () => {
 		globals.city.buildings = []; 
 		globals.city.buildingsCount = 0;

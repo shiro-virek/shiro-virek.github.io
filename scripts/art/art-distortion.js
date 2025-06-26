@@ -356,8 +356,6 @@
         window.requestAnimationFrame(loop);
     }
 
-    init();
-
     window.clearCanvas = () => {
 		Sound.error();
     }
@@ -392,4 +390,6 @@
             reader.readAsDataURL(file);
         }
     }
+
+    init();
 }

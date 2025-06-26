@@ -388,6 +388,9 @@
         window.requestAnimationFrame(loop);
     }
 
+    window.trackMouse = (xMouse, yMouse) => {
+    }
+    
     window.clearCanvas = () => {  
         randomize();
     }

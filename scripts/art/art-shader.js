@@ -131,6 +131,9 @@
         globals.startTime = Date.now();
     }
 
+    window.trackMouse = (xMouse, yMouse) => {
+    }
+    
     window.clearCanvas = () => {
         Sound.error();
     }

@@ -212,8 +212,9 @@
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
     }
-
-    init();
+    
+    window.trackMouse = (xMouse, yMouse) => {
+    }
 
     window.clearCanvas = () => {
 		Sound.error();
@@ -249,4 +250,6 @@
             reader.readAsDataURL(file);
         }
     }
+
+    init();
 }

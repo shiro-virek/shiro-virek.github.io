@@ -216,6 +216,9 @@
         requestAnimationFrame(loop);
     }
 
+    window.trackMouse = (xMouse, yMouse) => {
+    }
+    
 	window.clearCanvas = () => {		
 		globals.balls = [];
 	}
