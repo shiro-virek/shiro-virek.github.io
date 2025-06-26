@@ -1,43 +1,41 @@
 {
 	const globals = {
-		random: null
+		random: null,
+		angle: 0,
+		colorShift: 0,
+		rotatorsLengths: [],
+		rotatorsAngles: [],
     };
 
-	let angle = 0;
-
-	let colorShift = 0;
-
-	let rotatorsLengths = [];
-	let rotatorsAngles = [];
-
-	let OPACITY = 0.5;
-	let THICKNESS = 1;
-
-	let ANGLE_ROTATION = 10;
-
-	let COLOR_MAP_MAX = 500;
-	let ROTATORS = 3;
+    const config = { 
+        randomize: true,
+		opacity: 0.5,
+		thickness: 1,
+		angleRotation: 10,
+		colorMapMax: 500,
+		rotators: 3,
+    };
 
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
 
-		OPACITY = globals.random.nextRange(0.03, 0.1, 2);
-		THICKNESS = globals.random.nextInt(1, 20);
-		ANGLE_ROTATION = globals.random.nextInt(0, 20);
-		COLOR_MAP_MAX = globals.random.nextInt(1, 10000);
+		config.opacity = globals.random.nextRange(0.03, 0.1, 2);
+		config.thickness = globals.random.nextInt(1, 20);
+		config.angleRotation = globals.random.nextInt(0, 20);
+		config.colorMapMax = globals.random.nextInt(1, 10000);
 
 		colorShift = globals.random.nextInt(0, 359);
 
-		ROTATORS = globals.random.nextInt(0, 100);
+		config.rotators = globals.random.nextInt(0, 100);
 
 		let rotatorsLength = 0
 		let rotatorsAngle = 0;
 
-		for (let i = 0; i < ROTATORS - 1; i++) {
+		for (let i = 0; i < config.rotators - 1; i++) {
 			rotatorsLength += globals.random.nextInt(300, 1000)
 			rotatorsAngle += globals.random.nextInt(0, 180);
-			rotatorsLengths.push(rotatorsLength);
-			rotatorsAngles.push(rotatorsAngle);
+			globals.rotatorsLengths.push(rotatorsLength);
+			globals.rotatorsAngles.push(rotatorsAngle);
 		}
 	}
 
@@ -45,8 +43,8 @@
 	}
 
 	let init = () => {
-		initCanvas();
-		randomize();
+		initCanvas();		
+        if (config.randomize) randomize();
 		addEvents();
 		drawBackground(ctx, canvas);
 	}
@@ -66,33 +64,33 @@
 	let draw = (xPointer, yPointer) => {
 
 		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
-		let hue = Numbers.scale(distance, 0, 360, 0, COLOR_MAP_MAX);
+		let hue = Numbers.scale(distance, 0, 360, 0, config.colorMapMax);
 
 		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 
-		let color = `hsl(${hue}, 100%, 50%, ${OPACITY})`;
+		let color = `hsl(${hue}, 100%, 50%, ${config.opacity})`;
 
-		let lineWidth = Numbers.scale(distance, 1, 400, 1, THICKNESS);
+		let lineWidth = Numbers.scale(distance, 1, 400, 1, config.thickness);
 
 		Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
 
-		let angleRad = angle * Trigonometry.RAD_CONST;
+		let angleRad = globals.angle * Trigonometry.RAD_CONST;
 
 		Drawing.drawLine(ctx, xPointer, yPointer,
 			xPointer + parseInt(distance * Math.cos(angleRad)),
 			yPointer + parseInt(distance * Math.sin(angleRad)),
 			lineWidth, color);
 
-		if (ROTATORS > 0)
-			for (let i = 0; i < ROTATORS - 1; i++) {
-				let angleRad2 = (angle + rotatorsAngles[i]) * Trigonometry.RAD_CONST;
+		if (config.rotators > 0)
+			for (let i = 0; i < config.rotators - 1; i++) {
+				let angleRad2 = (globals.angle + globals.rotatorsAngles[i]) * Trigonometry.RAD_CONST;
 				Drawing.drawLine(ctx, xPointer, yPointer,
-					xPointer + parseInt((distance * rotatorsLengths[i]) * Math.cos(angleRad2)),
-					yPointer + parseInt((distance * rotatorsLengths[i]) * Math.sin(angleRad2)),
+					xPointer + parseInt((distance * globals.rotatorsLengths[i]) * Math.cos(angleRad2)),
+					yPointer + parseInt((distance * globals.rotatorsLengths[i]) * Math.sin(angleRad2)),
 					lineWidth, color);
 			}
 
-		angle += ANGLE_ROTATION;
+		globals.angle += config.angleRotation;
 	}
 
 	window.clearCanvas = () => {
