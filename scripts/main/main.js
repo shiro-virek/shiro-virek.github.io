@@ -36,7 +36,7 @@ let initCanvas = () => {
     uploadButton.addEventListener('click', function() {
         uploader.click();
     });
-    canvas = document.getElementById(Screen.CANVAS_ID);
+    canvas = document.getElementById("myCanvas");
     if (canvas.getContext) {
         ctx = canvas.getContext('2d', { willReadFrequently: true })
         drawBackground(ctx, canvas);
