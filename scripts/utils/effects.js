@@ -216,6 +216,54 @@ class Effects {
         }
     }    
 
+    static separableBoxBlur = (data, outputData, radius) => {
+        const tmp = new Uint8ClampedArray(data.length);
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0, count = 0;
+                for (let dx = -radius; dx <= radius; dx++) {
+                    let nx = x + dx;
+                    if (nx >= 0 && nx < width) {
+                        const idx = (y * width + nx) * 4;
+                        r += data[idx];
+                        g += data[idx + 1];
+                        b += data[idx + 2];
+                        a += data[idx + 3];
+                        count++;
+                    }
+                }
+                const i = (y * width + x) * 4;
+                tmp[i]     = r / count;
+                tmp[i + 1] = g / count;
+                tmp[i + 2] = b / count;
+                tmp[i + 3] = a / count;
+            }
+        }
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0, count = 0;
+                for (let dy = -radius; dy <= radius; dy++) {
+                    let ny = y + dy;
+                    if (ny >= 0 && ny < height) {
+                        const idx = (ny * width + x) * 4;
+                        r += tmp[idx];
+                        g += tmp[idx + 1];
+                        b += tmp[idx + 2];
+                        a += tmp[idx + 3];
+                        count++;
+                    }
+                }
+                const i = (y * width + x) * 4;
+                outputData[i]     = r / count;
+                outputData[i + 1] = g / count;
+                outputData[i + 2] = b / count;
+                outputData[i + 3] = a / count;
+            }
+        }
+    }
+
     static boxBlur = (data, outputData, radius) => {
         const src = data;
 
@@ -246,6 +294,71 @@ class Effects {
                 outputData[i + 3] = a / count;
             }
         }
+    }
+
+    static gaussianBlur = (data, outputData, radius, sigma) =>  {
+        const src = data;
+        const tmp = new Uint8ClampedArray(src.length);
+
+        const kernel = Effects.createGaussianKernel(radius, sigma);
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0, wSum = 0;
+                for (let k = -radius; k <= radius; k++) {
+                    const nx = x + k;
+                    if (nx >= 0 && nx < width) {
+                        const weight = kernel[k + radius];
+                        const idx = (y * width + nx) * 4;
+                        r += src[idx]     * weight;
+                        g += src[idx + 1] * weight;
+                        b += src[idx + 2] * weight;
+                        a += src[idx + 3] * weight;
+                        wSum += weight;
+                    }
+                }
+                const i = (y * width + x) * 4;
+                tmp[i]     = r / wSum;
+                tmp[i + 1] = g / wSum;
+                tmp[i + 2] = b / wSum;
+                tmp[i + 3] = a / wSum;
+            }
+        }
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0, wSum = 0;
+                for (let k = -radius; k <= radius; k++) {
+                    const ny = y + k;
+                    if (ny >= 0 && ny < height) {
+                        const weight = kernel[k + radius];
+                        const idx = (ny * width + x) * 4;
+                        r += tmp[idx]     * weight;
+                        g += tmp[idx + 1] * weight;
+                        b += tmp[idx + 2] * weight;
+                        a += tmp[idx + 3] * weight;
+                        wSum += weight;
+                    }
+                }
+                const i = (y * width + x) * 4;
+                outputData[i]     = r / wSum;
+                outputData[i + 1] = g / wSum;
+                outputData[i + 2] = b / wSum;
+                outputData[i + 3] = a / wSum;
+            }
+        }
+    }
+
+    static createGaussianKernel = (radius, sigma) => {
+        const kernel = [];
+        let sum = 0;
+        for (let x = -radius; x <= radius; x++) {
+            const weight = Math.exp(-(x * x) / (2 * sigma * sigma));
+            kernel.push(weight);
+            sum += weight;
+        }
+        
+        return kernel.map(w => w / sum);
     }
     
 }
