@@ -20,8 +20,7 @@
     let yPositionFunctions = [];
     let angleFunctions = [];
     let alphaFunctions = [];
-
-	let clicking = false;    
+ 
 
     const Figures = Object.freeze({
 		Square: Symbol("square"),
@@ -248,26 +247,12 @@
 		}, false);
 
 		canvas.addEventListener('touchstart', function (e) {
-			clicking = true;
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
 
 		canvas.addEventListener('touchmove', function (e) {
-			e.preventDefault();
 			trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		});
-
-		canvas.addEventListener('mousedown', e => {
-			clicking = true;
-		}, false);
-
-		canvas.addEventListener('mouseup', e => {
-			clicking = false;
-		}, false);
-
-		canvas.addEventListener('touchend', e => {
-			clicking = false;
-		}, false);   
     }
 
     let trackMouse = (xMouse, yMouse) => {
