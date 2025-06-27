@@ -8,9 +8,9 @@
 
     const config = {
         randomize: true,
-        damping: 0.99,
+        damping: 0.90,
         light: [-0.6, -0.6, 0.5],
-        radius: 40,
+        radius: 30,
     };    
 
     function drawDepression(cx, cy) {
@@ -113,10 +113,10 @@
         if (lastPosY == 0) lastPosY = y;
 
         if (clicking) {  
-            const rect = canvas.getBoundingClientRect();
-            const x1 = Math.floor((x - rect.left) * (width / rect.width));
-            const y1 = Math.floor((y - rect.top) * (height / rect.height));
-            drawDepression(x1, y1);        
+            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, x, y);
+            for (const p of points) {                
+                drawDepression(p.x, p.y); 
+            }
         }
 
         lastPosX = x;
