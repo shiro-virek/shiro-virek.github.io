@@ -3,7 +3,8 @@
         random: null,
         heightMap: new Float32Array(width * height),
         lightLen: null,
-
+        img: new Image(),
+        baseImageData: null,
     };
 
     const config = {
@@ -12,9 +13,6 @@
         light: [-0.6, -0.6, 0.5],
         radius: 30,
     };    
-
-let baseImageData = null;
-const img = new Image();
 
     function drawDepression(cx, cy) {
         for (let y = -config.radius; y <= config.radius; y++) {
@@ -54,15 +52,15 @@ const img = new Image();
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 
-        img.src = '../assets/Picture1.jpg';  
-        img.crossOrigin = "Anonymous";
+        globals.img.src = '../assets/Picture1.jpg';  
+        globals.img.crossOrigin = "Anonymous";
 
-        img.onload = () => {
-            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(img, canvas);
+        globals.img.onload = () => {
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, canvas);
             
-            ctx.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+            ctx.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
-            baseImageData = ctx.getImageData(0, 0, width, height);
+            globals.baseImageData = ctx.getImageData(0, 0, width, height);
             requestAnimationFrame(loop);
         };
 
@@ -78,7 +76,6 @@ const img = new Image();
         config.damping = globals.random.nextRange(0.3, 0.99);
         config.radius = globals.random.nextInt(20, 50);
     }
-
     
     let draw = () => {
         drawBackground(ctx, canvas);
@@ -87,7 +84,10 @@ const img = new Image();
 
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
-        const base = baseImageData.data;
+                
+        if (!globals.baseImageData) return;
+
+        const base = globals.baseImageData.data;
 
         for (let y = 1; y < height - 1; y++) {
             for (let x = 1; x < width - 1; x++) {
@@ -153,7 +153,30 @@ const img = new Image();
 	}
 
     window.upload = (e) => {
-		Sound.error();        
+		if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                globals.img.onerror = function() {
+                    alert('Error loading image');
+                };
+                
+                globals.img.src = event.target.result;
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }     
     }
 
     init();
