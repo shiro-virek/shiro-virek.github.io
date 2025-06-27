@@ -3,7 +3,8 @@
         random: null,
         heightMap: new Float32Array(width * height),
         lightLen: null,
-
+        img: new Image(),
+        baseImageData: null,
     };
 
     const config = {
@@ -45,10 +46,24 @@
     }
 
     let init = () => {
-		globals.random = Objects.getRandomObject();
-        if (config.randomize) randomize();
         initCanvas();
         addEvents();
+
+		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
+
+        globals.img.src = '../assets/Picture1.jpg';  
+        globals.img.crossOrigin = "Anonymous";
+
+        globals.img.onload = () => {
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, canvas);
+            
+            ctx.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            globals.baseImageData = ctx.getImageData(0, 0, width, height);
+            requestAnimationFrame(loop);
+        };
+
         globals.lightLen = Math.hypot(...config.light);
         for (let i = 0; i < 3; i++) config.light[i] /= globals.lightLen;
         window.requestAnimationFrame(loop);
@@ -61,7 +76,6 @@
         config.damping = globals.random.nextRange(0.3, 0.99);
         config.radius = globals.random.nextInt(20, 50);
     }
-
     
     let draw = () => {
         drawBackground(ctx, canvas);
@@ -70,31 +84,35 @@
 
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
+                
+        if (!globals.baseImageData) return;
+
+        const base = globals.baseImageData.data;
 
         for (let y = 1; y < height - 1; y++) {
             for (let x = 1; x < width - 1; x++) {
-            const idx = y * width + x;
-            const hL = globals.heightMap[idx - 1];
-            const hR = globals.heightMap[idx + 1];
-            const hU = globals.heightMap[idx - width];
-            const hD = globals.heightMap[idx + width];
+                const idx = y * width + x;
+                const hL = globals.heightMap[idx - 1];
+                const hR = globals.heightMap[idx + 1];
+                const hU = globals.heightMap[idx - width];
+                const hD = globals.heightMap[idx + width];
 
-            const nx = -(hR - hL);
-            const ny = -(hD - hU);
-            const nz = 1.0;
+                const nx = -(hR - hL);
+                const ny = -(hD - hU);
+                const nz = 1.0;
 
-            const length = Math.hypot(nx, ny, nz);
-            const n = [nx / length, ny / length, nz / length];
+                const length = Math.hypot(nx, ny, nz);
+                const n = [nx / length, ny / length, nz / length];
 
-            let dot = n[0]*config.light[0] + n[1]*config.light[1] + n[2]*config.light[2];
-            dot = Math.max(0, Math.min(1, dot));
+                let dot = n[0]*config.light[0] + n[1]*config.light[1] + n[2]*config.light[2];
+                dot = Math.max(0, Math.min(1, dot));
 
-            const c = Math.floor(dot * 255);
-            const i = (y * width + x) * 4;
-            data[i] = c;
-            data[i + 1] = c;
-            data[i + 2] = c;
-            data[i + 3] = 255;
+                const c = Math.floor(dot * 255);
+                const i = (y * width + x) * 4;
+                data[i]     = base[i] * dot;
+                data[i + 1] = base[i + 1] * dot;
+                data[i + 2] = base[i + 2] * dot;
+                data[i + 3] = 255;
             }
         }
 
@@ -135,7 +153,30 @@
 	}
 
     window.upload = (e) => {
-		Sound.error();        
+		if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                globals.img.onerror = function() {
+                    alert('Error loading image');
+                };
+                
+                globals.img.src = event.target.result;
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }     
     }
 
     init();

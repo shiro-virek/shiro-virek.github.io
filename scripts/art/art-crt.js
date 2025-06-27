@@ -125,23 +125,8 @@
             globals.canvasImg.width = config.crtColumns;
             globals.canvasImg.height = config.crtRows;
 
-            let newImgHeight = 0;
-            let newImgWidth = 0;
-            let newOriginX = 0;
-            let newOriginY = 0;
-
-            if (globals.canvasImg.width > globals.canvasImg.height) {
-                newImgHeight = globals.canvasImg.height;
-                newImgWidth = globals.canvasImg.height * globals.img.width / globals.img.height;
-                newOriginY = 0;
-                newOriginX = globals.canvasImg.width / 2 - (newImgWidth / 2);
-            } else {
-                newImgWidth = globals.canvasImg.width;
-                newImgHeight = newImgWidth * globals.img.height / globals.img.width;
-                newOriginX = 0;
-                newOriginY = globals.canvasImg.height / 2 - (newImgHeight / 2);
-            }
-
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
+            
             globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
             globals.imgData = globals.ctxImg.getImageData(0, 0, config.crtColumns, config.crtRows).data;
