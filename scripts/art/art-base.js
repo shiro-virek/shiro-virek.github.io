@@ -20,18 +20,6 @@
 
     let randomize = () => {
     }
-
-    let trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
-        if (clicking) {  
-
-        }
-
-        lastPosX = x;
-        lastPosY = y;
-    }
     
     let draw = () => {
         drawBackground(ctx, canvas);
@@ -46,6 +34,18 @@
         window.requestAnimationFrame(loop);
     }
 
+    window.trackMouse = (x, y) => {
+        if (lastPosX == 0) lastPosX = x;
+        if (lastPosY == 0) lastPosY = y;
+
+        if (clicking) {  
+
+        }
+
+        lastPosX = x;
+        lastPosY = y;
+    }
+    
     window.clearCanvas = () => {
 		Sound.error();
     }
