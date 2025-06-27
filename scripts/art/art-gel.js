@@ -58,23 +58,8 @@ const img = new Image();
         img.crossOrigin = "Anonymous";
 
         img.onload = () => {
-            let newImgHeight = 0;
-            let newImgWidth = 0;
-            let newOriginX = 0;
-            let newOriginY = 0;
-
-            if (width > height) {
-                newImgHeight = height;
-                newImgWidth = newImgHeight * img.width / img.height;
-                newOriginY = 0;
-                newOriginX = halfWidth - (newImgWidth / 2);
-            } else {
-                newImgWidth = width;
-                newImgHeight = newImgWidth * img.height / img.width;
-                newOriginX = 0;
-                newOriginY = halfHeight - (newImgHeight / 2);
-            }
-
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(img);
+            
             ctx.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
             baseImageData = ctx.getImageData(0, 0, width, height);
