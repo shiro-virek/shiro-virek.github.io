@@ -28,6 +28,7 @@ const art = [
                 "noise",
                 "tree",
                 "blinkenlights-mono",
+                "gel"
             ];
 const scripts = [];
 
