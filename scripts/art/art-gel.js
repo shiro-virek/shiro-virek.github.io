@@ -113,7 +113,8 @@
         if (lastPosY == 0) lastPosY = y;
 
         if (clicking) {  
-            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, x, y);
+            //let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, x, y);
+            let points = Trigonometry.pointsInterpolation(lastPosX, lastPosY, x, y, 10);
             for (const p of points) {                
                 drawDepression(p.x, p.y); 
             }

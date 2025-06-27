@@ -64,6 +64,20 @@ class Trigonometry {
         ];
     }
 
+    static pointsInterpolation = (x1, y1, x2, y2, pointsNumber) => {
+        const points = [];
+
+        for (let i = 0; i <= pointsNumber; i++) {
+            let t = i / pointsNumber;
+            let x = x1 + t * (x2 - x1);
+            let y = y1 + t * (y2 - y1);
+
+            points.push({x: Math.floor(x), y: Math.floor(y)});
+        }
+
+        return points;
+    }
+
     static bresenhamLine = (x1, y1, x2, y2) => {
         const points = [];
 
