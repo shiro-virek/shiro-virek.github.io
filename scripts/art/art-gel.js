@@ -58,6 +58,8 @@
     }
 
     let randomize = () => {
+        config.damping = globals.random.nextRange(0.3, 0.99);
+        config.radius = globals.random.nextInt(20, 50);
     }
 
     
