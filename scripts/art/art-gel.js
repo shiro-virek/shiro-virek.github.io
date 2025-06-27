@@ -13,6 +13,9 @@
         radius: 30,
     };    
 
+let baseImageData = null;
+const img = new Image();
+
     function drawDepression(cx, cy) {
         for (let y = -config.radius; y <= config.radius; y++) {
             for (let x = -config.radius; x <= config.radius; x++) {
@@ -45,10 +48,39 @@
     }
 
     let init = () => {
-		globals.random = Objects.getRandomObject();
-        if (config.randomize) randomize();
         initCanvas();
         addEvents();
+
+		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
+
+        img.src = '../assets/Picture1.jpg';  
+        img.crossOrigin = "Anonymous";
+
+        img.onload = () => {
+            let newImgHeight = 0;
+            let newImgWidth = 0;
+            let newOriginX = 0;
+            let newOriginY = 0;
+
+            if (width > height) {
+                newImgHeight = height;
+                newImgWidth = newImgHeight * img.width / img.height;
+                newOriginY = 0;
+                newOriginX = halfWidth - (newImgWidth / 2);
+            } else {
+                newImgWidth = width;
+                newImgHeight = newImgWidth * img.height / img.width;
+                newOriginX = 0;
+                newOriginY = halfHeight - (newImgHeight / 2);
+            }
+
+            ctx.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            baseImageData = ctx.getImageData(0, 0, width, height);
+            requestAnimationFrame(loop);
+        };
+
         globals.lightLen = Math.hypot(...config.light);
         for (let i = 0; i < 3; i++) config.light[i] /= globals.lightLen;
         window.requestAnimationFrame(loop);
@@ -70,31 +102,32 @@
 
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
+        const base = baseImageData.data;
 
         for (let y = 1; y < height - 1; y++) {
             for (let x = 1; x < width - 1; x++) {
-            const idx = y * width + x;
-            const hL = globals.heightMap[idx - 1];
-            const hR = globals.heightMap[idx + 1];
-            const hU = globals.heightMap[idx - width];
-            const hD = globals.heightMap[idx + width];
+                const idx = y * width + x;
+                const hL = globals.heightMap[idx - 1];
+                const hR = globals.heightMap[idx + 1];
+                const hU = globals.heightMap[idx - width];
+                const hD = globals.heightMap[idx + width];
 
-            const nx = -(hR - hL);
-            const ny = -(hD - hU);
-            const nz = 1.0;
+                const nx = -(hR - hL);
+                const ny = -(hD - hU);
+                const nz = 1.0;
 
-            const length = Math.hypot(nx, ny, nz);
-            const n = [nx / length, ny / length, nz / length];
+                const length = Math.hypot(nx, ny, nz);
+                const n = [nx / length, ny / length, nz / length];
 
-            let dot = n[0]*config.light[0] + n[1]*config.light[1] + n[2]*config.light[2];
-            dot = Math.max(0, Math.min(1, dot));
+                let dot = n[0]*config.light[0] + n[1]*config.light[1] + n[2]*config.light[2];
+                dot = Math.max(0, Math.min(1, dot));
 
-            const c = Math.floor(dot * 255);
-            const i = (y * width + x) * 4;
-            data[i] = c;
-            data[i + 1] = c;
-            data[i + 2] = c;
-            data[i + 3] = 255;
+                const c = Math.floor(dot * 255);
+                const i = (y * width + x) * 4;
+                data[i]     = base[i] * dot;
+                data[i + 1] = base[i + 1] * dot;
+                data[i + 2] = base[i + 2] * dot;
+                data[i + 3] = 255;
             }
         }
 
