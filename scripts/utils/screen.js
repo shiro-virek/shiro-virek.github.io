@@ -1,20 +1,20 @@
 class Screen {
-    static adaptImageToScreen = (img) => {
+    static adaptImageToScreen = (img, canvas) => {
         let newImgHeight = 0;
         let newImgWidth = 0;
         let newOriginX = 0;
         let newOriginY = 0;
 
-        if (width > height) {
-            newImgHeight = height;
+        if (canvas.width > canvas.height) {
+            newImgHeight = canvas.height;
             newImgWidth = newImgHeight * img.width / img.height;
             newOriginY = 0;
-            newOriginX = halfWidth - (newImgWidth / 2);
+            newOriginX = (canvas.width / 2) - (newImgWidth / 2);
         } else {
-            newImgWidth = width;
+            newImgWidth = canvas.width;
             newImgHeight = newImgWidth * img.height / img.width;
             newOriginX = 0;
-            newOriginY = halfHeight - (newImgHeight / 2);
+            newOriginY = (canvas.height / 2) - (newImgHeight / 2);
         }
 
         return { newImgHeight, newImgWidth, newOriginX, newOriginY}

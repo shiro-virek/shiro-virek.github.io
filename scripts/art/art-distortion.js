@@ -15,10 +15,9 @@
         mouseY: 0,
         lastPosX: 0,
         lastPosY: 0,
-        random: null
+        random: null,
+        img: new Image(),
     };
-
-    const img = new Image();
 
     function pincushion(data, outputData) {
         const radius = config.mode ? globals.mouseY : config.radius; 
@@ -102,15 +101,10 @@
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 
-        img.src = '../assets/Picture1.jpg';
-        img.crossOrigin = "Anonymous";
+        globals.img.src = '../assets/Picture1.jpg';
+        globals.img.crossOrigin = "Anonymous";
 
-        img.onload = function () {
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            trackMouse(0, 0);
-
+        globals.img.onload = function () {
             addEvents();
             window.requestAnimationFrame(loop)
         };
@@ -138,24 +132,9 @@
     let draw = () => {
         drawBackground(ctx, canvas);
 
-        let newImgHeight = 0;
-        let newImgWidth = 0;
-        let newOriginX = 0;
-        let newOriginY = 0;
-
-        if (width > height) {
-            newImgHeight = height;
-            newImgWidth = newImgHeight * img.width / img.height;
-            newOriginY = 0;
-            newOriginX = halfWidth - (newImgWidth / 2);
-        } else {
-            newImgWidth = width;
-            newImgHeight = newImgWidth * img.height / img.width;
-            newOriginX = 0;
-            newOriginY = halfHeight - (newImgHeight / 2);
-        }
-
-        ctx.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+        const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, canvas);
+            
+        ctx.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
@@ -207,11 +186,11 @@
             const reader = new FileReader();
             
             reader.onload = function(event) {                    
-                img.onerror = function() {
+                globals.img.onerror = function() {
                     alert('Error loading image');
                 };
                 
-                img.src = event.target.result;
+                globals.img.src = event.target.result;
             };
             
             reader.onerror = function() {

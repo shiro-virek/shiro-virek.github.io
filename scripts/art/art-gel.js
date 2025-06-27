@@ -58,7 +58,7 @@ const img = new Image();
         img.crossOrigin = "Anonymous";
 
         img.onload = () => {
-            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(img);
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(img, canvas);
             
             ctx.drawImage(img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
