@@ -27,7 +27,25 @@
 		rotationIncrement: 0.5,
 		tentaclesCount: 5,
 		hue: 0,
+        functionIndex: 1,
+        functions: [circle, pentagon, hexagon, square] 
     };
+
+	function circle(color, i){
+		Drawing.drawCircle(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, color, color);
+	}
+		
+	function square(color, i){
+		Drawing.drawSquare(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 0, color, color);
+	}
+
+	function hexagon(color, i){
+		Drawing.drawPolygon(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 5, 0, color, color)
+	}
+
+	function pentagon(color, i){
+		Drawing.drawPolygon(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 6, 0, color, color)
+	}
 
 	class Slice {
 
@@ -132,6 +150,7 @@
 		config.centerMovementSpeed = globals.random.nextInt(1, 5);
 		config.maxDistanceToCenter = globals.random.nextInt(0, 60);
 		config.tentaclesMovement = globals.random.nextBool();
+        config.functionIndex = globals.random.nextInt(0, config.functions.length);
 
 		globals.ringIterations = config.slicesCount / config.ringsDistance * config.tentaclesCount;
 	}
@@ -175,7 +194,9 @@
 			else
 				color = `hsl(${config.hue}, ${config.saturation}%, ${lightness}%)`;
 
-			Drawing.drawCircle(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, color, color);
+
+			const tentacleFunction = config.functions[config.functionIndex];
+			tentacleFunction(color, i);
 		}
 
 		updateRingShift();
