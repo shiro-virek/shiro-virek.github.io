@@ -262,18 +262,9 @@
         globals.semitone.alphaFunction = globals.random.getRandomFromArray(globals.alphaFunctions);
     }
 
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
         globals.semitone.draw(ctx);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
 	window.clearCanvas = () => {

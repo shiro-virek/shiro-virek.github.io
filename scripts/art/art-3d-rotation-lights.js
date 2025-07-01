@@ -287,21 +287,12 @@
         }
     }
     
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
         globals.world.draw();
     }
 
     let randomize = () => {        
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
 	window.clearCanvas = () => {		

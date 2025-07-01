@@ -182,20 +182,10 @@
     
     }
 
-    let draw = () => {
+    window.draw = () => {
+        config.crtScreen.update();
         drawBackground(ctx, canvas);
         config.crtScreen.draw(ctx);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        config.crtScreen.update();
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
     
     window.trackMouse = (xMouse, yMouse) => {

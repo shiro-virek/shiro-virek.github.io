@@ -21,17 +21,8 @@
     let randomize = () => {
     }
     
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
     window.trackMouse = (x, y) => {

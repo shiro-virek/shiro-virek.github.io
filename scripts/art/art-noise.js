@@ -121,19 +121,10 @@
         config.functionIndex = globals.random.nextInt(0, config.functions.length);
     }
     
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
         globals.pixelScreen.draw(ctx);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-        
         globals.time += 0.005;
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
     window.trackMouse = (xMouse, yMouse) => {

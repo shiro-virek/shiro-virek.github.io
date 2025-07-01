@@ -545,20 +545,11 @@
 		generateUrbanAttractors();
 	}
 
-	let draw = () => {
+	window.draw = () => {
 		drawBackground(ctx, canvas);
 		globals.metroNetwork.draw(ctx);
 	}
 
-	let loop = (timestamp) => {
-		let progress = timestamp - lastRender;
-
-		draw();
-
-		lastRender = timestamp;
-		window.requestAnimationFrame(loop);
-	}
-	
     window.trackMouse = (xMouse, yMouse) => {
     }
 

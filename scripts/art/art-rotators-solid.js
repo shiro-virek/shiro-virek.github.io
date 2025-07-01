@@ -58,7 +58,7 @@
 		}
 	}
 
-	let draw = (xPointer, yPointer) => {
+	window.draw = (xPointer, yPointer) => {
 
 		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
 		let hue = Numbers.scale(distance, 0, 360, 0, config.colorMapMax);

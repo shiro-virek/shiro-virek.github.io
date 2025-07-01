@@ -160,12 +160,6 @@
     let addEvents = () => {
     }
 
-    window.trackMouse = (x, y) => {
-        if (clicking) {
-            globals.pixelScreen.activatePixel(x, y);
-        }
-    }
-
     let randomize = () => {
         config.slowDown = globals.random.nextBool();
         config.stopOnBlur = globals.random.nextBool();
@@ -183,20 +177,17 @@
         config.rotate = globals.random.nextBool();
     }
 
-    let draw = () => {
+    window.draw = () => {
+        globals.pixelScreen.update();
+
         drawBackground(ctx, canvas);
         globals.pixelScreen.draw(ctx);
     }
 
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        globals.pixelScreen.update();
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
+    window.trackMouse = (x, y) => {
+        if (clicking) {
+            globals.pixelScreen.activatePixel(x, y);
+        }
     }
 
 	window.clearCanvas = () => {

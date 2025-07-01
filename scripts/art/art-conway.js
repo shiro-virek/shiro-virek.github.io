@@ -158,23 +158,14 @@
         ledScreen = new LedScreen();
     }
 
-    let draw = () => {
+    window.draw = () => {
+        ledScreen.update();
+        
         drawBackground(ctx, canvas);
         ledScreen.draw(ctx);
         ledScreen.copyBuffer();
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        ledScreen.update();
-
-        draw();
 
         Browser.sleep(200);
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
     window.trackMouse = (xMouse, yMouse) => {

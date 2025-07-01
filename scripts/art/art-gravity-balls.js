@@ -167,7 +167,7 @@
         let ball = new Ball(x, y);
         globals.balls.push(ball);
 
-	    Sound.ping(100);
+        Sound.ping(100);
     }
 
     let populateQuadTree = () => {
@@ -175,10 +175,6 @@
         for (const ball of globals.balls) {
             globals.quad.insert(ball);
         }
-    }
-
-    let draw = () => {
-        drawBackground(ctx, canvas, config.opacity);
     }
 
     let addEvents = () => {
@@ -195,10 +191,8 @@
 		config.opacity = globals.random.next(0.1, 1.0);
 	}
 
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
+    window.draw = () => {
+        drawBackground(ctx, canvas, config.opacity);
 
         populateQuadTree();
         
@@ -213,11 +207,6 @@
 
             ball.draw();
         }
-
-
-        lastRender = timestamp;
-
-        requestAnimationFrame(loop);
     }
 
     window.trackMouse = (xMouse, yMouse) => {

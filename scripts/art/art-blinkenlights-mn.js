@@ -386,18 +386,12 @@
         }
     }
 
-    let draw = () => {
+    window.draw = () => {
+        config.cellScreen.update();
+
         drawBackground(ctx, canvas);
         config.cellScreen.draw(ctx);
         config.cellScreen.copyBuffer();
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        config.cellScreen.update();
-
-        draw();
 
         config.mutationCounter++;
         if (config.mutationCounter % 50 === 0) {
@@ -405,9 +399,6 @@
         }
 
         Browser.sleep(globals.random.nextInt(50, 200));
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
