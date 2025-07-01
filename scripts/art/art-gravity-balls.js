@@ -8,6 +8,7 @@
         gravity: 0.5,
         damping: 0.9,
         drawQuadtree: false,
+        opacity: 1,
     };
 
     const globals = {
@@ -175,7 +176,7 @@
     }
 
     let draw = () => {
-        drawBackground(ctx, canvas);
+        drawBackground(ctx, canvas, config.opacity);
     }
 
     let addEvents = () => {
@@ -189,6 +190,7 @@
 		config.randomHue = globals.random.nextBool();
 		config.hue = globals.random.nextInt(0, 255);
 		config.radius = globals.random.nextInt(20, 50);
+		config.opacity = globals.random.next(0.1, 1.0);
 	}
 
     let loop = (timestamp) => {
