@@ -35,15 +35,9 @@
     }
 
     window.trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
         if (clicking) {  
 
         }
-
-        lastPosX = x;
-        lastPosY = y;
     }
     
     window.clearCanvas = () => {

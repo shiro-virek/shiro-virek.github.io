@@ -129,9 +129,6 @@
     }
 
     window.trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
         if (clicking) {  
             //let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, x, y);
             let points = Trigonometry.pointsInterpolation(lastPosX, lastPosY, x, y, 10);
@@ -139,9 +136,6 @@
                 drawDepression(p.x, p.y); 
             }
         }
-
-        lastPosX = x;
-        lastPosY = y;
     }
 
     window.clearCanvas = () => {

@@ -1,13 +1,17 @@
+let canvas;
+let ctx;
 let width = 0;
 let height = 0;
 let halfWidth = 0;
 let halfHeight = 0;
+let mouseX = 0;
+let mouseY = 0;
 let lastPosY = 0;
 let lastPosX = 0;
 let initialClickX = 0;
 let initialClickY = 0;
-let canvas;
-let ctx;
+let movX = 0;
+let movY = 0;
 let lastRender = 0;
 let uploader;
 let uploadButton;
@@ -40,6 +44,10 @@ let initCanvas = () => {
     canvas.addEventListener('mousemove', e => {
         if (lastPosX == 0) lastPosX = e.offsetX;
         if (lastPosY == 0) lastPosY = e.offsetY;
+        mouseX = e.offsetX;
+        mouseY = e.offsetY;
+        movX = lastPosX - e.offsetX;
+        movY = lastPosY - e.offsetY;
         mouseMoved = true;
         window.trackMouse(e.offsetX, e.offsetY);
         lastPosX = e.offsetX;
@@ -49,6 +57,10 @@ let initCanvas = () => {
     canvas.addEventListener('touchstart', function (e) { 
         if (lastPosX == 0) lastPosX = e.changedTouches[0].pageX;
         if (lastPosY == 0) lastPosY = e.changedTouches[0].pageY;
+        mouseX = e.changedTouches[0].pageX;
+        mouseY = e.changedTouches[0].pageY;
+        movX = lastPosX - e.changedTouches[0].pageX;
+        movY = lastPosY - e.changedTouches[0].pageY;
         initialClickX = e.changedTouches[0].pageX;
         initialClickY = e.changedTouches[0].pageY;
         mouseMoved = false; 
@@ -63,6 +75,10 @@ let initCanvas = () => {
         e.preventDefault();
         if (lastPosX == 0) lastPosX = e.changedTouches[0].pageX;
         if (lastPosY == 0) lastPosY = e.changedTouches[0].pageY;
+        mouseX = e.changedTouches[0].pageX;
+        mouseY = e.changedTouches[0].pageY;
+        movX = lastPosX - e.changedTouches[0].pageX;
+        movY = lastPosY - e.changedTouches[0].pageY;
         mouseMoved = true;
 		touches = e.touches;
 		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
@@ -75,6 +91,10 @@ let initCanvas = () => {
         clicking = true;
         if (lastPosX == 0) lastPosX = e.offsetX;
         if (lastPosY == 0) lastPosY = e.offsetY;
+        mouseX = e.offsetX;
+        mouseY = e.offsetY;
+        movX = lastPosX - e.offsetX;
+        movY = lastPosY - e.offsetY;
         initialClickX = e.offsetX;
         initialClickY = e.offsetY;
         lastPosX = e.offsetX;
