@@ -4,6 +4,8 @@ let halfWidth = 0;
 let halfHeight = 0;
 let lastPosY = 0;
 let lastPosX = 0;
+let initialClickX = 0;
+let initialClickY = 0;
 let canvas;
 let ctx;
 let lastRender = 0;
@@ -36,27 +38,47 @@ let initCanvas = () => {
     canvas = document.getElementById("myCanvas");
 
     canvas.addEventListener('mousemove', e => {
+        if (lastPosX == 0) lastPosX = e.offsetX;
+        if (lastPosY == 0) lastPosY = e.offsetY;
         mouseMoved = true;
         window.trackMouse(e.offsetX, e.offsetY);
+        lastPosX = e.offsetX;
+        lastPosY = e.offsetY;
     }, false);
 
     canvas.addEventListener('touchstart', function (e) { 
+        if (lastPosX == 0) lastPosX = e.changedTouches[0].pageX;
+        if (lastPosY == 0) lastPosY = e.changedTouches[0].pageY;
+        initialClickX = e.changedTouches[0].pageX;
+        initialClickY = e.changedTouches[0].pageY;
         mouseMoved = false; 
 		touches = e.touches;
 		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY); 
         clicking = true;
+        lastPosX = e.changedTouches[0].pageX;
+        lastPosY = e.changedTouches[0].pageY;
     });
 
     canvas.addEventListener('touchmove', function (e) {
         e.preventDefault();
+        if (lastPosX == 0) lastPosX = e.changedTouches[0].pageX;
+        if (lastPosY == 0) lastPosY = e.changedTouches[0].pageY;
         mouseMoved = true;
 		touches = e.touches;
 		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+        lastPosX = e.changedTouches[0].pageX;
+        lastPosY = e.changedTouches[0].pageY;
     });
 
     canvas.addEventListener('mousedown', e => {
         mouseMoved = false;
         clicking = true;
+        if (lastPosX == 0) lastPosX = e.offsetX;
+        if (lastPosY == 0) lastPosY = e.offsetY;
+        initialClickX = e.offsetX;
+        initialClickY = e.offsetY;
+        lastPosX = e.offsetX;
+        lastPosY = e.offsetY;
     }, false);
 
     canvas.addEventListener('mouseup', e => {

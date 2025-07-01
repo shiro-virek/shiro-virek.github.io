@@ -1,6 +1,8 @@
 {    
     const globals = {
-        random: null
+        random: null,
+        initialClickCx: 0,
+        initialClickCy: 0,
     };
 
     const config = {
@@ -67,36 +69,31 @@
         if (config.randomize) randomize();
         initCanvas();
         addEvents();
+        config.offsetX = -width * config.scale / 2;
+        config.offsetY = -height * config.scale / 2;
         window.requestAnimationFrame(loop);
     }
 
     let addEvents = () => {
+		canvas.addEventListener('mousedown', function (e) {
+            globals.initialClickCx = e.offsetX * config.scale + config.offsetX;
+            globals.initialClickCy = e.offsetY * config.scale + config.offsetY;
+		});
+
+		canvas.addEventListener('touchstart', function (e) {
+            globals.initialClickCx = e.changedTouches[0].pageX * config.scale + config.offsetX;
+            globals.initialClickCy = e.changedTouches[0].pageY * config.scale + config.offsetY;
+		});
     }
 
     let randomize = () => {
-        config.mode = globals.random.nextBool();
         config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length);
+        config.mode = config.fractalFunctionIndex == 0 ? 1 : globals.random.nextBool();
         config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
         config.ci = globals.random.nextRange(-1, 1);  
         config.hue = globals.random.nextInt(0, 360);
-    }
-
-    window.trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
-        if (clicking) {  
-            config.scale = config.mode ? Numbers.scale(x, 0, width, 0.00005, 0.01) : config.scale;
-            if (!config.mode){
-                config.cr = Numbers.scale(x, 0, width, -1, 1);
-                config.ci = Numbers.scale(y, 0, height, -1, 1);
-            }
-        }
-
-        lastPosX = x;
-        lastPosY = y;
     }
     
     let draw = () => {
@@ -104,9 +101,6 @@
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
-    
-        config.offsetX = -width * config.scale / 2;
-        config.offsetY = -height * config.scale / 2;
     
         for (let x=0; x < width; x++){
             for (let y=0; y < height; y++){
@@ -131,6 +125,26 @@
 
         lastRender = timestamp;
         window.requestAnimationFrame(loop);
+    }
+
+    window.trackMouse = (x, y) => {
+        if (clicking) {
+            if (config.mode) {
+                let delta = lastPosY - y;
+                if (delta !== 0) {
+                    const zoomFactor = 1 + (delta > 0 ? -0.1 : 0.1);
+                    config.scale = config.scale * zoomFactor;
+
+                    config.offsetX = globals.initialClickCx - initialClickX * config.scale;
+                    config.offsetY = globals.initialClickCy - initialClickY * config.scale;
+                }
+            } else {
+                config.cr = Numbers.scale(x, 0, width, -1, 1);
+                config.ci = Numbers.scale(y, 0, height, -1, 1);
+            }
+
+            lastPosY = y;
+        }
     }
 
 	window.clearCanvas = () => {
