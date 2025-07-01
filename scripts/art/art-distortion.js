@@ -13,8 +13,6 @@
     const globals = {
         mouseX: 0,
         mouseY: 0,
-        lastPosX: 0,
-        lastPosY: 0,
         random: null,
         img: new Image(),
     };
@@ -114,19 +112,10 @@
     };
 
     window.trackMouse = (x, y) => {
-        if (globals.lastPosX == 0) globals.lastPosX = x;
-        if (globals.lastPosY == 0) globals.lastPosY = y;
-
-        let movX = globals.lastPosX - x;
-        let movY = globals.lastPosY - y;
-
         if (clicking) {
             globals.mouseX = x;
             globals.mouseY = y;
         }
-
-        globals.lastPosX = x;
-        globals.lastPosY = y;
     }
 
     let draw = () => {

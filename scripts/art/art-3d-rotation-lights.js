@@ -227,11 +227,9 @@
             const lightDirection = [0, 0, 1]; 
         
             const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
-
             
             const lightness = Numbers.scale(dotProduct, -1000, 0, 50, 100);
 
-            
             return lightness;
         }   
 
@@ -246,7 +244,6 @@
                 ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
-            ctx.stroke();
             ctx.fill();
         }
     }
@@ -278,12 +275,6 @@
     }
 
     window.trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
-        let movX = lastPosX - x;
-        let movY = lastPosY - y;
-
         if (clicking) {  
             globals.world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
@@ -294,9 +285,6 @@
                 figure.translateY(halfHeight);
             });
         }
-
-        lastPosX = x;
-        lastPosY = y;
     }
     
     let draw = () => {

@@ -31,16 +31,10 @@
     }
 
     window.trackMouse = (x, y) => {
-        if (lastPosX == 0) lastPosX = x;
-        if (lastPosY == 0) lastPosY = y;
-
         if (clicking) {  
             config.amplitude = Numbers.scale(x, 0, width, 0, 50);
             config.length = Numbers.scale(y, 0, height, 0, 10);
         }
-
-        lastPosX = x;
-        lastPosY = y;
     }
     
     let draw = () => {

@@ -153,6 +153,8 @@
     let init = () => {
         initCanvas();
 
+        drawBackground(ctx, canvas, config.opacity);
+
         globals.quad = Quadtree.generateQuadtree(width, height);
 
 		globals.random = Objects.getRandomObject();

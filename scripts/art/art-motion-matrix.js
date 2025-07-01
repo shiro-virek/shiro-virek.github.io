@@ -16,12 +16,6 @@
     };
 
     const globals = {
-        mouseX: 0,
-        mouseY: 0,
-        clicking: false,
-        mouseMoved: false,
-        lastPosX: 0,
-        lastPosY: 0,
         pixelRows: 50,
         pixelColumns: 50,
         pixelScreen: null,
@@ -63,7 +57,7 @@
         }
 
         isPixelClicked = (col, row) => {
-            let pixelPos = this.getPixelByMousePosition(globals.mouseX, globals.mouseY);
+            let pixelPos = this.getPixelByMousePosition(mouseX, mouseY);
             return (pixelPos.col == col && pixelPos.row == row && clicking);
         }
 
@@ -167,18 +161,9 @@
     }
 
     window.trackMouse = (x, y) => {
-        if (globals.lastPosX == 0) globals.lastPosX = x;
-        if (globals.lastPosY == 0) globals.lastPosY = y;
-
-        globals.mouseX = x;
-        globals.mouseY = y;
-
         if (clicking) {
             globals.pixelScreen.activatePixel(x, y);
         }
-
-        globals.lastPosX = x;
-        globals.lastPosY = y;
     }
 
     let randomize = () => {

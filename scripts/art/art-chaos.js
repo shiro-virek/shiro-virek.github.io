@@ -243,21 +243,12 @@
     }
 
     window.trackMouse = (xMouse, yMouse) => {
-        if (clicking){
-            if (lastPosX == 0) lastPosX = xMouse;
-            if (lastPosY == 0) lastPosY = yMouse;
-    
-            let movX = lastPosX - xMouse;
-            let movY = lastPosY - yMouse;
-    
+        if (clicking){   
             for (let x = 0; x < config.dotsColumns; x++) {
                 for (let y = 0; y < config.dotsRows; y++) {
                     globals.semitone.dots[x][y].update(xMouse, yMouse);
                 }
             }
-    
-            lastPosX = xMouse;
-            lastPosY = yMouse;
         }
     }
 
