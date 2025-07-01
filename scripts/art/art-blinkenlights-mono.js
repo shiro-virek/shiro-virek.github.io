@@ -1,22 +1,20 @@
 {
     const globals = {
-        random: null
+        random: null,
+        cellScreen: null,
+        mutationCounter: 0,
     };
 
-    let cellRows = 50;
-    let cellColumns = 50;
-
-    let cellMargin = 0;
-    let cellPadding = 0;
-    let cellDiameter = 10;
-
-    let extendedSize = 2;
-    let circleRadius = 2;
-
-    let cellScreen;
-
-    let mutationCounter = 0;
-            
+    const config = {
+        cellRows: 50,
+        cellColumns: 50,
+        cellMargin: 0,
+        cellPadding: 0,
+        cellDiameter: 20,
+        extendedSize: 2,
+        circleRadius: 2,
+    };
+        
     const Condition = Object.freeze({
         Lower: Symbol("lower"),        
         Greater: Symbol("greater"),
@@ -59,13 +57,13 @@
         }
 
         generateCells = () => {
-            for (let x = 0; x <= cellColumns; x++) {
-                this.cells[x] = new Array(cellRows);
-                this.cellsBuffer[x] = new Array(cellRows);
+            for (let x = 0; x <= config.cellColumns; x++) {
+                this.cells[x] = new Array(config.cellRows);
+                this.cellsBuffer[x] = new Array(config.cellRows);
             }
 
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x <= config.cellColumns; x++) {
+                for (let y = 0; y <= config.cellRows; y++) {
                     let cell = new Cell(x, y);
                     this.cells[x][y] = cell;
                     let cellBuffer = new Cell(x, y);
@@ -75,23 +73,23 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x <= config.cellColumns; x++) {
+                for (let y = 0; y <= config.cellRows; y++) {
                     this.cellsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
         copyBuffer = () => {
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x <= config.cellColumns; x++) {
+                for (let y = 0; y <= config.cellRows; y++) {
                     this.cells[x][y].alive = this.cellsBuffer[x][y].alive;
                 }
             }    
         }
         
         isCellAliveSafe = (x, y) => {
-            if (x < 0 || y < 0 || x >= cellColumns || y >= cellRows)
+            if (x < 0 || y < 0 || x >= config.cellColumns || y >= config.cellRows)
                 return 0
             else
                 return this.cells[x][y].alive;
@@ -138,8 +136,8 @@
 
             switch(neighborhood.neighborhoodType){
                 case NeighborhoodType.Extended:
-                    for(let h=x-extendedSize; h<=x+extendedSize; h++){
-                        for(let v=y-extendedSize; v<=y+extendedSize; v++){
+                    for(let h=x-config.extendedSize; h<=x+config.extendedSize; h++){
+                        for(let v=y-config.extendedSize; v<=y+config.extendedSize; v++){
                             if ((h!=x || v!=y) && (this.isCellAliveSafe(h, v))) neighboursCount++;
                         }
                     }
@@ -161,14 +159,14 @@
                     if (this.isCellAliveSafe(x+1, y+1)) neighboursCount++;
                     break;
                 case NeighborhoodType.Circunference:
-                    neighboursCount = this.getNeighboursCountCircunference(x, y, circleRadius);
+                    neighboursCount = this.getNeighboursCountCircunference(x, y, config.circleRadius);
                     break;
                 case NeighborhoodType.Circle:
                     for (let i = 0; i < this.cells.length; i++) {
                         for (let j = 0; j < this.cells[i].length; j++) {
                             let squareDistance = (i - x) * 2 + (j - y) * 2;
                             
-                            if (squareDistance <= circleRadius ** 2) {
+                            if (squareDistance <= config.circleRadius ** 2) {
                                 if (this.isCellAliveSafe(i, j)) neighboursCount++;
                             }
                         }
@@ -228,8 +226,8 @@
         }
 
         update = () => {            
-            for (let x = 0; x <= cellColumns; x++) {
-                for (let y = 0; y <= cellRows; y++) {
+            for (let x = 0; x <= config.cellColumns; x++) {
+                for (let y = 0; y <= config.cellRows; y++) {
                     this.calculateCellStatus(x, y);
                 }
             }                  
@@ -238,12 +236,12 @@
 
     class Cell {
         constructor(column, row) {
-            this.diameter = cellDiameter;
-            this.radius = cellDiameter / 2;
+            this.diameter = config.cellDiameter;
+            this.radius = config.cellDiameter / 2;
             this.row = row;
             this.column = column;
-            this.x = cellMargin + column * cellPadding + column * this.diameter;
-            this.y = cellMargin + row * cellPadding + row * this.diameter;            
+            this.x = config.cellMargin + column * config.cellPadding + column * this.diameter;
+            this.y = config.cellMargin + row * config.cellPadding + row * this.diameter;            
             this.alive = false;
         }
 
@@ -275,13 +273,13 @@
     let randomize = () => {
         globals.random = Objects.getRandomObject();
 
-        cellDiameter = globals.random.nextInt(5, 15);        
-        extendedSize = globals.random.nextInt(1, 3);
-        circleRadius = globals.random.nextInt(1, 5);
+        config.cellDiameter = globals.random.nextInt(5, 15);        
+        config.extendedSize = globals.random.nextInt(1, 3);
+        config.circleRadius = globals.random.nextInt(1, 5);
 
-        cellRows = Math.floor((height - cellMargin)/ (cellDiameter + cellPadding));
-        cellColumns = Math.floor((width - cellMargin)/ (cellDiameter + cellPadding));
-        cellScreen = new CellScreen();
+        config.cellRows = Math.floor((height - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
+        config.cellColumns = Math.floor((width - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
+        config.cellScreen = new CellScreen();
         
         initializePatterns();
         
@@ -289,13 +287,13 @@
     }
 
     let initializePatterns = () => {
-        for (let x = 0; x <= cellColumns; x += globals.random.nextInt(2, 5)) {
-            for (let y = 0; y <= cellRows; y += globals.random.nextInt(2, 5)) {
+        for (let x = 0; x <= config.cellColumns; x += globals.random.nextInt(2, 5)) {
+            for (let y = 0; y <= config.cellRows; y += globals.random.nextInt(2, 5)) {
                 if (globals.random.nextBool()) {
                     for (let dx = 0; dx < 2; dx++) {
                         for (let dy = 0; dy < 2; dy++) {
-                            if (x + dx <= cellColumns && y + dy <= cellRows) {
-                                cellScreen.cells[x + dx][y + dy].alive = true;
+                            if (x + dx <= config.cellColumns && y + dy <= config.cellRows) {
+                                config.cellScreen.cells[x + dx][y + dy].alive = true;
                             }
                         }
                     }
@@ -305,21 +303,21 @@
 
         for (let i = 0; i < 10; i++) {
             if (globals.random.nextBool()) {
-                let y = globals.random.nextInt(0, cellRows);
-                for (let x = 0; x <= cellColumns; x++) {
-                    cellScreen.cells[x][y].alive = true;
+                let y = globals.random.nextInt(0, config.cellRows);
+                for (let x = 0; x <= config.cellColumns; x++) {
+                    config.cellScreen.cells[x][y].alive = true;
                 }
             } else {
-                let x = globals.random.nextInt(0, cellColumns);
-                for (let y = 0; y <= cellRows; y++) {
-                    cellScreen.cells[x][y].alive = true;
+                let x = globals.random.nextInt(0, config.cellColumns);
+                for (let y = 0; y <= config.cellRows; y++) {
+                    config.cellScreen.cells[x][y].alive = true;
                 }
             }
         }
     }
 
     let setBalancedRules = () => {
-        cellScreen.neighborhoods = [];
+        config.cellScreen.neighborhoods = [];
 
         let baseNeighborhood = new Neighborhood();
         baseNeighborhood.neighborhoodType = NeighborhoodType.Moore;
@@ -340,7 +338,7 @@
             true
         ));
         
-        cellScreen.neighborhoods.push(baseNeighborhood);
+        config.cellScreen.neighborhoods.push(baseNeighborhood);
 
         if (globals.random.nextBool()) {
             let specialNeighborhood = new Neighborhood();
@@ -361,24 +359,24 @@
                 globals.random.nextBool()
             ));
             
-            cellScreen.neighborhoods.push(specialNeighborhood);
+            config.cellScreen.neighborhoods.push(specialNeighborhood);
         }
     }
 
     let draw = () => {
         drawBackground(ctx, canvas);
-        cellScreen.draw(ctx);
-        cellScreen.copyBuffer();
+        config.cellScreen.draw(ctx);
+        config.cellScreen.copyBuffer();
     }
 
     let loop = (timestamp) => {
         let progress = timestamp - lastRender;
 
-        cellScreen.update();
+        config.cellScreen.update();
         draw();
 
-        mutationCounter++;
-        if (mutationCounter % 50 === 0) {
+        config.mutationCounter++;
+        if (config.mutationCounter % 50 === 0) {
             setBalancedRules();
         }
 
