@@ -96,7 +96,7 @@
         config.hue = globals.random.nextInt(0, 360);
     }
     
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -116,15 +116,6 @@
         }        
 
         ctx.putImageData(imageData, 0, 0);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
     window.trackMouse = (x, y) => {

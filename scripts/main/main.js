@@ -115,3 +115,14 @@ let initCanvas = () => {
         canvas.height = height;
     }
 }
+
+
+let loop = (timestamp) => {
+    let progress = timestamp - lastRender;
+
+    window.draw();
+
+    lastRender = timestamp;
+    window.requestAnimationFrame(loop);
+}
+

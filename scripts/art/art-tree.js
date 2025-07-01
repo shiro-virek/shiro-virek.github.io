@@ -37,7 +37,7 @@
         }
     }
     
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
 
         drawTree(ctx, halfWidth, halfHeight, 0, config.maxDepth, config.modifAmount, -config.modifAmount);
@@ -74,15 +74,6 @@
             drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, -Numbers.absoluteSubstraction(modifierX, 5), -Numbers.absoluteSubstraction(modifierY, 5));
             drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, -Numbers.absoluteSubstraction(modifierX, 5), -Numbers.absoluteSubstraction(modifierY, 5));
         }
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
 	window.clearCanvas = () => {

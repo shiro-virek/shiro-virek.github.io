@@ -77,7 +77,7 @@
         config.radius = globals.random.nextInt(20, 50);
     }
     
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
 
         diffuseHeightMap();
@@ -117,15 +117,6 @@
         }
 
         ctx.putImageData(imageData, 0, 0);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
     window.trackMouse = (x, y) => {

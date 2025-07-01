@@ -198,20 +198,11 @@
 		config.opacity = globals.random.next(0.1, 1.0);
 	}
 
-	let draw = () => {
+	window.draw = () => {
 		drawBackground(ctx, canvas, config.opacity);
 		globals.ballCollection.draw(ctx);
 	}
 
-	let loop = (timestamp) => {
-		let progress = timestamp - lastRender;
-
-		draw();
-
-		lastRender = timestamp;
-		window.requestAnimationFrame(loop);
-	}
-	
     window.trackMouse = (xMouse, yMouse) => {
     }
 

@@ -66,7 +66,8 @@
         Effects.ripple(data, data, amplitude, frequency, phase, centerX, centerY);
     }
 
-    let draw = () => {
+    window.draw = () => {
+        if (!globals.streaming) return;
         drawBackground(ctx, canvas);
 
         ctx.drawImage(globals.video, 0, 0, canvas.width, canvas.height);
@@ -77,16 +78,6 @@
         webcamFunction(imageData.data);
 
         ctx.putImageData(imageData, 0, 0);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        if (!globals.streaming) return;
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
     window.trackMouse = (xMouse, yMouse) => {

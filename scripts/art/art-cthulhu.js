@@ -179,7 +179,32 @@
 		return result;
 	}
 
-	let draw = () => {
+	let simulateTouchEvent = () => {
+		const touch1 = new Touch({
+			identifier: 1,
+			target: canvas,
+			clientX: 100,
+			clientY: 150,
+		});
+
+		const touch2 = new Touch({
+			identifier: 2,
+			target: canvas,
+			clientX: 200,
+			clientY: 250,
+		});
+
+		const touch3 = new Touch({
+			identifier: 3,
+			target: canvas,
+			clientX: 300,
+			clientY: 350,
+		});
+
+		Touch.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
+	}
+
+	window.draw = () => {
 		if (config.rotateAuto) config.rotationAngle += config.rotationIncrement;
 
 		drawBackground(ctx, canvas);
@@ -206,45 +231,11 @@
 		globals.timeCounter++;
 	}
 
-	let simulateTouchEvent = () => {
-		const touch1 = new Touch({
-			identifier: 1,
-			target: canvas,
-			clientX: 100,
-			clientY: 150,
-		});
-
-		const touch2 = new Touch({
-			identifier: 2,
-			target: canvas,
-			clientX: 200,
-			clientY: 250,
-		});
-
-		const touch3 = new Touch({
-			identifier: 3,
-			target: canvas,
-			clientX: 300,
-			clientY: 350,
-		});
-
-		Touch.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
-	}
-
 	window.trackMouse = (x, y) => {
 		if (clicking){
 			globals.mouseX = x;
 			globals.mouseY = y;
 		}
-	}
-
-	let loop = (timestamp) => {
-		let progress = timestamp - lastRender;
-
-		draw();
-
-		lastRender = timestamp;
-		window.requestAnimationFrame(loop);
 	}
 	
 	window.clearCanvas = () => {

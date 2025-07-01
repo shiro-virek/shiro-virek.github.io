@@ -310,18 +310,9 @@
         }
     }
 
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
         world.draw();
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
     }
 
 	window.clearCanvas = () => {		

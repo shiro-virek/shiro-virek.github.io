@@ -117,8 +117,17 @@
             globals.mouseY = y;
         }
     }
+    
+    let randomize = () => {
+        config.radius = globals.random.nextInt(100, Math.min(halfWidth, halfHeight));
+        config.strength = globals.random.nextRange(0.1, 10, 1);
+        config.amplitude = globals.random.nextInt(1, 20);
+        config.frequency = globals.random.nextRange(0.1, 0.5, 1);
+        config.mode = globals.random.nextBool();
+        config.functionIndex = globals.random.nextInt(0, config.functions.length);
+    }
 
-    let draw = () => {
+    window.draw = () => {
         drawBackground(ctx, canvas);
 
         const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, canvas);
@@ -137,24 +146,6 @@
         ctx.putImageData(outputImageData, 0, 0);
     }
     
-    let randomize = () => {
-        config.radius = globals.random.nextInt(100, Math.min(halfWidth, halfHeight));
-        config.strength = globals.random.nextRange(0.1, 10, 1);
-        config.amplitude = globals.random.nextInt(1, 20);
-        config.frequency = globals.random.nextRange(0.1, 0.5, 1);
-        config.mode = globals.random.nextBool();
-        config.functionIndex = globals.random.nextInt(0, config.functions.length);
-    }
-
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
-    }
-
     window.clearCanvas = () => {
 		Sound.error();
     }

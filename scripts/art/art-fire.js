@@ -117,7 +117,7 @@
 		window.requestAnimationFrame(loop)
 	}
 
-	let draw = () => {		
+	window.draw = () => {		
 		drawBackground(ctx, canvas);
 
 		for (i = 0; i < globals.particlesCount; i++) {
@@ -142,15 +142,6 @@
 	window.trackMouse = (mouseX, mouseY) => {
 		if (clicking)
 			addFire(mouseX, mouseY, true);
-	}
-
-	let loop = (timestamp) => {
-		let progress = timestamp - lastRender;
-
-		draw();
-
-		lastRender = timestamp;
-		window.requestAnimationFrame(loop);
 	}
 
 	window.clearCanvas = () => {		

@@ -633,16 +633,11 @@
 			globals.city.addBuilding(e.offsetX, e.offsetY);
 		}, false);
 	}
-
-	let loop = (timestamp) => {
-		let progress = timestamp - lastRender;
-
+	
+	window.draw = () => {
 		drawBackground(ctx, canvas);
 
 		globals.city.draw();
-
-		lastRender = timestamp;
-		window.requestAnimationFrame(loop);
 	}
 
     window.trackMouse = (xMouse, yMouse) => {

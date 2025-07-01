@@ -100,11 +100,6 @@
     let addEvents = () => {   
     }
 
-    window.trackMouse = (xMouse, yMouse) => {
-        if (clicking)
-            globals.ledScreen.setPixel(xMouse, yMouse);
-    }
-
     let randomize = () => {            
 		globals.random = Objects.getRandomObject();
         
@@ -114,20 +109,15 @@
         config.hue = globals.random.nextInt(0, 255);
     }
 
-    let draw = () => {
+    window.draw = () => {
+        globals.ledScreen.update();
         drawBackground(ctx, canvas);
         globals.ledScreen.draw(ctx);
     }
 
-    let loop = (timestamp) => {
-        let progress = timestamp - lastRender;
-
-        globals.ledScreen.update();
-
-        draw();
-
-        lastRender = timestamp;
-        window.requestAnimationFrame(loop);
+    window.trackMouse = (xMouse, yMouse) => {
+        if (clicking)
+            globals.ledScreen.setPixel(xMouse, yMouse);
     }
 
 	window.clearCanvas = () => {		

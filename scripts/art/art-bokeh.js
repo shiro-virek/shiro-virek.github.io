@@ -45,7 +45,7 @@
 		}	
 	}
 
-	let draw = (ctx, xPointer, yPointer) => {
+	window.draw = (ctx, xPointer, yPointer) => {
 
 		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer,  yPointer);
 
