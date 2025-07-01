@@ -227,11 +227,9 @@
             const lightDirection = [0, 0, 1]; 
         
             const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
-
             
             const lightness = Numbers.scale(dotProduct, -1000, 0, 50, 100);
 
-            
             return lightness;
         }   
 
@@ -246,7 +244,6 @@
                 ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
-            ctx.stroke();
             ctx.fill();
         }
     }

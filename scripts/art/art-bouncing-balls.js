@@ -173,6 +173,9 @@
 
 	let init = () => {
 		initCanvas();
+		
+        drawBackground(ctx, canvas, config.opacity);
+
 		globals.ballCollection = new BallCollection()
 		globals.random = Objects.getRandomObject();
 		if (config.randomize) randomize();
