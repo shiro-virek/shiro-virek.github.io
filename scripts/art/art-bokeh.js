@@ -36,7 +36,7 @@
 		config.colorShift = globals.random.nextInt(0, 359);
 		config.entropy = globals.random.nextInt(1, 250);
 		config.colorMapMax = globals.random.nextInt(1, 10000);
-		config.opacity = globals.random.nextRange(0.003, 0.03);
+		config.opacity = globals.random.nextRange(0.01, 0.03);
 	}
 
 	window.trackMouse = (xPointer, yPointer) => {

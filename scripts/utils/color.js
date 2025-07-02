@@ -57,5 +57,7 @@ class Color {
         return { r, g, b };
     }
 
-
+    static getLightness = (r, g, b) => {
+      return (0.21 * r) + (0.72 * g) + (0.07 * b)
+    }
 }

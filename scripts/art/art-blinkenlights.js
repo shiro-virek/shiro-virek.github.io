@@ -323,9 +323,6 @@
     }
 
     let addEvents = () => {  
-		canvas.addEventListener('click', e => {
-            randomize();
-        });
     }
 
     let randomize = () => {
@@ -417,12 +414,13 @@
     window.trackMouse = (xMouse, yMouse) => {
     }
     
-	window.clearCanvas = () => {  
-        randomize();
+	window.clearCanvas = () => {        
+		Sound.error();
 	}
 
 	window.magic = () => {  
-		Sound.error();
+		randomize();
+        Sound.tada();
 	}
 
     window.upload = () => {

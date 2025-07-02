@@ -242,8 +242,11 @@
 		Sound.error();
 	}
 
-	window.magic = () => {  
-		Sound.error();
+	window.magic = () => { 
+		config.tentaclesCount++;
+		globals.slices = [];
+		addSlices(); 
+		Sound.tada();
 	}
 
     window.upload = () => {

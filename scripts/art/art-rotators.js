@@ -20,7 +20,7 @@
 		globals.random = Objects.getRandomObject();
 
 		config.opacity = globals.random.nextRange(0.03, 0.1, 2);
-		config.thickness = globals.random.nextInt(1, 20);
+		config.thickness = globals.random.nextInt(1, 3);
 		config.angleRotation = globals.random.nextInt(0, 20);
 		config.colorMapMax = globals.random.nextInt(1, 10000);
 
@@ -64,7 +64,7 @@
 
 		let color = `hsl(${hue}, 100%, 50%, ${config.opacity})`;
 
-		let lineWidth = Numbers.scale(distance, 1, 400, 1, config.thickness);
+		let lineWidth = config.thickness; 
 
 		Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
 
@@ -89,6 +89,7 @@
 
 	window.clearCanvas = () => {
 		initCanvas();
+		drawBackground(ctx, canvas);
 	}
 
 	window.magic = () => {  

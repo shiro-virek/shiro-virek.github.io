@@ -109,6 +109,29 @@ class Sound {
         };
     }
 
+    static tada = () =>  {
+        const audioCtx = Sound.AudioContext.getInstance();
+
+        const oscillator = audioCtx.createOscillator();
+        oscillator.type = 'triangle';
+
+        const gainNode = audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+
+        oscillator.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+
+        oscillator.start(audioCtx.currentTime);
+
+        oscillator.stop(audioCtx.currentTime + 0.5);
+    }
+
     static stopAllSounds = () => {
         let ctx = Sound.AudioContext.getInstance();
         ctx.close();

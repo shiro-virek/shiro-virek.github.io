@@ -301,9 +301,6 @@
     }
 
     let addEvents = () => {  
-		canvas.addEventListener('click', e => {
-            randomize();
-        });
     }
 
     let randomize = () => {
@@ -405,11 +402,12 @@
     }
 
 	window.clearCanvas = () => {  
-        randomize();
+		Sound.error();
     }
 
 	window.magic = () => {  
-		Sound.error();
+		randomize();
+        Sound.tada();
 	}
 
     window.upload = () => {
