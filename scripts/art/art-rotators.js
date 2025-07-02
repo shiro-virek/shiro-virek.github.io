@@ -89,6 +89,7 @@
 
 	window.clearCanvas = () => {
 		initCanvas();
+		drawBackground(ctx, canvas);
 	}
 
 	window.magic = () => {  
