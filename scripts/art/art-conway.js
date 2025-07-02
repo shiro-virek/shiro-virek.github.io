@@ -1,17 +1,21 @@
 {
     const globals = {
 		random: null,
-        ledScreen: null,
+        cellScreen: null,
+        canvasImg: document.getElementById('auxCanvas'),
+        ctxImg: null,
+        img: new Image(),
+        imgData: null,
     };
     
     const config = {
         randomize: true,
         colorOff: "#222",
-        ledRows: 50,
-        ledColumns: 50,
-        ledMargin: 30,
-        ledPadding: 30,
-        ledDiameter: 20,
+        cellRows: 50,
+        cellColumns: 50,
+        cellMargin: 30,
+        cellPadding: 30,
+        cellDiameter: 20,
         hue: 150,
     };
     
@@ -20,99 +24,99 @@
 		Circle: Symbol("circle")
 	});
 
-    class LedScreen {
+    class CellScreen {
         constructor() {            
-            this.generateLeds();     
+            this.generateCells();     
 			let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);
 			this.shape = Figures[Object.keys(Figures)[rand]];     
         }
 
-        generateLeds = () => {
-            this.leds = [];
-            this.ledsBuffer = [];
-            for (let x = 0; x < config.ledColumns; x++) {
-                this.leds[x] = new Array(config.ledRows);
-                this.ledsBuffer[x] = new Array(config.ledRows);
+        generateCells = () => {
+            this.cells = [];
+            this.cellsBuffer = [];
+            for (let x = 0; x < config.cellColumns; x++) {
+                this.cells[x] = new Array(config.cellRows);
+                this.cellsBuffer[x] = new Array(config.cellRows);
             }
 
-            for (let x = 0; x < config.ledColumns; x++) {
-                for (let y = 0; y < config.ledRows; y++) {
-                    let led = new Led(x, y);
-                    this.leds[x][y] = led;
-                    let ledBuffer = new Led(x, y);
-                    this.ledsBuffer[x][y] = ledBuffer;
-                    this.leds[x][y].on =  globals.random.nextBool();
+            for (let x = 0; x < config.cellColumns; x++) {
+                for (let y = 0; y < config.cellRows; y++) {
+                    let cell = new Cell(x, y);
+                    this.cells[x][y] = cell;
+                    let cellBuffer = new Cell(x, y);
+                    this.cellsBuffer[x][y] = cellBuffer;
+                    this.cells[x][y].on =  globals.random.nextBool();
                 }
             }  
         }
 
         setPixel = (x, y) => {            
-            let col = Math.round((x - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
-            let row = Math.round((y - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
-            this.leds[col][row].on = true;
-            this.ledsBuffer[col][row].on = true;
+            let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+            let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+            this.cells[col][row].on = true;
+            this.cellsBuffer[col][row].on = true;
         }
 
         draw = (ctx) => {
-            for (let x = 0; x < config.ledColumns; x++) {
-                for (let y = 0; y < config.ledRows; y++) {
-                    this.ledsBuffer[x][y].draw(ctx);
+            for (let x = 0; x < config.cellColumns; x++) {
+                for (let y = 0; y < config.cellRows; y++) {
+                    this.cellsBuffer[x][y].draw(ctx);
                 }
             }
         }
 
         copyBuffer = () => {
-            for (let x = 0; x < config.ledColumns; x++) {
-                for (let y = 0; y < config.ledRows; y++) {
-                    this.leds[x][y].on =  this.ledsBuffer[x][y].on;
+            for (let x = 0; x < config.cellColumns; x++) {
+                for (let y = 0; y < config.cellRows; y++) {
+                    this.cells[x][y].on =  this.cellsBuffer[x][y].on;
                 }
             }    
         }
 
-        getLedValueSafe = (x, y) => {
-            if (x < 0 || y < 0 || x >= config.ledColumns || y >= config.ledRows)
+        getCellValueSafe = (x, y) => {
+            if (x < 0 || y < 0 || x >= config.cellColumns || y >= config.cellRows)
                 return false
             else
-                return this.leds[x][y];
+                return this.cells[x][y];
         }
 
-        calculateLedStatus = (x, y) => {
+        calculateCellStatus = (x, y) => {
             let value = false;
             let sum = 0;
 
-            if (this.getLedValueSafe(x, y-1).on) sum++;
-            if (this.getLedValueSafe(x, y+1).on) sum++;
-            if (this.getLedValueSafe(x-1, y-1).on) sum++;
-            if (this.getLedValueSafe(x+1, y-1).on) sum++;
-            if (this.getLedValueSafe(x-1, y).on) sum++;
-            if (this.getLedValueSafe(x+1, y).on) sum++;
-            if (this.getLedValueSafe(x-1, y+1).on) sum++;
-            if (this.getLedValueSafe(x+1, y+1).on) sum++;
+            if (this.getCellValueSafe(x, y-1).on) sum++;
+            if (this.getCellValueSafe(x, y+1).on) sum++;
+            if (this.getCellValueSafe(x-1, y-1).on) sum++;
+            if (this.getCellValueSafe(x+1, y-1).on) sum++;
+            if (this.getCellValueSafe(x-1, y).on) sum++;
+            if (this.getCellValueSafe(x+1, y).on) sum++;
+            if (this.getCellValueSafe(x-1, y+1).on) sum++;
+            if (this.getCellValueSafe(x+1, y+1).on) sum++;
 
-            if (this.leds[x][y].on && (sum < 2 || sum > 3)) value = false;
-            if (this.leds[x][y].on && sum >= 2 && sum <= 3) value = true;
-            if (!this.leds[x][y].on && sum == 3) value = true;
+            if (this.cells[x][y].on && (sum < 2 || sum > 3)) value = false;
+            if (this.cells[x][y].on && sum >= 2 && sum <= 3) value = true;
+            if (!this.cells[x][y].on && sum == 3) value = true;
 
             return value;
         }
 
         update = () => {            
-            for (let x = 0; x < config.ledColumns; x++) {
-                for (let y = 0; y < config.ledRows; y++) {
-                    this.ledsBuffer[x][y].on =  this.calculateLedStatus(x, y);
+            for (let x = 0; x < config.cellColumns; x++) {
+                for (let y = 0; y < config.cellRows; y++) {
+                    this.cellsBuffer[x][y].on =  this.calculateCellStatus(x, y);
                 }
             }                  
         }
     }
 
-    class Led {
+    class Cell {
         constructor(column, row) {
-            this.diameter = config.ledDiameter;
-            this.radius = config.ledDiameter / 2;
+            this.diameter = config.cellDiameter;
+            this.radius = config.cellDiameter / 2;
             this.row = row;
             this.column = column;
-            this.x = config.ledMargin + column * config.ledPadding + column * this.diameter;
-            this.y = config.ledMargin + row * config.ledPadding + row * this.diameter;
+            this.x = config.cellMargin + column * config.cellPadding + column * this.diameter;
+            this.y = config.cellMargin + row * config.cellPadding + row * this.diameter;
             this.on = false;
             this.color = `hsl(${config.hue}, 100%, 50%)`;
         }
@@ -120,7 +124,7 @@
         draw = (ctx) => {
             let color = this.on ? this.color : config.colorOff;
 
-            switch(ledScreen.shape){
+            switch(globals.cellScreen.shape){
                 case Figures.Circle:
                     Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, color, color)
                     break;
@@ -131,15 +135,45 @@
         }
     }
 
+    let loadImage = (source = '../assets/Picture1.jpg') => {
+        globals.img.src = source;
+
+        globals.img.onload = function () {
+            globals.canvasImg.width = config.cellColumns;
+            globals.canvasImg.height = config.cellRows;
+
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
+            
+            globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            globals.imgData = globals.ctxImg.getImageData(0, 0, config.cellColumns, config.cellRows).data;
+            globals.cellScreen = new CellScreen();
+            for (let y = 0; y < config.cellRows; y++) {
+                for (let x = 0; x < config.cellColumns; x++) {
+                    let i = y * config.cellColumns + x;
+                    const r = globals.imgData[i * 4 + 0];
+                    const g = globals.imgData[i * 4 + 1];
+                    const b = globals.imgData[i * 4 + 2];
+                    const a = globals.imgData[i * 4 + 3];
+
+                    let lightness = Color.getLightness(r, g, b);
+                    globals.cellScreen.cells[x][y].on = lightness > 120;
+                }
+            }
+        };
+    }
+
     let init = () => {
 		initCanvas();
+        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
         globals.random = Objects.getRandomObject();
-        config.ledDiameter = globals.random.nextInt(5, 20);        
-        config.ledPadding = globals.random.nextInt(0, 20);
-        config.ledMargin = config.ledPadding;
+        config.cellDiameter = globals.random.nextInt(5, 20);        
+        config.cellPadding = globals.random.nextInt(0, 20);
+        config.cellMargin = config.cellPadding;
 
-        config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
-        config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));        
+        config.cellRows = Math.floor((height - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
+        config.cellColumns = Math.floor((width - config.cellMargin)/ (config.cellDiameter + config.cellPadding));        
+        globals.cellScreen = new CellScreen();
         
         if (config.randomize) randomize();
 
@@ -149,21 +183,20 @@
 
     let addEvents = () => {        
 		canvas.addEventListener('click', e => {
-			ledScreen.setPixel(e.offsetX, e.offsetY);
+			globals.cellScreen.setPixel(e.offsetX, e.offsetY);
 		}, false);
     }
 
     let randomize = () => {        
         config.hue = globals.random.nextInt(0, 255); 
-        ledScreen = new LedScreen();
     }
 
     window.draw = () => {
-        ledScreen.update();
+        globals.cellScreen.update();
         
         drawBackground(ctx, canvas);
-        ledScreen.draw(ctx);
-        ledScreen.copyBuffer();
+        globals.cellScreen.draw(ctx);
+        globals.cellScreen.copyBuffer();
 
         Browser.sleep(200);
     }
@@ -172,15 +205,38 @@
     }
     
 	window.clearCanvas = () => {         
-        ledScreen.generateLeds();  
+        globals.cellScreen.generateCells();  
 	}
     
 	window.magic = () => {  
 		Sound.error();
 	}
 
-    window.upload = () => {
-		Sound.error();
+    window.upload = (e) => {
+		if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                globals.img.onerror = function() {
+                    alert('Error loading image');
+                };
+            
+                loadImage(event.target.result);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
     }
 
     init();    
