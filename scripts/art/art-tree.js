@@ -30,22 +30,6 @@
         config.modifAmount = globals.random.nextInt(-100, 100);
     }
 
-    window.trackMouse = (x, y) => {
-        if (clicking) {  
-            config.amplitude = Numbers.scale(x, 0, width, 0, 50);
-            config.length = Numbers.scale(y, 0, height, 0, 10);
-        }
-    }
-    
-    window.draw = () => {
-        drawBackground(ctx, canvas);
-
-        drawTree(ctx, halfWidth, halfHeight, 0, config.maxDepth, config.modifAmount, -config.modifAmount);
-        drawTree(ctx, halfWidth, halfHeight, 90, config.maxDepth, config.modifAmount, config.modifAmount);
-        drawTree(ctx, halfWidth, halfHeight, 180, config.maxDepth, -config.modifAmount, config.modifAmount);
-        drawTree(ctx, halfWidth, halfHeight, 270, config.maxDepth, -config.modifAmount, -config.modifAmount);
-    }
-
     let drawTree = (ctx, x1, y1, angle, depth, modifierX, modifierY) => { 
         if (depth != 0){
             var x2 = x1 + (Math.cos(angle * Trigonometry.RAD_CONST) * depth * config.length);
@@ -74,6 +58,22 @@
             drawTree(ctx, x2, y2, angle - config.amplitude, depth - 1, -Numbers.absoluteSubstraction(modifierX, 5), -Numbers.absoluteSubstraction(modifierY, 5));
             drawTree(ctx, x2, y2, angle + config.amplitude, depth - 1, -Numbers.absoluteSubstraction(modifierX, 5), -Numbers.absoluteSubstraction(modifierY, 5));
         }
+    }
+
+    window.trackMouse = (x, y) => {
+        if (clicking) {  
+            config.amplitude = Numbers.scale(x, 0, width, 0, 50);
+            config.length = Numbers.scale(y, 0, height, 0, 10);
+        }
+    }
+    
+    window.draw = () => {
+        drawBackground(ctx, canvas);
+
+        drawTree(ctx, halfWidth, halfHeight, 0, config.maxDepth, config.modifAmount, -config.modifAmount);
+        drawTree(ctx, halfWidth, halfHeight, 90, config.maxDepth, config.modifAmount, config.modifAmount);
+        drawTree(ctx, halfWidth, halfHeight, 180, config.maxDepth, -config.modifAmount, config.modifAmount);
+        drawTree(ctx, halfWidth, halfHeight, 270, config.maxDepth, -config.modifAmount, -config.modifAmount);
     }
 
 	window.clearCanvas = () => {

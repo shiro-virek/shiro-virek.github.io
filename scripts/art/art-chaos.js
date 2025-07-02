@@ -242,16 +242,6 @@
     let addEvents = () => {
     }
 
-    window.trackMouse = (xMouse, yMouse) => {
-        if (clicking){   
-            for (let x = 0; x < config.dotsColumns; x++) {
-                for (let y = 0; y < config.dotsRows; y++) {
-                    globals.semitone.dots[x][y].update(xMouse, yMouse);
-                }
-            }
-        }
-    }
-
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 360);
         globals.semitone.radioFunction = globals.random.getRandomFromArray(globals.radioFunctions);
@@ -260,6 +250,16 @@
         globals.semitone.yPositionFunction = globals.random.getRandomFromArray(globals.yPositionFunctions);          
         globals.semitone.angleFunction = globals.random.getRandomFromArray(globals.angleFunctions);        
         globals.semitone.alphaFunction = globals.random.getRandomFromArray(globals.alphaFunctions);
+    }
+
+    window.trackMouse = (xMouse, yMouse) => {
+        if (clicking){   
+            for (let x = 0; x < config.dotsColumns; x++) {
+                for (let y = 0; y < config.dotsRows; y++) {
+                    globals.semitone.dots[x][y].update(xMouse, yMouse);
+                }
+            }
+        }
     }
 
     window.draw = () => {
