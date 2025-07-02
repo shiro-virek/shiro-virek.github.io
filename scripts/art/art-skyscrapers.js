@@ -651,6 +651,7 @@
 	window.magic = () => {  
 		window.clearCanvas();
 		globals.city.generateCity();
+        Sound.tada();
 	}
 
     window.upload = () => {

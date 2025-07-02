@@ -561,6 +561,7 @@
 	window.magic = () => {  
 		window.clearCanvas();
 		globals.metroNetwork.generateNetwork();
+        Sound.tada();
 	}
 
     window.upload = () => {

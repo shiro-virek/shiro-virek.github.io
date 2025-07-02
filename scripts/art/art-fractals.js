@@ -143,7 +143,10 @@
 	}
 
 	window.magic = () => {  
-		Sound.error();
+        if (config.fractalFunctionIndex == 1 ){
+            config.mode = !config.mode;
+            Sound.tada();
+        }
 	}
 
     window.upload = () => {
