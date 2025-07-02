@@ -143,7 +143,7 @@
 
     window.trackMouse = (xMouse, yMouse) => {
         if (clicking){            
-            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, xMouse, yMouse);
+            let points = Trigonometry.bresenhamLine(Math.floor(lastPosX), Math.floor(lastPosY), Math.floor(xMouse), Math.floor(yMouse));
             for (const p of points) {                
                 globals.ledScreen.setPixel(p.x, p.y);
             }                
