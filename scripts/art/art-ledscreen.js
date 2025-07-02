@@ -44,6 +44,7 @@
         setPixel = (x, y) => {            
             let col = Math.round((x - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
             let row = Math.round((y - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
+            if (col > config.ledColumns - 1 || row > config.ledRows - 1 || col < 0 || row < 0) return;
             this.leds[col][row].on = true;
         }
 
@@ -108,17 +109,17 @@
     }
 
     window.trackMouse = (xMouse, yMouse) => {
-        if (clicking){            
-            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, xMouse, yMouse);
-            for (const p of points) {                
-                globals.ledScreen.setPixel(p.x, p.y);
-            }                
-        }    
     }
 
     window.draw = () => {
         globals.ledScreen.update();
-        drawBackground(ctx, canvas);
+        drawBackground(ctx, canvas);     
+        if (clicking){            
+            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, mouseX, mouseY);
+            for (const p of points) {                
+                globals.ledScreen.setPixel(p.x, p.y);
+            }                
+        }    
         globals.ledScreen.draw(ctx);
     }
 
