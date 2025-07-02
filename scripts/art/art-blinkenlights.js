@@ -2,8 +2,7 @@
     const globals = {
 		random: null,
         cellScreen: null,
-        mutationCounter: 0,        
-        lastHash: "",
+        mutationCounter: 0,     
         canvasImg: document.getElementById('auxCanvas'),
         ctxImg: null,
         img: new Image(),
@@ -431,13 +430,6 @@
         globals.cellScreen.draw(ctx);
         globals.cellScreen.copyBuffer();
         config.mutationCounter++;
-
-        let currentHash = globals.cellScreen.cells.flat().map(c => c.lightness.toFixed(1)).join("");
-        if (currentHash === globals.lastHash) {
-            randomize();
-            config.mutationCounter = 0;
-        }
-        globals.lastHash = currentHash;
 
         if (config.mutationCounter % 100 === 0) {
             setRandomRules();
