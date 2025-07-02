@@ -419,7 +419,7 @@
 	}
 
 	window.magic = () => {  
-		randomize();
+		setRandomRules();
         Sound.tada();
 	}
 

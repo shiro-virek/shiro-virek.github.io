@@ -372,27 +372,25 @@
         
         globals.cellScreen.neighborhoods.push(baseNeighborhood);
 
-        if (globals.random.nextBool()) {
-            let specialNeighborhood = new Neighborhood();
-            let types = [NeighborhoodType.Diagonal, NeighborhoodType.Circunference, NeighborhoodType.Extended];
-            specialNeighborhood.neighborhoodType = types[globals.random.nextInt(0, types.length - 1)];
-            
-            let conditionTypes = [Condition.Lower, Condition.Greater, Condition.Between];
-            let condition = conditionTypes[globals.random.nextInt(0, conditionTypes.length - 1)];
-            
-            let min = globals.random.nextInt(1, 3);
-            let max = globals.random.nextInt(min, min + 2);
-            
-            specialNeighborhood.rules.push(new Rule(
-                globals.random.nextBool(),
-                condition,
-                min,
-                max,
-                globals.random.nextBool()
-            ));
-            
-            globals.cellScreen.neighborhoods.push(specialNeighborhood);
-        }
+        let specialNeighborhood = new Neighborhood();
+        let types = [NeighborhoodType.Diagonal, NeighborhoodType.Circunference, NeighborhoodType.Extended];
+        specialNeighborhood.neighborhoodType = types[globals.random.nextInt(0, types.length - 1)];
+        
+        let conditionTypes = [Condition.Lower, Condition.Greater, Condition.Between];
+        let condition = conditionTypes[globals.random.nextInt(0, conditionTypes.length - 1)];
+        
+        let min = globals.random.nextInt(1, 3);
+        let max = globals.random.nextInt(min, min + 2);
+        
+        specialNeighborhood.rules.push(new Rule(
+            globals.random.nextBool(),
+            condition,
+            min,
+            max,
+            globals.random.nextBool()
+        ));
+        
+        globals.cellScreen.neighborhoods.push(specialNeighborhood);    
     }
 
     window.draw = () => {
@@ -417,7 +415,7 @@
     }
 
 	window.magic = () => {  
-		randomize();
+		setBalancedRules();
         Sound.tada();
 	}
 
