@@ -89,7 +89,7 @@
         }
     }
 
-    let loadImage = (source = '../assets/Picture1.jpg', status = 0) => {
+    let loadImage = (source = '../assets/Picture1.jpg') => {
         globals.img.src = source;
 
         globals.img.onload = function () {
@@ -144,17 +144,16 @@
     window.draw = () => {
         globals.ledScreen.update();
         drawBackground(ctx, canvas);
+        globals.ledScreen.draw(ctx);
+    }
+
+    window.trackMouse = (xMouse, yMouse) => {    
         if (clicking){            
-            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, mouseX, mouseY);
+            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, xMouse, yMouse);
             for (const p of points) {                
                 globals.ledScreen.setPixel(p.x, p.y);
             }                
         }   
-        globals.ledScreen.draw(ctx);
-    }
-
-    window.trackMouse = (xMouse, yMouse) => {
-    
     }
 
 	window.clearCanvas = () => {		
@@ -181,7 +180,7 @@
                     alert('Error loading image');
                 };
             
-                loadImage(event.target.result, 1);
+                loadImage(event.target.result);
             };
             
             reader.onerror = function() {
