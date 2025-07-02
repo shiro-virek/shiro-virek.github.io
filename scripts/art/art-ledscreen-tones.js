@@ -2,6 +2,10 @@
     const globals = {
         random: null,
         ledScreen: null,
+        canvasImg: document.getElementById('auxCanvas'),
+        ctxImg: null,
+        img: new Image(),
+        imgData: null,
     };
 
     const config = { 
@@ -44,9 +48,8 @@
         setPixel = (x, y) => {            
             let col = Math.round((x - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
             let row = Math.round((y - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
-            this.leds[col][row].value += config.valueIncrement;
-            if (this.leds[col][row].value > 255) 
-                this.leds[col][row].value = 0;
+            if (col > config.ledColumns - 1 || row > config.ledRows - 1 || col < 0 || row < 0) return;
+            if (this.leds[col][row].value < 255) this.leds[col][row].value += config.valueIncrement;
         }
 
         draw = (ctx) => {
@@ -86,8 +89,37 @@
         }
     }
 
+    let loadImage = (source = '../assets/Picture1.jpg', status = 0) => {
+        globals.img.src = source;
+
+        globals.img.onload = function () {
+            globals.canvasImg.width = config.ledColumns;
+            globals.canvasImg.height = config.ledRows;
+
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
+            
+            globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            globals.imgData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
+
+            for (let y = 0; y < config.ledRows; y++) {
+                for (let x = 0; x < config.ledColumns; x++) {
+                    let i = y * config.ledColumns + x;
+                    const r = globals.imgData[i * 4 + 0];
+                    const g = globals.imgData[i * 4 + 1];
+                    const b = globals.imgData[i * 4 + 2];
+                    const a = globals.imgData[i * 4 + 3];
+
+                    let lightness = Color.getLightness = (r, g, b);
+                    globals.ledScreen.leds[x][y].value = lightness;
+                }
+            }
+        };
+    }
+
     let init = () => {
         initCanvas();
+        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
         if (config.randomize) randomize();
         config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
         config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
@@ -112,16 +144,17 @@
     window.draw = () => {
         globals.ledScreen.update();
         drawBackground(ctx, canvas);
+        if (clicking){            
+            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, mouseX, mouseY);
+            for (const p of points) {                
+                globals.ledScreen.setPixel(p.x, p.y);
+            }                
+        }   
         globals.ledScreen.draw(ctx);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
-        if (clicking){            
-            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, xMouse, yMouse);
-            for (const p of points) {                
-                globals.ledScreen.setPixel(p.x, p.y);
-            }                
-        }    
+    
     }
 
 	window.clearCanvas = () => {		
@@ -132,8 +165,31 @@
 		Sound.error();
 	}
 
-    window.upload = () => {
-		Sound.error();
+    window.upload = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                globals.img.onerror = function() {
+                    alert('Error loading image');
+                };
+            
+                loadImage(event.target.result, 1);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
     }
 
     init();
