@@ -4,6 +4,10 @@
         cellScreen: null,
         mutationCounter: 0,        
         lastHash: "",
+        canvasImg: document.getElementById('auxCanvas'),
+        ctxImg: null,
+        img: new Image(),
+        imgData: null,
     };
 
     const config = {
@@ -315,6 +319,8 @@
     let init = () => {       
 		initCanvas();
         
+        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
+
         randomize();
 
         addEvents();
@@ -331,14 +337,14 @@
         config.cellDiameter = globals.random.nextInt(5, 20);        
         config.cellRows = Math.floor((height - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
         config.cellColumns = Math.floor((width - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
-        config.cellScreen = new CellScreen();
+        globals.cellScreen = new CellScreen();
 
         for (let x = 0; x <= config.cellColumns; x++) {
             for (let y = 0; y <= config.cellRows; y++) {
                 if (x >= 0 && y >= 0 && x < config.cellColumns && y < config.cellRows) {
-                    config.cellScreen.cells[x][y].hue = globals.random.nextInt(0, 360);
-                    config.cellScreen.cells[x][y].saturation = globals.random.nextInt(60, 100);
-                    config.cellScreen.cells[x][y].lightness = globals.random.nextInt(40, 60);
+                    globals.cellScreen.cells[x][y].hue = globals.random.nextInt(0, 360);
+                    globals.cellScreen.cells[x][y].saturation = globals.random.nextInt(60, 100);
+                    globals.cellScreen.cells[x][y].lightness = globals.random.nextInt(40, 60);
                 }
             }
         }
@@ -380,24 +386,53 @@
 
 
     let setRandomRules = () => {
-        config.cellScreen.neighborhoods = [];
+        globals.cellScreen.neighborhoods = [];
 
         let numberOfRules = globals.random.nextInt(5, 20);
         for(let i = 0; i < numberOfRules; i++){
             let newRule = getRandomRule();   
-            config.cellScreen.rules.push(newRule);
+            globals.cellScreen.rules.push(newRule);
         }
     }
 
+    let loadImage = (source = '../assets/Picture1.jpg') => {
+        globals.img.src = source;
+
+        globals.img.onload = function () {
+            globals.canvasImg.width = config.cellColumns;
+            globals.canvasImg.height = config.cellRows;
+
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
+            
+            globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            globals.imgData = globals.ctxImg.getImageData(0, 0, config.cellColumns, config.cellRows).data;
+            for (let y = 0; y < config.cellRows; y++) {
+                for (let x = 0; x < config.cellColumns; x++) {
+                    let i = y * config.cellColumns + x;
+                    const r = globals.imgData[i * 4 + 0];
+                    const g = globals.imgData[i * 4 + 1];
+                    const b = globals.imgData[i * 4 + 2];
+                    const a = globals.imgData[i * 4 + 3];
+
+                    const { h: hue, s: saturation, l: lightness } = Color.rgbToHsl(r, g, b);
+                    globals.cellScreen.cells[x][y].hue = hue;
+                    globals.cellScreen.cells[x][y].saturation = saturation;
+                    globals.cellScreen.cells[x][y].lightness = lightness;
+                }
+            }
+        };
+    }
+
     window.draw = () => {
-        config.cellScreen.update();
+        globals.cellScreen.update();
 
         drawBackground(ctx, canvas);
-        config.cellScreen.draw(ctx);
-        config.cellScreen.copyBuffer();
+        globals.cellScreen.draw(ctx);
+        globals.cellScreen.copyBuffer();
         config.mutationCounter++;
 
-        let currentHash = config.cellScreen.cells.flat().map(c => c.lightness.toFixed(1)).join("");
+        let currentHash = globals.cellScreen.cells.flat().map(c => c.lightness.toFixed(1)).join("");
         if (currentHash === globals.lastHash) {
             randomize();
             config.mutationCounter = 0;
@@ -419,12 +454,35 @@
 	}
 
 	window.magic = () => {  
-		randomize();
+		setRandomRules();
         Sound.tada();
 	}
 
-    window.upload = () => {
-		Sound.error();
+    window.upload = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                globals.img.onerror = function() {
+                    alert('Error loading image');
+                };
+            
+                loadImage(event.target.result);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
     }
 
     init();

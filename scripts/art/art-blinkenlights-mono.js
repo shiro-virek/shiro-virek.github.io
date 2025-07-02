@@ -3,6 +3,10 @@
         random: null,
         cellScreen: null,
         mutationCounter: 0,
+        canvasImg: document.getElementById('auxCanvas'),
+        ctxImg: null,
+        img: new Image(),
+        imgData: null,
     };
 
     const config = {
@@ -254,8 +258,37 @@
         }
     }
 
+    let loadImage = (source = '../assets/Picture1.jpg') => {
+        globals.img.src = source;
+
+        globals.img.onload = function () {
+            globals.canvasImg.width = config.cellColumns;
+            globals.canvasImg.height = config.cellRows;
+
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
+            
+            globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            globals.imgData = globals.ctxImg.getImageData(0, 0, config.cellColumns, config.cellRows).data;
+            for (let y = 0; y < config.cellRows; y++) {
+                for (let x = 0; x < config.cellColumns; x++) {
+                    let i = y * config.cellColumns + x;
+                    const r = globals.imgData[i * 4 + 0];
+                    const g = globals.imgData[i * 4 + 1];
+                    const b = globals.imgData[i * 4 + 2];
+                    const a = globals.imgData[i * 4 + 3];
+
+                    let lightness = Color.getLightness(r, g, b);
+                    globals.cellScreen.cells[x][y].alive = lightness > 120;
+                }
+            }
+        };
+    }
+
     let init = () => {       
         initCanvas();
+        
+        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
         
         randomize();
 
@@ -276,7 +309,8 @@
 
         config.cellRows = Math.floor((height - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
         config.cellColumns = Math.floor((width - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
-        config.cellScreen = new CellScreen();
+        
+        globals.cellScreen = new CellScreen();
         
         initializePatterns();
         
@@ -290,7 +324,7 @@
                     for (let dx = 0; dx < 2; dx++) {
                         for (let dy = 0; dy < 2; dy++) {
                             if (x + dx <= config.cellColumns && y + dy <= config.cellRows) {
-                                config.cellScreen.cells[x + dx][y + dy].alive = true;
+                                globals.cellScreen.cells[x + dx][y + dy].alive = true;
                             }
                         }
                     }
@@ -302,19 +336,19 @@
             if (globals.random.nextBool()) {
                 let y = globals.random.nextInt(0, config.cellRows);
                 for (let x = 0; x <= config.cellColumns; x++) {
-                    config.cellScreen.cells[x][y].alive = true;
+                    globals.cellScreen.cells[x][y].alive = true;
                 }
             } else {
                 let x = globals.random.nextInt(0, config.cellColumns);
                 for (let y = 0; y <= config.cellRows; y++) {
-                    config.cellScreen.cells[x][y].alive = true;
+                    globals.cellScreen.cells[x][y].alive = true;
                 }
             }
         }
     }
 
     let setBalancedRules = () => {
-        config.cellScreen.neighborhoods = [];
+        globals.cellScreen.neighborhoods = [];
 
         let baseNeighborhood = new Neighborhood();
         baseNeighborhood.neighborhoodType = NeighborhoodType.Moore;
@@ -335,36 +369,34 @@
             true
         ));
         
-        config.cellScreen.neighborhoods.push(baseNeighborhood);
+        globals.cellScreen.neighborhoods.push(baseNeighborhood);
 
-        if (globals.random.nextBool()) {
-            let specialNeighborhood = new Neighborhood();
-            let types = [NeighborhoodType.Diagonal, NeighborhoodType.Circunference, NeighborhoodType.Extended];
-            specialNeighborhood.neighborhoodType = types[globals.random.nextInt(0, types.length - 1)];
-            
-            let conditionTypes = [Condition.Lower, Condition.Greater, Condition.Between];
-            let condition = conditionTypes[globals.random.nextInt(0, conditionTypes.length - 1)];
-            
-            let min = globals.random.nextInt(1, 3);
-            let max = globals.random.nextInt(min, min + 2);
-            
-            specialNeighborhood.rules.push(new Rule(
-                globals.random.nextBool(),
-                condition,
-                min,
-                max,
-                globals.random.nextBool()
-            ));
-            
-            config.cellScreen.neighborhoods.push(specialNeighborhood);
-        }
+        let specialNeighborhood = new Neighborhood();
+        let types = [NeighborhoodType.Diagonal, NeighborhoodType.Circunference, NeighborhoodType.Extended];
+        specialNeighborhood.neighborhoodType = types[globals.random.nextInt(0, types.length - 1)];
+        
+        let conditionTypes = [Condition.Lower, Condition.Greater, Condition.Between];
+        let condition = conditionTypes[globals.random.nextInt(0, conditionTypes.length - 1)];
+        
+        let min = globals.random.nextInt(1, 3);
+        let max = globals.random.nextInt(min, min + 2);
+        
+        specialNeighborhood.rules.push(new Rule(
+            globals.random.nextBool(),
+            condition,
+            min,
+            max,
+            globals.random.nextBool()
+        ));
+        
+        globals.cellScreen.neighborhoods.push(specialNeighborhood);    
     }
 
     window.draw = () => {
-        config.cellScreen.update();
+        globals.cellScreen.update();
         drawBackground(ctx, canvas);
-        config.cellScreen.draw(ctx);
-        config.cellScreen.copyBuffer();
+        globals.cellScreen.draw(ctx);
+        globals.cellScreen.copyBuffer();
 
         config.mutationCounter++;
         if (config.mutationCounter % 50 === 0) {
@@ -382,12 +414,35 @@
     }
 
 	window.magic = () => {  
-		randomize();
+		setBalancedRules();
         Sound.tada();
 	}
 
-    window.upload = () => {
-		Sound.error();
+    window.upload = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                globals.img.onerror = function() {
+                    alert('Error loading image');
+                };
+            
+                loadImage(event.target.result);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
     }
 
     init();
