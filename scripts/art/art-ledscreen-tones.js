@@ -12,7 +12,7 @@
         ledPadding: 30,
         ledDiameter: 20,
         hue: 150,
-        valueIncrement: 5,
+        valueIncrement: 1,
     };
     
     const Figures = Object.freeze({
@@ -116,8 +116,12 @@
     }
 
     window.trackMouse = (xMouse, yMouse) => {
-        if (clicking)
-            globals.ledScreen.setPixel(xMouse, yMouse);
+        if (clicking){            
+            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, xMouse, yMouse);
+            for (const p of points) {                
+                globals.ledScreen.setPixel(p.x, p.y);
+            }                
+        }    
     }
 
 	window.clearCanvas = () => {		

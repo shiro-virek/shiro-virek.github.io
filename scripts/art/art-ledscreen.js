@@ -108,8 +108,12 @@
     }
 
     window.trackMouse = (xMouse, yMouse) => {
-        if (clicking)
-            globals.ledScreen.setPixel(xMouse, yMouse);
+        if (clicking){            
+            let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, xMouse, yMouse);
+            for (const p of points) {                
+                globals.ledScreen.setPixel(p.x, p.y);
+            }                
+        }    
     }
 
     window.draw = () => {

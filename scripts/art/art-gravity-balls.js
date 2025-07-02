@@ -217,7 +217,8 @@
 	}
 
 	window.magic = () => {  
-		Sound.error();
+        config.gravity = -config.gravity;
+		Sound.tada();
 	}
 
     window.upload = () => {
