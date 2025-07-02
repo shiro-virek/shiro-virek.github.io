@@ -147,7 +147,6 @@
             globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
             globals.imgData = globals.ctxImg.getImageData(0, 0, config.cellColumns, config.cellRows).data;
-            globals.cellScreen = new CellScreen();
             for (let y = 0; y < config.cellRows; y++) {
                 for (let x = 0; x < config.cellColumns; x++) {
                     let i = y * config.cellColumns + x;
