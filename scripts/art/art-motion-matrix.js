@@ -99,11 +99,17 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= config.pixelColumns; x++) {
-                for (let y = 0; y <= config.pixelRows; y++) {
-                    this.pixels[x][y].draw(ctx);
+            const flatList = this.pixels.flat();
+            flatList.sort((a, b) => {
+                if (isNaN(a.diameter) || isNaN(b.diameter)) {
+                    return 0; 
                 }
-            }
+                return a.diameter - b.diameter;
+            });	
+
+            flatList.forEach(pixel => {          
+                pixel.draw(ctx);     
+            });
         }
 
         update = () => {
