@@ -13,14 +13,17 @@
         slowDown: false,
         stopOnBlur: false,
         hue: 100,
+        pixelRows: 50,
+        pixelColumns: 50,
     };
 
     const globals = {
-        pixelRows: 50,
-        pixelColumns: 50,
+        random: null,
         pixelScreen: null,
-        pixelRadius: config.pixelDiameter / 2,
-        random: null
+        canvasImg: document.getElementById('auxCanvas'),
+        ctxImg: null,
+        img: new Image(),
+        imgData: null,
     };
 
     const Figures = Object.freeze({
@@ -37,12 +40,12 @@
         }
 
         generatePixels = () => {
-            for (let x = 0; x <= globals.pixelColumns; x++) {
-                this.pixels[x] = new Array(globals.pixelRows);
+            for (let x = 0; x <= config.pixelColumns; x++) {
+                this.pixels[x] = new Array(config.pixelRows);
             }
 
-            for (let x = 0; x <= globals.pixelColumns; x++) {
-                for (let y = 0; y <= globals.pixelRows; y++) {
+            for (let x = 0; x <= config.pixelColumns; x++) {
+                for (let y = 0; y <= config.pixelRows; y++) {
                     let pixel = new Pixel(x, y);
                     this.pixels[x][y] = pixel;
                 }
@@ -96,16 +99,22 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= globals.pixelColumns; x++) {
-                for (let y = 0; y <= globals.pixelRows; y++) {
-                    this.pixels[x][y].draw(ctx);
+            const flatList = this.pixels.flat();
+            flatList.sort((a, b) => {
+                if (isNaN(a.diameter) || isNaN(b.diameter)) {
+                    return 0; 
                 }
-            }
+                return a.diameter - b.diameter;
+            });	
+
+            flatList.forEach(pixel => {          
+                pixel.draw(ctx);     
+            });
         }
 
         update = () => {
-            for (let x = 0; x <= globals.pixelColumns; x++) {
-                for (let y = 0; y <= globals.pixelRows; y++) {
+            for (let x = 0; x <= config.pixelColumns; x++) {
+                for (let y = 0; y <= config.pixelRows; y++) {
                     this.movePixel(x, y);
                 }
             }
@@ -115,26 +124,28 @@
     class Pixel {
         constructor(column, row) {
             this.diameter = config.pixelDiameter;
-            this.radius = globals.pixelRadius;
+            this.radius = config.pixelDiameter / 2;
             this.row = row;
             this.column = column;
             this.x = config.pixelMargin + column * config.pixelPadding + column * this.diameter;
             this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;            
             this.hue = config.hue;
+            this.saturation = 100;
+            this.lightness = 50;
             this.growing = 0;
             this.angle = 0;
             this.rotating = 0;
         }
 
         getColor = (opacity = 1.0) => {
-            return `hsl(${this.hue}, 100%, 50%, ${opacity})`;
+            return `hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${opacity})`;
         }
 
         draw = (ctx) => {
             let opacity = config.transparent ? this.diameter / config.maxSize : 1;
             switch (globals.pixelScreen.shape) {
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x + globals.pixelRadius, this.y + globals.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
+                    Drawing.drawCircle(ctx, this.x + config.pixelRadius, this.y + config.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
                     break;
                 case Figures.Square:
                     Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
@@ -146,11 +157,13 @@
     let init = () => {
         initCanvas();
 
+        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
+
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 
-        globals.pixelRows = Math.floor((height - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
-        globals.pixelColumns = Math.floor((width - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
+        config.pixelRows = Math.floor((height - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
+        config.pixelColumns = Math.floor((width - config.pixelMargin) / (config.pixelDiameter + config.pixelPadding));
         globals.pixelScreen = new PixelScreen();
 
         addEvents();
@@ -177,6 +190,35 @@
         config.rotate = globals.random.nextBool();
     }
 
+    let loadImage = (source = '../assets/Picture1.jpg') => {
+        globals.img.src = source;
+
+        globals.img.onload = function () {
+            globals.canvasImg.width = config.pixelColumns;
+            globals.canvasImg.height = config.pixelRows;
+
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
+            
+            globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            globals.imgData = globals.ctxImg.getImageData(0, 0, config.pixelColumns, config.pixelRows).data;
+            for (let y = 0; y < config.pixelRows; y++) {
+                for (let x = 0; x < config.pixelColumns; x++) {
+                    let i = y * config.pixelColumns + x;
+                    const r = globals.imgData[i * 4 + 0];
+                    const g = globals.imgData[i * 4 + 1];
+                    const b = globals.imgData[i * 4 + 2];
+                    const a = globals.imgData[i * 4 + 3];
+
+                    const { h: hue, s: saturation, l: lightness } = Color.rgbToHsl(r, g, b);
+                    globals.pixelScreen.pixels[x][y].hue = hue;
+                    globals.pixelScreen.pixels[x][y].saturation = saturation;
+                    globals.pixelScreen.pixels[x][y].lightness = lightness;
+                }
+            }
+        };
+    }
+
     window.draw = () => {
         globals.pixelScreen.update();
 
@@ -198,8 +240,31 @@
 		Sound.error();
 	}
 
-    window.upload = () => {
-		Sound.error();
+    window.upload = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {                    
+                globals.img.onerror = function() {
+                    alert('Error loading image');
+                };
+            
+                loadImage(event.target.result);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
     }
     
     init();
