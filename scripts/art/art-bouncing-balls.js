@@ -8,6 +8,8 @@
 		radius: 20,
 		drawQuadtree: false,
 		opacity: 1,
+		minRadius: 5,
+		maxRadius: 50,
     };
 
 	const globals = {
@@ -19,7 +21,7 @@
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
-			this.radius = config.randomSize ? globals.random.nextInt(5, 50) : config.radius;
+			this.radius = config.randomSize ? globals.random.nextInt(config.minRadius, config.maxRadius) : config.radius;
 			this.mass = this.radius * 2;
 			this.speedY = globals.random.nextRange(1, 5);
 			this.speedX = globals.random.nextRange(1, 5);
@@ -90,7 +92,7 @@
 					ball.speedX = newVelX2;
 					ball.speedY = newVelY2;
 				
-					Sound.ping(1000);
+					Sound.ping(Numbers.scale((this.mass * ball.mass), config.minRadius, config.maxRadius * config.maxRadius, 1500, 800));
 				}
 			}
 		}
@@ -149,6 +151,21 @@
 		addBall = (x, y) => {
 			let ball = new Ball(x, y);
 
+			let returnObjects = [];
+
+			globals.ballCollection.quad.retrieve(returnObjects, ball);
+
+			for (const element of returnObjects) {
+			
+				let catX = Math.abs(ball.x - element.x);
+				let catY = Math.abs(ball.y - element.y);
+				let distance = Math.sqrt(catX * catX + catY * catY);
+
+				if (distance < ball.radius + element.radius) {
+					return;
+				}
+			}
+
 			globals.ballCollection.balls.push(ball);
 
 			Sound.ping(100);
@@ -174,7 +191,7 @@
 	let init = () => {
 		initCanvas();
 		
-        drawBackground(ctx, canvas, config.opacity);
+        drawBackground(ctx, canvas);
 
 		globals.ballCollection = new BallCollection()
 		globals.random = Objects.getRandomObject();
