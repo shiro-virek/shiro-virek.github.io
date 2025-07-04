@@ -15,6 +15,7 @@
         hue: 100,
         pixelRows: 50,
         pixelColumns: 50,
+        animateNeighbors: true,
     };
 
     const globals = {
@@ -65,9 +66,26 @@
         }
 
         activatePixel = (x, y) => {
+            if (x >= 0 && y >= 0 && x <= config.pixelColumns && y <= config.pixelRows){
+                this.pixels[x][y].growing = config.growSpeed;
+                this.pixels[x][y].rotating = config.growSpeed;
+            }
+        }
+
+        activatePixelAndNeighbours = (x, y) => {
             let pixelPos = this.getPixelByMousePosition(x, y);
-            this.pixels[pixelPos.col][pixelPos.row].growing = config.growSpeed;
-            this.pixels[pixelPos.col][pixelPos.row].rotating = config.growSpeed;
+            this.activatePixel(pixelPos.col, pixelPos.row);
+
+            if (config.animateNeighbors){
+                this.activatePixel(pixelPos.col-1, pixelPos.row-1);
+                this.activatePixel(pixelPos.col-1, pixelPos.row);
+                this.activatePixel(pixelPos.col, pixelPos.row-1);
+                this.activatePixel(pixelPos.col+1, pixelPos.row+1);
+                this.activatePixel(pixelPos.col, pixelPos.row+1);
+                this.activatePixel(pixelPos.col+1, pixelPos.row);
+                this.activatePixel(pixelPos.col+1, pixelPos.row-1);
+                this.activatePixel(pixelPos.col-1, pixelPos.row+1);
+            }
         }
 
         movePixel = (col, row) => {        
@@ -188,6 +206,7 @@
         config.shrinkSpeed = globals.random.nextRange(0.1, 2.0, 1);
         config.maxSize = globals.random.nextInt(config.pixelDiameter + 1, 255);
         config.rotate = globals.random.nextBool();
+        config.animateNeighbors = globals.random.nextBool();
     }
 
     let loadImage = (source = '../assets/Picture1.jpg') => {
@@ -228,7 +247,7 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {
-            globals.pixelScreen.activatePixel(x, y);
+            globals.pixelScreen.activatePixelAndNeighbours(x, y);
         }
     }
 
