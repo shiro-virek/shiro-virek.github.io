@@ -29,7 +29,8 @@
 
     const Figures = Object.freeze({
         Square: Symbol("square"),
-        Circle: Symbol("circle")
+        Circle: Symbol("circle"),
+        Hexagon: Symbol("hexagon"),
     });
 
     class PixelScreen {
@@ -167,6 +168,10 @@
                     break;
                 case Figures.Square:
                     Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity));
+                    break;
+                case Figures.Hexagon:
+                    let y = this.x % 2 == 0 ? this.y : this.y + this.radius;
+                    Drawing.drawPolygon(ctx, this.x, y, this.radius, 6, config.rotate ? this.angle : 0, this.getColor(opacity));
                     break;
             }
         }
