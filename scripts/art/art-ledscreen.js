@@ -87,7 +87,7 @@
                     Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color);
                     break;
                 case Figures.Hexagon:
-                    let y = this.x % 2 == 0 ? this.y : this.y + this.radius;
+                    let y = this.column % 2 == 0 ? this.y : this.y + this.radius;
                     Drawing.drawPolygon(ctx, this.x, y, this.radius, 6, 0, color);
                     break;
             }
