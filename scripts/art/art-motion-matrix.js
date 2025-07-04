@@ -163,10 +163,10 @@
             let opacity = config.transparent ? this.diameter / config.maxSize : 1;
             switch (globals.pixelScreen.shape) {
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x + config.pixelRadius, this.y + config.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
+                    Drawing.drawCircle(ctx, this.x + this.radius / 2, this.y + this.radius / 2, this.radius, this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
+                    Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity));
                     break;
             }
         }

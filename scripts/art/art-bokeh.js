@@ -89,7 +89,7 @@
 			y = (lastPosY + yMod) + entropyY;
 
 			for (let i = 0; i <= config.circles; i++) {
-				Drawing.drawCircle(ctx, x, y, config.size * (config.circles / i), color, color);
+				Drawing.drawCircle(ctx, x, y, config.size * (config.circles / i), color);
 			}
 		}
 	}

@@ -83,7 +83,8 @@
 
 			ctx.lineWidth = 1;
 			for (let i = 0; i < globals.metroNetwork.lines.length; i++) {
-				Drawing.drawRectangle(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, '#000', globals.metroNetwork.lines[i].colorBase());
+				Drawing.drawRectangle(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, globals.metroNetwork.lines[i].colorBase());
+				Drawing.drawRectangleBorder(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, "#000");
 				ctx.fillStyle = "#000";
 				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol}`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding * 2 + i * config.infoLineHeight);
 			}
@@ -190,7 +191,10 @@
 		}
 
 		drawStation = (ctx, color) => {			
-			Drawing.drawCircle(ctx, this.x, this.y, config.stationRadio, config.stationColorBorder ? color : "#000", "#FFF");
+			Drawing.drawCircle(ctx, this.x, this.y, config.stationRadio, "#FFF");
+
+			if (config.stationColorBorder)
+				Drawing.drawCircleBorder(ctx, this.x, this.y, config.stationRadio, "#000");
 		}
 
 		drawStationName = (ctx) => {

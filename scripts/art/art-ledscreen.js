@@ -81,10 +81,10 @@
 
             switch(globals.ledScreen.shape){
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, color, color)
+                    Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, color)
                     break;
                 case Figures.Square:                    
-                    Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color, color);
+                    Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color);
                     break;
             }
         }

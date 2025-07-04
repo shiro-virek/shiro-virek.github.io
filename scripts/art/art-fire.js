@@ -130,11 +130,11 @@
 				
 				globals.objects[i].previous.forEach(function (item) {	
 					color2.alpha *= 0.7;
-					Drawing.drawCircle(ctx, item.xMovement, item.yCenter, item.getDiameter(), color2.getRGBA(), color2.getRGBA());
+					Drawing.drawCircle(ctx, item.xMovement, item.yCenter, item.getDiameter(), color2.getRGBA());
 				});
 				
 
-				Drawing.drawCircle(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), color.getRGBA(), color.getRGBA());
+				Drawing.drawCircle(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), color.getRGBA());
 			}				
 		}
 	}

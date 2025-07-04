@@ -71,29 +71,29 @@
 
     function bars(pixel, noiseValue){
         let angle = Numbers.scale(noiseValue, -1, 1, 0, 360);
-        Drawing.drawRectangleR(ctx, pixel.x, pixel.y, pixel.diameter / 4, pixel.diameter, pixel.color, pixel.color, angle);   
+        Drawing.drawRectangleRotated(ctx, pixel.x, pixel.y, pixel.diameter / 4, pixel.diameter, pixel.color, angle);   
     }
 
     function squares(pixel, noiseValue){
         let side = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
-        Drawing.drawSquare(ctx, pixel.x, pixel.y, side, 0, pixel.color, pixel.color);  
+        Drawing.drawSquare(ctx, pixel.x, pixel.y, side, 0, pixel.color);  
     }
 
     function semitone(pixel, noiseValue){
         let radius = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
-        Drawing.drawCircle(ctx, pixel.x, pixel.y, radius, pixel.color, pixel.color); 
+        Drawing.drawCircle(ctx, pixel.x, pixel.y, radius, pixel.color); 
     }
 
     function brightness(pixel, noiseValue){
         let bright = Numbers.scale(noiseValue, -1, 1, 0, 50);
         let color = `hsl(${config.hue}, 100%, ${bright}%)`;
-        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color, color); 
+        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color); 
     }
 
     function hues(pixel, noiseValue){
         let newHue = Numbers.scale(noiseValue, -1, 1, 0, 360);
         let color = `hsl(${newHue}, 100%, 50%)`;
-        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color, color); 
+        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color); 
     }
 
     let init = () => {
