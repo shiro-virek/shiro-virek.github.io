@@ -19,7 +19,8 @@
 
 	const Figures = Object.freeze({
 		Square: Symbol("square"),
-		Circle: Symbol("circle")
+		Circle: Symbol("circle"),
+        Hexagon: Symbol("hexagon"),
 	});
 
 	class Particle {
@@ -121,10 +122,13 @@
 			if (globals.objects[i].notFirstTime) {
 				switch (globals.objects[i].shape) {
 					case Figures.Circle:
-						Drawing.drawCircle(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), globals.objects[i].getColor(), globals.objects[i].getColor());
+						Drawing.drawCircle(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), globals.objects[i].getColor());
 						break;
 					case Figures.Square:
 						Drawing.drawSquare(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), globals.objects[i].angle, globals.objects[i].getColor());
+						break;
+					case Figures.Hexagon:
+						Drawing.drawPolygon(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), 6, globals.objects[i].angle, globals.objects[i].getColor());
 						break;
 				}
 			}

@@ -31,7 +31,7 @@
         draw = () => {
             let color = `hsl(${this.hue}, ${100}%, ${50}%)`;
 
-			Drawing.drawCircle(ctx, this.x, this.y, this.radius, color, color);
+			Drawing.drawCircle(ctx, this.x, this.y, this.radius, color);
         }
 
         checkCollisionsBalls = () => {

@@ -286,7 +286,7 @@
         }
 
         draw = (ctx) => {
-            Drawing.drawSquare(ctx, this.x, this.y, this.diameter, 0, this.getColor(), this.getColor())
+            Drawing.drawSquare(ctx, this.x, this.y, this.diameter, 0, this.getColor())
         }
     }
 

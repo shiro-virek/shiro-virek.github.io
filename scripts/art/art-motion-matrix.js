@@ -15,6 +15,7 @@
         hue: 100,
         pixelRows: 50,
         pixelColumns: 50,
+        animateNeighbors: true,
     };
 
     const globals = {
@@ -28,7 +29,8 @@
 
     const Figures = Object.freeze({
         Square: Symbol("square"),
-        Circle: Symbol("circle")
+        Circle: Symbol("circle"),
+        Hexagon: Symbol("hexagon"),
     });
 
     class PixelScreen {
@@ -65,9 +67,26 @@
         }
 
         activatePixel = (x, y) => {
+            if (x >= 0 && y >= 0 && x <= config.pixelColumns && y <= config.pixelRows){
+                this.pixels[x][y].growing = config.growSpeed;
+                this.pixels[x][y].rotating = config.growSpeed;
+            }
+        }
+
+        activatePixelAndNeighbours = (x, y) => {
             let pixelPos = this.getPixelByMousePosition(x, y);
-            this.pixels[pixelPos.col][pixelPos.row].growing = config.growSpeed;
-            this.pixels[pixelPos.col][pixelPos.row].rotating = config.growSpeed;
+            this.activatePixel(pixelPos.col, pixelPos.row);
+
+            if (config.animateNeighbors){
+                this.activatePixel(pixelPos.col-1, pixelPos.row-1);
+                this.activatePixel(pixelPos.col-1, pixelPos.row);
+                this.activatePixel(pixelPos.col, pixelPos.row-1);
+                this.activatePixel(pixelPos.col+1, pixelPos.row+1);
+                this.activatePixel(pixelPos.col, pixelPos.row+1);
+                this.activatePixel(pixelPos.col+1, pixelPos.row);
+                this.activatePixel(pixelPos.col+1, pixelPos.row-1);
+                this.activatePixel(pixelPos.col-1, pixelPos.row+1);
+            }
         }
 
         movePixel = (col, row) => {        
@@ -145,10 +164,14 @@
             let opacity = config.transparent ? this.diameter / config.maxSize : 1;
             switch (globals.pixelScreen.shape) {
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x + config.pixelRadius, this.y + config.pixelRadius, this.radius, this.getColor(opacity), this.getColor(opacity));
+                    Drawing.drawCircle(ctx, this.x, this.y, this.radius, this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity), this.getColor(opacity));
+                    Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity));
+                    break;
+                case Figures.Hexagon:
+                    let y = this.x % 2 == 0 ? this.y : this.y + this.radius;
+                    Drawing.drawPolygon(ctx, this.x, y, this.radius, 6, config.rotate ? this.angle : 0, this.getColor(opacity));
                     break;
             }
         }
@@ -188,6 +211,7 @@
         config.shrinkSpeed = globals.random.nextRange(0.1, 2.0, 1);
         config.maxSize = globals.random.nextInt(config.pixelDiameter + 1, 255);
         config.rotate = globals.random.nextBool();
+        config.animateNeighbors = globals.random.nextBool();
     }
 
     let loadImage = (source = '../assets/Picture1.jpg') => {
@@ -228,7 +252,7 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {
-            globals.pixelScreen.activatePixel(x, y);
+            globals.pixelScreen.activatePixelAndNeighbours(x, y);
         }
     }
 

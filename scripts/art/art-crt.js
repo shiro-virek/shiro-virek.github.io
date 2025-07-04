@@ -109,9 +109,12 @@
             let colorR = `hsl(${0}, 100%, ${lightnessR}%)`;
             let colorG = `hsl(${120}, 100%, ${lightnessG}%)`;
             let colorB = `hsl(${255}, 100%, ${lightnessB}%)`;
-            Drawing.drawRectangle(ctx, this.x, this.y, third, this.diameter, borderColor, colorR)
-            Drawing.drawRectangle(ctx, this.x + third, this.y, third, this.diameter, borderColor, colorG)
-            Drawing.drawRectangle(ctx, this.x + third * 2, this.y, third, this.diameter, borderColor, colorB)
+            Drawing.drawRectangle(ctx, this.x, this.y, third, this.diameter, colorR)
+            Drawing.drawRectangle(ctx, this.x + third, this.y, third, this.diameter, colorG)
+            Drawing.drawRectangle(ctx, this.x + third * 2, this.y, third, this.diameter, colorB)
+            Drawing.drawRectangleBorder(ctx, this.x, this.y, third, this.diameter, borderColor)
+            Drawing.drawRectangleBorder(ctx, this.x + third, this.y, third, this.diameter, borderColor)
+            Drawing.drawRectangleBorder(ctx, this.x + third * 2, this.y, third, this.diameter, borderColor)
         }
     }
 

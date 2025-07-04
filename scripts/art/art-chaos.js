@@ -159,16 +159,16 @@
             if (this.on)
                 switch(globals.semitone.shape){
                     case Figures.Circle:
-                        Drawing.drawCircle(ctx, this.x, this.y, this.radio, this.color, this.color);
+                        Drawing.drawCircle(ctx, this.x, this.y, this.radio, this.color);
                         break;
                     case Figures.Square:             
-                        Drawing.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color, this.color);
+                        Drawing.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color);
                         break; 
                     case Figures.Hexagon:                    
-                        Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.angle, this.color, this.color);
+                        Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.angle, this.color);
                         break;
                     case Figures.Triangle:                    
-                        Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 3, this.angle, this.color, this.color);
+                        Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 3, this.angle, this.color);
                         break;
                 }                
         }

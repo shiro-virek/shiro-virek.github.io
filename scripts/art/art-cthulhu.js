@@ -32,19 +32,19 @@
     };
 
 	function circle(color, i){
-		Drawing.drawCircle(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, color, color);
+		Drawing.drawCircle(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, color);
 	}
 		
 	function square(color, i){
-		Drawing.drawSquare(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 0, color, color);
+		Drawing.drawSquare(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 0, color);
 	}
 
 	function hexagon(color, i){
-		Drawing.drawPolygon(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 5, 0, color, color)
+		Drawing.drawPolygon(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 5, 0, color)
 	}
 
 	function pentagon(color, i){
-		Drawing.drawPolygon(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 6, 0, color, color)
+		Drawing.drawPolygon(ctx, globals.slices[i].x, globals.slices[i].y, globals.slices[i].diameter, 6, 0, color)
 	}
 
 	class Slice {
