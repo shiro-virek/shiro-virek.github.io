@@ -1,5 +1,8 @@
 let currentScript = 0;
 let scriptCount = 0;
+let recording = false;
+let recorder = null;
+
 const art = [
                 "confetti", 
                 "fire", 
@@ -52,6 +55,28 @@ let downloadPicture = () => {
     aDownloadLink.download = seed ? `${seed}.png` : 'ccl.png';
     aDownloadLink.href = image;
     aDownloadLink.click();
+}
+
+let initRecorder = () => {
+    let chunks = [];
+    var canvas = document.getElementById('myCanvas');
+    const stream = canvas.captureStream(60)
+    recorder = new MediaRecorder(stream);
+
+    recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+        chunks.push(e.data);
+        }
+    };
+
+    recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ani.webm';
+        a.click();
+    };
 }
 
 let initScripts = () =>{	
@@ -139,8 +164,21 @@ let loadScriptByUrl = () => {
     loadScript(setScriptIndexByURL());
 }
 
+let recordVideo = () => {
+    if (!recording){     
+        initRecorder();
+        document.getElementById('recordButton').textContent = '◼️';
+        recorder.start();
+        recording = true;
+    }else{
+        document.getElementById('recordButton').textContent = '📹';
+        recorder.stop();
+        recording = false;
+    }
+};
+
 window.addEventListener('load', () => {
-    initScripts();			
+    initScripts();	
 
     if (Url.hasUrlParam('art')){
         loadScriptByUrl();
