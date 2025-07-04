@@ -17,6 +17,7 @@
         ledDiameter: 20,
         hue: 150,
         valueIncrement: 1,
+        mode: 1,
     };
     
     const Figures = Object.freeze({
@@ -77,18 +78,28 @@
         }
 
         draw = (ctx) => {
-            let color = `hsl(${config.hue}, 100%, ${this.value}%)`;
+            let color = null;
+            let size = null;
+            
+            if (config.mode) {
+                color = `hsl(${config.hue}, 100%, ${this.value}%)`
+                size = this.radius;
+            }
+            else{
+                color = `hsl(${config.hue}, 100%, 50%)`;
+                size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
+            }
 
             switch(globals.ledScreen.shape){
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, color)
+                    Drawing.drawCircle(ctx, this.x, this.y, size, color)
                     break;
                 case Figures.Square:                    
-                    Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color);
+                    Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
                     break;
                 case Figures.Hexagon:
-                    let y = this.x % 2 == 0 ? this.y : this.y + this.radius;
-                    Drawing.drawPolygon(ctx, this.x, y, this.radius, 6, 0, color);
+                    let y = this.column % 2 == 0 ? this.y : this.y + this.radius;
+                    Drawing.drawPolygon(ctx, this.x, y, size, 6, 0, color);
                     break;
             }
         }
@@ -139,7 +150,7 @@
 
     let randomize = () => {            
 		globals.random = Objects.getRandomObject();
-        
+        config.mode = globals.random.nextBool();
         config.ledDiameter = globals.random.nextInt(5, 20);        
         config.ledPadding = globals.random.nextInt(0, 20);
         config.ledMargin = config.ledPadding;  
