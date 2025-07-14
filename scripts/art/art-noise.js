@@ -82,13 +82,13 @@
         static drawShape = (ctx, x, y, diameter, color) => {
             switch(globals.pixelScreen.shape){
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, x + diameter / 2, y + diameter  / 2, diameter / 2, color)
+                    Drawing.drawCircle(ctx, x, y, diameter, color)
                     break;
                 case Figures.Square:                    
-                    Drawing.drawRectangle(ctx, x, y, diameter / 2, diameter, color);
+                    Drawing.drawRectangle(ctx, x - diameter / 2, y - diameter / 2, diameter, diameter, color);
                     break;
                 case Figures.Hexagon:
-                    Drawing.drawPolygon(ctx, x, y, diameter / 2, 6, 0, color);
+                    Drawing.drawPolygon(ctx, x, y, diameter, 6, 0, color);
                     break;
             }
         }
@@ -126,7 +126,7 @@
         globals.noise = new Noise(globals.random);
         if (config.randomize) randomize();
         initCanvas();
-        config.pixelDiameter = globals.random.nextInt(5, 20);        
+        config.pixelDiameter = globals.random.nextInt(5, 30);        
         config.pixelPadding = globals.random.nextInt(0, 5);
         config.pixelMargin = config.pixelPadding;
 
