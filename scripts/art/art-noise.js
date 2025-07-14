@@ -15,7 +15,8 @@
         pixelDiameter: 20,
         hue: 50,
         functionIndex: 3,
-        functions: [bars, squares, brightness, hues, semitone] 
+        alternatePixel: false,
+        functions: [bars, squares, brightness, hues, semitone],
     };    
 
     class PixelScreen {
@@ -56,7 +57,9 @@
             this.row = row;
             this.column = column;
             this.x = config.pixelMargin + column * config.pixelPadding + column * this.diameter;
-            this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;
+            this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;    
+            if (config.alternatePixel)
+                this.y = this.column % 2 == 0 ? this.y : this.y + this.radius;
             this.color = `hsl(${config.hue}, 100%, 50%)`;
         }
 
@@ -119,6 +122,7 @@
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 255);
         config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);
+        config.alternatePixel = globals.random.nextBool();
     }
     
     window.draw = () => {
