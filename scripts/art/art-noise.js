@@ -19,10 +19,18 @@
         functions: [bars, squares, brightness, hues, semitone],
     };    
 
+    const Figures = Object.freeze({
+		Square: Symbol("square"),
+		Circle: Symbol("circle"),
+        Hexagon: Symbol("hexagon"),
+    });
+
     class PixelScreen {
         constructor() {
             this.pixels = [];       
-            this.generatePixels();
+            this.generatePixels(); 
+            let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);
+			this.shape = Figures[Object.keys(Figures)[rand]];
         }
 
         generatePixels = () => {
@@ -70,6 +78,20 @@
             const modifierFunction = config.functions[config.functionIndex];
             modifierFunction(this, value);
         }
+
+        static drawShape = (ctx, x, y, diameter, color) => {
+            switch(globals.pixelScreen.shape){
+                case Figures.Circle:
+                    Drawing.drawCircle(ctx, x + diameter / 2, y + diameter  / 2, diameter / 2, color)
+                    break;
+                case Figures.Square:                    
+                    Drawing.drawRectangle(ctx, x, y, diameter / 2, diameter, color);
+                    break;
+                case Figures.Hexagon:
+                    Drawing.drawPolygon(ctx, x, y, diameter / 2, 6, 0, color);
+                    break;
+            }
+        }
     }
 
     function bars(pixel, noiseValue){
@@ -79,24 +101,24 @@
 
     function squares(pixel, noiseValue){
         let side = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
-        Drawing.drawSquare(ctx, pixel.x, pixel.y, side, 0, pixel.color);  
+        Pixel.drawShape(ctx, pixel.x, pixel.y, side, pixel.color);  
     }
 
     function semitone(pixel, noiseValue){
         let radius = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
-        Drawing.drawCircle(ctx, pixel.x, pixel.y, radius, pixel.color); 
+        Pixel.drawShape(ctx, pixel.x, pixel.y, radius, pixel.color); 
     }
 
     function brightness(pixel, noiseValue){
         let bright = Numbers.scale(noiseValue, -1, 1, 0, 50);
         let color = `hsl(${config.hue}, 100%, ${bright}%)`;
-        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color); 
+        Pixel.drawShape(ctx, pixel.x, pixel.y, pixel.radius, color); 
     }
 
     function hues(pixel, noiseValue){
         let newHue = Numbers.scale(noiseValue, -1, 1, 0, 360);
         let color = `hsl(${newHue}, 100%, 50%)`;
-        Drawing.drawCircle(ctx, pixel.x, pixel.y, pixel.radius, color); 
+        Pixel.drawShape(ctx, pixel.x, pixel.y, pixel.radius, color); 
     }
 
     let init = () => {
