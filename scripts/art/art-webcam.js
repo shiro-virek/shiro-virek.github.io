@@ -45,7 +45,7 @@
     }
 
     let randomize = () => { 
-        config.functionIndex = globals.random.nextInt(0, config.functions.length);   
+        config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);   
     }
 
     function negative(imageData){

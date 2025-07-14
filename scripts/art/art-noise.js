@@ -118,7 +118,7 @@
 
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 255);
-        config.functionIndex = globals.random.nextInt(0, config.functions.length);
+        config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);
     }
     
     window.draw = () => {

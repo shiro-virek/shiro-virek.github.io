@@ -105,7 +105,7 @@
 			this.windowCols = globals.random.nextInt(1, 5);
 			this.margin = globals.random.nextInt(0, 15);
 			this.width = globals.random.nextInt(40, 60);
-			this.CWHue = config.CWHues[globals.random.nextInt(0, config.CWHues.length)];
+			this.CWHue = config.CWHues[globals.random.nextInt(0, config.CWHues.length - 1)];
 			this.CWLight = globals.random.nextInt(10, 50);
 			this.CWSaturation = globals.random.nextInt(0, 100);
 			this.hue = globals.random.nextInt(1, 360);
@@ -126,7 +126,7 @@
 		}
 
 		randomizeTop = () => {
-			var rand = globals.random.nextInt(0, Object.keys(TopTypes).length);
+			var rand = globals.random.nextInt(0, Object.keys(TopTypes).length - 1);
 			this.topType = TopTypes[Object.keys(TopTypes)[rand]];
 
 			switch (this.topType) {
@@ -134,7 +134,7 @@
 					this.pinnacle = new Pinnacle(globals.random.nextInt(2, this.width / 2), globals.random.nextInt(5, this.width * 2));
 					break;
 				case TopTypes.Heliport:
-					let heliportColor = config.HeliportColors[globals.random.nextInt(0, config.HeliportColors.length)];
+					let heliportColor = config.HeliportColors[globals.random.nextInt(0, config.HeliportColors.length - 1)];
 					this.heliport = new Heliport(20, heliportColor);
 					break;				
 			}

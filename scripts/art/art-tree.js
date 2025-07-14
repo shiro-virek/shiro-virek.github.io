@@ -26,7 +26,7 @@
 
     let randomize = () => {
         config.hue = globals.random.nextInt(1, 360);
-        config.mode = globals.random.nextInt(0, 2);
+        config.mode = globals.random.nextInt(0, 1);
         config.modifAmount = globals.random.nextInt(-100, 100);
     }
 
