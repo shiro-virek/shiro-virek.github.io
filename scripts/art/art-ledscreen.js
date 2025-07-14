@@ -17,6 +17,7 @@
         ledPadding: 30,
         ledDiameter: 20,
         hue: 150,
+        alternatePixel: false,
     };
     
     const Figures = Object.freeze({
@@ -71,7 +72,9 @@
             this.row = row;
             this.column = column;
             this.x = config.ledMargin + column * config.ledPadding + column * this.diameter;
-            this.y = config.ledMargin + row * config.ledPadding + row * this.diameter;
+            this.y = config.ledMargin + row * config.ledPadding + row * this.diameter;            
+            if (config.alternatePixel)
+                this.y = this.column % 2 == 0 ? this.y : this.y + this.radius;
             this.on = false;
             this.color = `hsl(${config.hue}, 100%, 50%)`;
         }
@@ -87,8 +90,7 @@
                     Drawing.drawRectangle(ctx, this.x, this.y, this.diameter, this.diameter, color);
                     break;
                 case Figures.Hexagon:
-                    let y = this.column % 2 == 0 ? this.y : this.y + this.radius;
-                    Drawing.drawPolygon(ctx, this.x, y, this.radius, 6, 0, color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 6, 0, color);
                     break;
             }
         }
@@ -142,7 +144,8 @@
     }
 
     let randomize = () => {               
-        config.hue = globals.random.nextInt(0, 255);
+        config.hue = globals.random.nextInt(0, 255);    
+        config.alternatePixel = globals.random.nextBool();
     }
 
     window.trackMouse = (xMouse, yMouse) => {

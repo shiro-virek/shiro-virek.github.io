@@ -150,7 +150,7 @@
 		config.centerMovementSpeed = globals.random.nextInt(1, 5);
 		config.maxDistanceToCenter = globals.random.nextInt(0, 60);
 		config.tentaclesMovement = globals.random.nextBool();
-        config.functionIndex = globals.random.nextInt(0, config.functions.length);
+        config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);
 
 		globals.ringIterations = config.slicesCount / config.ringsDistance * config.tentaclesCount;
 	}

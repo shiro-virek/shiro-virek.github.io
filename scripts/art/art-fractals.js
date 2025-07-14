@@ -87,9 +87,9 @@
     }
 
     let randomize = () => {
-        config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length);
+        config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length - 1);
         config.mode = config.fractalFunctionIndex == 0 ? 1 : globals.random.nextBool();
-        config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length);
+        config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length - 1);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
         config.ci = globals.random.nextRange(-1, 1);  

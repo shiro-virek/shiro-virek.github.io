@@ -124,7 +124,7 @@
         config.amplitude = globals.random.nextInt(1, 20);
         config.frequency = globals.random.nextRange(0.1, 0.5, 1);
         config.mode = globals.random.nextBool();
-        config.functionIndex = globals.random.nextInt(0, config.functions.length);
+        config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);
     }
 
     window.draw = () => {
