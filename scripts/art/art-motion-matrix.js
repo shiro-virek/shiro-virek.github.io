@@ -16,6 +16,7 @@
         pixelRows: 50,
         pixelColumns: 50,
         animateNeighbors: true,
+        alternatePixel: false,
     };
 
     const globals = {
@@ -147,7 +148,9 @@
             this.row = row;
             this.column = column;
             this.x = config.pixelMargin + column * config.pixelPadding + column * this.diameter;
-            this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;            
+            this.y = config.pixelMargin + row * config.pixelPadding + row * this.diameter;          
+            if (config.alternatePixel)
+                this.y = this.x % 2 == 0 ? this.y : this.y + this.radius;
             this.hue = config.hue;
             this.saturation = 100;
             this.lightness = 50;
@@ -164,14 +167,13 @@
             let opacity = config.transparent ? this.diameter / config.maxSize : 1;
             switch (globals.pixelScreen.shape) {
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x, this.y, this.radius, this.getColor(opacity));
+                    Drawing.drawCircle(ctx, this.x, this.y, this.diameter / 2, this.getColor(opacity));
                     break;
                 case Figures.Square:
                     Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity));
                     break;
                 case Figures.Hexagon:
-                    let y = this.x % 2 == 0 ? this.y : this.y + this.radius;
-                    Drawing.drawPolygon(ctx, this.x, y, this.radius, 6, config.rotate ? this.angle : 0, this.getColor(opacity));
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.diameter / 2, 6, config.rotate ? this.angle : 0, this.getColor(opacity));
                     break;
             }
         }
@@ -211,7 +213,8 @@
         config.shrinkSpeed = globals.random.nextRange(0.1, 2.0, 1);
         config.maxSize = globals.random.nextInt(config.pixelDiameter + 1, 255);
         config.rotate = globals.random.nextBool();
-        config.animateNeighbors = globals.random.nextBool();
+        config.animateNeighbors = globals.random.nextBool();        
+        config.alternatePixel = globals.random.nextBool();
     }
 
     let loadImage = (source = '../assets/Picture1.jpg') => {
