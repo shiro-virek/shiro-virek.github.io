@@ -64,17 +64,11 @@
 
 		let color = `hsl(${hue}, 100%, 50%, ${config.opacity})`;
 
-		let lineWidth = Numbers.scale(distance, 0, 500, 0.25, config.thickness); 
-		console.log(lineWidth);
+		let lineWidth = Numbers.scale(distance, 0, 500, 1, config.thickness); 
 
-		Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
+	    Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
 
 		let angleRad = globals.angle * Trigonometry.RAD_CONST;
-
-		Drawing.drawLine(ctx, xPointer, yPointer,
-			xPointer + parseInt(distance * Math.cos(angleRad)),
-			yPointer + parseInt(distance * Math.sin(angleRad)),
-			lineWidth, color);
 
 		if (config.rotators > 0)
 			for (let i = 0; i < config.rotators - 1; i++) {

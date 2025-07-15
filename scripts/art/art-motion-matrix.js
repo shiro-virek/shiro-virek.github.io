@@ -106,15 +106,15 @@
                 }
             }
 
-            if (this.pixels[col][row].diameter <= config.pixelDiameter)
+            if (this.pixels[col][row].diameter <= this.pixels[col][row].initialDiameter)
             {
                 this.pixels[col][row].growing = 0;
-                this.pixels[col][row].diameter = config.pixelDiameter;
+                this.pixels[col][row].diameter = this.pixels[col][row].initialDiameter;
             }
 
-            if (this.pixels[col][row].angle <= 0){
+            if (this.pixels[col][row].angle <= this.pixels[col][row].initialAngle){
                 this.pixels[col][row].rotating = 0;                
-                this.pixels[col][row].angle = 0;
+                this.pixels[col][row].angle = this.pixels[col][row].initialAngle;
             }
         }
 
@@ -144,6 +144,7 @@
     class Pixel {
         constructor(column, row) {
             this.diameter = config.pixelDiameter;
+            this.initialDiameter = this.diameter;
             this.radius = config.pixelDiameter / 2;
             this.row = row;
             this.column = column;
@@ -156,6 +157,7 @@
             this.lightness = 50;
             this.growing = 0;
             this.angle = 0;
+            this.initialAngle = 0;
             this.rotating = 0;
         }
 
@@ -170,10 +172,10 @@
                     Drawing.drawCircle(ctx, this.x, this.y, this.diameter / 2, this.getColor(opacity));
                     break;
                 case Figures.Square:
-                    Drawing.drawSquare(ctx, this.x, this.y, this.diameter, config.rotate ? this.angle : 0, this.getColor(opacity));
+                    Drawing.drawSquare(ctx, this.x, this.y, this.diameter, this.angle, this.getColor(opacity));
                     break;
                 case Figures.Hexagon:
-                    Drawing.drawPolygon(ctx, this.x, this.y, this.diameter / 2, 6, config.rotate ? this.angle : 0, this.getColor(opacity));
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.diameter / 2, 6, this.angle, this.getColor(opacity));
                     break;
             }
         }
@@ -264,7 +266,24 @@
 	}
 
 	window.magic = () => {  
-		Sound.error();
+		const cx = (config.pixelColumns - 1) / 2;
+        const cy = (config.pixelRows - 1) / 2;
+
+        for (let y = 0; y <= config.pixelRows; y++) {
+            for (let x = 0; x <= config.pixelColumns; x++) {
+                
+                const distance = Math.sqrt((x - cx)**2 + (y - cy)**2);
+                let maxDistance = config.pixelColumns > config.pixelRows ? config.pixelColumns / 2 : config.pixelRows / 2;
+
+                let angle = Numbers.scale(distance, 0, maxDistance, 0, 360);
+                globals.pixelScreen.pixels[x][y].angle = angle;
+                globals.pixelScreen.pixels[x][y].initialAngle = angle;
+
+                let size = Numbers.scale(distance, 0, maxDistance, config.pixelDiameter, config.pixelDiameter / 3);
+                globals.pixelScreen.pixels[x][y].diameter = size;
+                globals.pixelScreen.pixels[x][y].initialDiameter = size;
+            }
+        }
 	}
 
     window.upload = (e) => {
