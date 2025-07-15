@@ -60,15 +60,22 @@ class Fractals {
         let y = 0;
         let iteration = 0;
 
-        while (x*x + y*y <= 4 && iteration < maxIterations) {
-            let xTemp = x*x - y*y + px;
-            y = -2 * x * y + py;
+        while (x * x + y * y <= 4 && iteration < maxIterations) {
+            let r = Math.sqrt(x * x + y * y);
+            let theta = Math.atan2(y, x);
+
+            theta = -theta;
+
+            r = Math.pow(r, pow);
+            theta = theta * pow;
+
+            let xTemp = r * Math.cos(theta) + px;
+            let yTemp = r * Math.sin(theta) + py;
+
             x = xTemp;
+            y = yTemp;
             iteration++;
         }
-
-        const pixelIndex = 4 * (py * width + px);
-        let color;
 
         if (iteration === maxIterations) {
             return 0;
