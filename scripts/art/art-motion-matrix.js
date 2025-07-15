@@ -194,6 +194,7 @@
         globals.pixelScreen = new PixelScreen();
 
         addEvents();
+
         window.requestAnimationFrame(loop)
     }
 
@@ -256,11 +257,11 @@
     }
 
     window.trackMouse = (x, y) => {
-        if (clicking) {
-            if (touches){				
-				touches.forEach(touch => {              
-                    globals.pixelScreen.activatePixelAndNeighbours(touch.clientX, touch.clientY);  
-                });								
+        if (clicking) {       
+            if (touches){	
+                for(let i=0; i<touches.length; i++){
+                    globals.pixelScreen.activatePixelAndNeighbours(touches[i].clientX, touches[i].clientY); 
+                }								
 			}else{		
                 globals.pixelScreen.activatePixelAndNeighbours(x, y);
 			}
