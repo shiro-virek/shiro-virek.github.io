@@ -101,7 +101,7 @@
                     Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
                     break;
                 case Figures.Hexagon:
-                    Drawing.drawPolygon(ctx, this.x, y, size, 6, 0, color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
                     break;
             }
         }

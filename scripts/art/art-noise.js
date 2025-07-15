@@ -126,7 +126,7 @@
         globals.noise = new Noise(globals.random);
         if (config.randomize) randomize();
         initCanvas();
-        config.pixelDiameter = globals.random.nextInt(5, 30);        
+        config.pixelDiameter = globals.random.nextInt(5, 25);        
         config.pixelPadding = globals.random.nextInt(0, 5);
         config.pixelMargin = config.pixelPadding;
 

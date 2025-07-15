@@ -64,7 +64,7 @@
 
 		let color = `hsl(${hue}, 100%, 50%, ${config.opacity})`;
 
-		let lineWidth = Numbers.scale(distance, 0, 500, 0.25, config.thickness); 
+		let lineWidth = Numbers.scale(distance, 0, 500, 1, config.thickness); 
 		console.log(lineWidth);
 
 		Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
