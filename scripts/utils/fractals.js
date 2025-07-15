@@ -95,7 +95,7 @@ class Fractals {
         let tolerance = 1e-6;
 
         for (let i = 0; i < maxIterations; i++) {
-            const p = 4;  
+            const p = 4;
 
             let r = Math.hypot(z.re, z.im);
             let theta = Math.atan2(z.im, z.re);
@@ -124,7 +124,7 @@ class Fractals {
                     return i;
             }
         }
-        
+
         return maxIterations;
     }
 
@@ -132,8 +132,8 @@ class Fractals {
         let iteration = 0;
         let x = 0;
         let y = 0;
-        while (x*x + y*y <= 4 && iteration < maxIterations) {
-            let xtemp = x*x - y*y + px;
+        while (x * x + y * y <= 4 && iteration < maxIterations) {
+            let xtemp = x * x - y * y + px;
             y = Math.abs(2 * x * y) + py;
             x = Math.abs(xtemp);
             iteration++;
@@ -141,4 +141,13 @@ class Fractals {
 
         return iteration;
     }
+
+
+
+
+
+
+
+
+
 }
