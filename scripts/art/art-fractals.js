@@ -17,7 +17,7 @@
         offsetY: 0,
         hue: 10,
         fractalFunctionIndex: 1,
-        fractalFunctions: [mandelbrot, julia],
+        fractalFunctions: [mandelbrot, julia, tricorn],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -62,6 +62,10 @@
 
     function julia(c, i){
         return Fractals.julia(c, i, config.maxIterations, config.pow, config.cr, config.ci);
+    }
+
+    function tricorn(c, i){
+        return Fractals.tricorn(c, i, config.maxIterations, config.pow, config.cr, config.ci);
     }
 
     let init = () => {
