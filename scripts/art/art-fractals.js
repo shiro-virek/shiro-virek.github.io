@@ -202,6 +202,7 @@
 	}
 
 	window.magic = () => {  
+        const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
         if (fractalFunction == julia || fractalFunction == hopalong){
             config.mode = !config.mode;
             Sound.tada();
