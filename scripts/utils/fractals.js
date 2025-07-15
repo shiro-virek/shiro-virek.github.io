@@ -127,4 +127,18 @@ class Fractals {
         
         return maxIterations;
     }
+
+    static burningShip = (px, py, maxIterations, pow) => {
+        let iteration = 0;
+        let x = 0;
+        let y = 0;
+        while (x*x + y*y <= 4 && iteration < maxIterations) {
+            let xtemp = x*x - y*y + px;
+            y = Math.abs(2 * x * y) + py;
+            x = Math.abs(xtemp);
+            iteration++;
+        }
+
+        return iteration;
+    }
 }

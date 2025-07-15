@@ -17,7 +17,7 @@
         offsetY: 0,
         hue: 10,
         fractalFunctionIndex: 1,
-        fractalFunctions: [mandelbrot, julia, tricorn, newton],
+        fractalFunctions: [mandelbrot, julia, tricorn, newton, burningShip],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -70,6 +70,10 @@
 
     function newton(c, i){
         return Fractals.newton(c, i, config.maxIterations, config.pow);
+    }
+
+    function burningShip(c, i){
+        return Fractals.burningShip(c, i, config.maxIterations, config.pow);
     }
 
     let init = () => {
