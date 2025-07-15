@@ -257,7 +257,13 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {
-            globals.pixelScreen.activatePixelAndNeighbours(x, y);
+            if (touches){				
+				touches.forEach(touch => {              
+                    globals.pixelScreen.activatePixelAndNeighbours(touch.clientX, touch.clientY);  
+                });								
+			}else{		
+                globals.pixelScreen.activatePixelAndNeighbours(x, y);
+			}
         }
     }
 
