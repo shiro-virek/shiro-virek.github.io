@@ -273,7 +273,8 @@
 	}
 
 	window.magic = () => {  
-		config.trail = 0.2;
+		Sound.tada();
+		config.trail = 0.1;
 	}
 
     window.upload = () => {
