@@ -117,7 +117,7 @@
         if (fractalFunction == julia || fractalFunction == hopalong)
             config.mode = globals.random.nextBool()
         else
-            config.mode = 0;
+            config.mode = 1;
     }
     
     let hopalongStep = (x, y) => {
