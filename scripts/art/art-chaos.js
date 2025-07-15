@@ -18,6 +18,7 @@
         dotPadding : 20,
         dotRadio : 10,
         hue : 150,
+        trail: 1,
     };
 
     const Figures = Object.freeze({
@@ -263,7 +264,7 @@
     }
 
     window.draw = () => {
-        drawBackground(ctx, canvas);
+        drawBackground(ctx, CanvasCaptureMediaStreamTrack, config.trail);
         globals.semitone.draw(ctx);
     }
 
@@ -272,7 +273,7 @@
 	}
 
 	window.magic = () => {  
-		Sound.error();
+		config.trail = 0.2;
 	}
 
     window.upload = () => {
