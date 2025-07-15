@@ -17,7 +17,7 @@
         offsetY: 0,
         hue: 10,
         fractalFunctionIndex: 1,
-        fractalFunctions: [mandelbrot, julia, tricorn],
+        fractalFunctions: [mandelbrot, julia, tricorn, newton],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -66,6 +66,10 @@
 
     function tricorn(c, i){
         return Fractals.tricorn(c, i, config.maxIterations, config.pow, config.cr, config.ci);
+    }
+
+    function newton(c, i){
+        return Fractals.newton(c, i, config.maxIterations, config.pow);
     }
 
     let init = () => {
