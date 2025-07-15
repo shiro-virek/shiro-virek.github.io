@@ -54,4 +54,26 @@ class Fractals {
         
         return 0;
     }
+
+    static tricorn = (px, py, maxIterations, pow) => {    
+        let x = 0;
+        let y = 0;
+        let iteration = 0;
+
+        while (x*x + y*y <= 4 && iteration < maxIterations) {
+            let xTemp = x*x - y*y + px;
+            y = -2 * x * y + py;
+            x = xTemp;
+            iteration++;
+        }
+
+        const pixelIndex = 4 * (py * width + px);
+        let color;
+
+        if (iteration === maxIterations) {
+            return 0;
+        } else {
+            return iteration;
+        }
+    }
 }
