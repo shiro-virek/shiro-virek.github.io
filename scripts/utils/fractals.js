@@ -181,21 +181,10 @@ class Fractals {
 
     static lambda = (px, py, maxIterations, pow, cr, ci) => {
         const escapeRadius = 20;
-        const zoom = 3;
-        const centerX = 0;
-        const centerY = 0;
-        const xMin = centerX - zoom;
-        const xMax = centerX + zoom;
-        const yMin = centerY - zoom;
-        const yMax = centerY + zoom;
-        const lambdaRe = xMin + (px / width) * (xMax - xMin);
-        const lambdaIm = yMin + (py / height) * (yMax - yMin);
-        let zRe = 0.5;
-        let zIm = 0.0;
+        let zRe = cr;
+        let zIm = ci;
         let iteration = 0;
         let escaped = false;
-        pow = 2;
-        maxIterations = 100;
 
         while (iteration < maxIterations) {
             const r = Math.hypot(zRe, zIm);
@@ -211,8 +200,8 @@ class Fractals {
             let multRe = zRe * oneMinusZpRe - zIm * oneMinusZpIm;
             let multIm = zRe * oneMinusZpIm + zIm * oneMinusZpRe;
 
-            let newZRe = lambdaRe * multRe - lambdaIm * multIm;
-            let newZIm = lambdaRe * multIm + lambdaIm * multRe;
+            let newZRe = px * multRe - py * multIm;
+            let newZIm = px * multIm + py * multRe;
 
             zRe = newZRe;
             zIm = newZIm;
@@ -233,8 +222,8 @@ class Fractals {
         let converged = false;
 
         const escapeRadius = 1e6;
-        const cRe = cr;  
-        const cIm = ci;  
+        const cRe = cr;
+        const cIm = ci;
 
         while (iteration < maxIterations && zx * zx + zy * zy < escapeRadius) {
             const zp = Numbers.complexPow(zx, zy, pow);
