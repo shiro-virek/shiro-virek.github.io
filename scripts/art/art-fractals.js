@@ -18,7 +18,7 @@
         hue: 10,
         fractalFunctionIndex: 1,
         fractalFunctions: [mandelbrot, julia, tricorn, newton, burningShip, phoenix, magnetType1, nova, lambda],
-        functionsWithTwoModes: [julia, phoenix, nova, lambda],
+        functionsWithTwoModes: [julia, phoenix, nova, lambda, magnetType1],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -116,7 +116,7 @@
     }
 
     let randomize = () => {
-        config.fractalFunctionIndex = 7; //globals.random.nextInt(0, config.fractalFunctions.length - 1);
+        config.fractalFunctionIndex = 8; //globals.random.nextInt(0, config.fractalFunctions.length - 1);
         config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length - 1);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  

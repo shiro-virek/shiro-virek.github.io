@@ -268,4 +268,32 @@ class Fractals {
 
         return converged ? iteration : 0;
     }
+
+    static magnetType1 = (zx, zy, maxIterations, pow, cr, ci) => {
+        const qRe = cr;
+        const qIm = ci;
+        const escapeRadius = 10;
+        let iteration = 0;
+
+        while (zx * zx + zy * zy < escapeRadius * escapeRadius && iteration < maxIterations) {
+            const num = Numbers.complexPow(zx, zy, pow);
+            num.re += zx;
+            num.im += zy;
+
+            const zPow = Numbers.complexPow(zx, zy, pow - 1);
+            const denRe = qRe * zPow.re - qIm * zPow.im + 1;
+            const denIm = qRe * zPow.im + qIm * zPow.re;
+
+            const denomMagSq = denRe * denRe + denIm * denIm;
+            let newZx = (num.re * denRe + num.im * denIm) / denomMagSq;
+            let newZy = (num.im * denRe - num.re * denIm) / denomMagSq;
+
+            zx = newZx;
+            zy = newZy;
+
+            iteration++;
+        }
+
+        return iteration;
+    }
 }
