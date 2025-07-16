@@ -14,4 +14,15 @@ class Numbers {
         const result = absValue + add;
         return number >= 0 ? result : -result;
     }
+
+    static complexPow =  (re, im, power) => {
+        const r = Math.hypot(re, im);
+        const theta = Math.atan2(im, re);
+        const rP = Math.pow(r, power);
+        const thetaP = theta * power;
+        return {
+        re: rP * Math.cos(thetaP),
+        im: rP * Math.sin(thetaP)
+        };
+    }
 }

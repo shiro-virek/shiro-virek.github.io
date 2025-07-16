@@ -179,4 +179,93 @@ class Fractals {
         return iteration;
     }
 
+    static lambda = (px, py, maxIterations, pow, cr, ci) => {
+        const escapeRadius = 20;
+        const zoom = 3;
+        const centerX = 0;
+        const centerY = 0;
+        const xMin = centerX - zoom;
+        const xMax = centerX + zoom;
+        const yMin = centerY - zoom;
+        const yMax = centerY + zoom;
+        const lambdaRe = xMin + (px / width) * (xMax - xMin);
+        const lambdaIm = yMin + (py / height) * (yMax - yMin);
+        let zRe = 0.5;
+        let zIm = 0.0;
+        let iteration = 0;
+        let escaped = false;
+        pow = 2;
+        maxIterations = 100;
+
+        while (iteration < maxIterations) {
+            const r = Math.hypot(zRe, zIm);
+            const theta = Math.atan2(zIm, zRe);
+            const rP = Math.pow(r, pow);
+            const thetaP = theta * pow;
+            const zpRe = rP * Math.cos(thetaP);
+            const zpIm = rP * Math.sin(thetaP);
+
+            const oneMinusZpRe = 1 - zpRe;
+            const oneMinusZpIm = -zpIm;
+
+            let multRe = zRe * oneMinusZpRe - zIm * oneMinusZpIm;
+            let multIm = zRe * oneMinusZpIm + zIm * oneMinusZpRe;
+
+            let newZRe = lambdaRe * multRe - lambdaIm * multIm;
+            let newZIm = lambdaRe * multIm + lambdaIm * multRe;
+
+            zRe = newZRe;
+            zIm = newZIm;
+
+            if (zRe * zRe + zIm * zIm > escapeRadius * escapeRadius) {
+                escaped = true;
+                break;
+            }
+
+            iteration++;
+        }
+
+        return escaped ? iteration : 0;
+    }
+
+    static nova = (zx, zy, maxIterations, pow, cr, ci) => {
+        let iteration = 0;
+        let converged = false;
+
+        const escapeRadius = 1e6;
+        const cRe = cr;  
+        const cIm = ci;  
+
+        while (iteration < maxIterations && zx * zx + zy * zy < escapeRadius) {
+            const zp = Numbers.complexPow(zx, zy, pow);
+            const zp1 = Numbers.complexPow(zx, zy, pow - 1);
+
+            const fRe = zp.re - 1;
+            const fIm = zp.im;
+
+            const dfRe = pow * zp1.re;
+            const dfIm = pow * zp1.im;
+
+            const denom = dfRe * dfRe + dfIm * dfIm;
+            let fracRe = (fRe * dfRe + fIm * dfIm) / denom;
+            let fracIm = (fIm * dfRe - fRe * dfIm) / denom;
+
+            let corrRe = cRe * fracRe - cIm * fracIm;
+            let corrIm = cRe * fracIm + cIm * fracRe;
+
+            zx -= corrRe;
+            zy -= corrIm;
+
+            if (Math.hypot(zp.re - 1, zp.im) < 1e-3 ||
+                Math.hypot(zp.re + 0.5, zp.im - Math.sqrt(3) / 2) < 1e-3 ||
+                Math.hypot(zp.re + 0.5, zp.im + Math.sqrt(3) / 2) < 1e-3) {
+                converged = true;
+                break;
+            }
+
+            iteration++;
+        }
+
+        return converged ? iteration : 0;
+    }
 }

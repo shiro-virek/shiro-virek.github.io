@@ -17,7 +17,8 @@
         offsetY: 0,
         hue: 10,
         fractalFunctionIndex: 1,
-        fractalFunctions: [mandelbrot, julia, tricorn, newton, burningShip, phoenix],
+        fractalFunctions: [mandelbrot, julia, tricorn, newton, burningShip, phoenix, magnetType1, nova, lambda],
+        functionsWithTwoModes: [julia, phoenix, nova, lambda],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -80,6 +81,18 @@
         return Fractals.phoenix(c, i, config.maxIterations, config.pow, config.cr, config.ci);
     }
 
+    function lambda(c, i){
+        return Fractals.lambda(c, i, config.maxIterations, config.pow, config.cr, config.ci);
+    }
+
+    function magnetType1(c, i){        
+        return Fractals.magnetType1(c, i, config.maxIterations, config.pow, config.cr, config.ci);
+    }
+
+    function nova(c, i){
+        return Fractals.nova(c, i, config.maxIterations, config.pow, config.cr, config.ci);
+    }
+
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
@@ -103,7 +116,7 @@
     }
 
     let randomize = () => {
-        config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length - 1);
+        config.fractalFunctionIndex = 7; //globals.random.nextInt(0, config.fractalFunctions.length - 1);
         config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length - 1);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
@@ -111,7 +124,7 @@
         config.hue = globals.random.nextInt(0, 360);
 
         const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
-        if (fractalFunction == julia || fractalFunction == phoenix)
+        if (config.functionsWithTwoModes.includes(fractalFunction))
             config.mode = globals.random.nextBool()
         else
             config.mode = 1;
@@ -164,7 +177,7 @@
 
 	window.magic = () => {  
         const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
-        if (fractalFunction == julia || fractalFunction == phoenix){
+        if (config.functionsWithTwoModes.includes(fractalFunction)){
             config.mode = !config.mode;
             Sound.tada();
         }else{
