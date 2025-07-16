@@ -142,12 +142,147 @@ class Fractals {
         return iteration;
     }
 
+    static phoenix = (px, py, maxIterations, pow, cr, ci) => {
+        let zx = 0;
+        let zy = 0;
+        let zxPrev = 0;
+        let zyPrev = 0;
 
+        let iteration = 0;
+        const pRe = cr;
+        const pIm = ci;
 
+        while (zx * zx + zy * zy <= 4 && iteration < maxIterations) {
+            let r = Math.sqrt(zx * zx + zy * zy);
+            let theta = Math.atan2(zy, zx);
 
+            r = Math.pow(r, pow);
+            theta = theta * pow;
 
+            let zxk = r * Math.cos(theta);
+            let zyk = r * Math.sin(theta);
 
+            zxk += px;
+            zyk += py;
 
+            zxk += pRe * zxPrev - pIm * zyPrev;
+            zyk += pRe * zyPrev + pIm * zxPrev;
 
+            zxPrev = zx;
+            zyPrev = zy;
+            zx = zxk;
+            zy = zyk;
 
+            iteration++;
+        }
+
+        return iteration;
+    }
+
+    static lambda = (px, py, maxIterations, pow, cr, ci) => {
+        const escapeRadius = 20;
+        let zRe = cr;
+        let zIm = ci;
+        let iteration = 0;
+        let escaped = false;
+
+        while (iteration < maxIterations) {
+            const r = Math.hypot(zRe, zIm);
+            const theta = Math.atan2(zIm, zRe);
+            const rP = Math.pow(r, pow);
+            const thetaP = theta * pow;
+            const zpRe = rP * Math.cos(thetaP);
+            const zpIm = rP * Math.sin(thetaP);
+
+            const oneMinusZpRe = 1 - zpRe;
+            const oneMinusZpIm = -zpIm;
+
+            let multRe = zRe * oneMinusZpRe - zIm * oneMinusZpIm;
+            let multIm = zRe * oneMinusZpIm + zIm * oneMinusZpRe;
+
+            let newZRe = px * multRe - py * multIm;
+            let newZIm = px * multIm + py * multRe;
+
+            zRe = newZRe;
+            zIm = newZIm;
+
+            if (zRe * zRe + zIm * zIm > escapeRadius * escapeRadius) {
+                escaped = true;
+                break;
+            }
+
+            iteration++;
+        }
+
+        return escaped ? iteration : 0;
+    }
+
+    static nova = (zx, zy, maxIterations, pow, cr, ci) => {
+        let iteration = 0;
+        let converged = false;
+
+        const escapeRadius = 1e6;
+        const cRe = cr;
+        const cIm = ci;
+
+        while (iteration < maxIterations && zx * zx + zy * zy < escapeRadius) {
+            const zp = Numbers.complexPow(zx, zy, pow);
+            const zp1 = Numbers.complexPow(zx, zy, pow - 1);
+
+            const fRe = zp.re - 1;
+            const fIm = zp.im;
+
+            const dfRe = pow * zp1.re;
+            const dfIm = pow * zp1.im;
+
+            const denom = dfRe * dfRe + dfIm * dfIm;
+            let fracRe = (fRe * dfRe + fIm * dfIm) / denom;
+            let fracIm = (fIm * dfRe - fRe * dfIm) / denom;
+
+            let corrRe = cRe * fracRe - cIm * fracIm;
+            let corrIm = cRe * fracIm + cIm * fracRe;
+
+            zx -= corrRe;
+            zy -= corrIm;
+
+            if (Math.hypot(zp.re - 1, zp.im) < 1e-3 ||
+                Math.hypot(zp.re + 0.5, zp.im - Math.sqrt(3) / 2) < 1e-3 ||
+                Math.hypot(zp.re + 0.5, zp.im + Math.sqrt(3) / 2) < 1e-3) {
+                converged = true;
+                break;
+            }
+
+            iteration++;
+        }
+
+        return converged ? iteration : 0;
+    }
+
+    static magnetType1 = (zx, zy, maxIterations, pow, cr, ci) => {
+        const qRe = cr;
+        const qIm = ci;
+        const escapeRadius = 10;
+        let iteration = 0;
+
+        while (zx * zx + zy * zy < escapeRadius * escapeRadius && iteration < maxIterations) {
+            const num = Numbers.complexPow(zx, zy, pow);
+            num.re += zx;
+            num.im += zy;
+
+            const zPow = Numbers.complexPow(zx, zy, pow - 1);
+            const denRe = qRe * zPow.re - qIm * zPow.im + 1;
+            const denIm = qRe * zPow.im + qIm * zPow.re;
+
+            const denomMagSq = denRe * denRe + denIm * denIm;
+            let newZx = (num.re * denRe + num.im * denIm) / denomMagSq;
+            let newZy = (num.im * denRe - num.re * denIm) / denomMagSq;
+
+            zx = newZx;
+            zy = newZy;
+
+            iteration++;
+        }
+
+        return iteration;
+    }
 }
