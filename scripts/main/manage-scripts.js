@@ -62,8 +62,11 @@ let downloadPicture = () => {
 let initRecorder = () => {
     let chunks = [];
     var canvas = document.getElementById('myCanvas');
-    const stream = canvas.captureStream(60)
-    recorder = new MediaRecorder(stream);
+    const stream = canvas.captureStream(60);
+    recorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm; codecs=vp9',
+        videoBitsPerSecond: 10_000_000
+    });
 
     recorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
