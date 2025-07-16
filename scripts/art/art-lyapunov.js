@@ -9,54 +9,53 @@
         randomize: true,
         mode: 1,
         pow: 2,
-        maxIterations: 500000,
+        minValue: -2,
+        maxValue: 2,
         scale: 0.005,
         cr: -0.7,
         ci: 0.27,
         offsetX: 0,
         offsetY: 0,
         hue: 10,
-
         pattern: "ABAB",
         steps: 10,
         discard: 100,
         aRange: [2.5, 4.0],
         bRange: [2.5, 4.0],
-
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };
 
     function drawPaletteColor1(value, data, x, y) {
-        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 360);
+        newValue = Numbers.scale(value, config.minValue, config.maxValue, 0, 360);
         const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
     function drawPaletteHue1(value, data, x, y) {
-        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 50);
+        newValue = Numbers.scale(value, config.minValue, config.maxValue, 0, 50);
         const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
     function drawPaletteGrayscale1(value, data, x, y) {
-        newValue = Numbers.scale(value, 0, config.maxIterations, 0, 255);
+        newValue = Numbers.scale(value, config.minValue, config.maxValue, 0, 255);
         Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);
     }
 
     function drawPaletteColor2(value, data, x, y) {
-        newValue = Numbers.scale(value, 0, config.maxIterations, 360, 0);
+        newValue = Numbers.scale(value, config.minValue, config.maxValue, 360, 0);
         const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
     function drawPaletteHue2(value, data, x, y) {
-        newValue = Numbers.scale(value, 0, config.maxIterations, 50, 0);
+        newValue = Numbers.scale(value, config.minValue, config.maxValue, 50, 0);
         const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
     function drawPaletteGrayscale2(value, data, x, y) {
-        newValue = Numbers.scale(value, 0, config.maxIterations, 255, 0);
+        newValue = Numbers.scale(value, config.minValue, config.maxValue, 255, 0);
         Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);
     }
 
@@ -94,7 +93,7 @@
         config.mode = globals.random.nextBool()
     }
 
-    function computeLyapunov(A, B) {
+    let computeLyapunov = (A, B) => {
         let x = 0.5;
         let sum = 0;
         let N = 0;
@@ -121,6 +120,7 @@
     let drawLyapunov = () => {
         const imgData = ctx.createImageData(width, height);
         const data = imgData.data;
+        const drawFunction = config.drawFunctions[config.drawFunctionIndex];
 
         for (let py = 0; py < height; py++) {
             let B = config.bRange[0] + (py / height) * (config.bRange[1] - config.bRange[0]);
@@ -131,19 +131,9 @@
                 let lambda = computeLyapunov(A, B);
 
                 const idx = 4 * (py * width + px);
+                    
+                drawFunction(lambda, data, px, py);
 
-                if (lambda < 0) {
-                    const c = Math.min(255, Math.floor(-lambda * 100));
-                    data[idx] = 0;
-                    data[idx + 1] = c;
-                    data[idx + 2] = 255;
-                } else {        const c = Math.min(255, Math.floor(lambda * 100));
-                    data[idx] = 255;
-                    data[idx + 1] = c;
-                    data[idx + 2] = 0;
-                }
-
-                data[idx + 3] = 255;
             }
         }
 
