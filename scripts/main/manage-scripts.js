@@ -32,7 +32,8 @@ const art = [
                 "tree",
                 "blinkenlights-mono",
                 "gel",
-                "hopalong"
+                "hopalong",
+                "lyapunov",
             ];
 const scripts = [];
 

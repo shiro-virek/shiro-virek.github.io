@@ -9,15 +9,13 @@
         randomize: true,
         mode: 1,
         pow: 2,
-        maxIterations: 50,
+        maxIterations: 500000,
         scale: 0.005,
         cr: -0.7,
         ci: 0.27,
         offsetX: 0,
         offsetY: 0,
         hue: 10,
-        fractalFunctionIndex: 1,
-        fractalFunctions: [hopalong],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -57,7 +55,7 @@
     }
 
     function hopalong(){
-        return drawHopalong(500000);
+        return drawHopalong(config.maxIterations);
     }
 
     let init = () => {
@@ -83,14 +81,11 @@
     }
 
     let randomize = () => {
-        config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length - 1);
         config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length - 1);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
         config.ci = globals.random.nextRange(-1, 1);  
         config.hue = globals.random.nextInt(0, 360);
-
-        const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
         
         config.scale = 20;
         
@@ -99,9 +94,9 @@
     }
     
     let hopalongStep = (x, y) => {
-        const a = 2;
-        const b = config.cr; //0.5;
-        const c = config.ci; //0.5;
+        const a = config.pow;
+        const b = config.cr; 
+        const c = config.ci; 
 
         let sign = x >= 0 ? 1 : -1;
         let xn = y - sign * Math.sqrt(Math.abs(b * x - c));
@@ -117,28 +112,22 @@
         let y = 0;
         const drawFunction = config.drawFunctions[config.drawFunctionIndex];
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
 
         for (let i = 0; i < iterations; i++) {
             [x, y] = hopalongStep(x, y);
             const px = Math.floor(cx + x * scale);
             const py = Math.floor(cy - y * scale);
-            if (px >= 0 && px < width && py >= 0 && py < height) {
-                let color = `hsl(${Numbers.scale(i, 0, iterations, 0, 360)}, ${100}%, ${50}%)`;
-                Pixels.setSinglePixel(ctx, px, py, color);
+            if (px >= 0 && px < width && py >= 0 && py < height) {       
+                drawFunction(i, imageData.data, px, py);
             }
         }
+
+        ctx.putImageData(imageData, 0, 0);
     }
 
     window.draw = () => {
         drawBackground(ctx, canvas);
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
-        const drawFunction = config.drawFunctions[config.drawFunctionIndex];
-
-        hopalong(500000);
+        hopalong(config.maxIterations);
     }
 
     window.trackMouse = (x, y) => {
