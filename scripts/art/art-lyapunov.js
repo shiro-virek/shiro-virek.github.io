@@ -1,4 +1,4 @@
-{    
+{
     const globals = {
         random: null,
         initialClickCx: 0,
@@ -16,50 +16,52 @@
         offsetX: 0,
         offsetY: 0,
         hue: 10,
-        drawFunctionIndex: 1,
-        drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
-    };    
 
-    function drawPaletteColor1(value, data, x, y){
+        pattern: "ABAB",
+        steps: 10,
+        discard: 100,
+        aRange: [2.5, 4.0],
+        bRange: [2.5, 4.0],
+
+        drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
+    };
+
+    function drawPaletteColor1(value, data, x, y) {
         newValue = Numbers.scale(value, 0, config.maxIterations, 0, 360);
         const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
-    function drawPaletteHue1(value, data, x, y){
+    function drawPaletteHue1(value, data, x, y) {
         newValue = Numbers.scale(value, 0, config.maxIterations, 0, 50);
         const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
-    function drawPaletteGrayscale1(value, data, x, y){
+    function drawPaletteGrayscale1(value, data, x, y) {
         newValue = Numbers.scale(value, 0, config.maxIterations, 0, 255);
-        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
+        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);
     }
 
-    function drawPaletteColor2(value, data, x, y){
+    function drawPaletteColor2(value, data, x, y) {
         newValue = Numbers.scale(value, 0, config.maxIterations, 360, 0);
         const { r: red, g: green, b: blue } = Color.hslToRgb(newValue, 100, 50);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
-    function drawPaletteHue2(value, data, x, y){
+    function drawPaletteHue2(value, data, x, y) {
         newValue = Numbers.scale(value, 0, config.maxIterations, 50, 0);
         const { r: red, g: green, b: blue } = Color.hslToRgb(config.hue, 100, newValue);
         Pixels.setPixelBatch(ctx, data, x, y, red, green, blue);
     }
 
-    function drawPaletteGrayscale2(value, data, x, y){
+    function drawPaletteGrayscale2(value, data, x, y) {
         newValue = Numbers.scale(value, 0, config.maxIterations, 255, 0);
-        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
-    }
-
-    function hopalong(){
-        return drawHopalong(config.maxIterations);
+        Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);
     }
 
     let init = () => {
-		globals.random = Objects.getRandomObject();
+        globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();
         addEvents();
@@ -69,65 +71,88 @@
     }
 
     let addEvents = () => {
-		canvas.addEventListener('mousedown', function (e) {
+        canvas.addEventListener('mousedown', function (e) {
             globals.initialClickCx = e.offsetX * config.scale + config.offsetX;
             globals.initialClickCy = e.offsetY * config.scale + config.offsetY;
-		});
+        });
 
-		canvas.addEventListener('touchstart', function (e) {
+        canvas.addEventListener('touchstart', function (e) {
             globals.initialClickCx = e.changedTouches[0].pageX * config.scale + config.offsetX;
             globals.initialClickCy = e.changedTouches[0].pageY * config.scale + config.offsetY;
-		});
+        });
     }
 
     let randomize = () => {
         config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length - 1);
-        config.pow = globals.random.nextInt(2, 5);   
-        config.cr = globals.random.nextRange(-1, 1);  
-        config.ci = globals.random.nextRange(-1, 1);  
+        config.pow = globals.random.nextInt(2, 5);
+        config.cr = globals.random.nextRange(-1, 1);
+        config.ci = globals.random.nextRange(-1, 1);
         config.hue = globals.random.nextInt(0, 360);
-        
+
         config.scale = 20;
-        
+
         config.mode = globals.random.nextBool()
-
-    }
-    
-    let hopalongStep = (x, y) => {
-        const a = config.pow;
-        const b = config.cr; 
-        const c = config.ci; 
-
-        let sign = x >= 0 ? 1 : -1;
-        let xn = y - sign * Math.sqrt(Math.abs(b * x - c));
-        let yn = a - x;
-        return [xn, yn];
     }
 
-    let drawHopalong = (iterations) => {
-        const cx = canvas.width / 2;
-        const cy = canvas.height / 2;
-        let scale = config.scale;
-        let x = 0;
-        let y = 0;
-        const drawFunction = config.drawFunctions[config.drawFunctionIndex];
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    function computeLyapunov(A, B) {
+        let x = 0.5;
+        let sum = 0;
+        let N = 0;
 
-        for (let i = 0; i < iterations; i++) {
-            [x, y] = hopalongStep(x, y);
-            const px = Math.floor(cx + x * scale);
-            const py = Math.floor(cy - y * scale);
-            if (px >= 0 && px < width && py >= 0 && py < height) {       
-                drawFunction(i, imageData.data, px, py);
+        const sequence = config.pattern.split('').map(ch => ch === 'A' ? A : B);
+
+        for (let i = 0; i < config.discard; i++) {
+            let r = sequence[i % sequence.length];
+            x = r * x * (1 - x);
+        }
+
+        for (let i = 0; i < config.steps; i++) {
+            let r = sequence[i % sequence.length];
+            x = r * x * (1 - x);
+            let derivative = Math.abs(r * (1 - 2 * x));
+            if (derivative < 1e-8) derivative = 1e-8;
+            sum += Math.log(derivative);
+            N++;
+        }
+
+        return sum / N;
+    }
+
+    let drawLyapunov = () => {
+        const imgData = ctx.createImageData(width, height);
+        const data = imgData.data;
+
+        for (let py = 0; py < height; py++) {
+            let B = config.bRange[0] + (py / height) * (config.bRange[1] - config.bRange[0]);
+
+            for (let px = 0; px < width; px++) {
+                let A = config.aRange[0] + (px / width) * (config.aRange[1] - config.aRange[0]);
+
+                let lambda = computeLyapunov(A, B);
+
+                const idx = 4 * (py * width + px);
+
+                if (lambda < 0) {
+                    const c = Math.min(255, Math.floor(-lambda * 100));
+                    data[idx] = 0;
+                    data[idx + 1] = c;
+                    data[idx + 2] = 255;
+                } else {        const c = Math.min(255, Math.floor(lambda * 100));
+                    data[idx] = 255;
+                    data[idx + 1] = c;
+                    data[idx + 2] = 0;
+                }
+
+                data[idx + 3] = 255;
             }
         }
 
-        ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(imgData, 0, 0);
     }
 
     window.draw = () => {
         drawBackground(ctx, canvas);
-        hopalong(config.maxIterations);
+        drawLyapunov();
     }
 
     window.trackMouse = (x, y) => {
@@ -150,17 +175,17 @@
         }
     }
 
-	window.clearCanvas = () => {
-		Sound.error();
-	}
+    window.clearCanvas = () => {
+        Sound.error();
+    }
 
-	window.magic = () => {  
+    window.magic = () => {
         config.mode = !config.mode;
         Sound.tada();
-	}
+    }
 
     window.upload = () => {
-		Sound.error();
+        Sound.error();
     }
 
     init();
