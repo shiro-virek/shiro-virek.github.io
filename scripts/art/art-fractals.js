@@ -17,7 +17,7 @@
         offsetY: 0,
         hue: 10,
         fractalFunctionIndex: 1,
-        fractalFunctions: [mandelbrot, julia, tricorn, newton, burningShip],
+        fractalFunctions: [mandelbrot, julia, tricorn, newton, burningShip, phoenix],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -76,6 +76,10 @@
         return Fractals.burningShip(c, i, config.maxIterations, config.pow);
     }
 
+    function phoenix(c, i){
+        return Fractals.phoenix(c, i, config.maxIterations, config.pow, config.cr, config.ci);
+    }
+
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
@@ -99,7 +103,7 @@
     }
 
     let randomize = () => {
-        config.fractalFunctionIndex = globals.random.nextInt(0, config.fractalFunctions.length - 1);
+        config.fractalFunctionIndex = 5; //globals.random.nextInt(0, config.fractalFunctions.length - 1);
         config.drawFunctionIndex = globals.random.nextInt(0, config.drawFunctions.length - 1);
         config.pow = globals.random.nextInt(2, 5);   
         config.cr = globals.random.nextRange(-1, 1);  
@@ -107,10 +111,10 @@
         config.hue = globals.random.nextInt(0, 360);
 
         const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
-        if (fractalFunction == julia)
+        if (fractalFunction == julia || fractalFunction == phoenix)
             config.mode = globals.random.nextBool()
         else
-            config.mode = 0;
+            config.mode = 1;
     }
     
     window.draw = () => {
@@ -159,7 +163,8 @@
 	}
 
 	window.magic = () => {  
-        if (fractalFunction == julia){
+        const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
+        if (fractalFunction == julia || fractalFunction == phoenix){
             config.mode = !config.mode;
             Sound.tada();
         }else{

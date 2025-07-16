@@ -142,12 +142,41 @@ class Fractals {
         return iteration;
     }
 
+    static phoenix = (px, py, maxIterations, pow, cr, ci) => {
+        let zx = 0;
+        let zy = 0;
+        let zxPrev = 0;
+        let zyPrev = 0;
 
+        let iteration = 0;
+        const pRe = cr;
+        const pIm = ci;
 
+        while (zx * zx + zy * zy <= 4 && iteration < maxIterations) {
+            let r = Math.sqrt(zx * zx + zy * zy);
+            let theta = Math.atan2(zy, zx);
 
+            r = Math.pow(r, pow);
+            theta = theta * pow;
 
+            let zxk = r * Math.cos(theta);
+            let zyk = r * Math.sin(theta);
 
+            zxk += px;
+            zyk += py;
 
+            zxk += pRe * zxPrev - pIm * zyPrev;
+            zyk += pRe * zyPrev + pIm * zxPrev;
 
+            zxPrev = zx;
+            zyPrev = zy;
+            zx = zxk;
+            zy = zyk;
+
+            iteration++;
+        }
+
+        return iteration;
+    }
 
 }
