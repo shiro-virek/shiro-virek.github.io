@@ -9,7 +9,7 @@
         randomize: true,
         mode: 1,
         pow: 2,
-        maxIterations: 50,
+        maxIterations: 500000,
         scale: 0.005,
         cr: -0.7,
         ci: 0.27,
@@ -122,12 +122,8 @@
             [x, y] = hopalongStep(x, y);
             const px = Math.floor(cx + x * scale);
             const py = Math.floor(cy - y * scale);
-            if (px >= 0 && px < width && py >= 0 && py < height) {
-                let color = `hsl(${Numbers.scale(i, 0, iterations, 0, 360)}, ${100}%, ${50}%)`;            
-                const { r: red, g: green, b: blue } = Color.hslToRgb(color, 100, 50);
-                Pixels.setPixelBatch(ctx, imageData.data, px, py, red, green, blue);
-            
-                
+            if (px >= 0 && px < width && py >= 0 && py < height) {       
+                drawFunction(i, imageData.data, px, py);
             }
         }
 
@@ -142,7 +138,7 @@
         const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
         const drawFunction = config.drawFunctions[config.drawFunctionIndex];
 
-        hopalong(500000);
+        hopalong(config.maxIterations);
     }
 
     window.trackMouse = (x, y) => {
