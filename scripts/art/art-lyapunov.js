@@ -12,8 +12,6 @@
         minValue: -2,
         maxValue: 2,
         scale: 0.005,
-        cr: -0.7,
-        ci: 0.27,
         offsetX: 0,
         offsetY: 0,
         hue: 10,
@@ -87,9 +85,8 @@
         config.cr = globals.random.nextRange(-1, 1);
         config.ci = globals.random.nextRange(-1, 1);
         config.hue = globals.random.nextInt(0, 360);
-
+        config.pattern = getPattern();
         config.scale = 20;
-
         config.mode = globals.random.nextBool()
     }
 
@@ -117,6 +114,15 @@
         return sum / N;
     }
 
+    let getPattern = () => {
+        let letters = globals.random.nextInt(1, 10);
+        let pattern = "";
+        for(let i=0; i < letters; i++){
+            pattern += globals.random.nextBool() ? "A" : "B";
+        }
+        return pattern;
+    }
+
     let drawLyapunov = () => {
         const imgData = ctx.createImageData(width, height);
         const data = imgData.data;
@@ -133,7 +139,6 @@
                 const idx = 4 * (py * width + px);
                     
                 drawFunction(lambda, data, px, py);
-
             }
         }
 
@@ -157,8 +162,13 @@
                     config.offsetY = globals.initialClickCy - initialClickY * config.scale;
                 }
             } else {
-                config.cr = Numbers.scale(x, 0, width, -1, 1);
-                config.ci = Numbers.scale(y, 0, height, -1, 1);
+                if (globals.random.nextBool()){
+                    config.aRange = [Numbers.scale(x, 0, width, 1, 5), Numbers.scale(y, 0, height, 1, 5)];
+                    config.bRange = [Numbers.scale(x, 0, width, 1, 5), Numbers.scale(y, 0, height, 1, 5)];
+                }else{
+                    config.aRange = [Numbers.scale(x, 0, width, 1, 5), Numbers.scale(y, 0, height, 1, 5)];
+                    config.bRange = [Numbers.scale(y, 0, height, 1, 5), Numbers.scale(x, 0, width, 1, 5)];
+                }
             }
 
             lastPosY = y;
@@ -170,8 +180,7 @@
     }
 
     window.magic = () => {
-        config.mode = !config.mode;
-        Sound.tada();
+        Sound.error();
     }
 
     window.upload = () => {
