@@ -31,7 +31,8 @@ const art = [
                 "noise",
                 "tree",
                 "blinkenlights-mono",
-                "gel"
+                "gel",
+                "hopalong"
             ];
 const scripts = [];
 
