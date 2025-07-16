@@ -117,17 +117,21 @@
         let y = 0;
         const drawFunction = config.drawFunctions[config.drawFunctionIndex];
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
 
         for (let i = 0; i < iterations; i++) {
             [x, y] = hopalongStep(x, y);
             const px = Math.floor(cx + x * scale);
             const py = Math.floor(cy - y * scale);
             if (px >= 0 && px < width && py >= 0 && py < height) {
-                let color = `hsl(${Numbers.scale(i, 0, iterations, 0, 360)}, ${100}%, ${50}%)`;
-                Pixels.setSinglePixel(ctx, px, py, color);
+                let color = `hsl(${Numbers.scale(i, 0, iterations, 0, 360)}, ${100}%, ${50}%)`;            
+                const { r: red, g: green, b: blue } = Color.hslToRgb(color, 100, 50);
+                Pixels.setPixelBatch(ctx, imageData.data, px, py, red, green, blue);
+            
+                
             }
         }
+
+        ctx.putImageData(imageData, 0, 0);
     }
 
     window.draw = () => {
