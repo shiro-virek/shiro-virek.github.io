@@ -17,7 +17,7 @@
         offsetY: 0,
         hue: 10,
         fractalFunctionIndex: 1,
-        fractalFunctions: [mandelbrot, julia, tricorn, newton, burningShip, hopalong],
+        fractalFunctions: [hopalong],
         drawFunctionIndex: 1,
         drawFunctions: [drawPaletteColor1, drawPaletteColor2, drawPaletteGrayscale1, drawPaletteGrayscale2, drawPaletteHue1, drawPaletteHue2],
     };    
@@ -56,26 +56,6 @@
         Pixels.setPixelBatch(ctx, data, x, y, newValue, newValue, newValue);       
     }
 
-    function mandelbrot(c, i){
-        return Fractals.mandelbrot(c, i, config.maxIterations, config.pow);
-    }
-
-    function julia(c, i){
-        return Fractals.julia(c, i, config.maxIterations, config.pow, config.cr, config.ci);
-    }
-
-    function tricorn(c, i){
-        return Fractals.tricorn(c, i, config.maxIterations, config.pow, config.cr, config.ci);
-    }
-
-    function newton(c, i){
-        return Fractals.newton(c, i, config.maxIterations, config.pow);
-    }
-
-    function burningShip(c, i){
-        return Fractals.burningShip(c, i, config.maxIterations, config.pow);
-    }
-
     function hopalong(){
         return drawHopalong(500000);
     }
@@ -111,13 +91,11 @@
         config.hue = globals.random.nextInt(0, 360);
 
         const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
-        if (fractalFunction == hopalong){
-            config.scale = 20;
-        }
-        if (fractalFunction == julia || fractalFunction == hopalong)
-            config.mode = globals.random.nextBool()
-        else
-            config.mode = 0;
+        
+        config.scale = 20;
+        
+        config.mode = globals.random.nextBool()
+
     }
     
     let hopalongStep = (x, y) => {
@@ -160,21 +138,7 @@
         const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
         const drawFunction = config.drawFunctions[config.drawFunctionIndex];
 
-        if (fractalFunction != hopalong){
-            for (let x=0; x < width; x++){
-                for (let y=0; y < height; y++){
-                    const rc = x * config.scale + config.offsetX;
-                    const ic = y * config.scale + config.offsetY;
-                    
-                    let value = fractalFunction(rc, ic);
-                    
-                    drawFunction(value, data, x, y);
-                }
-            }     
-            ctx.putImageData(imageData, 0, 0);
-        }else{
-            hopalong(500000);
-        }   
+        hopalong(500000);
     }
 
     window.trackMouse = (x, y) => {
@@ -202,10 +166,8 @@
 	}
 
 	window.magic = () => {  
-        if (fractalFunction == julia || fractalFunction == hopalong){
-            config.mode = !config.mode;
-            Sound.tada();
-        }
+        config.mode = !config.mode;
+        Sound.tada();
 	}
 
     window.upload = () => {
