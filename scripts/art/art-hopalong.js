@@ -99,9 +99,9 @@
     }
     
     let hopalongStep = (x, y) => {
-        const a = 2;
-        const b = config.cr; //0.5;
-        const c = config.ci; //0.5;
+        const a = config.pow;
+        const b = config.cr; 
+        const c = config.ci; 
 
         let sign = x >= 0 ? 1 : -1;
         let xn = y - sign * Math.sqrt(Math.abs(b * x - c));
