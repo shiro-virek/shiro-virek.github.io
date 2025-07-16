@@ -65,7 +65,7 @@ let initRecorder = () => {
     const stream = canvas.captureStream(60);
     recorder = new MediaRecorder(stream, {
         mimeType: 'video/webm; codecs=vp9',
-        videoBitsPerSecond: 10_000_000
+        videoBitsPerSecond: 50_000_000
     });
 
     recorder.ondataavailable = (e) => {
