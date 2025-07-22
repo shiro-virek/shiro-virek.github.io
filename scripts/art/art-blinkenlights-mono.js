@@ -236,6 +236,27 @@
                 }
             }                  
         }
+
+        setCellTouch = (x, y) => {
+            this.setCell(x, y);
+            this.setCell(x-1, y+1);
+            this.setCell(x-1, y-1);
+            this.setCell(x+1, y-1);
+            this.setCell(x+1, y+1);
+            this.setCell(x, y+1);
+            this.setCell(x-1, y);
+            this.setCell(x, y-1);
+            this.setCell(x+1, y);
+        }
+
+        setCell = (x, y) => {      
+            if (x < 0 || y < 0 || x >= config.cellColumns || y >= config.cellRows){
+                let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+                let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+                this.cells[col][row].alive = !this.cells[col][row].alive;
+                this.cellsBuffer[col][row].alive = !this.cellsBuffer[col][row].alive;
+            }      
+        }
     }
 
     class Cell {
@@ -403,10 +424,11 @@
             setBalancedRules();
         }
 
-        Browser.sleep(globals.random.nextInt(50, 200));
+        Browser.sleep(50);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
+        if (clicking) globals.cellScreen.setCellTouch(xMouse, yMouse);
     }
     
     window.clearCanvas = () => {          

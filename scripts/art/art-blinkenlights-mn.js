@@ -261,6 +261,29 @@
 
             return count > 0 ? total / count : 0;
         }
+
+        setCellTouch = (x, y) => {
+            this.setCell(x, y);
+            this.setCell(x-1, y+1);
+            this.setCell(x-1, y-1);
+            this.setCell(x+1, y-1);
+            this.setCell(x+1, y+1);
+            this.setCell(x, y+1);
+            this.setCell(x-1, y);
+            this.setCell(x, y-1);
+            this.setCell(x+1, y);
+        }
+
+        setCell = (x, y) => {      
+            if (x < 0 || y < 0 || x >= config.cellColumns || y >= config.cellRows){
+                let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+                let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+                this.cells[col][row].energy += 10;
+                this.cellsBuffer[col][row].energy += 10;
+                this.cells[col][row].alive = !this.cells[col][row].alive;
+                this.cellsBuffer[col][row].alive = !this.cellsBuffer[col][row].alive;
+            }      
+        }
     }
 
     class Cell {
@@ -310,11 +333,11 @@
 
         config.cellRows = Math.floor((height - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
         config.cellColumns = Math.floor((width - config.cellMargin)/ (config.cellDiameter + config.cellPadding));
-        config.cellScreen = new CellScreen();
+        globals.cellScreen = new CellScreen();
         
         for (let x = 0; x <= config.cellColumns; x++) {
             for (let y = 0; y <= config.cellRows; y++) {
-                config.cellScreen.cells[x][y].alive = globals.random.next() < 0.2;    
+                globals.cellScreen.cells[x][y].alive = globals.random.next() < 0.2;    
             }
         }    
         setRandomRules();
@@ -358,7 +381,7 @@
     }
 
     let setRandomRules = () => {
-        config.cellScreen.neighborhoods = [];
+        globals.cellScreen.neighborhoods = [];
 
         let numberOfNeighborhoods = globals.random.nextInt(1, 3);
         for (let j = 0; j < numberOfNeighborhoods; j++) {
@@ -378,27 +401,28 @@
             }
 
             if (neighborhood.rules.length > 0) {
-                config.cellScreen.neighborhoods.push(neighborhood);
+                globals.cellScreen.neighborhoods.push(neighborhood);
             }
         }
     }
 
     window.draw = () => {
-        config.cellScreen.update();
+        globals.cellScreen.update();
 
         drawBackground(ctx, canvas);
-        config.cellScreen.draw(ctx);
-        config.cellScreen.copyBuffer();
+        globals.cellScreen.draw(ctx);
+        globals.cellScreen.copyBuffer();
 
-        config.mutationCounter++;
-        if (config.mutationCounter % 50 === 0) {
+        globals.mutationCounter++;
+        if (globals.mutationCounter % 50 === 0) {
             setRandomRules();
         }
 
-        Browser.sleep(globals.random.nextInt(50, 200));
+        Browser.sleep(50);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
+        if (clicking)  globals.cellScreen.setCellTouch(xMouse, yMouse);
     }
 
 	window.clearCanvas = () => {  

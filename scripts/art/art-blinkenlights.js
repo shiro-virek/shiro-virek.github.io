@@ -291,7 +291,32 @@
                 for (let y = 0; y < config.cellRows; y++) {
                     this.calculateCellStatus(x, y);
                 }
-            }                  
+            }             
+        }
+
+        setCellTouch = (x, y) => {
+            this.setCell(x, y);
+            this.setCell(x-1, y+1);
+            this.setCell(x-1, y-1);
+            this.setCell(x+1, y-1);
+            this.setCell(x+1, y+1);
+            this.setCell(x, y+1);
+            this.setCell(x-1, y);
+            this.setCell(x, y-1);
+            this.setCell(x+1, y);
+        }
+
+        setCell = (x, y) => {      
+            if (x < 0 || y < 0 || x >= config.cellColumns || y >= config.cellRows){
+                let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+                let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
+                this.cells[col][row].hue += 10;
+                this.cellsBuffer[col][row].hue += 10;                
+                this.cells[col][row].saturation += 1;
+                this.cellsBuffer[col][row].saturation += 1;           
+                this.cells[col][row].lightness += 1;
+                this.cellsBuffer[col][row].lightness += 1;
+            }      
         }
     }
 
@@ -387,10 +412,24 @@
     let setRandomRules = () => {
         globals.cellScreen.neighborhoods = [];
 
-        let numberOfRules = globals.random.nextInt(5, 20);
+        globals.cellScreen.rules.push(new Rule(Condition.Greater, 250, 0, Attribute.Hue, Condition.Lower, 200, 0, 1.1, NeighbourhoodType.Moore));
+        globals.cellScreen.rules.push(new Rule(Condition.Greater, 250, 0, Attribute.Hue, Condition.Greater, 250, 0, 0.8, NeighbourhoodType.Moore));
+        globals.cellScreen.rules.push(new Rule(Condition.Lower, 200, 0, Attribute.Hue, Condition.Greater, 150, 0, 0.9, NeighbourhoodType.Moore));
+        globals.cellScreen.rules.push(new Rule(Condition.Lower, 200, 0, Attribute.Hue, Condition.Lower, 100, 0, 1.2, NeighbourhoodType.Moore));
+
+        let numberOfRules = globals.random.nextInt(3, 5);
         for(let i = 0; i < numberOfRules; i++){
             let newRule = getRandomRule();   
+
+            let oppositeRule = Objects.clone(newRule);
+            if (oppositeRule.Condition == Condition.Greater) oppositeRule.condition = Condition.Lower;
+            if (oppositeRule.Condition == Condition.Lower) oppositeRule.condition = Condition.Greater;
+            if (oppositeRule.conditionNeighbours == Condition.Lower) oppositeRule.conditionNeighbours = Condition.Greater;
+            if (oppositeRule.conditionNeighbours == Condition.Greater) oppositeRule.conditionNeighbours = Condition.Lower;
+            oppositeRule.value = oppositeRule.value > 1 ? 1 - (1 - oppositeRule.value) : 1 + (1 - oppositeRule.value);
+
             globals.cellScreen.rules.push(newRule);
+            globals.cellScreen.rules.push(oppositeRule);
         }
     }
 
@@ -435,10 +474,11 @@
             setRandomRules();
         }
 
-        Browser.sleep(globals.random.nextInt(50, 200));
+        Browser.sleep(50);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
+        if (clicking) globals.cellScreen.setCellTouch(xMouse, yMouse);
     }
     
 	window.clearCanvas = () => {        
