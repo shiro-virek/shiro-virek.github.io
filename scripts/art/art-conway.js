@@ -50,7 +50,7 @@
             }  
         }
 
-        setPixel = (x, y) => {            
+        setCell = (x, y) => {            
             let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
             let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
             this.cells[col][row].on = true;
@@ -182,7 +182,7 @@
 
     let addEvents = () => {        
 		canvas.addEventListener('click', e => {
-			globals.cellScreen.setPixel(e.offsetX, e.offsetY);
+			globals.cellScreen.setCell(e.offsetX, e.offsetY);
 		}, false);
     }
 
