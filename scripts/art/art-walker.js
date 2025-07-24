@@ -60,11 +60,11 @@
         let newX = 0;
         let newY = 0;   
         let direction = null;
-
         let step = 0;
+        let rand = 0;
 
         do {
-            let rand =  globals.random.nextInt(0, Object.keys(Directions).length - 1);
+            rand =  globals.random.nextInt(0, Object.keys(Directions).length - 1);
 
             direction = Directions[Object.keys(Directions)[rand]];
 
@@ -97,7 +97,7 @@
         let color = 0;
 
         if (config.changeColor)
-            color = `hsl(${config.hue}, ${100}%, ${Numbers.scale(step, 0, config.step * 1.9, 0, 100)}%)`
+            color = `hsl(${config.hue}, ${Numbers.scale(Math.abs(newX - newY), 0, width, 0, 100)}%, ${Numbers.scale(step, 0, config.step * 1.9, 0, 50)}%)`
         else
             color = `hsl(${config.hue}, ${100}%, ${50}%)`
 
