@@ -13,7 +13,7 @@ class Random {
   }
 
   nextInt(min, max) {
-    return Math.round(this.nextRange(min, max));
+    return Math.floor(this.nextRange(min, max + 1));
   }
   
   getRandomFromArray = (array) => {

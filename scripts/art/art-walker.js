@@ -1,0 +1,132 @@
+{
+    const Directions = Object.freeze({
+		Up: Symbol("up"),		
+		Down: Symbol("down"),
+        Left: Symbol("left"),
+        Right: Symbol("right"),
+	});
+
+    const globals = {
+        random: null,
+        lastLineX: width / 2,
+        lastLineY: height / 2,
+        lastDirection: Directions.Left,
+    };
+
+    const config = {
+        randomize: true,
+        step: 10,
+        hue: 0,
+        fixedStep: false,
+        changeColor: false,
+    };    
+
+
+    let init = () => {
+		globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
+        initCanvas();
+        drawBackground(ctx, canvas);
+        addEvents();
+        window.requestAnimationFrame(loop);
+    }
+
+    let addEvents = () => {
+    }
+
+    let randomize = () => {
+        config.step = globals.random.nextInt(1, 10);
+        config.hue = globals.random.nextInt(0, 360);
+        config.fixedStep = globals.random.nextBool();
+        config.changeColor = globals.random.nextBool();
+    }
+
+    let oppositeDirection = (direction) => {
+        switch (globals.lastDirection) {
+            case Directions.Down:   
+                return direction === Directions.Up;
+            case Directions.Up:       
+                return direction === Directions.Down;
+            case Directions.Left:
+                return direction === Directions.Right;
+            case Directions.Right:
+                return direction === Directions.Left;
+            default:
+                break;
+        }
+    }
+    
+    window.draw = () => {
+        let newX = 0;
+        let newY = 0;   
+        let direction = null;
+        let step = 0;
+        let rand = 0;
+
+        do {
+            rand =  globals.random.nextInt(0, Object.keys(Directions).length - 1);
+
+            direction = Directions[Object.keys(Directions)[rand]];
+
+            step = config.step;
+
+            if (config.fixedStep) step *= globals.random.nextRange(0.1,1.9);
+
+            switch (direction) {
+                case Directions.Down:
+                    newX = globals.lastLineX;
+                    newY = globals.lastLineY + step;
+                    break;
+                case Directions.Up:                
+                    newX = globals.lastLineX;
+                    newY = globals.lastLineY - step;
+                    break;
+                case Directions.Left:
+                    newX = globals.lastLineX - step;
+                    newY = globals.lastLineY;
+                    break;
+                case Directions.Right:
+                    newX = globals.lastLineX + step;
+                    newY = globals.lastLineY;
+                    break;
+                default:
+                    break;
+            }
+        } while (newX < 0 || newY < 0 || newX > width || newY > height || oppositeDirection(direction));
+
+        let color = 0;
+
+        if (config.changeColor)
+            color = `hsl(${config.hue}, ${Numbers.scale(Math.abs(newX - newY), 0, width, 0, 100)}%, ${Numbers.scale(step, 0, config.step * 1.9, 0, 50)}%)`
+        else
+            color = `hsl(${config.hue}, ${100}%, ${50}%)`
+
+        Drawing.drawLine(ctx, globals.lastLineX, globals.lastLineY, newX, newY, 1, color);
+
+        Drawing.drawLine(ctx, width - globals.lastLineX, globals.lastLineY, width - newX, newY, 1, color);
+
+        globals.lastDirection = direction;
+        globals.lastLineX = newX;
+        globals.lastLineY = newY;
+    }
+
+    window.trackMouse = (x, y) => {
+        if (clicking) {  
+
+        }
+    }
+    
+    window.clearCanvas = () => {
+		Sound.error();
+    }
+
+	window.magic = () => {  
+		Sound.error();
+	}
+
+    window.upload = (e) => {
+		Sound.error();        
+    }
+
+    init();
+}

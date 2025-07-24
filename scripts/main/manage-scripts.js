@@ -34,6 +34,7 @@ const art = [
                 "gel",
                 "hopalong",
                 "lyapunov",
+                "walker",
             ];
 const scripts = [];
 
