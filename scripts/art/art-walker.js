@@ -17,6 +17,8 @@
         randomize: true,
         step: 10,
         hue: 0,
+        fixedStep: false,
+        changeColor: false,
     };    
 
 
@@ -35,6 +37,8 @@
     let randomize = () => {
         config.step = globals.random.nextInt(1, 10);
         config.hue = globals.random.nextInt(0, 360);
+        config.fixedStep = globals.random.nextBool();
+        config.changeColor = globals.random.nextBool();
     }
 
     let oppositeDirection = (direction) => {
@@ -57,26 +61,32 @@
         let newY = 0;   
         let direction = null;
 
+        let step = 0;
+
         do {
             let rand =  globals.random.nextInt(0, Object.keys(Directions).length - 1);
 
             direction = Directions[Object.keys(Directions)[rand]];
 
+            step = config.step;
+
+            if (config.fixedStep) step *= globals.random.nextRange(0.1,1.9);
+
             switch (direction) {
                 case Directions.Down:
                     newX = globals.lastLineX;
-                    newY = globals.lastLineY + config.step;
+                    newY = globals.lastLineY + step;
                     break;
                 case Directions.Up:                
                     newX = globals.lastLineX;
-                    newY = globals.lastLineY - config.step;
+                    newY = globals.lastLineY - step;
                     break;
                 case Directions.Left:
-                    newX = globals.lastLineX - config.step;
+                    newX = globals.lastLineX - step;
                     newY = globals.lastLineY;
                     break;
                 case Directions.Right:
-                    newX = globals.lastLineX + config.step;
+                    newX = globals.lastLineX + step;
                     newY = globals.lastLineY;
                     break;
                 default:
@@ -84,7 +94,12 @@
             }
         } while (newX < 0 || newY < 0 || newX > width || newY > height || oppositeDirection(direction));
 
-        let color = `hsl(${config.hue}, ${100}%, ${50}%)`;
+        let color = 0;
+
+        if (config.changeColor)
+            color = `hsl(${config.hue}, ${100}%, ${Numbers.scale(step, 0, config.step * 1.9, 0, 100)}%)`
+        else
+            color = `hsl(${config.hue}, ${100}%, ${50}%)`
 
         Drawing.drawLine(ctx, globals.lastLineX, globals.lastLineY, newX, newY, 1, color);
 
