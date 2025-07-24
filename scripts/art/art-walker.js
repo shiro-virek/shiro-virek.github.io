@@ -16,6 +16,7 @@
     const config = {
         randomize: true,
         step: 10,
+        hue: 0,
     };    
 
 
@@ -32,9 +33,11 @@
     }
 
     let randomize = () => {
+        config.step = globals.random.nextInt(1, 10);
+        config.hue = globals.random.nextInt(0, 360);
     }
 
-    let invalidDirection = (direction) => {
+    let oppositeDirection = (direction) => {
         switch (globals.lastDirection) {
             case Directions.Down:   
                 return direction === Directions.Up;
@@ -56,7 +59,7 @@
 
         do {
             let rand =  globals.random.nextInt(0, Object.keys(Directions).length - 1);
-            console.log(rand);
+
             direction = Directions[Object.keys(Directions)[rand]];
 
             switch (direction) {
@@ -79,9 +82,13 @@
                 default:
                     break;
             }
-        } while (newX < 0 || newY < 0 || newX > width || newY > height || invalidDirection(direction));
+        } while (newX < 0 || newY < 0 || newX > width || newY > height || oppositeDirection(direction));
 
-        Drawing.drawLine(ctx, globals.lastLineX, globals.lastLineY, newX, newY, 2, '#FFF');
+        let color = `hsl(${config.hue}, ${100}%, ${50}%)`;
+
+        Drawing.drawLine(ctx, globals.lastLineX, globals.lastLineY, newX, newY, 1, color);
+
+        Drawing.drawLine(ctx, width - globals.lastLineX, globals.lastLineY, width - newX, newY, 1, color);
 
         globals.lastDirection = direction;
         globals.lastLineX = newX;
