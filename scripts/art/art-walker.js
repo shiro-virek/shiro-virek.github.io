@@ -19,8 +19,8 @@
         hue: 0,
         fixedStep: false,
         changeColor: false,
+        transparent: false,
     };    
-
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
@@ -39,6 +39,7 @@
         config.hue = globals.random.nextInt(0, 360);
         config.fixedStep = globals.random.nextBool();
         config.changeColor = globals.random.nextBool();
+        config.transparent = globals.random.nextBool();
     }
 
     let oppositeDirection = (direction) => {
@@ -97,9 +98,9 @@
         let color = 0;
 
         if (config.changeColor)
-            color = `hsl(${config.hue}, ${Numbers.scale(Math.abs(newX - newY), 0, width, 0, 100)}%, ${Numbers.scale(step, 0, config.step * 1.9, 0, 50)}%)`
+            color = `hsla(${config.hue}, ${Numbers.scale(Math.abs(newX - newY), 0, width, 0, 100)}%, ${Numbers.scale(step, 0, config.step * 1.9, 0, 50)}%, ${config.transparent ? 0.3 : 1.0})`
         else
-            color = `hsl(${config.hue}, ${100}%, ${50}%)`
+            color = `hsla(${config.hue}, ${100}%, ${50}%, ${config.transparent ? 0.3 : 1.0})`
 
         Drawing.drawLine(ctx, globals.lastLineX, globals.lastLineY, newX, newY, 1, color);
 
