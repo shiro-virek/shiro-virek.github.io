@@ -4,6 +4,10 @@
 		Down: Symbol("down"),
         Left: Symbol("left"),
         Right: Symbol("right"),
+        NE: Symbol("ne"),		
+		NW: Symbol("nw"),
+        SE: Symbol("se"),
+        SW: Symbol("sw"),
 	});
 
     const globals = {
@@ -20,6 +24,7 @@
         fixedStep: false,
         changeColor: false,
         transparent: false,
+        diagonals: false,
     };    
 
     let init = () => {
@@ -40,6 +45,7 @@
         config.fixedStep = globals.random.nextBool();
         config.changeColor = globals.random.nextBool();
         config.transparent = globals.random.nextBool();
+        config.diagonals = globals.random.nextBool();
     }
 
     let oppositeDirection = (direction) => {
@@ -52,6 +58,14 @@
                 return direction === Directions.Right;
             case Directions.Right:
                 return direction === Directions.Left;
+            case Directions.NE:   
+                return direction === Directions.SW;
+            case Directions.NW:       
+                return direction === Directions.SE;
+            case Directions.SE:
+                return direction === Directions.NW;
+            case Directions.SW:
+                return direction === Directions.NE;
             default:
                 break;
         }
@@ -65,13 +79,17 @@
         let rand = 0;
 
         do {
-            rand =  globals.random.nextInt(0, Object.keys(Directions).length - 1);
+            if (config.diagonals)
+                rand =  globals.random.nextInt(0, Object.keys(Directions).length - 1)
+            else
+                rand =  globals.random.nextInt(0, 3);
 
             direction = Directions[Object.keys(Directions)[rand]];
 
             step = config.step;
 
             if (config.fixedStep) step *= globals.random.nextRange(0.1,1.9);
+            let hypotenuse = Math.sqrt((step*step)+(step*step));
 
             switch (direction) {
                 case Directions.Down:
@@ -90,6 +108,22 @@
                     newX = globals.lastLineX + step;
                     newY = globals.lastLineY;
                     break;
+                case Directions.NE:   
+                    newX = globals.lastLineX - hypotenuse;
+                    newY = globals.lastLineY - hypotenuse;
+                    break;
+                case Directions.NW: 
+                    newX = globals.lastLineX + hypotenuse;
+                    newY = globals.lastLineY - hypotenuse;
+                    break;      
+                case Directions.SE:
+                    newX = globals.lastLineX - hypotenuse;
+                    newY = globals.lastLineY + hypotenuse;
+                    break;
+                case Directions.SW:
+                    newX = globals.lastLineX + hypotenuse;
+                    newY = globals.lastLineY + hypotenuse;
+                    break;
                 default:
                     break;
             }
@@ -100,7 +134,7 @@
         if (config.changeColor)
             color = `hsla(${config.hue}, ${Numbers.scale(Math.abs(newX - newY), 0, width, 0, 100)}%, ${Numbers.scale(step, 0, config.step * 1.9, 0, 50)}%, ${config.transparent ? 0.3 : 1.0})`
         else
-            color = `hsla(${config.hue}, ${100}%, ${50}%, ${config.transparent ? 0.3 : 1.0})`
+            color = `hsla(${config.hue}, ${100}%, ${50}%, ${config.transparent ? 0.5 : 1.0})`
 
         Drawing.drawLine(ctx, globals.lastLineX, globals.lastLineY, newX, newY, 1, color);
 
