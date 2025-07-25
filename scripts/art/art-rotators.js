@@ -19,10 +19,9 @@
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
 
-		config.opacity = globals.random.nextRange(0.03, 0.1, 2);
+		config.opacity = globals.random.nextRange(0.03, 0.1);
 		config.thickness = globals.random.nextInt(1, 5);
-		config.angleRotation = globals.random.nextInt(0, 20);
-		config.colorMapMax = globals.random.nextInt(1, 10000);
+		config.angleRotation = globals.random.nextRange(0, 5);
 
 		colorShift = globals.random.nextInt(0, 359);
 
@@ -56,9 +55,8 @@
 	}
 
 	window.draw = (xPointer, yPointer) => {
-
 		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
-		let hue = Numbers.scale(distance, 0, 360, 0, config.colorMapMax);
+		let hue = Numbers.scale(distance, 0, 100, 0, 360);
 
 		hue = (hue + colorShift) < 360 ? hue + colorShift : hue + colorShift - 360;
 
@@ -66,9 +64,7 @@
 
 		let lineWidth = Numbers.scale(distance, 0, 500, 1, config.thickness); 
 
-	    Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
-
-		let angleRad = globals.angle * Trigonometry.RAD_CONST;
+		Drawing.drawLine(ctx, lastPosX, lastPosY, xPointer, yPointer, lineWidth, color);
 
 		if (config.rotators > 0)
 			for (let i = 0; i < config.rotators - 1; i++) {

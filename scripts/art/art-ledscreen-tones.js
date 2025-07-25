@@ -129,7 +129,11 @@
                     const a = globals.imgData[i * 4 + 3];
 
                     let lightness = Color.getLightness = (r, g, b);
-                    globals.ledScreen.leds[x][y].value = lightness;
+
+                    if (config.mode)
+                        globals.ledScreen.leds[x][y].value = Numbers.scale(lightness, 0, 250, 0, 100);
+                    else
+                        globals.ledScreen.leds[x][y].value = lightness
                 }
             }
         };
