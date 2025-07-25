@@ -166,6 +166,7 @@
 		initCanvas();
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
         globals.random = Objects.getRandomObject();
+        if (config.randomize) randomize();
         config.cellDiameter = globals.random.nextInt(5, 20);        
         config.cellPadding = globals.random.nextInt(0, 20);
         config.cellMargin = config.cellPadding;
@@ -174,7 +175,6 @@
         config.cellColumns = Math.floor((width - config.cellMargin)/ (config.cellDiameter + config.cellPadding));        
         globals.cellScreen = new CellScreen();
         
-        if (config.randomize) randomize();
 
         addEvents();
         window.requestAnimationFrame(loop)
@@ -187,7 +187,7 @@
     }
 
     let randomize = () => {        
-        config.hue = globals.random.nextInt(0, 255); 
+        config.hue = globals.random.nextInt(0, 360); 
     }
 
     window.draw = () => {
