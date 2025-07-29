@@ -134,7 +134,9 @@
     }
 
 	window.magic = () => {  
-		Sound.error();
+        config.light[0] *= -1;
+        config.light[1] *= -1;
+		Sound.tada();
 	}
 
     window.upload = (e) => {
