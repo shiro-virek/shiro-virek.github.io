@@ -410,17 +410,17 @@
 
 
     let setRandomRules = () => {
-        globals.cellScreen.neighborhoods = [];
+        globals.cellScreen.rules = [];
 
-        globals.cellScreen.rules.push(new Rule(Condition.Between, 270, 90, Attribute.Hue, Condition.Greater, 180, 0, 1.01, NeighbourhoodType.VonNeumann));
-        globals.cellScreen.rules.push(new Rule(Condition.Between, 270, 180, Attribute.Hue, Condition.Lower, 180, 0, 1.01, NeighbourhoodType.VonNeumann));
-        globals.cellScreen.rules.push(new Rule(Condition.Lower, 90, 0, Attribute.Hue, Condition.Greater, 180, 0, 0.99, NeighbourhoodType.VonNeumann));
-        globals.cellScreen.rules.push(new Rule(Condition.Greater, 270, 0, Attribute.Hue, Condition.Greater, 180, 0, 0.99, NeighbourhoodType.VonNeumann));
+        globals.cellScreen.rules.push(new Rule(Condition.Between, 270, 90, Attribute.Hue, Condition.Greater, 180, 0, 0.99, NeighbourhoodType.Extended));
+        globals.cellScreen.rules.push(new Rule(Condition.Between, 270, 180, Attribute.Hue, Condition.Lower, 180, 0, 0.99, NeighbourhoodType.Extended));
+        globals.cellScreen.rules.push(new Rule(Condition.Lower, 90, 0, Attribute.Hue, Condition.Greater, 180, 0, 1.01, NeighbourhoodType.Extended));
+        globals.cellScreen.rules.push(new Rule(Condition.Greater, 270, 0, Attribute.Hue, Condition.Greater, 180, 0, 1.01, NeighbourhoodType.Extended));
         
-        globals.cellScreen.rules.push(new Rule(Condition.Between, 192, 64, Attribute.Lightness, Condition.Greater, 128, 0, 1.01, NeighbourhoodType.Moore));
-        globals.cellScreen.rules.push(new Rule(Condition.Between, 192, 128, Attribute.Lightness, Condition.Lower, 128, 0, 1.01, NeighbourhoodType.Moore));
-        globals.cellScreen.rules.push(new Rule(Condition.Lower, 64, 0, Attribute.Lightness, Condition.Greater, 128, 0, 0.99, NeighbourhoodType.Moore));
-        globals.cellScreen.rules.push(new Rule(Condition.Greater, 192, 0, Attribute.Lightness, Condition.Greater, 128, 0, 0.99, NeighbourhoodType.Moore));
+        globals.cellScreen.rules.push(new Rule(Condition.Between, 192, 64, Attribute.Lightness, Condition.Greater, 128, 0, 1.01, NeighbourhoodType.Extended));
+        globals.cellScreen.rules.push(new Rule(Condition.Between, 192, 128, Attribute.Lightness, Condition.Lower, 128, 0, 1.01, NeighbourhoodType.Extended));
+        globals.cellScreen.rules.push(new Rule(Condition.Lower, 64, 0, Attribute.Lightness, Condition.Greater, 128, 0, 0.99, NeighbourhoodType.Extended));
+        globals.cellScreen.rules.push(new Rule(Condition.Greater, 192, 0, Attribute.Lightness, Condition.Greater, 128, 0, 0.99, NeighbourhoodType.Extended));
 
         let numberOfRules = globals.random.nextInt(3, 5);
         for(let i = 0; i < numberOfRules; i++){
