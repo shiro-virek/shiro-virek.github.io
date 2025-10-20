@@ -34,8 +34,8 @@
         update = () => {
             if (this.streets.length > 0) {	
                 for (const street of globals.city.streets) {
-                    street.length1 += 0.2;
-                    street.length2 += 0.2;
+                    if (street.growing1) street.length1 += 0.2;
+                    if (street.growing2) street.length2 += 0.2;
                 }
 			} 
         }
@@ -43,7 +43,8 @@
 
     class Street {
         constructor(x, y) {
-            this.growing = true;
+            this.growing1 = true;
+            this.growing2 = true;
 			this.originX = x;
             this.originY = y;
             this.angle = globals.random.nextInt(0,360);
