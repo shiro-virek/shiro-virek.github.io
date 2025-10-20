@@ -62,7 +62,7 @@
                         y2 = street2.originY + Math.sin(street2.angle * Trigonometry.RAD_CONST) * street2.length1;
 
                         if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
-                            street2.originX, street2.originY, x2, y2)) street.growing1 = false;
+                            street2.originX, street2.originY, x2, y2)) street.growing2 = false;
 
                         //---------
 
@@ -70,7 +70,7 @@
                         y2 = street2.originY + Math.sin((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
 
                         if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
-                            street2.originX, street2.originY, x2, y2)) street.growing1 = false;
+                            street2.originX, street2.originY, x2, y2)) street.growing2 = false;
 
                         //---------
 
