@@ -46,6 +46,8 @@
                         if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
                             street2.originX, street2.originY, x2, y2)) street.growing1 = false;
 
+                        if (x1 < 0 || x1 > width || y1 < 0 || y1 > height) street.growing1 = false;
+
                         //---------
 
                         x2 = street2.originX + Math.cos((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
@@ -64,6 +66,8 @@
                         if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
                             street2.originX, street2.originY, x2, y2)) street.growing2 = false;
 
+                        if (x1 < 0 || x1 > width || y1 < 0 || y1 > height) street.growing2 = false;
+
                         //---------
 
                         x2 = street2.originX + Math.cos((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
@@ -73,6 +77,8 @@
                             street2.originX, street2.originY, x2, y2)) street.growing2 = false;
 
                         //---------
+                        
+
 
                         if (street.growing1) street.length1 += 0.2;
                         if (street.growing2) street.length2 += 0.2;
