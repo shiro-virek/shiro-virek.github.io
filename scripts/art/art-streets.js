@@ -34,8 +34,50 @@
         update = () => {
             if (this.streets.length > 0) {	
                 for (const street of globals.city.streets) {
-                    if (street.growing1) street.length1 += 0.2;
-                    if (street.growing2) street.length2 += 0.2;
+                    for (const street2 of globals.city.streets) {
+                        if (street == street2)
+                            continue;
+
+                        let x1 = street.originX + Math.cos(street.angle * Trigonometry.RAD_CONST) * street.length1;
+                        let y1 = street.originY + Math.sin(street.angle * Trigonometry.RAD_CONST) * street.length1;
+                        let x2 = street2.originX + Math.cos(street2.angle * Trigonometry.RAD_CONST) * street2.length1;
+                        let y2 = street2.originY + Math.sin(street2.angle * Trigonometry.RAD_CONST) * street2.length1;
+
+                        if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
+                            street2.originX, street2.originY, x2, y2)) street.growing1 = false;
+
+                        //---------
+
+                        x2 = street2.originX + Math.cos((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
+                        y2 = street2.originY + Math.sin((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
+
+                        if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
+                            street2.originX, street2.originY, x2, y2)) street.growing1 = false;
+
+                        //---------
+
+                        x1 = street.originX + Math.cos((street.angle + 180) * Trigonometry.RAD_CONST) * street.length2;
+                        y1 = street.originY + Math.sin((street.angle + 180) * Trigonometry.RAD_CONST) * street.length2;
+                        x2 = street2.originX + Math.cos(street2.angle * Trigonometry.RAD_CONST) * street2.length1;
+                        y2 = street2.originY + Math.sin(street2.angle * Trigonometry.RAD_CONST) * street2.length1;
+
+                        if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
+                            street2.originX, street2.originY, x2, y2)) street.growing1 = false;
+
+                        //---------
+
+                        x2 = street2.originX + Math.cos((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
+                        y2 = street2.originY + Math.sin((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
+
+                        if (Trigonometry.segmentsIntersect(street.originX, street.originY, x1, y1,
+                            street2.originX, street2.originY, x2, y2)) street.growing1 = false;
+
+                        //---------
+
+                        if (street.growing1) street.length1 += 0.2;
+                        if (street.growing2) street.length2 += 0.2;
+                    }
+
                 }
 			} 
         }

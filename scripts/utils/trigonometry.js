@@ -104,4 +104,34 @@ class Trigonometry {
 
         return points;
     }
+
+    static orientation = (ax, ay, bx, by, cx, cy) => {
+        const val = (by - ay) * (cx - bx) - (bx - ax) * (cy - by);
+        if (val === 0) return 0;       
+        return val > 0 ? 1 : 2;         
+    }
+
+    static onSegment = (ax, ay, bx, by, cx, cy) => {
+        return Math.min(ax, bx) <= cx && cx <= Math.max(ax, bx) &&
+                Math.min(ay, by) <= cy && cy <= Math.max(ay, by);
+    }
+
+    static segmentsIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+        const o1 = Trigonometry.orientation(x1, y1, x2, y2, x3, y3);
+        const o2 = Trigonometry.orientation(x1, y1, x2, y2, x4, y4);
+        const o3 = Trigonometry.orientation(x3, y3, x4, y4, x1, y1);
+        const o4 = Trigonometry.orientation(x3, y3, x4, y4, x2, y2);
+
+        if (o1 !== o2 && o3 !== o4) return true;
+
+        if (o1 === 0 && Trigonometry.onSegment(x1, y1, x2, y2, x3, y3)) return true;
+        if (o2 === 0 && Trigonometry.onSegment(x1, y1, x2, y2, x4, y4)) return true;
+        if (o3 === 0 && Trigonometry.onSegment(x3, y3, x4, y4, x1, y1)) return true;
+        if (o4 === 0 && Trigonometry.onSegment(x3, y3, x4, y4, x2, y2)) return true;
+
+        return false;
+    }
+
+
+
 }
