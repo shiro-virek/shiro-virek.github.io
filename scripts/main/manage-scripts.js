@@ -36,6 +36,7 @@ const art = [
                 "lyapunov",
                 "walker",
                 "streets",
+                "filters",
             ];
 const scripts = [];
 
