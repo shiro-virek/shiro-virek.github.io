@@ -39,14 +39,6 @@
     
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {   
-               /* const index = (y * width + x) * 4;
-                outputData[index] = data[index];       
-                outputData[index + 1] = data[index + 1]; 
-                outputData[index + 2] = data[index + 2]; 
-                outputData[index + 3] = data[index + 3];  
-                */
-        
-                
                 let newPixels = [
                     applyFilter(data, x, y, kernel[1][1]),
                     applyFilter(data, x-1, y-1, kernel[0][0]),
