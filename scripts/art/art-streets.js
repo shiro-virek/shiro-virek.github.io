@@ -80,13 +80,26 @@
                         
 
 
-                        if (street.growing1) street.length1 += 0.2;
-                        if (street.growing2) street.length2 += 0.2;
                     }
+
+
+                    if (street.growing1) street.length1 += 0.1;
+                    if (street.growing2) street.length2 += 0.1;
 
                 }
 			} 
         }
+
+        generateStreets = () => {
+			let distance = width / 10;
+			let lineCols = Math.floor(width / distance) + 1;
+			let lineRows = Math.floor(height / distance) + 1;
+			for (let x=0; x < lineCols; x++) {
+				for (let y=0; y < lineRows; y++) {
+					globals.city.addStreet(x * distance, y * distance);	
+				}
+			}
+		}
     }
 
     class Street {
@@ -136,7 +149,9 @@
     }
 
 	window.magic = () => {  
-		Sound.error();
+	    window.clearCanvas();
+		globals.city.generateStreets();
+        Sound.tada();
 	}
 
     window.upload = (e) => {
