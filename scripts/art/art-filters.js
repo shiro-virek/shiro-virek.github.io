@@ -30,12 +30,61 @@
     }
 
     function edges(data, outputData) {
+        
+        /*
+        //Edges
         let kernel = [
             [-1, -1, -1],
             [-1, 8, -1],
             [-1, -1, -1],
         ];
-          
+
+
+        //Sharpen
+        let kernel = [
+            [0, -1, 0],
+            [-1, 5, -1],
+            [0, -1, 0],
+        ];
+
+        //Emboss
+        let kernel = [
+            [-2, -1, 0],
+            [-1, 1, 1],
+            [0, 1, 2],
+        ];
+
+
+        //Sobel X
+        let kernel = [
+            [-1, 0, 1],
+            [-2, 0, 2],
+            [-1, 0, 1],
+        ];
+
+
+        //Sobel Y
+        let kernel = [
+            [-1, -2, -1],
+            [0, 0, 0],
+            [1, 2, 1],
+        ];
+
+        //Blur * 1/9
+        let kernel = [
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 1],
+        ];
+
+        */
+
+        //Gaussian blur * 1/16
+        let kernel = [
+            [1, 2, 1],
+            [2, 4, 2],
+            [1, 2, 1],
+        ];
     
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {   
