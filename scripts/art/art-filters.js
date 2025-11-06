@@ -7,7 +7,7 @@
         frequency: 0.3,
         mode: 1,
         functionIndex: 1,
-        functions: [edges] 
+        functions: [edges, sobelX, sobelY, sharpen, gaussianBlur, blur, emboss] 
     };
     
     const globals = {
@@ -30,74 +30,88 @@
     }
 
     function edges(data, outputData) {
-        
-        /*
-        //Edges
         let kernel = [
             [-1, -1, -1],
             [-1, 8, -1],
             [-1, -1, -1],
         ];
 
+        applyFilter(data, outputData, kernel);
+    }
 
-        //Sharpen
+
+    function sharpen(data, outputData) {
         let kernel = [
             [0, -1, 0],
             [-1, 5, -1],
             [0, -1, 0],
         ];
+        applyFilter(data, outputData, kernel);
+    }
 
-        //Emboss
+    function emboss(data, outputData) {
         let kernel = [
             [-2, -1, 0],
             [-1, 1, 1],
             [0, 1, 2],
         ];
 
+        applyFilter(data, outputData, kernel);
+    }
 
-        //Sobel X
+    function sobelX(data, outputData) {
         let kernel = [
             [-1, 0, 1],
             [-2, 0, 2],
             [-1, 0, 1],
         ];
 
+        applyFilter(data, outputData, kernel);
+    }
 
-        //Sobel Y
+    function sobelY(data, outputData) {
         let kernel = [
             [-1, -2, -1],
             [0, 0, 0],
             [1, 2, 1],
         ];
 
-        //Blur * 1/9
+        applyFilter(data, outputData, kernel);
+    }
+
+    function blur(data, outputData) {
         let kernel = [
             [1, 1, 1],
             [1, 1, 1],
             [1, 1, 1],
         ];
 
-        */
+        applyFilter(data, outputData, kernel, 9);
+    }
 
-        //Gaussian blur * 1/16
+    function gaussianBlur(data, outputData) {
         let kernel = [
             [1, 2, 1],
             [2, 4, 2],
             [1, 2, 1],
         ];
-    
+
+        applyFilter(data, outputData, kernel, 16);
+    }
+
+    function applyFilter(data, outputData, kernel, normalizeFactor = 1) {         
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {   
                 let newPixels = [
-                    applyFilter(data, x, y, kernel[1][1]),
-                    applyFilter(data, x-1, y-1, kernel[0][0]),
-                    applyFilter(data, x+1, y+1, kernel[2][2]),
-                    applyFilter(data, x-1, y+1, kernel[0][2]),
-                    applyFilter(data, x+1, y-1, kernel[2][0]),
-                    applyFilter(data, x-1, y, kernel[0][1]),
-                    applyFilter(data, x, y-1, kernel[1][0]),
-                    applyFilter(data, x+1, y, kernel[2][1]),
-                    applyFilter(data, x, y+1, kernel[1][2])
+                    applyFilterOnPixel(data, x, y, kernel[1][1]),
+                    applyFilterOnPixel(data, x-1, y-1, kernel[0][0]),
+                    applyFilterOnPixel(data, x+1, y+1, kernel[2][2]),
+                    applyFilterOnPixel(data, x-1, y+1, kernel[0][2]),
+                    applyFilterOnPixel(data, x+1, y-1, kernel[2][0]),
+                    applyFilterOnPixel(data, x-1, y, kernel[0][1]),
+                    applyFilterOnPixel(data, x, y-1, kernel[1][0]),
+                    applyFilterOnPixel(data, x+1, y, kernel[2][1]),
+                    applyFilterOnPixel(data, x, y+1, kernel[1][2])
                 ];
 
 
@@ -110,15 +124,15 @@
                 }
                     
                 const index = (y * width + x) * 4;
-                outputData[index] = pixelsSum[0];       
-                outputData[index + 1] = pixelsSum[1];  
-                outputData[index + 2] = pixelsSum[2];  
+                outputData[index] = pixelsSum[0] / normalizeFactor;       
+                outputData[index + 1] = pixelsSum[1] / normalizeFactor;  
+                outputData[index + 2] = pixelsSum[2] / normalizeFactor;  
                 outputData[index + 3] = 255;  
             }
         }
     }
 
-    let applyFilter = (data, x, y, filterValue) => { 
+    let applyFilterOnPixel = (data, x, y, filterValue) => { 
         if (x < 0 || x > width || y < 0 || y > width) return 0;
         const index = (y * width + x) * 4;
         return [data[index] * filterValue,
