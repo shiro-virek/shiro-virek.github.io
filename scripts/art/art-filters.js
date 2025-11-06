@@ -7,7 +7,7 @@
         frequency: 0.3,
         mode: 1,
         functionIndex: 1,
-        functions: [edges, sobelX, sobelY, sharpen, gaussianBlur, blur, emboss] 
+        functions: [edges, sobelX, sobelY, sharpen, gaussianBlur, blur, emboss, textures, horizontalLines, verticalLines, spotDetector, edgeEnhancement, cornersKirschNorth, diagonalEdgesSE, diagonalEdgesNW] 
     };
     
     const globals = {
@@ -27,6 +27,86 @@
                 outputData[index + 3] = data[index + 3];                 
             }
         }
+    }
+
+    function textures(data, outputData) {
+        let kernel = [
+            [1, -2, 1],
+            [-2, 4, -2],
+            [1, -2, 1],
+        ];
+
+        applyFilter(data, outputData, kernel);
+    }
+
+    function horizontalLines(data, outputData) {
+        let kernel = [
+            [-1, -1, -1],
+            [2, 2, 2],
+            [-1, -1, -1],
+        ];
+
+        applyFilter(data, outputData, kernel);
+    }
+
+    function verticalLines(data, outputData) {
+        let kernel = [
+            [-1, 2, -1],
+            [-1, 2, -1],
+            [-1, 2, -1],
+        ];
+
+        applyFilter(data, outputData, kernel);
+    }
+
+    function spotDetector(data, outputData) {
+        let kernel = [
+            [-1, -1, -1],
+            [-1, 8, -1],
+            [-1, -1, -1],
+        ];
+
+        applyFilter(data, outputData, kernel);
+    }
+
+    function edgeEnhancement(data, outputData) {
+        let kernel = [
+            [-1, 0, 1],
+            [-1, 1, 1],
+            [-1, 0, 1],
+        ];
+
+        applyFilter(data, outputData, kernel);
+    }
+
+    function cornersKirschNorth(data, outputData) {
+        let kernel = [
+            [5, 5, 5],
+            [-3, 0, -3],
+            [-3, -3, -3],
+        ];
+
+        applyFilter(data, outputData, kernel);
+    }
+
+    function diagonalEdgesSE(data, outputData) {
+        let kernel = [
+            [-1, -1, 0],
+            [-1, 0, 1],
+            [0, 1, 1],
+        ];
+
+        applyFilter(data, outputData, kernel);
+    }
+
+    function diagonalEdgesNW(data, outputData) {
+        let kernel = [
+            [0, 1, 1],
+            [-1, 0, 1],
+            [-1, -1, 0],
+        ];
+
+        applyFilter(data, outputData, kernel);
     }
 
     function edges(data, outputData) {
