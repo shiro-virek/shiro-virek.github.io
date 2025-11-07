@@ -116,6 +116,26 @@ class Trigonometry {
                 Math.min(ay, by) <= cy && cy <= Math.max(ay, by);
     }
 
+    static getSegmentsIntersectionPoint = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+        const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+        if (denom === 0) return null;
+
+        const px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / denom;
+        const py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / denom;
+
+        const dentroLinea1 = (px >= Math.min(x1, x2) && px <= Math.max(x1, x2)) &&
+                            (py >= Math.min(y1, y2) && py <= Math.max(y1, y2));
+        const dentroLinea2 = (px >= Math.min(x3, x4) && px <= Math.max(x3, x4)) &&
+                            (py >= Math.min(y3, y4) && py <= Math.max(y3, y4));
+
+        if (dentroLinea1 && dentroLinea2) {
+            return { x: px, y: py };
+        }
+        return null;
+    }
+
+
     static segmentsIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
         const o1 = Trigonometry.orientation(x1, y1, x2, y2, x3, y3);
         const o2 = Trigonometry.orientation(x1, y1, x2, y2, x4, y4);
