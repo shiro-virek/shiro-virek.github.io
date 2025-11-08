@@ -77,7 +77,7 @@
 
                         let intersection3 = (Trigonometry.getSegmentsIntersectionPoint(street.originX, street.originY, x2, y2, street2.originX, street2.originY, x3, y3));
                         if (intersection3){
-                            let distance5 = Trigonometry.distanceBetweenTwoPoints(intersection3.x, intersection3.y, x1, y1);
+                            let distance5 = Trigonometry.distanceBetweenTwoPoints(intersection3.x, intersection3.y, x2, y2);
                             let distance6 = Trigonometry.distanceBetweenTwoPoints(intersection3.x, intersection3.y, x3, y3);
                             if (distance5 && distance6)
                                 if (distance5 < distance6)
