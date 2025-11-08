@@ -146,4 +146,18 @@ class Drawing {
         ctx.strokeStyle = color;
         ctx.stroke();
     }
+
+    static drawLineFromAngle = (ctx, x, y, angleDeg, length = 100, color = '#FFF') => {
+        const angleRad = angleDeg * Math.PI / 180;
+
+        const x2 = x + Math.cos(angleRad) * length;
+        const y2 = y + Math.sin(angleRad) * length;
+
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.moveTo(x, y);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
+
 }

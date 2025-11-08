@@ -35,6 +35,8 @@ const art = [
                 "hopalong",
                 "lyapunov",
                 "walker",
+                "streets",
+                "filters",
             ];
 const scripts = [];
 

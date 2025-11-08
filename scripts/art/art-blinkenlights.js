@@ -268,7 +268,7 @@
 
                 if (this.ruleFulfilcell(rule, neighboursResult, this.getCellValueSafe(x, y, rule))) {
                     let updatedCell = this.applyRule(rule, this.cells[x][y]);
-
+/*
                     switch (rule.attribute) {
                         case Attribute.Hue:
                             updatedCell.hue = (updatedCell.hue + this.cells[x][y].hue * 2) / 3;
@@ -280,7 +280,7 @@
                             updatedCell.lightness = (updatedCell.lightness + this.cells[x][y].lightness * 2) / 3;
                             break;
                     }
-
+*/
                     this.cellsBuffer[x][y] = updatedCell;
                 }
             });      
