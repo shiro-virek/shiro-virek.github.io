@@ -14,7 +14,8 @@
 		}
 
 		addStreet = (x, y) => {
-				let street = new Street(x, y);
+                let id = this.streets.length + 1;
+				let street = new Street(x, y, id);
 				//city.randomize();
 				globals.city.streets.push(street);
 		
@@ -33,10 +34,21 @@
 
         update = () => {
             if (this.streets.length > 0) {	
+                let streetComparisons = [];
+
                 for (const street of globals.city.streets) {
                     for (const street2 of globals.city.streets) {
                         if (street == street2)
                             continue;
+
+                        let found = false;
+                        for (const set of streetComparisons) {
+                            if ((set[0] == street.id && set[1] == street2.id) || (set[0] == street2.id && set[1] == street.id))
+                                found = true;
+                        }
+                        if (found) continue;
+
+                        streetComparisons.push([[street.id, street2.id]]);
 
                         let x1 = street.originX + Math.cos(street.angle * Trigonometry.RAD_CONST) * street.length1;
                         let y1 = street.originY + Math.sin(street.angle * Trigonometry.RAD_CONST) * street.length1;
@@ -118,7 +130,7 @@
     }
 
     class Street {
-        constructor(x, y) {
+        constructor(x, y, id) {
             this.growing1 = true;
             this.growing2 = true;
 			this.originX = x;
@@ -126,6 +138,7 @@
             this.angle = globals.random.nextInt(0,360);
             this.length1 = 0;
             this.length2 = 0;
+            this.id = id
 		}
     }
 
