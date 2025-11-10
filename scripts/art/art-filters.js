@@ -1,10 +1,6 @@
 {
     const config = {
         randomize: true,
-        radius: 250,
-        strength: 3.5,
-        amplitude: 10,
-        frequency: 0.3,
         mode: 1,
         functionIndex: 1,
         functions: [edges, sobelX, sobelY, sharpen, gaussianBlur, blur, emboss, textures, horizontalLines, verticalLines, spotDetector, edgeEnhancement, cornersKirschNorth, diagonalEdgesSE, diagonalEdgesNW] 
@@ -119,7 +115,6 @@
         applyFilter(data, outputData, kernel);
     }
 
-
     function sharpen(data, outputData) {
         let kernel = [
             [0, -1, 0],
@@ -179,7 +174,7 @@
         applyFilter(data, outputData, kernel, 16);
     }
 
-    function applyFilter(data, outputData, kernel, normalizeFactor = 1) {         
+    function applyFilter(data, outputData, kernel, normalizeFactor = 1) {  
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {   
                 let newPixels = [
@@ -194,7 +189,6 @@
                     applyFilterOnPixel(data, x, y+1, kernel[1][2])
                 ];
 
-
                 let pixelsSum = [0,0,0,0];
 
                 for(let i = 0; i < newPixels.length; i++){
@@ -202,18 +196,19 @@
                     pixelsSum[1] += newPixels[i][1];
                     pixelsSum[2] += newPixels[i][2];
                 }
+
+                pixelsSum[3] = 255;
                     
                 const index = (y * width + x) * 4;
                 outputData[index] = pixelsSum[0] / normalizeFactor;       
                 outputData[index + 1] = pixelsSum[1] / normalizeFactor;  
                 outputData[index + 2] = pixelsSum[2] / normalizeFactor;  
-                outputData[index + 3] = 255;  
+                outputData[index + 3] = pixelsSum[3];  
             }
         }
     }
 
     let applyFilterOnPixel = (data, x, y, filterValue) => { 
-        if (x < 0 || x > width || y < 0 || y > width) return 0;
         const index = (y * width + x) * 4;
         return [data[index] * filterValue,
                 data[index + 1] * filterValue,
