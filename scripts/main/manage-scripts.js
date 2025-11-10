@@ -37,6 +37,7 @@ const art = [
                 "walker",
                 "streets",
                 "filters",
+                "ledscreen-video"
             ];
 const scripts = [];
 
