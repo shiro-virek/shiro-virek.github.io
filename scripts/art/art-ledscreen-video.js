@@ -107,15 +107,8 @@
         }
     }
 
-    let loadImage = (source) => {    
-        /*
-        globals.canvasImg.width = config.ledColumns;
-        globals.canvasImg.height = config.ledRows;
+    let loadImage = () => {    
 
-        const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
-        
-        globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
-    */
         globals.imgData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
     
         for (let y = 0; y < config.ledRows; y++) {
@@ -237,8 +230,15 @@
             console.log(`📸 FPS: ${fps}`);
             console.log(`🔢 Total de frames: ${totalFrames}`);
 
-            globals.canvasImg.width = video.videoWidth;
-            globals.canvasImg.height = video.videoHeight;
+            //globals.canvasImg.width = video.videoWidth;
+            //globals.canvasImg.height = video.videoHeight;
+
+
+            globals.canvasImg.width = config.ledColumns;
+            globals.canvasImg.height = config.ledRows;
+
+            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
+       
 
             const frames = [];
 
@@ -248,12 +248,20 @@
 
                 await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
 
-                globals.ctxImg.drawImage(video, 0, 0, globals.canvasImg.width, globals.canvasImg.height);
-                const frameData = globals.ctxImg.getImageData(0, 0, globals.canvasImg.width, globals.canvasImg.height);
-                frames.push(frameData);
 
-                loadImage(frameData); 
-                //Browser.sleep(100);
+
+
+
+ 
+                globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+
+
+                //globals.ctxImg.drawImage(video, 0, 0, globals.canvasImg.width, globals.canvasImg.height);
+                //const frameData = globals.ctxImg.getImageData(0, 0, globals.canvasImg.width, globals.canvasImg.height);
+                //frames.push();
+
+                loadImage(); 
                 if (i % Math.ceil(totalFrames / 10) === 0)
                 console.log(`🧩 Progreso: ${(i / totalFrames * 100).toFixed(0)}%`);
 
