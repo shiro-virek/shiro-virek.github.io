@@ -6,6 +6,7 @@
         ctxImg: null,
         img: new Image(),
         imgData: null,
+        frames: [],
     };
 
     const config = { 
@@ -107,7 +108,7 @@
         }
     }
 
-    let loadImage = () => {    
+    let loadVideo = () => {    
 
         globals.imgData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
     
@@ -208,16 +209,16 @@
 
         const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
     
-        const frames = [];
-
         for (let i = 0; i < totalFrames; i++) {
             const t = i / fps;
             video.currentTime = t;
             await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
             globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
-            frames.push();            
-            loadImage(); 
+            globals.frames.push();            
+            loadVideo(); 
         }       
+
+        //foreach ()
     }
 
     init();
