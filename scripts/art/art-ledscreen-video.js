@@ -107,29 +107,50 @@
             }
         }
     }
+        
+    let loadVideo = () => {
+        let i = 0;
+        const total = globals.frames.length;
+        const fps = 30; 
+        const frameDuration = 1000 / fps;
+        let lastTime = 0;
 
-    let loadVideo = () => {    
+        function animate(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const delta = timestamp - lastTime;
 
-        globals.imgData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
-    
-        for (let y = 0; y < config.ledRows; y++) {
-            for (let x = 0; x < config.ledColumns; x++) {
-                let i = y * config.ledColumns + x;
-                const r = globals.imgData[i * 4 + 0];
-                const g = globals.imgData[i * 4 + 1];
-                const b = globals.imgData[i * 4 + 2];
-                const a = globals.imgData[i * 4 + 3];
+            if (delta >= frameDuration) {
+                const frame = globals.frames[i];
 
-                let lightness = Color.getLightness = (r, g, b);
+                for (let y = 0; y < config.ledRows; y++) {
+                    for (let x = 0; x < config.ledColumns; x++) {
+                        const index = (y * config.ledColumns + x) * 4;
+                        const r = frame[index];
+                        const g = frame[index + 1];
+                        const b = frame[index + 2];
+                        const lightness = Color.getLightness(r, g, b);
 
-                if (config.mode)
-                    globals.ledScreen.leds[x][y].value = Numbers.scale(lightness, 0, 250, 0, 100);
-                else
-                    globals.ledScreen.leds[x][y].value = lightness
+                        if (config.mode)
+                            globals.ledScreen.leds[x][y].value = Numbers.scale(lightness, 0, 250, 0, 100);
+                        else
+                            globals.ledScreen.leds[x][y].value = lightness;
+                    }
+                }
+
+                drawBackground(ctx, canvas);
+                globals.ledScreen.draw(ctx);
+
+                i++;
+                if (i >= total) i = 0; 
+
+                lastTime = timestamp;
             }
+
+            requestAnimationFrame(animate);
         }
 
-    }
+        requestAnimationFrame(animate);
+    };
 
     let init = () => {
         initCanvas();
@@ -200,10 +221,6 @@
         const duration = video.duration;
         const totalFrames = Math.floor(duration * fps);
 
-        console.log(`🎬 Duración: ${duration.toFixed(2)}s`);
-        console.log(`📸 FPS: ${fps}`);
-        console.log(`🔢 Total de frames: ${totalFrames}`);
-
         globals.canvasImg.width = config.ledColumns;
         globals.canvasImg.height = config.ledRows;
 
@@ -214,11 +231,12 @@
             video.currentTime = t;
             await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
             globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
-            globals.frames.push();            
-            loadVideo(); 
-        }       
 
-        //foreach ()
+            const frameData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
+            globals.frames.push(frameData);            
+        }       
+        
+        loadVideo();
     }
 
     init();
