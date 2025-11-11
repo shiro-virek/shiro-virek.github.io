@@ -179,97 +179,45 @@
 	}
 
     window.upload = async (e) => {
-    /*
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            
-            if (!file.type.match('image.*')) {
-                alert('Please select an image file');
-                return;
-            }
-            
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {                    
-                globals.img.onerror = function() {
-                    alert('Error loading image');
-                };
-            
-                loadImage(event.target.result);
-            };
-            
-            reader.onerror = function() {
-                alert('Error reading file');
-            };
-            
-            reader.readAsDataURL(file);
-        }
+        const file = e.target.files[0];
+        if (!file) return;
 
-        */
-            const file = e.target.files[0];
-            if (!file) return;
+        const url = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.src = url;
+        video.crossOrigin = "anonymous";
+        video.muted = true; 
+        await video.play(); 
+        video.pause();
 
-            const url = URL.createObjectURL(file);
-            const video = document.createElement("video");
-            video.src = url;
-            video.crossOrigin = "anonymous";
-            video.muted = true; // necesario en algunos navegadores
-            await video.play(); // fuerza a cargar metadatos
-            video.pause();
+        await new Promise(res => {
+            if (video.readyState >= 2) res();
+            else video.onloadeddata = res;
+        });
 
-            await new Promise(res => {
-                if (video.readyState >= 2) res();
-                else video.onloadeddata = res;
-            });
+        const fps = 30; 
+        const duration = video.duration;
+        const totalFrames = Math.floor(duration * fps);
 
-            const fps = 30; // podés ajustar o calcularlo
-            const duration = video.duration;
-            const totalFrames = Math.floor(duration * fps);
+        console.log(`🎬 Duración: ${duration.toFixed(2)}s`);
+        console.log(`📸 FPS: ${fps}`);
+        console.log(`🔢 Total de frames: ${totalFrames}`);
 
-            console.log(`🎬 Duración: ${duration.toFixed(2)}s`);
-            console.log(`📸 FPS: ${fps}`);
-            console.log(`🔢 Total de frames: ${totalFrames}`);
+        globals.canvasImg.width = config.ledColumns;
+        globals.canvasImg.height = config.ledRows;
 
-            //globals.canvasImg.width = video.videoWidth;
-            //globals.canvasImg.height = video.videoHeight;
+        const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
+    
+        const frames = [];
 
-
-            globals.canvasImg.width = config.ledColumns;
-            globals.canvasImg.height = config.ledRows;
-
-            const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
-       
-
-            const frames = [];
-
-            for (let i = 0; i < totalFrames; i++) {
-                const t = i / fps;
-                video.currentTime = t;
-
-                await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
-
-
-
-
-
- 
-                globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
-
-
-
-                //globals.ctxImg.drawImage(video, 0, 0, globals.canvasImg.width, globals.canvasImg.height);
-                //const frameData = globals.ctxImg.getImageData(0, 0, globals.canvasImg.width, globals.canvasImg.height);
-                //frames.push();
-
-                loadImage(); 
-                if (i % Math.ceil(totalFrames / 10) === 0)
-                console.log(`🧩 Progreso: ${(i / totalFrames * 100).toFixed(0)}%`);
-
-            }
-
-            console.log("✅ Listo, frames capturados:", frames.length);
-            console.log(frames);
-        
+        for (let i = 0; i < totalFrames; i++) {
+            const t = i / fps;
+            video.currentTime = t;
+            await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
+            globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
+            frames.push();            
+            loadImage(); 
+        }       
     }
 
     init();
