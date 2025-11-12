@@ -29,6 +29,7 @@
         Emoji: Symbol("Emoji"),
         Ascii: Symbol("Ascii"),
         Ansi: Symbol("Ansi"),
+        Gameboy: Symbol("Gameboy"),
 	});
 
     class LedScreen {
@@ -115,6 +116,10 @@
                     break;
                 case Figures.Ansi:    
                     SpecialPixels.drawAnsi(ctx, this.x, this.y, this.value);
+                    break;
+                case Figures.Gameboy:    
+                    let value = Numbers.scale(this.value, 0, 100, 0, 255);
+                    SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, value);
                     break;
             }
         }
@@ -216,10 +221,10 @@
 		globals.random = Objects.getRandomObject();
         config.mode = globals.random.nextBool();
         config.ledDiameter = globals.random.nextInt(5, 20);        
-        config.ledPadding = globals.random.nextInt(0, 20);
+        config.ledPadding = 0; //this.shape != Figures.Gameboy ? globals.random.nextInt(0, 20) : 0;
         config.ledMargin = config.ledPadding;  
         config.hue = globals.random.nextInt(0, 255);    
-        config.alternatePixel = globals.random.nextBool();
+        config.alternatePixel = this.shape != Figures.Gameboy ? globals.random.nextBool() : false;
     }
 
     window.draw = () => {

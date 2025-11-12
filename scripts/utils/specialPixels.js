@@ -61,6 +61,18 @@ class SpecialPixels {
         else return `█`;
     }
 
+    static getGameboy = (value) => {
+        if (value >= 0 && value < 65)
+            return `#0f380f`
+        else if (value >= 65 && value < 130)
+            return `#306230`
+        else if (value >= 130 && value < 195)            
+            return `#8bac0f`
+        else if (value >= 195 && value <= 255)
+            return `#9bbc0f`
+        else return `#9bbc0f`;
+    }
+
     static drawEmoji = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
         ctx.font = `${fontSize} bold Arial`;
         ctx.fillStyle = color;
@@ -77,5 +89,17 @@ class SpecialPixels {
         ctx.font = `${fontSize} bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAnsi(value), x, y);
+        Drawing.drawSquare = (ctx, x, y, side, angle, color = '#00FF00')
+    }
+
+    static drawGameboy = (ctx, x, y, side, value) => {
+        ctx.save();
+        ctx.fillStyle = this.getGameboy(value);				
+        ctx.beginPath();
+        let halfSide = side / 2;	
+        ctx.translate(x, y);
+        ctx.rect(-halfSide, -halfSide, side, side);
+        ctx.fill();
+        ctx.restore();
     }
 }
