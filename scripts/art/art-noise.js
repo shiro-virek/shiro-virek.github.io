@@ -130,7 +130,7 @@
 
     function emoji(pixel, noiseValue){
         let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
-        SpecialPixels.drawEmoji(ctx, pixel.x, pixel.y, value);
+        SpecialPixels.drawEmoji(ctx, pixel.x, pixel.y, value, "#FFF", 10);
     }
 
     function ansi(pixel, noiseValue){

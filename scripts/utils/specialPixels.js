@@ -61,21 +61,21 @@ class SpecialPixels {
         else return `█`;
     }
 
-    static drawEmoji = (ctx, x, y, value) => {
-        ctx.font = "20px bold Arial";
-        ctx.fillStyle = "#FFF";
+    static drawEmoji = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
+        ctx.font = `${fontSize} bold Arial`;
+        ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getEmoji(value), x, y);
     }
 
-    static drawAscii = (ctx, x, y, value) => {
-        ctx.font = "20px bold Arial";
-        ctx.fillStyle = "#FFF";
+    static drawAscii = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
+        ctx.font = `${fontSize} bold Arial`;
+        ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAscii(value), x, y);
     }
 
-    static drawAnsi = (ctx, x, y, value) => {
-        ctx.font = "20px bold Arial";
-        ctx.fillStyle = "#FFF";
+    static drawAnsi = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
+        ctx.font = `${fontSize} bold Arial`;
+        ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAnsi(value), x, y);
     }
 }
