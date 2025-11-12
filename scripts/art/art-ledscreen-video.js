@@ -108,9 +108,8 @@
         }
     }
         
-    let loadVideo = async (file) => {
+    let loadVideo = async (url) => {
         globals.frames = [];
-        const url = URL.createObjectURL(file);
         const video = document.createElement("video");
         video.src = url;
         video.crossOrigin = "anonymous";
@@ -229,8 +228,10 @@
     window.upload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        const url = URL.createObjectURL(file);
         
-        loadVideo(file);
+        loadVideo(url);
     }
 
     init();
