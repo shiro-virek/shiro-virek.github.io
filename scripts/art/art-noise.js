@@ -16,7 +16,9 @@
         hue: 50,
         functionIndex: 3,
         alternatePixel: false,
-        functions: [bars, squares, brightness, hues, semitone],
+        //functions: [bars, squares, brightness, hues, semitone, ascii, emoji, ansi],
+
+        functions: [ascii, emoji, ansi],
     };    
 
     const Figures = Object.freeze({
@@ -119,6 +121,21 @@
         let newHue = Numbers.scale(noiseValue, -1, 1, 0, 360);
         let color = `hsl(${newHue}, 100%, 50%)`;
         Pixel.drawShape(ctx, pixel.x, pixel.y, pixel.radius, color); 
+    }
+
+    function ascii(pixel, noiseValue){
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        SpecialPixels.drawAscii(ctx, pixel.x, pixel.y, value);
+    }
+
+    function emoji(pixel, noiseValue){
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        SpecialPixels.drawEmoji(ctx, pixel.x, pixel.y, value);
+    }
+
+    function ansi(pixel, noiseValue){
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        SpecialPixels.drawAnsi(ctx, pixel.x, pixel.y, value);
     }
 
     let init = () => {

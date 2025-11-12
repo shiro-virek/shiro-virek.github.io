@@ -23,11 +23,11 @@
     };
     
     const Figures = Object.freeze({
-		/*Square: Symbol("square"),
+		Square: Symbol("square"),
 		Circle: Symbol("circle"),
         Hexagon: Symbol("hexagon"),
         Emoji: Symbol("Emoji"),
-        Ascii: Symbol("Ascii"),*/
+        Ascii: Symbol("Ascii"),
         Ansi: Symbol("Ansi"),
 	});
 
@@ -108,86 +108,17 @@
                     Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
                     break;
                 case Figures.Emoji:
-                    ctx.font = "20px bold Arial";
-                    ctx.fillStyle = "#FFF";
-                    ctx.fillText(getEmoji(this.value), this.x, this.y);
+                    SpecialPixels.drawEmoji(ctx, this.x, this.y, this.value);
                     break;
-                case Figures.Ascii:                    
-                    ctx.font = "20px bold Arial";
-                    ctx.fillStyle = "#FFF";
-                    ctx.fillText(getAscii(this.value), this.x, this.y);
+                case Figures.Ascii:             
+                    SpecialPixels.drawAscii(ctx, this.x, this.y, this.value);
                     break;
-                case Figures.Ansi:                    
-                    ctx.font = "20px bold Arial";
-                    ctx.fillStyle = "#FFF";
-                    ctx.fillText(getAnsi(this.value), this.x, this.y);
+                case Figures.Ansi:    
+                    SpecialPixels.drawAnsi(ctx, this.x, this.y, this.value);
                     break;
             }
         }
     }
-
-    let getEmoji = (value) => {
-        if (value >= 0 && value < 25)
-            return `♣️`
-        else if (value >= 25 && value < 50)
-            return `🎱`
-        else if (value >= 50 && value < 75)
-            return `🌚`
-        else if (value >= 75 && value < 100)
-            return `😈`
-        else if (value >= 100 && value < 120)            
-            return `💩`
-        else if (value >= 125 && value <= 150)
-            return `🍎`
-        else if (value >= 150 && value <= 175)
-            return `😡`
-        else if (value >= 175 && value <= 200)
-            return `😀`
-        else if (value >= 200 && value <= 225)
-            return `🌝`
-        else if (value >= 225 && value <= 255)
-            return `💀`
-        else return `💀`;
-    }
-
-    let getAscii = (value) => {
-        if (value >= 0 && value < 25)
-            return `@`
-        else if (value >= 25 && value < 50)
-            return `%`
-        else if (value >= 50 && value < 75)
-            return `$`
-        else if (value >= 75 && value < 100)
-            return `#`
-        else if (value >= 100 && value < 120)            
-            return `*`
-        else if (value >= 125 && value <= 150)
-            return `+`
-        else if (value >= 150 && value <= 175)
-            return `;`
-        else if (value >= 175 && value <= 200)
-            return `:`
-        else if (value >= 200 && value <= 225)
-            return `-`
-        else if (value >= 225 && value <= 255)
-            return `.`
-        else return `.`;
-    }
-
-    let getAnsi = (value) => {
-        if (value >= 0 && value < 50)
-            return ` `
-        else if (value >= 50 && value < 100)
-            return `░`
-        else if (value >= 100 && value < 150)
-            return `▒`
-        else if (value >= 150 && value < 200)            
-            return `▓`
-        else if (value >= 200 && value <= 255)
-            return `█`
-        else return `█`;
-    }
-        
         
     let loadVideo = async (url) => {
         globals.frames = [];
