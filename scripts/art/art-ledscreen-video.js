@@ -183,13 +183,7 @@
         globals.ledScreen.draw(ctx);
     }
 
-    window.trackMouse = (xMouse, yMouse) => {    
-        if (clicking){            
-            let points = Trigonometry.bresenhamLine(Math.floor(lastPosX), Math.floor(lastPosY), Math.floor(xMouse), Math.floor(yMouse));
-            for (const p of points) {                
-                globals.ledScreen.setPixel(p.x, p.y);
-            }                
-        }   
+    window.trackMouse = (xMouse, yMouse) => {
     }
 
 	window.clearCanvas = () => {		
@@ -201,6 +195,8 @@
 	}
 
     window.upload = async (e) => {
+        globals.frames = [];
+
         const file = e.target.files[0];
         if (!file) return;
 
