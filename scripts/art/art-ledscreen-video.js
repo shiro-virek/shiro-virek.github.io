@@ -26,6 +26,8 @@
 		Square: Symbol("square"),
 		Circle: Symbol("circle"),
         Hexagon: Symbol("hexagon"),
+        Emoji: Symbol("Emoji"),
+        Ascii: Symbol("Ascii"),
 	});
 
     class LedScreen {
@@ -104,14 +106,103 @@
                 case Figures.Hexagon:
                     Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
                     break;
+                case Figures.Emoji:
+                    ctx.font = "20px bold Arial";
+                    ctx.fillStyle = "#FFF";
+                    ctx.fillText(getEmoji(this.value), this.x, this.y);
+                    break;
+                case Figures.Ascii:                    
+                    ctx.font = "20px bold Arial";
+                    ctx.fillStyle = "#FFF";
+                    ctx.fillText(getAscii(this.value), this.x, this.y);
+                    break;
             }
         }
     }
+
+    let getEmoji = (value) => {
+        if (value >= 0 && value < 25)
+            return `♣️`
+        else if (value >= 25 && value < 50)
+            return `🎱`
+        else if (value >= 50 && value < 75)
+            return `🌚`
+        else if (value >= 75 && value < 100)
+            return `😈`
+        else if (value >= 100 && value < 120)            
+            return `💩`
+        else if (value >= 125 && value <= 150)
+            return `🍎`
+        else if (value >= 150 && value <= 175)
+            return `😡`
+        else if (value >= 175 && value <= 200)
+            return `😀`
+        else if (value >= 200 && value <= 225)
+            return `🌝`
+        else if (value >= 225 && value <= 255)
+            return `💀`
+        else return `💀`;
+    }
+
+    let getAscii = (value) => {
+        if (value >= 0 && value < 25)
+            return `@`
+        else if (value >= 25 && value < 50)
+            return `%`
+        else if (value >= 50 && value < 75)
+            return `$`
+        else if (value >= 75 && value < 100)
+            return `#`
+        else if (value >= 100 && value < 120)            
+            return `*`
+        else if (value >= 125 && value <= 150)
+            return `+`
+        else if (value >= 150 && value <= 175)
+            return `;`
+        else if (value >= 175 && value <= 200)
+            return `:`
+        else if (value >= 200 && value <= 225)
+            return `-`
+        else if (value >= 225 && value <= 255)
+            return `.`
+        else return `.`;
+    }
         
-    let loadVideo = () => {
+    let loadVideo = async (url) => {
+        globals.frames = [];
+        const video = document.createElement("video");
+        video.src = url;
+        video.crossOrigin = "anonymous";
+        video.muted = true; 
+        await video.play(); 
+        video.pause();
+
+        await new Promise(res => {
+            if (video.readyState >= 2) res();
+            else video.onloadeddata = res;
+        });
+
+        const fps = 30; 
+        const duration = video.duration;
+        const totalFrames = Math.floor(duration * fps);
+
+        globals.canvasImg.width = config.ledColumns;
+        globals.canvasImg.height = config.ledRows;
+
+        const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
+    
+        for (let i = 0; i < totalFrames; i++) {
+            const t = i / fps;
+            video.currentTime = t;
+            await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
+            globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            const frameData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
+            globals.frames.push(frameData);            
+        }       
+
         let i = 0;
         const total = globals.frames.length;
-        const fps = 30; 
         const frameDuration = 1000 / fps;
         let lastTime = 0;
 
@@ -162,6 +253,8 @@
         
         addEvents();
         window.requestAnimationFrame(loop)
+    
+        loadVideo("assets/Video1.mp4");
     }
 
     let addEvents = () => {   
@@ -183,13 +276,7 @@
         globals.ledScreen.draw(ctx);
     }
 
-    window.trackMouse = (xMouse, yMouse) => {    
-        if (clicking){            
-            let points = Trigonometry.bresenhamLine(Math.floor(lastPosX), Math.floor(lastPosY), Math.floor(xMouse), Math.floor(yMouse));
-            for (const p of points) {                
-                globals.ledScreen.setPixel(p.x, p.y);
-            }                
-        }   
+    window.trackMouse = (xMouse, yMouse) => {
     }
 
 	window.clearCanvas = () => {		
@@ -205,38 +292,8 @@
         if (!file) return;
 
         const url = URL.createObjectURL(file);
-        const video = document.createElement("video");
-        video.src = url;
-        video.crossOrigin = "anonymous";
-        video.muted = true; 
-        await video.play(); 
-        video.pause();
-
-        await new Promise(res => {
-            if (video.readyState >= 2) res();
-            else video.onloadeddata = res;
-        });
-
-        const fps = 30; 
-        const duration = video.duration;
-        const totalFrames = Math.floor(duration * fps);
-
-        globals.canvasImg.width = config.ledColumns;
-        globals.canvasImg.height = config.ledRows;
-
-        const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
-    
-        for (let i = 0; i < totalFrames; i++) {
-            const t = i / fps;
-            video.currentTime = t;
-            await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
-            globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
-
-            const frameData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
-            globals.frames.push(frameData);            
-        }       
         
-        loadVideo();
+        loadVideo(url);
     }
 
     init();
