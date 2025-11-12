@@ -16,9 +16,7 @@
         hue: 50,
         functionIndex: 3,
         alternatePixel: false,
-        //functions: [bars, squares, brightness, hues, semitone, ascii, emoji, ansi],
-
-        functions: [ascii, emoji, ansi],
+        functions: [bars, squares, brightness, hues, semitone, ascii, emoji, ansi],
     };    
 
     const Figures = Object.freeze({
