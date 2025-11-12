@@ -108,10 +108,42 @@
         }
     }
         
-    let loadVideo = () => {
+    let loadVideo = async (file) => {
+        globals.frames = [];
+        const url = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.src = url;
+        video.crossOrigin = "anonymous";
+        video.muted = true; 
+        await video.play(); 
+        video.pause();
+
+        await new Promise(res => {
+            if (video.readyState >= 2) res();
+            else video.onloadeddata = res;
+        });
+
+        const fps = 30; 
+        const duration = video.duration;
+        const totalFrames = Math.floor(duration * fps);
+
+        globals.canvasImg.width = config.ledColumns;
+        globals.canvasImg.height = config.ledRows;
+
+        const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
+    
+        for (let i = 0; i < totalFrames; i++) {
+            const t = i / fps;
+            video.currentTime = t;
+            await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
+            globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
+
+            const frameData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
+            globals.frames.push(frameData);            
+        }       
+
         let i = 0;
         const total = globals.frames.length;
-        const fps = 30; 
         const frameDuration = 1000 / fps;
         let lastTime = 0;
 
@@ -195,44 +227,10 @@
 	}
 
     window.upload = async (e) => {
-        globals.frames = [];
-
         const file = e.target.files[0];
         if (!file) return;
-
-        const url = URL.createObjectURL(file);
-        const video = document.createElement("video");
-        video.src = url;
-        video.crossOrigin = "anonymous";
-        video.muted = true; 
-        await video.play(); 
-        video.pause();
-
-        await new Promise(res => {
-            if (video.readyState >= 2) res();
-            else video.onloadeddata = res;
-        });
-
-        const fps = 30; 
-        const duration = video.duration;
-        const totalFrames = Math.floor(duration * fps);
-
-        globals.canvasImg.width = config.ledColumns;
-        globals.canvasImg.height = config.ledRows;
-
-        const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptVideoToScreen(video, globals.canvasImg);
-    
-        for (let i = 0; i < totalFrames; i++) {
-            const t = i / fps;
-            video.currentTime = t;
-            await new Promise(resolve => video.addEventListener("seeked", resolve, { once: true }));
-            globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
-
-            const frameData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
-            globals.frames.push(frameData);            
-        }       
         
-        loadVideo();
+        loadVideo(file);
     }
 
     init();
