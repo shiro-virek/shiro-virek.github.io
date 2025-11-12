@@ -23,11 +23,12 @@
     };
     
     const Figures = Object.freeze({
-		Square: Symbol("square"),
+		/*Square: Symbol("square"),
 		Circle: Symbol("circle"),
         Hexagon: Symbol("hexagon"),
         Emoji: Symbol("Emoji"),
-        Ascii: Symbol("Ascii"),
+        Ascii: Symbol("Ascii"),*/
+        Ansi: Symbol("Ansi"),
 	});
 
     class LedScreen {
@@ -116,6 +117,11 @@
                     ctx.fillStyle = "#FFF";
                     ctx.fillText(getAscii(this.value), this.x, this.y);
                     break;
+                case Figures.Ansi:                    
+                    ctx.font = "20px bold Arial";
+                    ctx.fillStyle = "#FFF";
+                    ctx.fillText(getAnsi(this.value), this.x, this.y);
+                    break;
             }
         }
     }
@@ -167,6 +173,21 @@
             return `.`
         else return `.`;
     }
+
+    let getAnsi = (value) => {
+        if (value >= 0 && value < 50)
+            return ` `
+        else if (value >= 50 && value < 100)
+            return `░`
+        else if (value >= 100 && value < 150)
+            return `▒`
+        else if (value >= 150 && value < 200)            
+            return `▓`
+        else if (value >= 200 && value <= 255)
+            return `█`
+        else return `█`;
+    }
+        
         
     let loadVideo = async (url) => {
         globals.frames = [];
