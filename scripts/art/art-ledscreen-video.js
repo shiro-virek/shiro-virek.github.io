@@ -193,6 +193,8 @@
         
         addEvents();
         window.requestAnimationFrame(loop)
+    
+        loadVideo("assets/Video1.mp4");
     }
 
     let addEvents = () => {   
