@@ -27,7 +27,7 @@
 	});
 
     const config = { 
-        randomize: false,
+        randomize: true,
         ledRows: 50,
         ledColumns: 50,
         ledMargin: 0,
@@ -36,7 +36,7 @@
         hue: 150,
         valueIncrement: 1,
         alternatePixel: false,
-        shape: Figures.Sin,
+        shape: Figures.SquareLightness,
     };
     
     class LedScreen {
