@@ -1,74 +1,74 @@
 class SpecialPixels {
     static getEmoji = (value) => {
-        if (value >= 0 && value < 25)
+        if (value >= 0 && value < 10)
             return `♣️`
-        else if (value >= 25 && value < 50)
+        else if (value >= 10 && value < 20)
             return `🎱`
-        else if (value >= 50 && value < 75)
+        else if (value >= 20 && value < 30)
             return `🌚`
-        else if (value >= 75 && value < 100)
+        else if (value >= 30 && value < 40)
             return `😈`
-        else if (value >= 100 && value < 120)            
+        else if (value >= 40 && value < 50)            
             return `💩`
-        else if (value >= 125 && value <= 150)
+        else if (value >= 50 && value < 60)
             return `🍎`
-        else if (value >= 150 && value <= 175)
+        else if (value >= 60 && value < 70)
             return `😡`
-        else if (value >= 175 && value <= 200)
+        else if (value >= 70 && value < 80)
             return `😀`
-        else if (value >= 200 && value <= 225)
+        else if (value >= 80 && value < 90)
             return `🌝`
-        else if (value >= 225 && value <= 255)
+        else if (value >= 90 && value <= 100)
             return `💀`
         else return `💀`;
     }
 
     static getAscii = (value) => {
-        if (value >= 0 && value < 25)
+        if (value >= 0 && value < 10)
             return `@`
-        else if (value >= 25 && value < 50)
+        else if (value >= 10 && value < 20)
             return `%`
-        else if (value >= 50 && value < 75)
+        else if (value >= 20 && value < 30)
             return `$`
-        else if (value >= 75 && value < 100)
+        else if (value >= 30 && value < 40)
             return `#`
-        else if (value >= 100 && value < 120)            
+        else if (value >= 40 && value < 50)            
             return `*`
-        else if (value >= 125 && value <= 150)
+        else if (value >= 50 && value < 60)
             return `+`
-        else if (value >= 150 && value <= 175)
+        else if (value >= 60 && value < 70)
             return `;`
-        else if (value >= 175 && value <= 200)
+        else if (value >= 70 && value < 80)
             return `:`
-        else if (value >= 200 && value <= 225)
+        else if (value >= 80 && value < 90)
             return `-`
-        else if (value >= 225 && value <= 255)
+        else if (value >= 90 && value <= 100)
             return `.`
         else return `.`;
     }
 
     static getAnsi = (value) => {
-        if (value >= 0 && value < 50)
+        if (value >= 0 && value < 20)
             return ` `
-        else if (value >= 50 && value < 100)
+        else if (value >= 20 && value < 40)
             return `░`
-        else if (value >= 100 && value < 150)
+        else if (value >= 40 && value < 60)
             return `▒`
-        else if (value >= 150 && value < 200)            
+        else if (value >= 60 && value < 80)            
             return `▓`
-        else if (value >= 200 && value <= 255)
+        else if (value >= 80 && value <= 100)
             return `█`
         else return `█`;
     }
 
     static getGameboy = (value) => {
-        if (value >= 0 && value < 65)
+        if (value >= 0 && value < 25)
             return `#0f380f`
-        else if (value >= 65 && value < 130)
+        else if (value >= 25 && value < 50)
             return `#306230`
-        else if (value >= 130 && value < 195)            
+        else if (value >= 50 && value < 75)            
             return `#8bac0f`
-        else if (value >= 195 && value <= 255)
+        else if (value >= 75 && value <= 100)
             return `#9bbc0f`
         else return `#9bbc0f`;
     }

@@ -128,8 +128,7 @@
                     SpecialPixels.drawAnsi(ctx, this.x, this.y, this.lightness);
                     break;
                 case Figures.Gameboy:    
-                    value = Numbers.scale(this.lightness, 0, 100, 0, 255);
-                    SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, value);
+                    SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, this.lightness);
                     break;
                 case Figures.Character:    
                     value = Numbers.scale(this.lightness, 0, 100, 5, 40);
