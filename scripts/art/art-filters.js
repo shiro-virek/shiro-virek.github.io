@@ -1,7 +1,6 @@
 {
     const config = {
         randomize: true,
-        mode: 1,
         functionIndex: 1,
         functions: [edges, sobelX, sobelY, sharpen, gaussianBlur, blur, emboss, textures, horizontalLines, verticalLines, spotDetector, edgeEnhancement, cornersKirschNorth, diagonalEdgesSE, diagonalEdgesNW] 
     };
@@ -245,7 +244,6 @@
         config.strength = globals.random.nextRange(0.1, 10, 1);
         config.amplitude = globals.random.nextInt(1, 20);
         config.frequency = globals.random.nextRange(0.1, 0.5, 1);
-        config.mode = 1; //globals.random.nextBool();
         config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);
     }
 

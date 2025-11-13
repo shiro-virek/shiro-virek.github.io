@@ -11,12 +11,12 @@
         pixelRows: 50,
         pixelColumns: 50,
         pixelMargin: 0,
-        pixelPadding: 30,
+        pixelPadding: 0,
         pixelDiameter: 20,
         hue: 50,
         functionIndex: 3,
         alternatePixel: false,
-        functions: [bars, squares, brightness, hues, semitone, ascii, emoji, ansi],
+        functions: [size, brightness, hue, semitone, ascii, emoji, ansi, character, bar, crt, sin, gameboy],
     };    
 
     const Figures = Object.freeze({
@@ -94,12 +94,7 @@
         }
     }
 
-    function bars(pixel, noiseValue){
-        let angle = Numbers.scale(noiseValue, -1, 1, 0, 360);
-        Drawing.drawRectangleRotated(ctx, pixel.x, pixel.y, pixel.diameter / 4, pixel.diameter, pixel.color, angle);   
-    }
-
-    function squares(pixel, noiseValue){
+    function size(pixel, noiseValue){
         let side = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
         Pixel.drawShape(ctx, pixel.x, pixel.y, side, pixel.color);  
     }
@@ -115,14 +110,14 @@
         Pixel.drawShape(ctx, pixel.x, pixel.y, pixel.radius, color); 
     }
 
-    function hues(pixel, noiseValue){
+    function hue(pixel, noiseValue){
         let newHue = Numbers.scale(noiseValue, -1, 1, 0, 360);
         let color = `hsl(${newHue}, 100%, 50%)`;
         Pixel.drawShape(ctx, pixel.x, pixel.y, pixel.radius, color); 
     }
 
     function ascii(pixel, noiseValue){
-        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 100);
         SpecialPixels.drawAscii(ctx, pixel.x, pixel.y, value);
     }
 
@@ -136,13 +131,39 @@
         SpecialPixels.drawAnsi(ctx, pixel.x, pixel.y, value);
     }
 
+    function bar(pixel, noiseValue){
+        let angle = Numbers.scale(noiseValue, -1, 1, 0, 360);
+        SpecialPixels.drawBar(ctx, pixel.x, pixel.y, pixel.diameter / 4, pixel.diameter, angle, pixel.color); 
+    }
+
+    function character(pixel, noiseValue){
+        let value = Numbers.scale(noiseValue, -1, 1, 5, 40);
+        SpecialPixels.drawCharacter(ctx, pixel.x, pixel.y, value);
+    }  
+
+    function gameboy(pixel, noiseValue){
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        SpecialPixels.drawGameboy(ctx, pixel.x, pixel.y, pixel.diameter, value);
+    }
+    
+    function crt(pixel, noiseValue){
+        const { r: red, g: green, b: blue } = Color.hslToRgb(Numbers.scale(noiseValue, -1, 1, 0, 360), 100, 50);
+        SpecialPixels.drawCRT(ctx, pixel.x, pixel.y, pixel.diameter, red, green, blue);
+    }
+    
+    function sin(pixel, noiseValue){
+        let amplitude = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
+        Drawing.drawSin(ctx, pixel.x, pixel.y, pixel.diameter, amplitude);
+    }
+
     let init = () => {
 		globals.random = Objects.getRandomObject();
         globals.noise = new Noise(globals.random);
         if (config.randomize) randomize();
         initCanvas();
-        config.pixelDiameter = globals.random.nextInt(5, 25);        
-        config.pixelPadding = globals.random.nextInt(0, 5);
+        config.pixelDiameter = globals.random.nextInt(5, 25);   
+        if (config.functionIndex != 9 && config.functionIndex != 10 &&  config.functionIndex != 11)     
+            config.pixelPadding = globals.random.nextInt(0, 5);
         config.pixelMargin = config.pixelPadding;
 
         config.pixelRows = Math.floor((height - config.pixelMargin)/ (config.pixelDiameter + config.pixelPadding));
@@ -159,7 +180,8 @@
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 255);
         config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);
-        config.alternatePixel = globals.random.nextBool();
+        if (config.functionIndex != 10 && config.functionIndex != 11)
+            config.alternatePixel = globals.random.nextBool();
     }
     
     window.draw = () => {
