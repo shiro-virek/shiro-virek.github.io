@@ -131,7 +131,7 @@
                     SpecialPixels.drawAscii(ctx, this.x, this.y, 100 - this.lightness);
                     break;
                 case Figures.Ansi:    
-                    SpecialPixels.drawAnsi(ctx, this.x, this.y, 100 - this.lightness);
+                    SpecialPixels.drawAnsi(ctx, this.x, this.y, this.lightness);
                     break;
                 case Figures.Gameboy:    
                     SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, 100 - this.lightness);
@@ -171,7 +171,7 @@
 
             for (let y = 0; y < config.ledRows; y++) {
                 for (let x = 0; x < config.ledColumns; x++) {
-                    let index = y * config.ledColumns + x;
+                    let index = (y * config.ledColumns + x) * 4;
                     globals.ledScreen.leds[x][y].r = globals.imgData[index];
                     globals.ledScreen.leds[x][y].g = globals.imgData[index + 1];
                     globals.ledScreen.leds[x][y].b = globals.imgData[index + 2];
