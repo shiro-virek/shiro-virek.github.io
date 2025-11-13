@@ -126,6 +126,7 @@
     }
         
     let loadVideo = async (url) => {
+        Browser.showSpinner();
         globals.frames = [];
         const video = document.createElement("video");
         video.src = url;
@@ -157,6 +158,8 @@
             const frameData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
             globals.frames.push(frameData);            
         }       
+
+        Browser.hideSpinner();
 
         let i = 0;
         const total = globals.frames.length;
