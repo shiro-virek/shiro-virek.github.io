@@ -13,8 +13,8 @@
         randomize: true,
         ledRows: 50,
         ledColumns: 50,
-        ledMargin: 30,
-        ledPadding: 30,
+        ledMargin: 0,
+        ledPadding: 0,
         ledDiameter: 20,
         hue: 150,
         valueIncrement: 1,
@@ -24,15 +24,16 @@
     };
     
     const Figures = Object.freeze({
-		/*Square: Symbol("square"),
+		Square: Symbol("square"),
 		Circle: Symbol("circle"),
         Hexagon: Symbol("hexagon"),
         Emoji: Symbol("Emoji"),
         Ascii: Symbol("Ascii"),
         Ansi: Symbol("Ansi"),
         Gameboy: Symbol("Gameboy"),
-        Character: Symbol("Character"),*/
+        Character: Symbol("Character"),
         Bar: Symbol("Bar"),
+        CRT: Symbol("CRT"),
 	});
 
     class LedScreen {
@@ -100,8 +101,7 @@
                 size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
             }
             let value = 0;
-            switch(globals.ledScreen.shape){
-                
+            switch(globals.ledScreen.shape){                
                 case Figures.Circle:
                     Drawing.drawCircle(ctx, this.x, this.y, size, color)
                     break;
@@ -131,6 +131,19 @@
                 case Figures.Bar:    
                     let angle = Numbers.scale(this.value, 0, 100, 0, 360);
                     SpecialPixels.drawBar(ctx, this.x, this.y, config.ledDiameter, angle);
+                    break;
+                case Figures.CRT:
+                        let borderColor = '#000';
+                        let third = config.ledDiameter / 3;
+                        let colorR = `hsl(${0}, 100%, ${Numbers.scale(this.r, 0, 255, 20, 70)}%)`;
+                        let colorG = `hsl(${120}, 100%, ${Numbers.scale(this.g, 0, 255, 20, 70)}%)`;
+                        let colorB = `hsl(${255}, 100%, ${Numbers.scale(this.b, 0, 255, 20, 70)}%)`;
+                        Drawing.drawRectangle(ctx, this.x, this.y, third, config.ledDiameter, colorR)
+                        Drawing.drawRectangle(ctx, this.x + third, this.y, third, config.ledDiameter, colorG)
+                        Drawing.drawRectangle(ctx, this.x + third * 2, this.y, third, config.ledDiameter, colorB)
+                        Drawing.drawRectangleBorder(ctx, this.x, this.y, third, config.ledDiameter, borderColor)
+                        Drawing.drawRectangleBorder(ctx, this.x + third, this.y, third, config.ledDiameter, borderColor)
+                        Drawing.drawRectangleBorder(ctx, this.x + third * 2, this.y, third, config.ledDiameter, borderColor)
                     break;
             }
         }
@@ -187,10 +200,10 @@
                 for (let y = 0; y < config.ledRows; y++) {
                     for (let x = 0; x < config.ledColumns; x++) {
                         const index = (y * config.ledColumns + x) * 4;
-                        const r = frame[index];
-                        const g = frame[index + 1];
-                        const b = frame[index + 2];
-                        const lightness = Color.getLightness(r, g, b);
+                        globals.ledScreen.leds[x][y].r = frame[index];
+                        globals.ledScreen.leds[x][y].g = frame[index + 1];
+                        globals.ledScreen.leds[x][y].b = frame[index + 2];
+                        const lightness = Color.getLightness(frame[index], frame[index+1], frame[index+2]);
 
                         if (config.mode)
                             globals.ledScreen.leds[x][y].value = Numbers.scale(lightness, 0, 250, 0, 100);
@@ -236,11 +249,13 @@
         config.mode = globals.random.nextBool();
         let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
         config.shape = Figures[Object.keys(Figures)[rand]];
-        config.ledDiameter = globals.random.nextInt(5, 20);        
-        config.ledPadding = config.shape != Figures.Gameboy ? globals.random.nextInt(0, 20) : 0;
+        config.ledDiameter = globals.random.nextInt(5, 20);       
+        if (config.shape != Figures.Gameboy){
+            config.ledPadding = globals.random.nextInt(0, 5);
+            config.alternatePixel = globals.random.nextBool();
+        }
         config.ledMargin = config.ledPadding;  
         config.hue = globals.random.nextInt(0, 255);    
-        config.alternatePixel = config.shape != Figures.Gameboy ? globals.random.nextBool() : false;
     }
 
     window.draw = () => {
