@@ -122,18 +122,19 @@
     }
 
     function emoji(pixel, noiseValue){
-        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 100);
         SpecialPixels.drawEmoji(ctx, pixel.x, pixel.y, value, "#FFF", 10);
     }
 
     function ansi(pixel, noiseValue){
-        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 100);
         SpecialPixels.drawAnsi(ctx, pixel.x, pixel.y, value);
     }
 
     function bar(pixel, noiseValue){
         let angle = Numbers.scale(noiseValue, -1, 1, 0, 360);
-        SpecialPixels.drawBar(ctx, pixel.x, pixel.y, pixel.diameter / 4, pixel.diameter, angle, pixel.color); 
+        let color = `hsl(${config.hue}, 100%, 50%)`;
+        SpecialPixels.drawBar(ctx, pixel.x, pixel.y, pixel.diameter, angle, color); 
     }
 
     function character(pixel, noiseValue){
@@ -142,7 +143,7 @@
     }  
 
     function gameboy(pixel, noiseValue){
-        let value = Numbers.scale(noiseValue, -1, 1, 0, 255);
+        let value = Numbers.scale(noiseValue, -1, 1, 0, 100);
         SpecialPixels.drawGameboy(ctx, pixel.x, pixel.y, pixel.diameter, value);
     }
     
