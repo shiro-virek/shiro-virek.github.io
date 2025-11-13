@@ -30,8 +30,9 @@
         Emoji: Symbol("Emoji"),
         Ascii: Symbol("Ascii"),
         Ansi: Symbol("Ansi"),
-        Gameboy: Symbol("Gameboy"),*/
-        Character: Symbol("Character"),
+        Gameboy: Symbol("Gameboy"),
+        Character: Symbol("Character"),*/
+        Bar: Symbol("Bar"),
 	});
 
     class LedScreen {
@@ -126,6 +127,10 @@
                 case Figures.Character:    
                     value = Numbers.scale(this.value, 0, 100, 5, 40);
                     SpecialPixels.drawCharacter(ctx, this.x, this.y, value);
+                    break;
+                case Figures.Bar:    
+                    let angle = Numbers.scale(this.value, 0, 100, 0, 360);
+                    SpecialPixels.drawBar(ctx, this.x, this.y, config.ledDiameter, angle);
                     break;
             }
         }

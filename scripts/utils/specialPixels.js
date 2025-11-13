@@ -107,4 +107,9 @@ class SpecialPixels {
         ctx.fill();
         ctx.restore();
     }
+
+    static drawBar = (ctx, x, y, side, angle = 0, color = "#FFF") => {
+        Drawing.drawRectangleRotated(ctx, x, y, side / 4, side, color, angle);   
+    }
+
 }
