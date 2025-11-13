@@ -245,10 +245,10 @@
         let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
         config.shape = Figures[Object.keys(Figures)[rand]];
         config.ledDiameter = globals.random.nextInt(5, 20);       
-        if (config.shape != Figures.Gameboy){
+        if (config.shape != Figures.Gameboy && config.shape != Figures.Sin)
+            config.alternatePixel = globals.random.nextBool();        
+        if (config.shape != Figures.CRT && config.shape != Figures.Gameboy && config.shape != Figures.Sin)        
             config.ledPadding = globals.random.nextInt(0, 10);
-            config.alternatePixel = globals.random.nextBool();
-        }
         config.ledMargin = config.ledPadding;  
         config.hue = globals.random.nextInt(0, 255);    
     }
