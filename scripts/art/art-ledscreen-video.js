@@ -23,10 +23,11 @@
         Character: Symbol("Character"),
         Bar: Symbol("Bar"),
         CRT: Symbol("CRT"),
+        Sin: Symbol("Sin"),
 	});
 
     const config = { 
-        randomize: true,
+        randomize: false,
         ledRows: 50,
         ledColumns: 50,
         ledMargin: 0,
@@ -35,7 +36,7 @@
         hue: 150,
         valueIncrement: 1,
         alternatePixel: false,
-        shape: Figures.Square,
+        shape: Figures.Sin,
     };
     
     class LedScreen {
@@ -148,6 +149,10 @@
                     break;
                 case Figures.CRT:
                     SpecialPixels.drawCRT(ctx, this.x, this.y, config.ledDiameter, this.r, this.g, this.b);
+                    break;
+                case Figures.Sin:
+                    let amplitude = Numbers.scale(this.lightness, 0, 200, 0, config.ledDiameter / 2);
+                    Drawing.drawSin(ctx, this.x, this.y, config.ledDiameter, amplitude);
                     break;
             }
         }
