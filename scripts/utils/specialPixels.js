@@ -74,22 +74,27 @@ class SpecialPixels {
     }
 
     static drawEmoji = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
-        ctx.font = `${fontSize} bold Arial`;
+        ctx.font = `${fontSize}px bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getEmoji(value), x, y);
     }
 
     static drawAscii = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
-        ctx.font = `${fontSize} bold Arial`;
+        ctx.font = `${fontSize}px bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAscii(value), x, y);
     }
 
+    static drawCharacter = (ctx, x, y, value, color = "#FFF", char = "*") => {
+        ctx.font = `${value}px bold Arial`;
+        ctx.fillStyle = color;
+        ctx.fillText(char, x, y);
+    }
+
     static drawAnsi = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
-        ctx.font = `${fontSize} bold Arial`;
+        ctx.font = `${fontSize}px bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAnsi(value), x, y);
-        Drawing.drawSquare = (ctx, x, y, side, angle, color = '#00FF00')
     }
 
     static drawGameboy = (ctx, x, y, side, value) => {
@@ -102,4 +107,23 @@ class SpecialPixels {
         ctx.fill();
         ctx.restore();
     }
+
+    static drawBar = (ctx, x, y, side, angle = 0, color = "#FFF") => {
+        Drawing.drawRectangleRotated(ctx, x, y, side / 4, side, color, angle);   
+    }
+
+    static drawCRT = (ctx, x, y, size, r, g, b) => {
+        let borderColor = '#000';
+        let third = size / 3;
+        let colorR = `hsl(${0}, 100%, ${Numbers.scale(r, 0, 255, 20, 70)}%)`;
+        let colorG = `hsl(${120}, 100%, ${Numbers.scale(g, 0, 255, 20, 70)}%)`;
+        let colorB = `hsl(${255}, 100%, ${Numbers.scale(b, 0, 255, 20, 70)}%)`;
+        Drawing.drawRectangle(ctx, x, y, third, size, colorR)
+        Drawing.drawRectangle(ctx, x + third, y, third, size, colorG)
+        Drawing.drawRectangle(ctx, x + third * 2, y, third, size, colorB)
+        Drawing.drawRectangleBorder(ctx, x, y, third, size, borderColor)
+        Drawing.drawRectangleBorder(ctx, x + third, y, third, size, borderColor)
+        Drawing.drawRectangleBorder(ctx, x + third * 2, y, third, size, borderColor)
+    }
+
 }

@@ -85,6 +85,30 @@
 				left:0; 
 				display: none;
 			}
+
+			.overlay {
+				position: fixed;       
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				background: rgba(0, 0, 0, 0.6); 
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 9999;
+			}
+
+			.spinner {
+				width: 100px;       
+				height: 100px;
+				animation: spin 1.5s linear infinite;
+			}
+
+			@keyframes spin {
+				from { transform: rotate(0deg); }
+				to { transform: rotate(360deg); }
+			}
 			
 		</style>
 	</head>
@@ -113,6 +137,9 @@
 		<script src="./scripts/utils/specialPixels.js"></script>
 		<script src="./scripts/main/main.js"></script>
 		<script src="./scripts/main/manage-scripts.js"></script>
+		<div class="overlay" id="overlay">
+			<img src="./assets/Spinner.png" alt="Loading..." class="spinner">
+		</div>
 		<div>
 			<canvas id="myCanvas"></canvas>
 			<canvas id="canvasShader"></canvas>

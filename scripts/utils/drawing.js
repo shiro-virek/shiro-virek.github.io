@@ -160,4 +160,24 @@ class Drawing {
         ctx.stroke();
     }
 
+    static drawSin = (ctx, x, y, longitud, amplitud, ciclos = 1) => {
+        const puntos = 10;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        for (let i = 0; i <= puntos; i++) {
+            const progreso = i / puntos; 
+            const angulo = progreso * ciclos * 2 * Math.PI;
+            const xActual = x + progreso * longitud;
+            const yActual = y - Math.sin(angulo) * amplitud;
+            ctx.lineTo(xActual, yActual);
+        }
+
+        ctx.strokeStyle = "#0077ff";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+
+
 }
