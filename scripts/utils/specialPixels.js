@@ -89,7 +89,6 @@ class SpecialPixels {
         ctx.font = `${fontSize} bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAnsi(value), x, y);
-        Drawing.drawSquare = (ctx, x, y, side, angle, color = '#00FF00')
     }
 
     static drawGameboy = (ctx, x, y, side, value) => {

@@ -20,6 +20,7 @@
         valueIncrement: 1,
         mode: 1,
         alternatePixel: false,
+        shape: null,
     };
     
     const Figures = Object.freeze({
@@ -35,8 +36,7 @@
     class LedScreen {
         constructor() {      
             this.generateLeds();          
-			let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
-			this.shape = Figures[Object.keys(Figures)[rand]];
+			this.shape = config.shape;
         }
 
         generateLeds = () => {
@@ -220,11 +220,13 @@
     let randomize = () => {            
 		globals.random = Objects.getRandomObject();
         config.mode = globals.random.nextBool();
+        let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
+        config.shape = Figures[Object.keys(Figures)[rand]];
         config.ledDiameter = globals.random.nextInt(5, 20);        
-        config.ledPadding = 0; //this.shape != Figures.Gameboy ? globals.random.nextInt(0, 20) : 0;
+        config.ledPadding = config.shape != Figures.Gameboy ? globals.random.nextInt(0, 20) : 0;
         config.ledMargin = config.ledPadding;  
         config.hue = globals.random.nextInt(0, 255);    
-        config.alternatePixel = this.shape != Figures.Gameboy ? globals.random.nextBool() : false;
+        config.alternatePixel = config.shape != Figures.Gameboy ? globals.random.nextBool() : false;
     }
 
     window.draw = () => {
