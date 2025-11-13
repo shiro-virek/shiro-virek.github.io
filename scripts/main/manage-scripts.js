@@ -12,13 +12,13 @@ const art = [
                 "metro", 
                 "3d-rotation", 
                 "chaos", 
-                "ledscreen", 
+                "screen", 
                 "conway", 
                 "motion-matrix",
                 "bouncing-balls",
                 "cthulhu",
                 "crt",
-                "ledscreen-tones", 
+                "screen-tones", 
                 "rotators-solid",
                 "3d-rotation-lights", 
                 "distortion",
@@ -37,7 +37,7 @@ const art = [
                 "walker",
                 "streets",
                 "filters",
-                "ledscreen-video"
+                "screen-video"
             ];
 const scripts = [];
 
