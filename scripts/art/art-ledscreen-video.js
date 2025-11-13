@@ -87,7 +87,7 @@
             this.y = config.ledMargin + row * config.ledPadding + row * this.diameter;
             if (config.alternatePixel)
                 this.y = this.column % 2 == 0 ? this.y : this.y + this.radius;
-            this.value = 0;
+            this.lightness = 0;
         }
 
         draw = (ctx) => {
@@ -96,68 +96,58 @@
             let value = 0;
             switch(globals.ledScreen.shape){                
                 case Figures.CircleSize:
-                    size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
+                    size = Numbers.scale(this.lightness, 0, 255, 0, config.ledDiameter + config.ledMargin);
                     color = `hsl(${config.hue}, 100%, 50%)`;
                     Drawing.drawCircle(ctx, this.x, this.y, size, color)
                     break;
                 case Figures.SquareSize:        
-                    size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
+                    size = Numbers.scale(this.lightness, 0, 255, 0, config.ledDiameter + config.ledMargin);
                     color = `hsl(${config.hue}, 100%, 50%)`;            
                     Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
                     break;
                 case Figures.HexagonSize:
-                    size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
+                    size = Numbers.scale(this.lightness, 0, 255, 0, config.ledDiameter + config.ledMargin);
                     color = `hsl(${config.hue}, 100%, 50%)`;
                     Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
                     break;
                 case Figures.CircleLightness:
-                    color = `hsl(${config.hue}, 100%, ${this.value}%)`
+                    color = `hsl(${config.hue}, 100%, ${this.lightness}%)`
                     size = this.radius;
                     Drawing.drawCircle(ctx, this.x, this.y, size, color)
                     break;
                 case Figures.SquareLightness:     
-                    color = `hsl(${config.hue}, 100%, ${this.value}%)`
+                    color = `hsl(${config.hue}, 100%, ${this.lightness}%)`
                     size = this.radius;               
                     Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
                     break;
                 case Figures.HexagonLightness:
-                    color = `hsl(${config.hue}, 100%, ${this.value}%)`
+                    color = `hsl(${config.hue}, 100%, ${this.lightness}%)`
                     size = this.radius;
                     Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
                     break;
                 case Figures.Emoji:
-                    SpecialPixels.drawEmoji(ctx, this.x, this.y, this.value);
+                    SpecialPixels.drawEmoji(ctx, this.x, this.y, this.lightness);
                     break;
                 case Figures.Ascii:             
-                    SpecialPixels.drawAscii(ctx, this.x, this.y, this.value);
+                    SpecialPixels.drawAscii(ctx, this.x, this.y, this.lightness);
                     break;
                 case Figures.Ansi:    
-                    SpecialPixels.drawAnsi(ctx, this.x, this.y, this.value);
+                    SpecialPixels.drawAnsi(ctx, this.x, this.y, this.lightness);
                     break;
                 case Figures.Gameboy:    
-                    value = Numbers.scale(this.value, 0, 100, 0, 255);
+                    value = Numbers.scale(this.lightness, 0, 100, 0, 255);
                     SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, value);
                     break;
                 case Figures.Character:    
-                    value = Numbers.scale(this.value, 0, 100, 5, 40);
+                    value = Numbers.scale(this.lightness, 0, 100, 5, 40);
                     SpecialPixels.drawCharacter(ctx, this.x, this.y, value);
                     break;
                 case Figures.Bar:    
-                    let angle = Numbers.scale(this.value, 0, 100, 0, 360);
+                    let angle = Numbers.scale(this.lightness, 0, 100, 0, 360);
                     SpecialPixels.drawBar(ctx, this.x, this.y, config.ledDiameter, angle);
                     break;
                 case Figures.CRT:
-                        let borderColor = '#000';
-                        let third = config.ledDiameter / 3;
-                        let colorR = `hsl(${0}, 100%, ${Numbers.scale(this.r, 0, 255, 20, 70)}%)`;
-                        let colorG = `hsl(${120}, 100%, ${Numbers.scale(this.g, 0, 255, 20, 70)}%)`;
-                        let colorB = `hsl(${255}, 100%, ${Numbers.scale(this.b, 0, 255, 20, 70)}%)`;
-                        Drawing.drawRectangle(ctx, this.x, this.y, third, config.ledDiameter, colorR)
-                        Drawing.drawRectangle(ctx, this.x + third, this.y, third, config.ledDiameter, colorG)
-                        Drawing.drawRectangle(ctx, this.x + third * 2, this.y, third, config.ledDiameter, colorB)
-                        Drawing.drawRectangleBorder(ctx, this.x, this.y, third, config.ledDiameter, borderColor)
-                        Drawing.drawRectangleBorder(ctx, this.x + third, this.y, third, config.ledDiameter, borderColor)
-                        Drawing.drawRectangleBorder(ctx, this.x + third * 2, this.y, third, config.ledDiameter, borderColor)
+                    SpecialPixels.drawCRT(ctx, this.x, this.y, config.ledDiameter, this.r, this.g, this.b);
                     break;
             }
         }
@@ -217,7 +207,7 @@
                         globals.ledScreen.leds[x][y].r = frame[index];
                         globals.ledScreen.leds[x][y].g = frame[index + 1];
                         globals.ledScreen.leds[x][y].b = frame[index + 2];
-                        globals.ledScreen.leds[x][y].value = Color.getLightness(frame[index], frame[index+1], frame[index+2]);
+                        globals.ledScreen.leds[x][y].lightness = Color.getLightness(frame[index], frame[index+1], frame[index+2]);
                     }
                 }
 

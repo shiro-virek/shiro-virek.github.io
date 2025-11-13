@@ -112,4 +112,18 @@ class SpecialPixels {
         Drawing.drawRectangleRotated(ctx, x, y, side / 4, side, color, angle);   
     }
 
+    static drawCRT = (ctx, x, y, size, r, g, b) => {
+        let borderColor = '#000';
+        let third = size / 3;
+        let colorR = `hsl(${0}, 100%, ${Numbers.scale(r, 0, 255, 20, 70)}%)`;
+        let colorG = `hsl(${120}, 100%, ${Numbers.scale(g, 0, 255, 20, 70)}%)`;
+        let colorB = `hsl(${255}, 100%, ${Numbers.scale(b, 0, 255, 20, 70)}%)`;
+        Drawing.drawRectangle(ctx, x, y, third, size, colorR)
+        Drawing.drawRectangle(ctx, x + third, y, third, size, colorG)
+        Drawing.drawRectangle(ctx, x + third * 2, y, third, size, colorB)
+        Drawing.drawRectangleBorder(ctx, x, y, third, size, borderColor)
+        Drawing.drawRectangleBorder(ctx, x + third, y, third, size, borderColor)
+        Drawing.drawRectangleBorder(ctx, x + third * 2, y, third, size, borderColor)
+    }
+
 }
