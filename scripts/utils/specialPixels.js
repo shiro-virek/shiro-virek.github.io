@@ -74,19 +74,25 @@ class SpecialPixels {
     }
 
     static drawEmoji = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
-        ctx.font = `${fontSize} bold Arial`;
+        ctx.font = `${fontSize}px bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getEmoji(value), x, y);
     }
 
     static drawAscii = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
-        ctx.font = `${fontSize} bold Arial`;
+        ctx.font = `${fontSize}px bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAscii(value), x, y);
     }
 
+    static drawCharacter = (ctx, x, y, value, color = "#FFF", char = "*") => {
+        ctx.font = `${value}px bold Arial`;
+        ctx.fillStyle = color;
+        ctx.fillText(char, x, y);
+    }
+
     static drawAnsi = (ctx, x, y, value, color = "#FFF", fontSize = 20) => {
-        ctx.font = `${fontSize} bold Arial`;
+        ctx.font = `${fontSize}px bold Arial`;
         ctx.fillStyle = color;
         ctx.fillText(SpecialPixels.getAnsi(value), x, y);
     }

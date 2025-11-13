@@ -24,13 +24,14 @@
     };
     
     const Figures = Object.freeze({
-		Square: Symbol("square"),
+		/*Square: Symbol("square"),
 		Circle: Symbol("circle"),
         Hexagon: Symbol("hexagon"),
         Emoji: Symbol("Emoji"),
         Ascii: Symbol("Ascii"),
         Ansi: Symbol("Ansi"),
-        Gameboy: Symbol("Gameboy"),
+        Gameboy: Symbol("Gameboy"),*/
+        Character: Symbol("Character"),
 	});
 
     class LedScreen {
@@ -97,8 +98,9 @@
                 color = `hsl(${config.hue}, 100%, 50%)`;
                 size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
             }
-
+            let value = 0;
             switch(globals.ledScreen.shape){
+                
                 case Figures.Circle:
                     Drawing.drawCircle(ctx, this.x, this.y, size, color)
                     break;
@@ -118,8 +120,12 @@
                     SpecialPixels.drawAnsi(ctx, this.x, this.y, this.value);
                     break;
                 case Figures.Gameboy:    
-                    let value = Numbers.scale(this.value, 0, 100, 0, 255);
+                    value = Numbers.scale(this.value, 0, 100, 0, 255);
                     SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, value);
+                    break;
+                case Figures.Character:    
+                    value = Numbers.scale(this.value, 0, 100, 5, 40);
+                    SpecialPixels.drawCharacter(ctx, this.x, this.y, value);
                     break;
             }
         }
