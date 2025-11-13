@@ -34,7 +34,6 @@
         ledPadding: 0,
         ledDiameter: 20,
         hue: 150,
-        valueIncrement: 1,
         alternatePixel: false,
         shape: Figures.SquareLightness,
     };
@@ -57,13 +56,6 @@
                     this.leds[x][y] = led;
                 }
             }
-        }
-
-        setPixel = (x, y) => {            
-            let col = Math.round((x - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
-            let row = Math.round((y - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
-            if (col > config.ledColumns - 1 || row > config.ledRows - 1 || col < 0 || row < 0) return;
-            if (this.leds[col][row].value < 255) this.leds[col][row].value += config.valueIncrement;
         }
 
         draw = (ctx) => {
@@ -151,7 +143,7 @@
                     SpecialPixels.drawCRT(ctx, this.x, this.y, config.ledDiameter, this.r, this.g, this.b);
                     break;
                 case Figures.Sin:
-                    let amplitude = Numbers.scale(this.lightness, 0, 200, 0, config.ledDiameter / 2);
+                    let amplitude = Numbers.scale(this.lightness, 0, 100, 0, config.ledDiameter / 2);
                     Drawing.drawSin(ctx, this.x, this.y, config.ledDiameter, amplitude);
                     break;
             }
@@ -212,7 +204,7 @@
                         globals.ledScreen.leds[x][y].r = frame[index];
                         globals.ledScreen.leds[x][y].g = frame[index + 1];
                         globals.ledScreen.leds[x][y].b = frame[index + 2];
-                        globals.ledScreen.leds[x][y].lightness = Color.getLightness(frame[index], frame[index+1], frame[index+2]);
+                        globals.ledScreen.leds[x][y].lightness =  Numbers.scale(Color.getLightness(frame[index], frame[index+1], frame[index+2]), 0, 250, 0, 100);
                     }
                 }
 
