@@ -9,24 +9,13 @@
         frames: [],
     };
 
-    const config = { 
-        randomize: true,
-        ledRows: 50,
-        ledColumns: 50,
-        ledMargin: 0,
-        ledPadding: 0,
-        ledDiameter: 20,
-        hue: 150,
-        valueIncrement: 1,
-        mode: 1,
-        alternatePixel: false,
-        shape: null,
-    };
-    
     const Figures = Object.freeze({
-		Square: Symbol("square"),
-		Circle: Symbol("circle"),
-        Hexagon: Symbol("hexagon"),
+		SquareSize: Symbol("squareSize"),
+		SquareLightness: Symbol("squareLightness"),
+		CircleSize: Symbol("circleSize"),
+		CircleLightness: Symbol("circleLightness"),
+        HexagonLightness: Symbol("hexagonLightness"),
+        HexagonLightness: Symbol("hexagonLightness"),
         Emoji: Symbol("Emoji"),
         Ascii: Symbol("Ascii"),
         Ansi: Symbol("Ansi"),
@@ -36,6 +25,19 @@
         CRT: Symbol("CRT"),
 	});
 
+    const config = { 
+        randomize: true,
+        ledRows: 50,
+        ledColumns: 50,
+        ledMargin: 0,
+        ledPadding: 0,
+        ledDiameter: 20,
+        hue: 150,
+        valueIncrement: 1,
+        alternatePixel: false,
+        shape: Figures.Square,
+    };
+    
     class LedScreen {
         constructor() {      
             this.generateLeds();          
@@ -91,24 +93,36 @@
         draw = (ctx) => {
             let color = null;
             let size = null;
-            
-            if (config.mode) {
-                color = `hsl(${config.hue}, 100%, ${this.value}%)`
-                size = this.radius;
-            }
-            else{
-                color = `hsl(${config.hue}, 100%, 50%)`;
-                size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
-            }
             let value = 0;
             switch(globals.ledScreen.shape){                
-                case Figures.Circle:
+                case Figures.CircleSize:
+                    size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
+                    color = `hsl(${config.hue}, 100%, 50%)`;
                     Drawing.drawCircle(ctx, this.x, this.y, size, color)
                     break;
-                case Figures.Square:                    
+                case Figures.SquareSize:        
+                    size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
+                    color = `hsl(${config.hue}, 100%, 50%)`;            
                     Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
                     break;
-                case Figures.Hexagon:
+                case Figures.HexagonSize:
+                    size = Numbers.scale(this.value, 0, 255, 0, config.ledDiameter + config.ledMargin);
+                    color = `hsl(${config.hue}, 100%, 50%)`;
+                    Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
+                    break;
+                case Figures.CircleLightness:
+                    color = `hsl(${config.hue}, 100%, ${this.value}%)`
+                    size = this.radius;
+                    Drawing.drawCircle(ctx, this.x, this.y, size, color)
+                    break;
+                case Figures.SquareLightness:     
+                    color = `hsl(${config.hue}, 100%, ${this.value}%)`
+                    size = this.radius;               
+                    Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
+                    break;
+                case Figures.HexagonLightness:
+                    color = `hsl(${config.hue}, 100%, ${this.value}%)`
+                    size = this.radius;
                     Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
                     break;
                 case Figures.Emoji:
@@ -203,12 +217,7 @@
                         globals.ledScreen.leds[x][y].r = frame[index];
                         globals.ledScreen.leds[x][y].g = frame[index + 1];
                         globals.ledScreen.leds[x][y].b = frame[index + 2];
-                        const lightness = Color.getLightness(frame[index], frame[index+1], frame[index+2]);
-
-                        if (config.mode)
-                            globals.ledScreen.leds[x][y].value = Numbers.scale(lightness, 0, 250, 0, 100);
-                        else
-                            globals.ledScreen.leds[x][y].value = lightness;
+                        globals.ledScreen.leds[x][y].value = Color.getLightness(frame[index], frame[index+1], frame[index+2]);
                     }
                 }
 
@@ -246,12 +255,11 @@
 
     let randomize = () => {            
 		globals.random = Objects.getRandomObject();
-        config.mode = globals.random.nextBool();
         let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
         config.shape = Figures[Object.keys(Figures)[rand]];
         config.ledDiameter = globals.random.nextInt(5, 20);       
         if (config.shape != Figures.Gameboy){
-            config.ledPadding = globals.random.nextInt(0, 5);
+            config.ledPadding = globals.random.nextInt(0, 10);
             config.alternatePixel = globals.random.nextBool();
         }
         config.ledMargin = config.ledPadding;  
