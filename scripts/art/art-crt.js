@@ -17,6 +17,7 @@
         crtScreen: null,
         offsetX: 0,
         offsetY: 0,
+        alternatePixel: false,
     }
     
     class CrtScreen {
@@ -89,6 +90,7 @@
     class Crt {
         constructor(column, row) {
             this.diameter = config.crtDiameter;
+            this.radius = config.crtDiameter / 2;
             this.row = row;
             this.column = column;
             this.r = 0;
@@ -96,6 +98,8 @@
             this.b = 0;
             this.x = config.offsetX + column * this.diameter;
             this.y = config.offsetY + row * this.diameter;
+            if (config.alternatePixel)
+                this.y = this.column % 2 == 0 ? this.y : this.y + this.radius;
         }
     }
 
@@ -132,7 +136,6 @@
         globals.canvasImg.width = canvas.width;
         globals.canvasImg.height = canvas.height;   
 
-        globals.random = Objects.getRandomObject();
         globals.canvasImg = document.getElementById('auxCanvas');
         globals.ctxImg = globals.canvasImg.getContext("2d");
 
@@ -163,7 +166,8 @@
     }
 
     let randomize = () => {
-    
+        globals.random = Objects.getRandomObject();
+        config.alternatePixel = globals.random.nextBool();   
     }
 
     window.draw = () => {
