@@ -134,7 +134,7 @@
                     SpecialPixels.drawAnsi(ctx, this.x, this.y, this.lightness);
                     break;
                 case Figures.Gameboy:    
-                    SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, 100 - this.lightness);
+                    SpecialPixels.drawGameboy(ctx, this.x, this.y, config.ledDiameter, this.lightness);
                     break;
                 case Figures.Character:    
                     value = Numbers.scale(this.lightness, 0, 100, 5, 40);
@@ -145,7 +145,7 @@
                     SpecialPixels.drawBar(ctx, this.x, this.y, config.ledDiameter, angle);
                     break;
                 case Figures.CRT:
-                    const { r: red, g: green, b: blue } = Color.hslToRgb(100, 100, 100 - this.lightness);
+                    const { r: red, g: green, b: blue } = Color.hslToRgb(100, 100, this.lightness);
                     SpecialPixels.drawCRT(ctx, this.x, this.y, config.ledDiameter, red, green, blue);
                     break;
                 case Figures.Sin:
