@@ -62,6 +62,11 @@
             let row = Math.round((y - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
             if (col > config.ledColumns - 1 || row > config.ledRows - 1 || col < 0 || row < 0) return;
             if (this.leds[col][row].lightness < 100) this.leds[col][row].lightness += config.valueIncrement;
+            if (this.leds[col][row].r < 255){
+                this.leds[col][row].r += config.valueIncrement;
+                this.leds[col][row].g += config.valueIncrement;
+                this.leds[col][row].b += config.valueIncrement;
+            } 
         }
 
         draw = (ctx) => {
@@ -87,6 +92,9 @@
             if (config.alternatePixel)
                 this.y = this.column % 2 == 0 ? this.y : this.y + this.radius;
             this.lightness = 0;
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
         }
 
         draw = (ctx) => {
@@ -145,8 +153,7 @@
                     SpecialPixels.drawBar(ctx, this.x, this.y, config.ledDiameter, angle);
                     break;
                 case Figures.CRT:
-                    const { r: red, g: green, b: blue } = Color.hslToRgb(100, 100, this.lightness);
-                    SpecialPixels.drawCRT(ctx, this.x, this.y, config.ledDiameter, red, green, blue);
+                    SpecialPixels.drawCRT(ctx, this.x, this.y, config.ledDiameter, this.r, this.g, this.b);
                     break;
                 case Figures.Sin:
                     let amplitude = Numbers.scale(this.lightness, 0, 100, 0, config.ledDiameter / 2);
