@@ -58,11 +58,7 @@
                         const b = globals.imgData[i * 4 + 2];
                         const a = globals.imgData[i * 4 + 3];
 
-                        let newR = Numbers.scale(r, 0, 255, 20, 70);
-                        let newG = Numbers.scale(g, 0, 255, 20, 70);
-                        let newB = Numbers.scale(b, 0, 255, 20, 70);
-
-                        this.crts[x][y].draw(ctx, newR, newG, newB);
+                        SpecialPixels.drawCRT(ctx, this.crts[x][y].x, this.crts[x][y].y, this.crts[x][y].diameter, r, g, b);
                     }
                 }
             }
@@ -70,9 +66,9 @@
             if (this.status == 1) {      
                 for (let y = 0; y < config.crtRows; y++) {
                     for (let x = 0; x < config.crtColumns; x++) {
-                        let value = globals.random.nextBool() ? 255 : 0;
-
-                        this.crts[x][y].draw(ctx, value, value, value);
+                        let value = globals.random.nextBool() ? 255 : 100;
+                        
+                        SpecialPixels.drawCRT(ctx, this.crts[x][y].x, this.crts[x][y].y, this.crts[x][y].diameter, value, value, value);
                     }
                 }
             }
@@ -100,21 +96,6 @@
             this.b = 0;
             this.x = config.offsetX + column * this.diameter;
             this.y = config.offsetY + row * this.diameter;
-        }
-
-        draw = (ctx, lightnessR, lightnessG, lightnessB) => {
-            let borderColor = '#000';
-            let third = this.diameter / 3;
-
-            let colorR = `hsl(${0}, 100%, ${lightnessR}%)`;
-            let colorG = `hsl(${120}, 100%, ${lightnessG}%)`;
-            let colorB = `hsl(${255}, 100%, ${lightnessB}%)`;
-            Drawing.drawRectangle(ctx, this.x, this.y, third, this.diameter, colorR)
-            Drawing.drawRectangle(ctx, this.x + third, this.y, third, this.diameter, colorG)
-            Drawing.drawRectangle(ctx, this.x + third * 2, this.y, third, this.diameter, colorB)
-            Drawing.drawRectangleBorder(ctx, this.x, this.y, third, this.diameter, borderColor)
-            Drawing.drawRectangleBorder(ctx, this.x + third, this.y, third, this.diameter, borderColor)
-            Drawing.drawRectangleBorder(ctx, this.x + third * 2, this.y, third, this.diameter, borderColor)
         }
     }
 
