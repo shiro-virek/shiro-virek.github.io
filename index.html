@@ -96,7 +96,7 @@
 				display: none;
 				align-items: center;
 				justify-content: center;
-				z-index: 9999;
+				z-index: 10000;
 			}
 
 			.spinner {
@@ -110,6 +110,17 @@
 				to { transform: rotate(360deg); }
 			}
 			
+			.progress-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 0%;            
+				height: 100vh;
+				background: rgba(111, 0, 255, 0.4); 
+				z-index: 9999;         
+				transition: width 0.2s linear; 
+			}
+
 		</style>
 	</head>
 	<body>		
@@ -140,6 +151,7 @@
 		<div class="overlay" id="overlay">
 			<img src="./assets/Spinner.png" alt="Loading..." class="spinner">
 		</div>
+		<div class="progress-overlay" id="overlayProgress"></div>
 		<div>
 			<canvas id="myCanvas"></canvas>
 			<canvas id="canvasShader"></canvas>

@@ -180,10 +180,13 @@
             globals.ctxImg.drawImage(video, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
             const frameData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
-            globals.frames.push(frameData);            
-        }       
-
+            globals.frames.push(frameData);   
+            
+            let percent = (i / totalFrames * 100).toFixed(0);
+            Browser.setProgress(percent);    
+        }        
         Browser.hideSpinner();
+        Browser.resetProgress();
 
         let i = 0;
         const total = globals.frames.length;

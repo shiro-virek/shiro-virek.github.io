@@ -11,4 +11,13 @@ class Browser {
     static hideSpinner = () => {
         document.getElementById('overlay').style.display = 'none';
     }
+    
+    static setProgress = (percent) => {
+        percent = Math.max(0, Math.min(100, percent));
+        document.getElementById("overlayProgress").style.width = percent + "%";
+    }
+
+    static resetProgress = () => {
+        document.getElementById("overlayProgress").style.width = "0%";
+    }
 }
