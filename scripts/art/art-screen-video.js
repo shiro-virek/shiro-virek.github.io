@@ -24,6 +24,8 @@
         Bar: Symbol("Bar"),
         CRT: Symbol("CRT"),
         Sin: Symbol("Sin"),
+        Bubbles: Symbol("Bubbles"),
+        Sin2: Symbol("Sin2"),
 	});
 
     const config = { 
@@ -142,9 +144,22 @@
                     SpecialPixels.drawCRT(ctx, this.x, this.y, config.ledDiameter, this.r, this.g, this.b);
                     break;
                 case Figures.Sin:
+                    color = `hsl(${config.hue}, 100%, 50%)`
                     let amplitude = Numbers.scale(this.lightness, 0, 100, 0, config.ledDiameter / 2);
-                    Drawing.drawSin(ctx, this.x, this.y, config.ledDiameter, amplitude);
+                    Drawing.drawSin(ctx, this.x, this.y, config.ledDiameter, amplitude, 1, color, 2);
                     break;
+                case Figures.Sin2:
+                    color = `hsl(${config.hue}, 100%, 50%)`
+                    let cycles = Math.ceil(Numbers.scale(this.lightness, 0, 100, 0, 2));
+                    Drawing.drawSin(ctx, this.x, this.y, config.ledDiameter, config.ledDiameter / 2, cycles, color);
+                    break;
+                case Figures.Bubbles:
+                    color = `hsl(${config.hue}, 100%, 50%)`
+                    let circles = Numbers.scale(this.lightness, 0, 100, 0, 4);
+                    for (let i=0; i<=circles; i++){
+                        Drawing.drawCircleBorder(ctx, this.x + globals.random.nextInt(0, 10), this.y + globals.random.nextInt(0, 10), globals.random.nextInt(3, 7), color)
+                    }
+                    break;                    
             }
         }
     }
@@ -248,9 +263,9 @@
         let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
         config.shape = Figures[Object.keys(Figures)[rand]];
         config.ledDiameter = globals.random.nextInt(5, 20);       
-        if (config.shape != Figures.Gameboy && config.shape != Figures.Sin)
+        if (config.shape != Figures.Gameboy && config.shape != Figures.Sin && config.shape != Figures.Sin2)
             config.alternatePixel = globals.random.nextBool();        
-        if (config.shape != Figures.CRT && config.shape != Figures.Gameboy && config.shape != Figures.Sin)        
+        if (config.shape != Figures.CRT && config.shape != Figures.Gameboy && config.shape != Figures.Sin && config.shape != Figures.Sin2)        
             config.ledPadding = globals.random.nextInt(0, 10);
         config.ledMargin = config.ledPadding;  
         config.hue = globals.random.nextInt(0, 255);    
