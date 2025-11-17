@@ -46,6 +46,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Clay');  
         initCanvas();
         addEvents();
 

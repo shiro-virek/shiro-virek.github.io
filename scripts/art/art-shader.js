@@ -82,6 +82,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Shader');  
         globals.canvasShader = document.getElementById("canvasShader");
 
         globals.gl = globals.canvasShader.getContext('webgl');

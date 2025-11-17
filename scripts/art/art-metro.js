@@ -485,6 +485,7 @@
 	}
 
 	let init = () => {
+        Browser.setTitle('Metro');  
 		initCanvas();
 		globals.metroNetwork = new metroNetwork()
 		globals.random = Objects.getRandomObject();

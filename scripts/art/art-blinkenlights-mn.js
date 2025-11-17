@@ -313,7 +313,8 @@
         }
     }
 
-    let init = () => {       
+    let init = () => { 
+        Browser.setTitle('Cellular automata');      
 		initCanvas();
         
         randomize();

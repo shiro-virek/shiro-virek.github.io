@@ -253,6 +253,7 @@
     }
 
     let init = () => {	
+        Browser.setTitle('3D w/lights');
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();

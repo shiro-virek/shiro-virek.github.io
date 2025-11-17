@@ -109,6 +109,7 @@
 	}
 
 	let init = () => {
+        Browser.setTitle('Fire');  
 		initCanvas();		
         if (config.randomize) randomize();
 		addParticles();

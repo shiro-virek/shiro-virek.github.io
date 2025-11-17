@@ -52,9 +52,10 @@
 			<li><a href="?art=cthulhu">Cthulhu</a></li>
 			<li><a href="?art=distortion">Distortion</a></li>
 			<li><a href="?art=filters">Filters</a></li>
-			<li><a href="?art=fire">Fire</li>
+			<li><a href="?art=fire">Fire</a></li>
 			<li><a href="?art=fractals">Fractals</a></li>
-			<li><a href="?art=gel">Clay</a></li>
+			<li><a href="?art=clay">Clay</a></li>
+			<li><a href="?art=clay-2">Clay 2</a></li>
 			<li><a href="?art=gravity-balls">Gravity balls</a></li>
 			<li><a href="?art=hopalong">Hopalong</a></li>
 			<li><a href="?art=lyapunov">Lyapunov</a></li>
@@ -72,7 +73,7 @@
 			<li><a href="?art=tree">Tree</a></li>
 			<li><a href="?art=walker">Walker</a></li>
 			<li><a href="?art=webcam">Webcam</a></li>
-			<li><a onclick="gotoRepo()">Source code</a></li>
+			<li><a href="#" onclick="goToRepo()">Source code</a></li>
 		</ul>
 		</div>
 		<div class="overlay" id="overlay">
@@ -80,6 +81,7 @@
 		</div>
 		<div class="progress-overlay" id="overlayProgress"></div>
 		<div>
+			<div class="art-title outlined-text" id="artTitle">...</div>
 			<canvas id="myCanvas"></canvas>
 			<canvas id="canvasShader"></canvas>
 			<canvas id="auxCanvas"></canvas>
@@ -98,13 +100,19 @@
 			<!--<button onclick="loadNextScript()" id="nextButton">></button>-->
 		</div>	
 		<script src="./regist_serviceWorker.js"></script>
-		
+				
 		<script>
 			const menu = document.getElementById("menuLateral");
 			const btn = document.getElementById("btnMenu");
 
 			btn.addEventListener("click", () => {
-			menu.classList.toggle("menu-visible");
+				menu.classList.toggle("menu-visible");
+			});
+
+			document.addEventListener("click", (e) => {
+				if (!menu.contains(e.target) && !btn.contains(e.target)) {
+					menu.classList.remove("menu-visible");
+				}
 			});
 		</script>
 	</body>

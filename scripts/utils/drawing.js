@@ -160,7 +160,7 @@ class Drawing {
         ctx.stroke();
     }
 
-    static drawSin = (ctx, x, y, longitud, amplitud, ciclos = 1) => {
+    static drawSin = (ctx, x, y, longitud, amplitud, ciclos = 1, color = "#FFF", lineWidth = 1) => {
         const puntos = 10;
 
         ctx.beginPath();
@@ -174,8 +174,8 @@ class Drawing {
             ctx.lineTo(xActual, yActual);
         }
 
-        ctx.strokeStyle = "#0077ff";
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
         ctx.stroke();
     }
 

@@ -8,6 +8,7 @@
     };    
 
     let init = () => {
+        Browser.setTitle('example');
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();

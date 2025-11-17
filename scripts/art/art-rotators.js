@@ -42,6 +42,7 @@
 	}
 
 	let init = () => {
+        Browser.setTitle('Rotators 2');  
 		initCanvas();		
         if (config.randomize) randomize();
 		addEvents();

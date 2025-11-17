@@ -94,6 +94,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Fractals');  
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();

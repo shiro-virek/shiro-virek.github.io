@@ -26,15 +26,6 @@ halfHeight = height / 2;
 lastPosY = 0;
 lastPosX = 0;
 
-let initMenu = () => {
-    const menu = document.getElementById("menuLateral");
-    const btn = document.getElementById("btnMenu");
-
-    btn.addEventListener("click", () => {
-    menu.classList.toggle("menu-visible");
-    });
-}	
-
 let drawBackground = (ctx, canvas, opacity = 1) => {
     if (ctx) {
         ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
@@ -125,7 +116,6 @@ let initCanvas = () => {
     }
 }
 
-
 let loop = (timestamp) => {
     let progress = timestamp - lastRender;
 
@@ -134,5 +124,3 @@ let loop = (timestamp) => {
     lastRender = timestamp;
     window.requestAnimationFrame(loop);
 }
-
-initMenu();

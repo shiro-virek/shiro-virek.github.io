@@ -7,11 +7,26 @@ html, body {
 	font-family: "bulkypix", sans-serif;
 }
 
+.art-title {
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	z-index: 9999;
+}
+
 @font-face {
 	font-family: "bulkypix";
 	src: url("fonts/BULKYPIX.TTF") format("truetype");
 	font-weight: normal;
 	font-style: normal;
+}
+.outlined-text {
+	color: white; 
+	text-shadow:
+	-1px -1px 0 black,
+	1px -1px 0 black, 
+	-1px 1px 0 black,
+	1px 1px 0 black; 
 }
 
 #myCanvas {

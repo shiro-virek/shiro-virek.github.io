@@ -189,6 +189,7 @@
 	}
 
 	let init = () => {
+		Browser.setTitle('Bouncing balls');  
 		initCanvas();
 		
         drawBackground(ctx, canvas);
