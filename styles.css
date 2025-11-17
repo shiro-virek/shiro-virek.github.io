@@ -4,6 +4,14 @@ html, body {
 	overflow: hidden; 
 	width: 100%;
 	height: 100%;
+	font-family: "bulkypix", sans-serif;
+}
+
+@font-face {
+	font-family: "bulkypix";
+	src: url("fonts/BULKYPIX.TTF") format("truetype");
+	font-weight: normal;
+	font-style: normal;
 }
 
 #myCanvas {
