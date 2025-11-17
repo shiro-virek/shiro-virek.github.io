@@ -1,0 +1,175 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	overflow: hidden; 
+	width: 100%;
+	height: 100%;
+	font-family: "bulkypix", sans-serif;
+}
+
+@font-face {
+	font-family: "bulkypix";
+	src: url("fonts/BULKYPIX.TTF") format("truetype");
+	font-weight: normal;
+	font-style: normal;
+}
+
+#myCanvas {
+	margin:0; 
+	padding:0; 
+	position:absolute; 
+	top:0; 
+	left:0;
+}
+
+#canvasShader {
+	display: block; 
+	width: 100%; 
+	height: 100%;
+}
+
+#auxCanvas {
+	margin:0; 
+	padding:0; 
+	position:absolute; 
+	top:0; 
+	left:0; 
+	display: none;
+}
+
+/* Menu */
+
+@media (min-width: 680px) {
+	#buttons{
+		position: fixed; 
+		bottom: 10px; 
+		left: 50%;
+		transform: translateX(-50%);
+	}
+}
+			
+@media (max-width: 670px) {
+	#buttons{
+		position: fixed; 
+		bottom: 10px; 
+		left: 10px;
+	}
+}
+
+button {
+	background-color: white; 
+	border: none;
+	color: black;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 14px;
+	font-weight: bold;
+	cursor: pointer;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	opacity: 0.5;
+}
+
+#previousButton{
+	position: fixed; 
+	bottom: 10px; 
+	left: 10px;
+}
+
+#nextButton{
+	position: fixed; 
+	bottom: 10px; 
+	right: 10px;
+}
+
+/* Progress */
+
+.overlay {
+	position: fixed;       
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0, 0, 0, 0.6); 
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+}
+
+.spinner {
+	width: 100px;       
+	height: 100px;
+	animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+.progress-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 0%;            
+	height: 100vh;
+	background: rgba(111, 0, 255, 0.4); 
+	z-index: 9999;         
+	transition: width 0.2s linear; 
+}
+
+/* Side menu */
+
+.menu-lateral {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 260px;               
+	height: 100vh;             
+	background: rgba(0,0,0,0.85);
+	color: white;
+	overflow-y: auto;         
+	transform: translateX(-100%); 
+	transition: transform 0.3s ease;
+	z-index: 10500;            
+	padding: 20px 0;
+}
+
+.menu-lateral ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.menu-lateral li {
+	margin: 12px 0;
+}
+
+.menu-lateral a {
+	color: white;
+	text-decoration: none;
+	font-size: 18px;
+	padding: 10px 20px;
+	display: block;
+}
+
+.menu-lateral a:hover {
+	background: rgba(255,255,255,0.15);
+}
+
+.menu-visible {
+	transform: translateX(0);
+}
+
+.menu-lateral {
+	-ms-overflow-style: none;     
+	scrollbar-width: none;      
+}
+
+.menu-lateral::-webkit-scrollbar {
+	width: 0px;                   
+	background: transparent;
+}

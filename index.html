@@ -8,109 +8,8 @@
 		<link rel="apple-touch-icon" sizes="180x180" href="./icon512_rounded.png">
 		<link rel="manifest" href="./manifest.json" />
 		<link rel="icon" type="image/x-icon" href="./favicon.ico">
+		<link rel="stylesheet" href="styles.css">
 		<title>shiro-virek</title>
-		<style>
-			button {
-				background-color: white; 
-				border: none;
-				color: black;
-				text-align: center;
-				text-decoration: none;
-				display: inline-block;
-				font-size: 14px;
-				font-weight: bold;
-				cursor: pointer;
-				border-radius: 50%;
-				width: 40px;
-				height: 40px;
-				opacity: 0.5;
-			}
-
-			#previousButton{
-				position: fixed; 
-				bottom: 10px; 
-				left: 10px;
-			}
-
-			#nextButton{
-				position: fixed; 
-				bottom: 10px; 
-				right: 10px;
-			}
-			
-			@media (min-width: 680px) {
-				#buttons{
-					position: fixed; 
-					bottom: 10px; 
-					left: 50%;
-					transform: translateX(-50%);
-				}
-			}
-						
-			@media (max-width: 670px) {
-				#buttons{
-					position: fixed; 
-					bottom: 10px; 
-					left: 10px;
-				}
-			}
-
-			html, body {
-				margin: 0;
-				padding: 0;
-				overflow: hidden; 
-				width: 100%;
-				height: 100%;
-			}
-
-			#myCanvas {
-				margin:0; 
-				padding:0; 
-				position:absolute; 
-				top:0; 
-				left:0;
-			}
-			
-			#canvasShader {
-				display: block; 
-				width: 100%; 
-				height: 100%;
-			}
-			
-			#auxCanvas {
-				margin:0; 
-				padding:0; 
-				position:absolute; 
-				top:0; 
-				left:0; 
-				display: none;
-			}
-
-			.overlay {
-				position: fixed;       
-				top: 0;
-				left: 0;
-				width: 100vw;
-				height: 100vh;
-				background: rgba(0, 0, 0, 0.6); 
-				display: none;
-				align-items: center;
-				justify-content: center;
-				z-index: 9999;
-			}
-
-			.spinner {
-				width: 100px;       
-				height: 100px;
-				animation: spin 1.5s linear infinite;
-			}
-
-			@keyframes spin {
-				from { transform: rotate(0deg); }
-				to { transform: rotate(360deg); }
-			}
-			
-		</style>
 	</head>
 	<body>		
 		<script src="./scripts/utils/utils.js"></script>		
@@ -137,16 +36,56 @@
 		<script src="./scripts/utils/specialPixels.js"></script>
 		<script src="./scripts/main/main.js"></script>
 		<script src="./scripts/main/manage-scripts.js"></script>
+		<div id="menuLateral" class="menu-lateral">
+		<ul>
+			<li><a href="?art=3d-rotation">3D</a></li>
+			<li><a href="?art=3d-rotation-lights">3D w/lights</a></li>
+			<li><a href="?art=blinkenlights">blinkenlights</a></li>
+			<li><a href="?art=blinkenlights-mn">Celullar automata</a></li>
+			<li><a href="?art=blinkenlights-mono">Celullar automata 2</a></li>
+			<li><a href="?art=bokeh">Bokeh</a></li>
+			<li><a href="?art=bouncing-balls">Bouncing balls</a></li>
+			<li><a href="?art=chaos">Chaos</a></li>
+			<li><a href="?art=confetti">Confetti</a></li>
+			<li><a href="?art=conway">Conway</a></li>
+			<li><a href="?art=crt">CRT</a></li>
+			<li><a href="?art=cthulhu">Cthulhu</a></li>
+			<li><a href="?art=distortion">Distortion</a></li>
+			<li><a href="?art=filters">Filters</a></li>
+			<li><a href="?art=fire">Fire/a></li>
+			<li><a href="?art=fractals">Fractals</a></li>
+			<li><a href="?art=gel">Clay</a></li>
+			<li><a href="?art=gravity-balls">Gravity balls</a></li>
+			<li><a href="?art=hopalong">Hopalong</a></li>
+			<li><a href="?art=lyapunov">Lyapunov</a></li>
+			<li><a href="?art=metro">Metro</a></li>
+			<li><a href="?art=motion-matrix">Motion matrix</a></li>
+			<li><a href="?art=noise">Noise</a></li>
+			<li><a href="?art=rotators">Rotators</a></li>
+			<li><a href="?art=rotators-solid">Rotators 2</a></li>
+			<li><a href="?art=screen">Screen</a></li>
+			<li><a href="?art=screen-tones">Screen 2</a></li>
+			<li><a href="?art=screen-video">Video</a></li>
+			<li><a href="?art=shader">Shader</a></li>
+			<li><a href="?art=skyscrapers">Skyscrapers</a></li>
+			<li><a href="?art=streets">Streets</a></li>
+			<li><a href="?art=tree">Tree</a></li>
+			<li><a href="?art=walker">Walker</a></li>
+			<li><a href="?art=webcam">Webcam</a></li>
+		</ul>
+		</div>
 		<div class="overlay" id="overlay">
 			<img src="./assets/Spinner.png" alt="Loading..." class="spinner">
 		</div>
+		<div class="progress-overlay" id="overlayProgress"></div>
 		<div>
 			<canvas id="myCanvas"></canvas>
 			<canvas id="canvasShader"></canvas>
 			<canvas id="auxCanvas"></canvas>
 		</div>	
 		<div id="buttons">
-			<!--<button onclick="loadPreviousScript()" id="previousButton"><</button>-->
+			<!--<button onclick="loadPreviousScript()" id="previousButton"><</button>-->			
+			<button id="btnMenu">☰</button>
 			<button onclick="reload()" id="randomButton">🎲</button>	
 			<button onclick="reloadParams()" id="randomParamsButton">🔄</button>
 			<button onclick="clearCanvas()" id="clearCanvasButton">❌</button>
@@ -159,6 +98,15 @@
 			<!--<button onclick="loadNextScript()" id="nextButton">></button>-->
 		</div>	
 		<script src="./regist_serviceWorker.js"></script>
+		
+		<script>
+			const menu = document.getElementById("menuLateral");
+			const btn = document.getElementById("btnMenu");
+
+			btn.addEventListener("click", () => {
+			menu.classList.toggle("menu-visible");
+			});
+		</script>
 	</body>
 </html>
 
