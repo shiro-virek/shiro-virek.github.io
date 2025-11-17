@@ -52,7 +52,7 @@
 			<li><a href="?art=cthulhu">Cthulhu</a></li>
 			<li><a href="?art=distortion">Distortion</a></li>
 			<li><a href="?art=filters">Filters</a></li>
-			<li><a href="?art=fire">Fire</li>
+			<li><a href="?art=fire">Fire</a></li>
 			<li><a href="?art=fractals">Fractals</a></li>
 			<li><a href="?art=gel">Clay</a></li>
 			<li><a href="?art=gravity-balls">Gravity balls</a></li>
@@ -72,7 +72,7 @@
 			<li><a href="?art=tree">Tree</a></li>
 			<li><a href="?art=walker">Walker</a></li>
 			<li><a href="?art=webcam">Webcam</a></li>
-			<li><a onclick="gotoRepo()">Source code</a></li>
+			<li><a href="#" onclick="gotoRepo()">Source code</a></li>
 		</ul>
 		</div>
 		<div class="overlay" id="overlay">
@@ -104,7 +104,13 @@
 			const btn = document.getElementById("btnMenu");
 
 			btn.addEventListener("click", () => {
-			menu.classList.toggle("menu-visible");
+				menu.classList.toggle("menu-visible");
+			});
+
+			document.addEventListener("click", (e) => {
+				if (!menu.contains(e.target) && !btn.contains(e.target)) {
+					menu.classList.remove("menu-visible");
+				}
 			});
 		</script>
 	</body>
