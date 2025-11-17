@@ -14,6 +14,7 @@
     };    
 
     let init = () => {
+        Browser.setTitle('Tree');  
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();

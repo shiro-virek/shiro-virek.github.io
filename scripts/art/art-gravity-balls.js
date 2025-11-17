@@ -151,6 +151,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Gravity balls');  
         initCanvas();
 
         drawBackground(ctx, canvas, config.opacity);

@@ -203,7 +203,8 @@
     let addEvents = () => {   
     }
 
-    let randomize = () => {            
+    let randomize = () => {     
+        Browser.setTitle('Screen 2');         
 		globals.random = Objects.getRandomObject();
         config.ledDiameter = globals.random.nextInt(5, 20);     
 		let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);   

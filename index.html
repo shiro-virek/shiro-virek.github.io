@@ -72,7 +72,7 @@
 			<li><a href="?art=tree">Tree</a></li>
 			<li><a href="?art=walker">Walker</a></li>
 			<li><a href="?art=webcam">Webcam</a></li>
-			<li><a href="#" onclick="gotoRepo()">Source code</a></li>
+			<li><a href="#" onclick="goToRepo()">Source code</a></li>
 		</ul>
 		</div>
 		<div class="overlay" id="overlay">
@@ -80,6 +80,7 @@
 		</div>
 		<div class="progress-overlay" id="overlayProgress"></div>
 		<div>
+			<div class="art-title outlined-text" id="artTitle">...</div>
 			<canvas id="myCanvas"></canvas>
 			<canvas id="canvasShader"></canvas>
 			<canvas id="auxCanvas"></canvas>
@@ -98,7 +99,7 @@
 			<!--<button onclick="loadNextScript()" id="nextButton">></button>-->
 		</div>	
 		<script src="./regist_serviceWorker.js"></script>
-		
+				
 		<script>
 			const menu = document.getElementById("menuLateral");
 			const btn = document.getElementById("btnMenu");

@@ -94,6 +94,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Distortion');  
         initCanvas();
         
 		globals.random = Objects.getRandomObject();

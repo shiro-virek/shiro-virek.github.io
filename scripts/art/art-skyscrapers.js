@@ -620,6 +620,7 @@
 	}
 
 	let init = () => {
+        Browser.setTitle('Skyscrapers');  
 		initCanvas();
 		globals.city = new City()
 		globals.city.randomize();

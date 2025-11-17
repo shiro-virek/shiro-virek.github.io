@@ -20,4 +20,8 @@ class Browser {
     static resetProgress = () => {
         document.getElementById("overlayProgress").style.width = "0%";
     }
+
+    static setTitle = (title) => {
+        document.getElementById("artTitle").textContent = title;
+    }
 }

@@ -158,6 +158,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Noise');  
 		globals.random = Objects.getRandomObject();
         globals.noise = new Noise(globals.random);
         if (config.randomize) randomize();

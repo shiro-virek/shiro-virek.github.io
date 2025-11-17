@@ -13,6 +13,7 @@
     };    
     
     let init = () => {
+        Browser.setTitle('Webcam');  
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 		initCanvas();

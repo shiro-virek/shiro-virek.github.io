@@ -215,6 +215,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Filters');  
         initCanvas();
         
 		globals.random = Objects.getRandomObject();

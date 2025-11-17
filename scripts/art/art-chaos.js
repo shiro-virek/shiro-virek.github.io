@@ -192,6 +192,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Chaos');  
         initCanvas();
         config.dotsRows = Math.floor(height / (config.dotRadio + config.dotPadding));
         config.dotsColumns = Math.floor(width / (config.dotRadio + config.dotPadding));

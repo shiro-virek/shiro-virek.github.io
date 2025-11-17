@@ -105,6 +105,7 @@
 	}
 
 	let init = () => {
+		Browser.setTitle('Confetti');  
 		initCanvas();
 		if (config.randomize) randomize();
 		addParticles();

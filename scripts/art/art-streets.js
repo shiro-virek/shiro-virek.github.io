@@ -143,6 +143,7 @@
     }
 
     let init = () => {
+        Browser.setTitle('Streets');  
 		globals.random = Objects.getRandomObject();
         globals.city = new City();
         if (config.randomize) randomize();
