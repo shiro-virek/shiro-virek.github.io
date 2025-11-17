@@ -37,7 +37,8 @@ const art = [
                 "walker",
                 "streets",
                 "filters",
-                "screen-video"
+                "screen-video",
+                "clay-2"
             ];
 const scripts = [];
 
