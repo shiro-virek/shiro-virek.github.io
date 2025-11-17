@@ -179,5 +179,14 @@ class Drawing {
         ctx.stroke();
     }
 
-
+    static createFlatColor = (ctx, r, g, b) => {
+        const imgData = ctx.createImageData(width, height);
+        for (let i = 0; i < imgData.data.length; i += 4) {
+            imgData.data[i]     = r;
+            imgData.data[i + 1] = g;
+            imgData.data[i + 2] = b;
+            imgData.data[i + 3] = 255;
+        }
+        return imgData;
+    }
 }
