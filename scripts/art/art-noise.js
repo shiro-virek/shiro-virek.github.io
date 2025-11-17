@@ -154,7 +154,7 @@
     
     function sin(pixel, noiseValue){
         let amplitude = Numbers.scale(noiseValue, -1, 1, 0, pixel.diameter);
-        let color = `hsl(${config.hue}, 100%, ${bright}%)`;
+        let color = `hsl(${config.hue}, 100%, 50%)`;
         Drawing.drawSin(ctx, pixel.x, pixel.y, pixel.diameter, amplitude, 1, color, 2);
     }
 
