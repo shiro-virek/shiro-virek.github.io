@@ -31,7 +31,7 @@ const art = [
                 "noise",
                 "tree",
                 "blinkenlights-mono",
-                "gel",
+                "clay",
                 "hopalong",
                 "lyapunov",
                 "walker",

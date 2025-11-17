@@ -1,3 +1,7 @@
+:root {
+	--main-color: rgba(111, 0, 255, 0.4);
+}
+
 html, body {
 	margin: 0;
 	padding: 0;
@@ -131,7 +135,7 @@ button {
 	left: 0;
 	width: 0%;            
 	height: 100vh;
-	background: rgba(111, 0, 255, 0.4); 
+	background: var(--main-color); 
 	z-index: 9999;         
 	transition: width 0.2s linear; 
 }

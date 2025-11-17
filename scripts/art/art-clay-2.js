@@ -37,8 +37,6 @@
 
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
-
-        globals.img.src = '../assets/Picture1.jpg';  
         globals.img.crossOrigin = "Anonymous";
 
         globals.img.onload = () => {
@@ -69,8 +67,11 @@
 
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
+
+        const color = Color.parseColor(Browser.getCssVariable("--main-color"));
+        globals.baseImageData = Drawing.createFlatColor(ctx, color.r, color.g, color.b);
                 
-        if (!globals.baseImageData) return;
+        if (!globals.baseImageData) return;      
 
         const base = globals.baseImageData.data;
 

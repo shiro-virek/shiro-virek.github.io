@@ -60,4 +60,20 @@ class Color {
     static getLightness = (r, g, b) => {
       return (0.21 * r) + (0.72 * g) + (0.07 * b)
     }
+
+    static parseColor = (str) => {
+        const ctx = document.createElement("canvas").getContext("2d");
+        ctx.fillStyle = str;
+
+        const parsed = ctx.fillStyle;
+
+        const match = parsed.match(/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\)/);
+
+        return {
+            r: +match[1],
+            g: +match[2],
+            b: +match[3],
+            a: match[4] ? +match[4] : 1
+        };
+    }
 }
