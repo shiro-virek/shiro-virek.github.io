@@ -278,8 +278,15 @@
 				ctx.fill();
 			}
 
-			if (this.waterTank){
-
+			if (this.waterTank){				
+				let widthDecrement = this.width * 0.3;
+				let tank = new Building(this.x, this.y - this.height - this.getAngleDecrement(widthDecrement), 1);
+				tank.saturation = 0;
+				tank.hue = 0;
+				tank.light = 50;
+				tank.width = this.width - widthDecrement;
+				tank.height = this.height / 3;
+				tank.drawModule(ctx, false)
 			}
 		}
 
