@@ -125,7 +125,6 @@
     }
 
     let init = () => {
-        Browser.setTitle('Screen');  
         initCanvas();
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
 		globals.random = Objects.getRandomObject(); 

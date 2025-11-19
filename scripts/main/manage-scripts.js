@@ -4,41 +4,41 @@ let recording = false;
 let recorder = null;
 
 const art = [
-                "confetti", 
-                "fire", 
-                "rotators", 
-                "bokeh", 
-                "skyscrapers", 
-                "metro", 
-                "3d-rotation", 
-                "chaos", 
-                "screen", 
-                "conway", 
-                "motion-matrix",
-                "bouncing-balls",
-                "cthulhu",
-                "crt",
-                "screen-tones", 
-                "rotators-solid",
-                "3d-rotation-lights", 
-                "distortion",
-                "blinkenlights",
-                "blinkenlights-mn",
-                "shader",
-                "gravity-balls",
-                "webcam",
-                "fractals", 
-                "noise",
-                "tree",
-                "blinkenlights-mono",
-                "clay",
-                "hopalong",
-                "lyapunov",
-                "walker",
-                "streets",
-                "filters",
-                "screen-video",
-                "clay-2"
+                { "name": "confetti", "display": "Confetti"}, 
+                { "name": "fire", "display": "Fire" }, 
+                { "name": "rotators", "display": "Rotators"}, 
+                { "name": "bokeh", "display": "Bokeh"},
+                { "name": "skyscrapers", "display": "Skyscrapers"},
+                { "name": "metro", "display": "Metro"},
+                { "name": "3d-rotation", "display": "3D"},
+                { "name": "chaos", "display": "Chaos"},
+                { "name": "screen", "display": "Screen"},
+                { "name": "conway", "display": "Conway"},
+                { "name": "motion-matrix","display": "Motion matrix"},
+                { "name": "bouncing-balls","display": "Bouncing balls"},
+                { "name": "cthulhu", "display": "Cthulhu"},
+                { "name": "crt","display": "CRT"},
+                { "name": "screen-tones", "display": "Screen 2"},
+                { "name": "rotators-solid", "display": "Rotators2"},
+                { "name": "3d-rotation-lights", "display": "3D w/lights"},
+                { "name": "distortion","display": "Distortion"},
+                { "name": "blinkenlights","display": "Blinkenlights"},
+                { "name": "blinkenlights-mn", "display": "Cellular automata 2"},
+                { "name": "shader", "display": "Shader"},
+                { "name": "gravity-balls", "display": "Gravity balls"},
+                { "name": "webcam", "display": "Webcam"},
+                { "name": "fractals", "display": "Fractals"},
+                { "name": "noise", "display": "Noise"},
+                { "name": "tree", "display": "Tree"},
+                { "name": "blinkenlights-mono", "display": "Cellular automata"},
+                { "name": "clay", "display": "Clay"},
+                { "name": "hopalong", "display": "Hopalong"},
+                { "name": "lyapunov", "display": "Lyapunov"},
+                { "name": "walker", "display": "Walker"},
+                { "name": "streets", "display": "Streets"},
+                { "name": "filters", "display": "Filters"},
+                { "name": "screen-video", "display": "Video"},
+                { "name": "clay-2", "display": "Clay 2"},
             ];
 const scripts = [];
 
@@ -47,7 +47,7 @@ let reload = () => {
 }
 
 let reloadParams = () => {
-    location.href = `${window.location.origin}?art=${art[currentScript]}`;
+    location.href = `${window.location.origin}?art=${art[currentScript].name}`;
 }
 
 let goToRepo = () => {
@@ -91,7 +91,7 @@ let initRecorder = () => {
 
 let initScripts = () =>{	
     art.forEach(element => {					
-        scripts.push(`scripts/art/art-${element}.js`);
+        scripts.push(`scripts/art/art-${element.name}.js`);
     });											
         
     scriptCount = scripts.length;				
@@ -112,7 +112,12 @@ let removePreviousScript = () =>{
 
 let setScriptIndexByURL = () =>{					
     let artItem = Url.getUrlParam("art");					
-    let artItemIndex = art.indexOf(artItem);
+    let artItemIndex = 0;
+    for (let index = 0; index < art.length; index++) {
+        const item = art[index];
+        if (item.name == artItem) artItemIndex = index;
+    }
+
     if (artItemIndex >= 0){						
         let randomButton = document.getElementById("randomButton");
         currentScript = artItemIndex;
@@ -154,6 +159,7 @@ let loadScript = (getScriptIndexFunction) =>{
     removePreviousScript();
     getScriptIndexFunction;
     setCurrentScript();
+    Browser.setTitle(art[currentScript].display);
 }
 
 let loadNextScript = () =>{
@@ -167,7 +173,7 @@ let loadPreviousScript = () =>{
 let loadRandomScript = () =>{
     loadScript(randomScriptIndex());
 
-    Url.setUrlParam('art', art[currentScript]);
+    Url.setUrlParam('art', art[currentScript].name);
 }
 
 let loadScriptByUrl = () => {				

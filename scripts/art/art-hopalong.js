@@ -59,7 +59,6 @@
     }
 
     let init = () => {
-        Browser.setTitle('Hopalong');  
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();

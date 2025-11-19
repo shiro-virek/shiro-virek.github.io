@@ -181,8 +181,7 @@
         }
     }
 
-    let init = () => {
-        Browser.setTitle('Motion matrix');  
+    let init = () => { 
         initCanvas();
 
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
