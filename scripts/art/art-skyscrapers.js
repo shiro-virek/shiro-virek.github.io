@@ -29,6 +29,7 @@
 		Heliport: Symbol("heliport"),
 		Square: Symbol("square"),
 		WaterTank: Symbol("waterTank"),
+		Pool: Symbol("pool"),
 	});
 
 	class City {
@@ -144,6 +145,9 @@
 					break;
 				case TopTypes.WaterTank:
 					this.waterTank = new WaterTank();	
+					break;		
+				case TopTypes.Pool:
+					this.pool = new Pool();	
 					break;		
 			}
 		}
@@ -287,6 +291,19 @@
 				tank.width = this.width - widthDecrement;
 				tank.height = this.height / 3;
 				tank.drawModule(ctx, false)
+			}
+
+			if (this.pool){
+				ctx.fillStyle = "#03A9F4";
+				let squareHeightFactor = this.heightFactor / 3;
+				let squareWidthFactor = this.widthFactor / 3;
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - squareHeightFactor);
+				ctx.lineTo(this.x - this.widthFactor + squareWidthFactor, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x - squareWidthFactor,  (this.y - this.height - (this.heightFactor * 2 ) + squareHeightFactor * 2));			
+				ctx.lineTo(this.x - squareWidthFactor * 2 + this.widthFactor, this.y - this.height - squareHeightFactor * 2);
+				ctx.lineTo(this.x, this.y - this.height - squareHeightFactor);
+				ctx.fill();
 			}
 		}
 
@@ -643,8 +660,7 @@
 		}
 	}
 	class SquareTop {
-		constructor() {
-	
+		constructor() {	
 		}
 	}
 
@@ -653,6 +669,10 @@
 		}
 	}
 
+	class Pool {
+		constructor() {
+		}
+	}
 	class Heliport {
 		constructor(width, color) {
 			this.width = width;
