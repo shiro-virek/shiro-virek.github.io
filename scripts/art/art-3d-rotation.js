@@ -279,7 +279,6 @@
     }
 
     let init = () => {
-        Browser.setTitle('3D');
         initCanvas();
         world = new ThreeDWorld();
         addEvents();

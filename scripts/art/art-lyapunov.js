@@ -58,7 +58,6 @@
     }
 
     let init = () => {
-        Browser.setTitle('Lyapunov');  
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();

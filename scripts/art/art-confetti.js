@@ -104,8 +104,7 @@
 	let addEvents = () => {
 	}
 
-	let init = () => {
-		Browser.setTitle('Confetti');  
+	let init = () => { 
 		initCanvas();
 		if (config.randomize) randomize();
 		addParticles();

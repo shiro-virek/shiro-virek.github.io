@@ -159,7 +159,6 @@
 	}
 
 	let init = () => {
-        Browser.setTitle('Cthulhu');  
 		initCanvas();
         if (config.randomize) randomize();
 		console.log(config.tentaclesCount);

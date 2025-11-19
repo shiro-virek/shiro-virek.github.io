@@ -127,7 +127,6 @@
     }
 
     let init = () => {
-        Browser.setTitle('CRT');  
         initCanvas(); 
 
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });

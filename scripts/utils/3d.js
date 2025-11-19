@@ -21,7 +21,7 @@ class ThreeD {
     
     static calculateFaceNormal = (vertices, face) => {
         if (face.length < 3) {
-            throw new Error('Se necesitan al menos 3 vértices para definir una cara.');
+            throw new Error('Needs at least 3 vertices');
         }
     
         const v0 = vertices[face[0]];

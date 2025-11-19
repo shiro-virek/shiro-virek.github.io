@@ -307,7 +307,6 @@
     }
 
     let init = () => {    
-        Browser.setTitle('Cellular automata');   
         initCanvas();
         
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });

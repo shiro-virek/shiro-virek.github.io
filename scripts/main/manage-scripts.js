@@ -32,8 +32,8 @@ const art = [
                 { "name": "tree", "display": "Tree"},
                 { "name": "blinkenlights-mono", "display": "Cellular automata"},
                 { "name": "clay", "display": "Clay"},
-                { "name": "hopalong", "display": "Confetti"},
-                { "name": "lyapunov", "display": "Hopalong"},
+                { "name": "hopalong", "display": "Hopalong"},
+                { "name": "lyapunov", "display": "Lyapunov"},
                 { "name": "walker", "display": "Walker"},
                 { "name": "streets", "display": "Streets"},
                 { "name": "filters", "display": "Filters"},
@@ -159,6 +159,7 @@ let loadScript = (getScriptIndexFunction) =>{
     removePreviousScript();
     getScriptIndexFunction;
     setCurrentScript();
+    Browser.setTitle(art[currentScript].display);
 }
 
 let loadNextScript = () =>{

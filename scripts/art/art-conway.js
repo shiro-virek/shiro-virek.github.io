@@ -162,8 +162,7 @@
         };
     }
 
-    let init = () => {
-        Browser.setTitle('Conway');  
+    let init = () => { 
 		initCanvas();
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
         globals.random = Objects.getRandomObject();

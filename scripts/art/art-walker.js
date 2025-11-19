@@ -28,7 +28,6 @@
     };    
 
     let init = () => {
-        Browser.setTitle('Walker');  
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();

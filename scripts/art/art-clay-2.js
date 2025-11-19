@@ -31,7 +31,6 @@
     }
 
     let init = () => {
-        Browser.setTitle('Clay 2');  
         initCanvas();
         addEvents();
 

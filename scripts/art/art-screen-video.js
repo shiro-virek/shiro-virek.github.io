@@ -241,7 +241,6 @@
     };
 
     let init = () => {
-        Browser.setTitle('Video');  
         initCanvas();
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
         if (config.randomize) randomize();

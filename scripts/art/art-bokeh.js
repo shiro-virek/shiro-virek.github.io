@@ -16,7 +16,6 @@
     };
 
 	let init = () => {
-		Browser.setTitle('Bokeh');  
 		initCanvas();		
 
         drawBackground(ctx, canvas);

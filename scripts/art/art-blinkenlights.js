@@ -340,8 +340,7 @@
         }
     }
 
-    let init = () => {  
-        Browser.setTitle('Blinkenlights');       
+    let init = () => {     
 		initCanvas();
         
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });

@@ -214,8 +214,7 @@
                 data[index + 2] * filterValue]
     }
 
-    let init = () => {
-        Browser.setTitle('Filters');  
+    let init = () => {  
         initCanvas();
         
 		globals.random = Objects.getRandomObject();
