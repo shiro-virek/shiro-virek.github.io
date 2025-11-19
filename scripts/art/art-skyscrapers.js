@@ -26,7 +26,9 @@
 	const TopTypes = Object.freeze({
 		None: Symbol("none"),
 		Pinnacle: Symbol("pinnacle"),
-		Heliport: Symbol("heliport")
+		Heliport: Symbol("heliport"),
+		Square: Symbol("square"),
+		WaterTank: Symbol("waterTank"),
 	});
 
 	class City {
@@ -136,7 +138,13 @@
 				case TopTypes.Heliport:
 					let heliportColor = config.HeliportColors[globals.random.nextInt(0, config.HeliportColors.length - 1)];
 					this.heliport = new Heliport(20, heliportColor);
-					break;				
+					break;	
+				case TopTypes.Square:
+					this.squareTop = new SquareTop();
+					break;
+				case TopTypes.WaterTank:
+					this.waterTank = new WaterTank();	
+					break;		
 			}
 		}
 
@@ -255,6 +263,23 @@
 				ctx.textAlign = "center";
 				ctx.textBaseline = "middle";
 				ctx.fillText("H", this.x, this.y - this.height - this.heightFactor);
+			}
+
+			if (this.squareTop){
+				ctx.fillStyle = this.colorDark();
+				let squareHeightFactor = this.heightFactor / 3;
+				let squareWidthFactor = this.widthFactor / 3;
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - squareHeightFactor);
+				ctx.lineTo(this.x - this.widthFactor + squareWidthFactor, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x,  this.y - this.height - (this.heightFactor * 2 ) + squareHeightFactor );				
+				ctx.lineTo(this.x - squareWidthFactor + this.widthFactor , this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x, this.y - this.height - squareHeightFactor);
+				ctx.fill();
+			}
+
+			if (this.waterTank){
+
 			}
 		}
 
@@ -608,6 +633,16 @@
 		constructor(width, height) {
 			this.width = width;
 			this.height = height;
+		}
+	}
+	class SquareTop {
+		constructor() {
+	
+		}
+	}
+
+	class WaterTank {
+		constructor() {
 		}
 	}
 
