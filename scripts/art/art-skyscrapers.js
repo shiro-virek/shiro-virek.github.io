@@ -24,12 +24,12 @@
 	});
 
 	const TopTypes = Object.freeze({
-		None: Symbol("none"),
 		Pinnacle: Symbol("pinnacle"),
 		Heliport: Symbol("heliport"),
 		Square: Symbol("square"),
 		WaterTank: Symbol("waterTank"),
 		Pool: Symbol("pool"),
+		Dome: Symbol("dome"),
 	});
 
 	class City {
@@ -129,7 +129,10 @@
 		}
 
 		randomizeTop = () => {
-			var rand = globals.random.nextInt(0, Object.keys(TopTypes).length - 1);
+			this.widthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
+			this.heightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
+			
+			var rand = 5 //globals.random.nextInt(0, Object.keys(TopTypes).length - 1);
 			this.topType = TopTypes[Object.keys(TopTypes)[rand]];
 
 			switch (this.topType) {
@@ -148,7 +151,10 @@
 					break;		
 				case TopTypes.Pool:
 					this.pool = new Pool();	
-					break;		
+					break;	
+				case TopTypes.Dome:
+					this.dome = new Dome(this.widthFactor, this.heightFactor);	
+					break;			
 			}
 		}
 
@@ -226,7 +232,7 @@
 		drawModule = (ctx, firstModule) => {
 			this.widthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
 			this.heightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
-
+			
 			this.drawLeftFace(ctx);
 			this.drawRightFace(ctx);
 			this.drawTopFace(ctx);
@@ -303,6 +309,24 @@
 				ctx.lineTo(this.x - squareWidthFactor,  (this.y - this.height - (this.heightFactor * 2 ) + squareHeightFactor * 2));			
 				ctx.lineTo(this.x - squareWidthFactor * 2 + this.widthFactor, this.y - this.height - squareHeightFactor * 2);
 				ctx.lineTo(this.x, this.y - this.height - squareHeightFactor);
+				ctx.fill();
+			}
+
+			if (this.dome){
+				ctx.fillStyle = this.colorDark();
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - this.dome.heightFactor);
+				ctx.lineTo(this.x - this.widthFactor + this.dome.widthFactor, this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x,  this.y - this.height - (this.heightFactor * 3 ) + this.dome.heightFactor );	
+				ctx.lineTo(this.x, this.y - this.height - this.dome.heightFactor);
+				ctx.fill();
+
+				ctx.fillStyle = this.colorDarker();
+				ctx.beginPath();
+				ctx.moveTo(this.x, this.y - this.height - this.dome.heightFactor);
+				ctx.lineTo(this.x,  this.y - this.height - (this.heightFactor * 3 ) + this.dome.heightFactor );				
+				ctx.lineTo(this.x - this.dome.widthFactor + this.widthFactor , this.y - this.height - this.heightFactor);
+				ctx.lineTo(this.x, this.y - this.height - this.dome.heightFactor);
 				ctx.fill();
 			}
 		}
@@ -673,6 +697,14 @@
 		constructor() {
 		}
 	}
+
+	class Dome {
+		constructor(buildingWidthFactor, buildingHeightFactor) {
+			this.widthFactor = buildingWidthFactor / 2;
+			this.heightFactor = buildingHeightFactor / 2;
+		}
+	}
+
 	class Heliport {
 		constructor(width, color) {
 			this.width = width;
