@@ -62,20 +62,10 @@
     }
 
     let addSpecialControls = () => {
-        const contenedor = document.getElementById("specialControls");
-
-        const boton = document.createElement("button");
-        boton.textContent = "+";
-        boton.classList.add("animated-button");
-
-        boton.addEventListener("click", () => {
+        let grow = () => {
             alert("¡Botón clickeado!");
-        });
-
-        contenedor.appendChild(boton); 
-        requestAnimationFrame(() => {
-            boton.classList.add("visible");
-        });
+        }
+        Browser.addButton("btnGrow", "+", grow);
     }
     
     window.draw = () => {

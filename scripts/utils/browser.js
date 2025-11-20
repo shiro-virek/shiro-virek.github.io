@@ -30,4 +30,19 @@ class Browser {
         const variable = styles.getPropertyValue(varName).trim()
         return variable;
     }
+    
+    static addButton = (id, caption, action) => {
+        const container = document.getElementById("specialControls");
+
+        const button = document.createElement("button");
+        button.textContent = caption;
+        button.classList.add("animated-button");
+
+        button.addEventListener("click", action);
+
+        container.appendChild(button); 
+        requestAnimationFrame(() => {
+            button.classList.add("visible");
+        });
+    }
 }
