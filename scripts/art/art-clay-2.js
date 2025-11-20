@@ -63,9 +63,14 @@
 
     let addSpecialControls = () => {
         let grow = () => {
-            alert("¡Botón clickeado!");
+            config.radius += 5;
         }
         Browser.addButton("btnGrow", "+", grow);
+
+        let shrink = () => {
+            config.radius -= 5;
+        }
+        Browser.addButton("btnShrink", "-", shrink);
     }
     
     window.draw = () => {
