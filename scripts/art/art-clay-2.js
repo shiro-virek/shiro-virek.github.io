@@ -9,7 +9,6 @@
 
     const config = {
         randomize: true,
-        damping: 0.90,
         light: [-0.6, -0.6, 0.5],
         radius: 30,
         sign: -1,
@@ -56,7 +55,6 @@
     }
 
     let randomize = () => {
-        config.damping = globals.random.nextRange(0.3, 0.99);
         config.radius = globals.random.nextInt(20, 50);
         config.sign = globals.random.nextBool() ? 1 : -1;
     }
