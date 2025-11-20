@@ -317,14 +317,14 @@
 				ctx.beginPath();
 				ctx.moveTo(this.x, this.y - this.height - this.dome.heightFactor);
 				ctx.lineTo(this.x - this.widthFactor + this.dome.widthFactor, this.y - this.height - this.heightFactor);
-				ctx.lineTo(this.x,  this.y - this.height - (this.heightFactor * 3 ) + this.dome.heightFactor );	
+				ctx.lineTo(this.x,  this.y - this.height - (this.heightFactor * this.dome.height ) + this.dome.heightFactor );	
 				ctx.lineTo(this.x, this.y - this.height - this.dome.heightFactor);
 				ctx.fill();
 
 				ctx.fillStyle = this.colorDarker();
 				ctx.beginPath();
 				ctx.moveTo(this.x, this.y - this.height - this.dome.heightFactor);
-				ctx.lineTo(this.x,  this.y - this.height - (this.heightFactor * 3 ) + this.dome.heightFactor );				
+				ctx.lineTo(this.x,  this.y - this.height - (this.heightFactor * this.dome.height ) + this.dome.heightFactor );				
 				ctx.lineTo(this.x - this.dome.widthFactor + this.widthFactor , this.y - this.height - this.heightFactor);
 				ctx.lineTo(this.x, this.y - this.height - this.dome.heightFactor);
 				ctx.fill();
@@ -700,8 +700,10 @@
 
 	class Dome {
 		constructor(buildingWidthFactor, buildingHeightFactor) {
-			this.widthFactor = buildingWidthFactor / 2;
-			this.heightFactor = buildingHeightFactor / 2;
+			let size = globals.random.nextInt(1, 4); 
+			this.height = globals.random.nextInt(2, 5);
+			this.widthFactor = size == 1 ? 0 : buildingWidthFactor / size;
+			this.heightFactor = size == 1 ? 0 : buildingHeightFactor / size;
 		}
 	}
 
