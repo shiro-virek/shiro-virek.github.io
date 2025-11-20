@@ -373,20 +373,36 @@
 
         let baseNeighborhood = new Neighborhood();
         baseNeighborhood.neighborhoodType = NeighborhoodType.Moore;
-        
+
         baseNeighborhood.rules.push(new Rule(
-            false, 
-            Condition.Equal,
-            3,
+            true, 
+            Condition.Lower,
+            2,
             0,
-            true
+            false
         ));
         
+        baseNeighborhood.rules.push(new Rule(
+            true,
+            Condition.Greater,
+            3,
+            0,
+            false
+        ));
+
         baseNeighborhood.rules.push(new Rule(
             true,
             Condition.Between,
             2,
             3,
+            true
+        ));
+
+        baseNeighborhood.rules.push(new Rule(
+            false,
+            Condition.Equal,
+            3,
+            0,
             true
         ));
         
@@ -410,7 +426,7 @@
             globals.random.nextBool()
         ));
         
-        globals.cellScreen.neighborhoods.push(specialNeighborhood);    
+        globals.cellScreen.neighborhoods.push(specialNeighborhood);   
     }
 
     window.draw = () => {
