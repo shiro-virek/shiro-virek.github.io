@@ -49,7 +49,7 @@ class Browser {
     static addMenu = (items) => {
         const container = document.getElementById("menuLateral");
 
-        items.sort((a, b) => a.name.localeCompare(b.name));
+        let menuItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
 
         let addToMenu = (caption, link, action = null) => {
             const ul = document.createElement('ul');
@@ -66,7 +66,7 @@ class Browser {
             container.appendChild(ul);
         }
 
-        items.forEach(element => {
+        menuItems.forEach(element => {
             addToMenu(element.display, `?art=${element.name}`);
         });
 

@@ -339,8 +339,8 @@
     }
 
     let initializePatterns = () => {
-        for (let x = 0; x <= config.cellColumns; x += globals.random.nextInt(2, 5)) {
-            for (let y = 0; y <= config.cellRows; y += globals.random.nextInt(2, 5)) {
+        for (let x = 0; x <= config.cellColumns; x += globals.random.nextInt(2, 3)) {
+            for (let y = 0; y <= config.cellRows; y += globals.random.nextInt(2, 3)) {
                 if (globals.random.nextBool()) {
                     for (let dx = 0; dx < 2; dx++) {
                         for (let dy = 0; dy < 2; dy++) {
@@ -353,7 +353,7 @@
             }
         }
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 20; i++) {
             if (globals.random.nextBool()) {
                 let y = globals.random.nextInt(0, config.cellRows);
                 for (let x = 0; x <= config.cellColumns; x++) {
