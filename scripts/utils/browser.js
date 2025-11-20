@@ -45,4 +45,31 @@ class Browser {
             button.classList.add("visible");
         });
     }
+
+    static addMenu = (items) => {
+        const container = document.getElementById("menuLateral");
+
+        let menuItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
+
+        let addToMenu = (caption, link, action = null) => {
+            const ul = document.createElement('ul');
+            const li = document.createElement('li');
+
+            let a = Object.assign(document.createElement('a'), {
+                textContent: caption,
+                href: link
+            });
+
+            if (action) a.addEventListener('click', action);
+            li.appendChild(a);
+            ul.appendChild(li);
+            container.appendChild(ul);
+        }
+
+        menuItems.forEach(element => {
+            addToMenu(element.display, `?art=${element.name}`);
+        });
+
+        addToMenu("Source code", '#', goToRepo);
+    }
 }
