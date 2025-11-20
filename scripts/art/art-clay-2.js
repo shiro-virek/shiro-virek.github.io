@@ -9,7 +9,6 @@
 
     const config = {
         randomize: true,
-        damping: 0.90,
         light: [-0.6, -0.6, 0.5],
         radius: 30,
         sign: -1,
@@ -50,15 +49,28 @@
         globals.lightLen = Math.hypot(...config.light);
         for (let i = 0; i < 3; i++) config.light[i] /= globals.lightLen;
         window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
     }
 
     let randomize = () => {
-        config.damping = globals.random.nextRange(0.3, 0.99);
         config.radius = globals.random.nextInt(20, 50);
         config.sign = globals.random.nextBool() ? 1 : -1;
+    }
+
+    let addSpecialControls = () => {
+        let grow = () => {
+            config.radius += 5;
+        }
+        Browser.addButton("btnGrow", "+", grow);
+
+        let shrink = () => {
+            config.radius -= 5;
+        }
+        Browser.addButton("btnShrink", "-", shrink);
     }
     
     window.draw = () => {

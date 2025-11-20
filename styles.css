@@ -192,3 +192,45 @@ button {
 	width: 0px;                   
 	background: transparent;
 }
+
+/* Special controls */
+
+#specialControls {
+    position: fixed;         
+    top: 50%;               
+    right: 0;                
+    transform: translateY(-50%);      
+    display: flex;
+    flex-direction: column;   
+    align-items: flex-end;     
+    padding: 10px;
+    z-index: 9999;            
+    pointer-events: auto;     
+}
+
+#specialControls button {
+    margin: 5px 0;
+}
+
+.animated-button {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.animated-button.visible {
+    opacity: 0.5;
+    transform: translateX(0);
+}
+
+@keyframes shakeSoft {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+
+.animated-button:hover {
+    animation: shakeSoft 0.2s ease-in-out;
+}
