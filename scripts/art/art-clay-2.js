@@ -49,6 +49,8 @@
         globals.lightLen = Math.hypot(...config.light);
         for (let i = 0; i < 3; i++) config.light[i] /= globals.lightLen;
         window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -57,6 +59,23 @@
     let randomize = () => {
         config.radius = globals.random.nextInt(20, 50);
         config.sign = globals.random.nextBool() ? 1 : -1;
+    }
+
+    let addSpecialControls = () => {
+        const contenedor = document.getElementById("specialControls");
+
+        const boton = document.createElement("button");
+        boton.textContent = "+";
+        boton.classList.add("animated-button");
+
+        boton.addEventListener("click", () => {
+            alert("¡Botón clickeado!");
+        });
+
+        contenedor.appendChild(boton); 
+        requestAnimationFrame(() => {
+            boton.classList.add("visible");
+        });
     }
     
     window.draw = () => {
