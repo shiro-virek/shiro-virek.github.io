@@ -132,12 +132,12 @@
 			this.widthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
 			this.heightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * this.width;
 			
-			var rand = 5 //globals.random.nextInt(0, Object.keys(TopTypes).length - 1);
+			var rand = globals.random.nextInt(0, Object.keys(TopTypes).length - 1);
 			this.topType = TopTypes[Object.keys(TopTypes)[rand]];
 
 			switch (this.topType) {
 				case TopTypes.Pinnacle:
-					this.pinnacle = new Pinnacle(globals.random.nextInt(2, this.width / 2), globals.random.nextInt(5, this.width * 2));
+					this.pinnacle = new Pinnacle(globals.random.nextInt(2, this.width / 3), globals.random.nextInt(this.width, this.width * 2));
 					break;
 				case TopTypes.Heliport:
 					let heliportColor = config.HeliportColors[globals.random.nextInt(0, config.HeliportColors.length - 1)];
@@ -295,7 +295,7 @@
 				tank.hue = 0;
 				tank.light = 50;
 				tank.width = this.width - widthDecrement;
-				tank.height = this.height / 3;
+				tank.height = tank.width / 3;
 				tank.drawModule(ctx, false)
 			}
 
