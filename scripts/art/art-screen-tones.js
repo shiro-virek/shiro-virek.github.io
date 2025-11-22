@@ -66,6 +66,7 @@
                 this.leds[col][row].r += config.valueIncrement;
                 this.leds[col][row].g += config.valueIncrement;
                 this.leds[col][row].b += config.valueIncrement;
+                this.leds[col][row].lightness += config.valueIncrement;
             } 
         }
 
@@ -98,39 +99,39 @@
         }
 
         draw = (ctx) => {
-            let color = null;
+            let colour =  "";
             let size = null;
             let value = 0;
             switch(config.shape){                
                 case Figures.CircleSize:
                     size = Numbers.scale(this.lightness, 0, 100, 0, config.ledDiameter + config.ledMargin);
-                    color = `hsl(${config.hue}, 100%, 50%)`;
-                    Drawing.drawCircle(ctx, this.x, this.y, size, color)
+                    colour = `hsl(${config.hue}, 100%, 50%)`;
+                    Drawing.drawCircle(ctx, this.x, this.y, size, colour)
                     break;
                 case Figures.SquareSize:        
                     size = Numbers.scale(this.lightness, 0, 100, 0, config.ledDiameter + config.ledMargin);
-                    color = `hsl(${config.hue}, 100%, 50%)`;            
-                    Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
+                    colour = `hsl(${config.hue}, 100%, 50%)`;            
+                    Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, colour);
                     break;
                 case Figures.HexagonSize:
                     size = Numbers.scale(this.lightness, 0, 100, 0, config.ledDiameter + config.ledMargin);
-                    color = `hsl(${config.hue}, 100%, 50%)`;
-                    Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
+                    colour = `hsl(${config.hue}, 100%, 50%)`;
+                    Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, colour);
                     break;
                 case Figures.CircleLightness:
-                    color = `hsl(${config.hue}, 100%, ${this.lightness}%)`
+                    colour = `hsl(${config.hue}, 100%, ${this.lightness}%)`
                     size = this.radius;
-                    Drawing.drawCircle(ctx, this.x, this.y, size, color)
+                    Drawing.drawCircle(ctx, this.x, this.y, size, colour);
                     break;
                 case Figures.SquareLightness:     
-                    color = `hsl(${config.hue}, 100%, ${this.lightness}%)`
+                    colour = `hsl(${config.hue}, 100%, ${this.lightness}%)`
                     size = this.radius;               
-                    Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, color);
+                    Drawing.drawRectangle(ctx, this.x - size, this.y - size, size * 2, size * 2, colour);
                     break;
                 case Figures.HexagonLightness:
-                    color = `hsl(${config.hue}, 100%, ${this.lightness}%)`
+                    colour = `hsl(${config.hue}, 100%, ${this.lightness}%)`;
                     size = this.radius;
-                    Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, size, 6, 0, colour);
                     break;
                 case Figures.Emoji:
                     SpecialPixels.drawEmoji(ctx, this.x, this.y, 100 - this.lightness);
@@ -183,7 +184,7 @@
                     globals.ledScreen.leds[x][y].r = globals.imgData[index];
                     globals.ledScreen.leds[x][y].g = globals.imgData[index + 1];
                     globals.ledScreen.leds[x][y].b = globals.imgData[index + 2];
-                    globals.ledScreen.leds[x][y].lightness =  Numbers.scale(Color.getLightness(globals.imgData[index], globals.imgData[index+1], globals.imgData[index+2]), 0, 250, 0, 100);
+                    globals.ledScreen.leds[x][y].lightness = Numbers.scale(Color.getLightness(globals.imgData[index], globals.imgData[index+1], globals.imgData[index+2]), 0, 250, 0, 100);
                 }
             }
         };
