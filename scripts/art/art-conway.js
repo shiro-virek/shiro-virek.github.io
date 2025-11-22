@@ -17,6 +17,8 @@
         cellPadding: 30,
         cellDiameter: 20,
         hue: 150,
+        speed: 200,
+        pause: false,
     };
     
     const Figures = Object.freeze({
@@ -48,6 +50,18 @@
                     this.cells[x][y].on =  globals.random.nextBool();
                 }
             }  
+        }
+
+        setCellTouch = (x, y) => {
+            this.setCell(x, y);
+            this.setCell(x-1, y+1);
+            this.setCell(x-1, y-1);
+            this.setCell(x+1, y-1);
+            this.setCell(x+1, y+1);
+            this.setCell(x, y+1);
+            this.setCell(x-1, y);
+            this.setCell(x, y-1);
+            this.setCell(x+1, y);
         }
 
         setCell = (x, y) => {            
@@ -178,29 +192,53 @@
 
         addEvents();
         window.requestAnimationFrame(loop)
+
+        addSpecialControls();
     }
 
-    let addEvents = () => {        
-		canvas.addEventListener('click', e => {
-			globals.cellScreen.setCell(e.offsetX, e.offsetY);
-		}, false);
+    let addEvents = () => {    
     }
 
     let randomize = () => {        
         config.hue = globals.random.nextInt(0, 360); 
     }
 
+    let addSpecialControls = () => {
+        let pause = () => {
+            config.pause = true;
+        }
+        Browser.addButton("btnPause", "⏸️", pause);
+
+        let start = () => {
+            config.pause = false;
+        }
+        Browser.addButton("btnStart", "▶️", start);
+
+        let fast = () => {
+            if (config.speed >= 50) config.speed -= 50;
+        }
+        Browser.addButton("btnFast", "🐇", fast);
+
+        let slow = () => {
+            config.speed += 50;
+        }
+        Browser.addButton("btnSlow", "🐢", slow);
+    }
+
     window.draw = () => {
-        globals.cellScreen.update();
+        if (!config.pause) 
+            globals.cellScreen.update();
         
         drawBackground(ctx, canvas);
         globals.cellScreen.draw(ctx);
         globals.cellScreen.copyBuffer();
 
-        Browser.sleep(200);
+        if (!config.pause) 
+            Browser.sleep(config.speed);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
+		if (clicking) globals.cellScreen.setCellTouch(xMouse, yMouse);
     }
     
 	window.clearCanvas = () => {         

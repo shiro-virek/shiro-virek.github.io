@@ -18,7 +18,7 @@
         cellDiameter: 20,
         extendedSize: 2,
         circleRadius: 2,
-        speed: 100,
+        speed: 200,
         pause: false,
     };
         
@@ -464,6 +464,7 @@
     window.draw = () => {
         if (!config.pause) 
             globals.cellScreen.update();
+        
         drawBackground(ctx, canvas);
         globals.cellScreen.draw(ctx);
         globals.cellScreen.copyBuffer();
