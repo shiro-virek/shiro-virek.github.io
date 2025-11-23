@@ -66,6 +66,8 @@
         config.offsetX = -width * config.scale / 2;
         config.offsetY = -height * config.scale / 2;
         window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -123,6 +125,13 @@
         }
 
         ctx.putImageData(imageData, 0, 0);
+    }
+
+    let addSpecialControls = () => {
+        let info = () => {            
+            window.open('https://en.wikibooks.org/wiki/Fractals/Hopalong', '_blank');
+        }
+        Browser.addButton("btnInfo", "ℹ️", info);
     }
 
     window.draw = () => {

@@ -65,6 +65,8 @@
         config.offsetX = -width * config.scale / 2;
         config.offsetY = -height * config.scale / 2;
         window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -143,6 +145,13 @@
         }
 
         ctx.putImageData(imgData, 0, 0);
+    }
+
+    let addSpecialControls = () => {
+        let info = () => {            
+            window.open('https://en.wikipedia.org/wiki/Lyapunov_fractal', '_blank');
+        }
+        Browser.addButton("btnInfo", "ℹ️", info);
     }
 
     window.draw = () => {

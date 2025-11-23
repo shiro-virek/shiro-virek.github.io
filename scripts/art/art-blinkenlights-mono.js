@@ -7,6 +7,7 @@
         ctxImg: null,
         img: new Image(),
         imgData: null,
+        color: null,
     };
 
     const config = {
@@ -17,6 +18,8 @@
         cellDiameter: 20,
         extendedSize: 2,
         circleRadius: 2,
+        speed: 200,
+        pause: false,
     };
         
     const Condition = Object.freeze({
@@ -253,8 +256,8 @@
             if (x < 0 || y < 0 || x >= config.cellColumns || y >= config.cellRows){
                 let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
                 let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
-                this.cells[col][row].alive = !this.cells[col][row].alive;
-                this.cellsBuffer[col][row].alive = !this.cellsBuffer[col][row].alive;
+                this.cells[col][row].alive = true; 
+                this.cellsBuffer[col][row].alive = true; 
             }      
         }
     }
@@ -271,7 +274,10 @@
         }
 
         getColor = () => {
-            return `hsl(${0}, ${100}%, ${this.alive ? 100 : 0}%)`;
+            if (this.alive)
+                return `rgb(${globals.color.r}, ${globals.color.g}, ${globals.color.b}, 1)`
+            else
+                return `rgb(${globals.color.r}, ${globals.color.g}, ${globals.color.b}, 0.5)`
         }
 
         draw = (ctx) => {
@@ -306,7 +312,9 @@
         };
     }
 
-    let init = () => {    
+    let init = () => {          
+        globals.color = Color.parseColor(Browser.getCssVariable("--main-color"))
+
         initCanvas();
         
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
@@ -316,6 +324,8 @@
         addEvents();
 
         window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {  
@@ -429,18 +439,43 @@
         globals.cellScreen.neighborhoods.push(specialNeighborhood);   
     }
 
+    let addSpecialControls = () => {
+        let pause = () => {
+            config.pause = true;
+        }
+        Browser.addButton("btnPause", "⏸️", pause);
+
+        let start = () => {
+            config.pause = false;
+        }
+        Browser.addButton("btnStart", "▶️", start);
+
+        let fast = () => {
+            if (config.speed >= 50) config.speed -= 50;
+        }
+        Browser.addButton("btnFast", "🐇", fast);
+
+        let slow = () => {
+            config.speed += 50;
+        }
+        Browser.addButton("btnSlow", "🐢", slow);
+    }
+
     window.draw = () => {
-        globals.cellScreen.update();
+        if (!config.pause) 
+            globals.cellScreen.update();
+        
         drawBackground(ctx, canvas);
         globals.cellScreen.draw(ctx);
         globals.cellScreen.copyBuffer();
-
+        
         config.mutationCounter++;
         if (config.mutationCounter % 50 === 0) {
             setBalancedRules();
         }
 
-        Browser.sleep(50);
+        if (!config.pause) 
+            Browser.sleep(config.speed);
     }
 
     window.trackMouse = (xMouse, yMouse) => {

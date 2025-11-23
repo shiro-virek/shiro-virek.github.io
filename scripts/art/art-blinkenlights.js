@@ -17,6 +17,8 @@
         cellDiameter: 20,
         extendedSize: 2,
         circleRadius: 2,
+        speed: 0,
+        pause: false,
     };
     
 	const Attribute = Object.freeze({
@@ -310,12 +312,12 @@
             if (x < 0 || y < 0 || x >= config.cellColumns || y >= config.cellRows){
                 let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
                 let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
-                this.cells[col][row].hue += 10;
-                this.cellsBuffer[col][row].hue += 10;                
-                this.cells[col][row].saturation += 1;
-                this.cellsBuffer[col][row].saturation += 1;           
-                this.cells[col][row].lightness += 1;
-                this.cellsBuffer[col][row].lightness += 1;
+                this.cells[col][row].hue = 0;
+                this.cellsBuffer[col][row].hue = 0;                
+                this.cells[col][row].saturation = 0;
+                this.cellsBuffer[col][row].saturation = 0;                
+                this.cells[col][row].lightness = 0;
+                this.cellsBuffer[col][row].lightness = 0;       
             }      
         }
     }
@@ -350,6 +352,8 @@
         addEvents();
 
         window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {  
@@ -468,8 +472,31 @@
         };
     }
 
+    let addSpecialControls = () => {
+        let pause = () => {
+            config.pause = true;
+        }
+        Browser.addButton("btnPause", "⏸️", pause);
+
+        let start = () => {
+            config.pause = false;
+        }
+        Browser.addButton("btnStart", "▶️", start);
+
+        let fast = () => {
+            if (config.speed >= 50) config.speed -= 50;
+        }
+        Browser.addButton("btnFast", "🐇", fast);
+
+        let slow = () => {
+            config.speed += 50;
+        }
+        Browser.addButton("btnSlow", "🐢", slow);
+    }
+
     window.draw = () => {
-        globals.cellScreen.update();
+        if (!config.pause) 
+            globals.cellScreen.update();
 
         drawBackground(ctx, canvas);
         globals.cellScreen.draw(ctx);
@@ -480,6 +507,8 @@
             setRandomRules();
         }
 
+        if (!config.pause) 
+            Browser.sleep(config.speed);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
