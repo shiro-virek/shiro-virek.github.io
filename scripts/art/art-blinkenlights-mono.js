@@ -482,8 +482,8 @@
         if (clicking) globals.cellScreen.setCellTouch(xMouse, yMouse);
     }
     
-    window.clearCanvas = () => {          
-		Sound.error();
+    window.clearCanvas = () => {
+        globals.cellScreen.generateCells(); 
     }
 
 	window.magic = () => {  

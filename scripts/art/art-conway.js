@@ -33,7 +33,7 @@
 			this.shape = Figures[Object.keys(Figures)[rand]];     
         }
 
-        generateCells = () => {
+        generateCells = (clear = false) => {
             this.cells = [];
             this.cellsBuffer = [];
             for (let x = 0; x < config.cellColumns; x++) {
@@ -47,7 +47,7 @@
                     this.cells[x][y] = cell;
                     let cellBuffer = new Cell(x, y);
                     this.cellsBuffer[x][y] = cellBuffer;
-                    this.cells[x][y].on =  globals.random.nextBool();
+                    this.cells[x][y].on =  clear ? false : globals.random.nextBool();
                 }
             }  
         }
@@ -282,7 +282,7 @@
     }
     
 	window.clearCanvas = () => {         
-        globals.cellScreen.generateCells();  
+        globals.cellScreen.generateCells(true);  
 	}
     
 	window.magic = () => {  
