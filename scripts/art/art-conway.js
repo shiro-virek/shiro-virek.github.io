@@ -64,11 +64,16 @@
             this.setCell(x+1, y);
         }
 
-        setCell = (x, y) => {            
+        setCell = (x, y, value = true) => {            
             let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
             let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
-            this.cells[col][row].on = true;
-            this.cellsBuffer[col][row].on = true;
+            this.cells[col][row].on = value;
+            this.cellsBuffer[col][row].on = value;
+        }
+
+        setCellGrid = (col, row, value = true) => {            
+            this.cells[col][row].on = value;
+            this.cellsBuffer[col][row].on = value;
         }
 
         draw = (ctx) => {
@@ -223,6 +228,41 @@
             config.speed += 50;
         }
         Browser.addButton("btnSlow", "🐢", slow);
+
+        let glider = () => {
+            let x = 0;
+            let y = 0;
+            globals.cellScreen.setCellGrid(x, y, false);
+            globals.cellScreen.setCellGrid(x+1, y, false);
+            globals.cellScreen.setCellGrid(x+2, y, false);
+            globals.cellScreen.setCellGrid(x+3, y, false);
+            globals.cellScreen.setCellGrid(x+4, y, false);
+
+            globals.cellScreen.setCellGrid(x, y+1, false);
+            globals.cellScreen.setCellGrid(x+1, y+1, false);
+            globals.cellScreen.setCellGrid(x+2, y+1, true);
+            globals.cellScreen.setCellGrid(x+3, y+1, false);
+            globals.cellScreen.setCellGrid(x+4, y+1, false);
+            
+            globals.cellScreen.setCellGrid(x, y+2, false);
+            globals.cellScreen.setCellGrid(x+1, y+2, false);
+            globals.cellScreen.setCellGrid(x+2, y+2, false);
+            globals.cellScreen.setCellGrid(x+3, y+2, true);
+            globals.cellScreen.setCellGrid(x+4, y+2, false);
+            
+            globals.cellScreen.setCellGrid(x, y+3, false);
+            globals.cellScreen.setCellGrid(x+1, y+3, true);
+            globals.cellScreen.setCellGrid(x+2, y+3, true);
+            globals.cellScreen.setCellGrid(x+3, y+3, true);
+            globals.cellScreen.setCellGrid(x+4, y+3, false);
+            
+            globals.cellScreen.setCellGrid(x, y+4, false);
+            globals.cellScreen.setCellGrid(x+1, y+4, false);
+            globals.cellScreen.setCellGrid(x+2, y+4, false);
+            globals.cellScreen.setCellGrid(x+3, y+4, false);
+            globals.cellScreen.setCellGrid(x+4, y+4, false);
+        }
+        Browser.addButton("btnGlider", "👾", glider);
     }
 
     window.draw = () => {
