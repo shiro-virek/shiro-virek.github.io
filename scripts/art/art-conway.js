@@ -33,7 +33,7 @@
 			this.shape = Figures[Object.keys(Figures)[rand]];     
         }
 
-        generateCells = () => {
+        generateCells = (clear = false) => {
             this.cells = [];
             this.cellsBuffer = [];
             for (let x = 0; x < config.cellColumns; x++) {
@@ -47,7 +47,7 @@
                     this.cells[x][y] = cell;
                     let cellBuffer = new Cell(x, y);
                     this.cellsBuffer[x][y] = cellBuffer;
-                    this.cells[x][y].on =  globals.random.nextBool();
+                    this.cells[x][y].on =  clear ? false : globals.random.nextBool();
                 }
             }  
         }
@@ -64,11 +64,25 @@
             this.setCell(x+1, y);
         }
 
-        setCell = (x, y) => {            
+        setCell = (x, y, value = true) => {            
             let col = Math.round((x - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
             let row = Math.round((y - config.cellMargin) / ((config.cellDiameter) + config.cellPadding));
-            this.cells[col][row].on = true;
-            this.cellsBuffer[col][row].on = true;
+            this.cells[col][row].on = value;
+            this.cellsBuffer[col][row].on = value;
+        }
+
+        setCellGrid = (col, row, value = true) => {            
+            this.cells[col][row].on = value;
+            this.cellsBuffer[col][row].on = value;
+        }
+
+        setCellInput = (inputMatrix, x = 0, y = 0) => {
+            for (let rowIndex = 0; rowIndex < inputMatrix.length; rowIndex++) {
+                for (let colIndex = 0; colIndex < inputMatrix[rowIndex].length; colIndex++) {           
+                    this.cells[x + colIndex][y + rowIndex].on = inputMatrix[rowIndex][colIndex];
+                    this.cellsBuffer[x + colIndex][y + rowIndex].on = inputMatrix[rowIndex][colIndex];                    
+                }
+            }
         }
 
         draw = (ctx) => {
@@ -223,6 +237,19 @@
             config.speed += 50;
         }
         Browser.addButton("btnSlow", "🐢", slow);
+
+        let glider = () => {
+            const matrix = [
+            [0, 0, 0, 0, 0],            
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 0, 0, 0],
+            ];
+
+            globals.cellScreen.setCellInput(matrix);
+        }
+        Browser.addButton("btnGlider", "👾", glider);
     }
 
     window.draw = () => {
@@ -242,7 +269,7 @@
     }
     
 	window.clearCanvas = () => {         
-        globals.cellScreen.generateCells();  
+        globals.cellScreen.generateCells(true);  
 	}
     
 	window.magic = () => {  

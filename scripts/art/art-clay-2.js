@@ -126,8 +126,8 @@
         }
     }
 
-    window.clearCanvas = () => {
-		Sound.error();
+    window.clearCanvas = () => {		
+        globals.heightMap = new Float32Array(width * height);
     }
 
 	window.magic = () => {  

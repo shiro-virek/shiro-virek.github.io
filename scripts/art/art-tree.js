@@ -62,7 +62,7 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {  
-            config.amplitude = Numbers.scale(x, 0, width, 0, 50);
+            config.amplitude = Numbers.scale(x, 0, width, 0, 180);
             config.length = Numbers.scale(y, 0, height, 0, 10);
         }
     }
