@@ -49,7 +49,7 @@ class Browser {
     static addMenu = (items) => {
         const container = document.getElementById("menuLateral");
 
-        let menuItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
+        let menuItems = [...items].sort((a, b) => a.display.localeCompare(b.display));
 
         let addToMenu = (caption, link, action = null) => {
             const ul = document.createElement('ul');
