@@ -147,26 +147,17 @@
             }
         }
 
-addFigure(x, y) {
+        addFigure(x, y) {
             let figure = new Figure();
 
             figure.vertices = Objects.clone(config.figureInfo.vertices);
             figure.edges = Objects.clone(config.figureInfo.edges);
 
-            // --- CORRECCIÓN DE POSICIÓN ---
-            
-            // 1. COMPENSAR EL ZOOM (Des-escalar)
-            // Calculamos cuánto se redujo la imagen para volver a ampliar las coordenadas
             const scaleFactor = config.FOV / this.cameraZ;
             let worldX = x / scaleFactor;
             let worldY = y / scaleFactor;
-            let worldZ = 0; // Asumimos que creamos la figura en la profundidad 0
-
-            // 2. COMPENSAR LA ROTACIÓN DE CÁMARA (Des-rotar)
-            // Si la cámara está rotada, debemos rotar el punto de aparición en sentido contrario
-            // para que coincida con lo que ves en pantalla.
+            let worldZ = 0; 
             
-            // Inversa de Rotación Z (Yaw)
             if (this.cameraRotationZ !== 0) {
                 let angleZ = ThreeDWorld.sexagesimalToRadian(this.cameraRotationZ); 
                 let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
@@ -175,17 +166,13 @@ addFigure(x, y) {
                 worldY = newY;
             }
 
-            // Inversa de Rotación X (Pitch)
             if (this.cameraRotationX !== 0) {
                 let angleX = ThreeDWorld.sexagesimalToRadian(this.cameraRotationX);
-                // Al rotar en X, la Y de pantalla afecta a la Y y Z del mundo
                 let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
                 let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
                 worldY = newY;
-                // worldZ = newZ; // No necesitamos mover la figura en Z, solo colocarla en X,Y correctos
             }
 
-            // Aplicamos las coordenadas corregidas
             figure.translateX(worldX);
             figure.translateY(worldY);
 
