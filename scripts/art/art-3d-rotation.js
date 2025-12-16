@@ -69,7 +69,7 @@
     ];
 
     const config = {
-        FOV: 10000,
+        FOV: 800,
         drawEdges: globals.random.nextBool(),
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
     };    
@@ -79,6 +79,7 @@
             this.figures = [];
             this.cameraRotationX = 0; 
             this.cameraRotationZ = 0;
+            this.cameraZ = 1000;
         }
 
         draw = () => {
@@ -89,19 +90,27 @@
         }
 
          worldToScreen = (point) => {
-            // 1. Aplicar la rotación de la cámara (rotación inversa al mundo)
+            // 1. Aplicar rotación
             const rotatedPoint = this.applyCameraRotation(point); 
             
             const x = rotatedPoint[0];
             const y = rotatedPoint[1];
             const z = rotatedPoint[2];
 
-            // 2. Proyectar (usando la coordenada Z ya rotada)
-            const scaleFactor = config.FOV / (config.FOV + z);
+            // 2. Proyectar
+            // La magia está aquí: (Lente) / (Profundidad del punto + Distancia de la Cámara)
+            // Si this.cameraZ disminuye, el denominador baja y el objeto se ve más grande.
+            
+            // Evitamos división por cero o invertir la imagen si la cámara cruza el objeto
+            let depth = z + this.cameraZ;
+            if (depth < 1) depth = 1; // "Clipping" muy básico para no romper la pantalla
+
+            const scaleFactor = config.FOV / depth;
+            
             const projectedX = x * scaleFactor;
             const projectedY = y * scaleFactor;
             
-            return [projectedX, projectedY];
+            return [projectedX, projectedY];    
         }
 
         worldToScreenOblique = (point, angleX, angleY) => {
@@ -130,11 +139,6 @@
 
         static sexagesimalToRadian = (degrees) => {
             return degrees * (Math.PI / 180);
-        }
-
-        addDistance = (distance) => {
-            if (config.FOV + distance > 0)
-                config.FOV += distance;
         }
 
         drawFigures = () => {
@@ -319,12 +323,14 @@
 
     let addSpecialControls = () => {
         let grow = () => {
-            config.FOV += 10000;
+            world.cameraZ -= 10;
+            if (world.cameraZ < 100) world.cameraZ = 100;
         }
         Browser.addButton("btnGrow", "+", grow);
 
         let shrink = () => {
-            config.FOV -= 10000;
+            world.cameraZ += 10;
+            if (world.cameraZ < 100) world.cameraZ = 100;
         }
         Browser.addButton("btnShrink", "-", shrink);
     }
@@ -348,17 +354,6 @@
             if (!mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
-
-        canvas.addEventListener('wheel', function(e) {
-            // e.deltaY es negativo si la rueda va hacia arriba (acercar), positivo hacia abajo (alejar)
-            const zoomAmount = e.deltaY * 5; // Ajusta el factor para una sensibilidad cómoda
-            
-            // Si la rueda va hacia abajo (e.deltaY > 0), el zoomAmount es positivo, lo que *aumenta* el FOV, alejando
-            // Si la rueda va hacia arriba (e.deltaY < 0), el zoomAmount es negativo, lo que *disminuye* el FOV, acercando
-            world.addDistance(zoomAmount); 
-            
-            e.preventDefault(); // Evita el scroll de la página
-        });
 
         canvas.addEventListener('mousedown', function (e) {
             // Verificar si una tecla de modificador (ej: Shift) está presionada para rotar la cámara
