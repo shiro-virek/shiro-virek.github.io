@@ -101,8 +101,8 @@
 
             const scaleFactor = config.FOV / depth;
             
-            const projectedX = x * scaleFactor;
-            const projectedY = y * scaleFactor;
+            const projectedX = (x * scaleFactor) + halfWidth;
+            const projectedY = (y * scaleFactor) + halfHeight;
             
             return [projectedX, projectedY];    
         }
@@ -148,14 +148,17 @@
         }
 
         addFigure(x, y) {
+            let centeredX = x - halfWidth;
+            let centeredY = y - halfHeight;
+
             let figure = new Figure();
 
             figure.vertices = Objects.clone(config.figureInfo.vertices);
             figure.edges = Objects.clone(config.figureInfo.edges);
 
             const scaleFactor = config.FOV / this.cameraZ;
-            let worldX = x / scaleFactor;
-            let worldY = y / scaleFactor;
+            let worldX = centeredX / scaleFactor;
+            let worldY = centeredY / scaleFactor;
             let worldZ = 0; 
             
             if (this.cameraRotationZ !== 0) {
@@ -387,12 +390,8 @@
             
         } else if (clicking) {    
             world.figures.forEach(figure => {
-                figure.translateX(-halfWidth);
-                figure.translateY(-halfHeight);
                 figure.rotateX(movY);
                 figure.rotateY(movX);
-                figure.translateX(halfWidth);
-                figure.translateY(halfHeight);
             });
         }
     }
