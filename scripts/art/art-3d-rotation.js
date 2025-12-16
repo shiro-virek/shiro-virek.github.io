@@ -3,6 +3,8 @@
         random: Objects.getRandomObject()
     };
 
+    let isCameraDragging = false;
+
     const figureTypes = [
         {
             name: "letterV",
@@ -67,7 +69,7 @@
     ];
 
     const config = {
-        FOV: 10000,
+        FOV: 800,
         drawEdges: globals.random.nextBool(),
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
     };    
@@ -75,6 +77,9 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
+            this.cameraRotationX = 0; 
+            this.cameraRotationZ = 0;
+            this.cameraZ = 1000;
         }
 
         draw = () => {
@@ -85,10 +90,21 @@
         }
 
         worldToScreen = (point) => {
-            const scaleFactor = config.FOV / (config.FOV + point[2]);
-            const projectedX = point[0] * scaleFactor;
-            const projectedY = point[1] * scaleFactor;
-            return [projectedX, projectedY];
+            const rotatedPoint = this.applyCameraRotation(point); 
+            
+            const x = rotatedPoint[0];
+            const y = rotatedPoint[1];
+            const z = rotatedPoint[2];
+
+            let depth = z + this.cameraZ;
+            if (depth < 1) depth = 1; 
+
+            const scaleFactor = config.FOV / depth;
+            
+            const projectedX = (x * scaleFactor) + halfWidth;
+            const projectedY = (y * scaleFactor) + halfHeight;
+            
+            return [projectedX, projectedY];    
         }
 
         worldToScreenOblique = (point, angleX, angleY) => {
@@ -119,11 +135,6 @@
             return degrees * (Math.PI / 180);
         }
 
-        addDistance = (distance) => {
-            if (config.FOV + distance > 0)
-                config.FOV += distance;
-        }
-
         drawFigures = () => {
             for (let i = this.figures.length - 1; i >= 0; i--) {
                 this.figures[i].drawFigure(ctx);
@@ -137,16 +148,59 @@
         }
 
         addFigure(x, y) {
+            let centeredX = x - halfWidth;
+            let centeredY = y - halfHeight;
+
             let figure = new Figure();
 
             figure.vertices = Objects.clone(config.figureInfo.vertices);
             figure.edges = Objects.clone(config.figureInfo.edges);
 
-            figure.translateX(x);
-            figure.translateY(y);
+            const scaleFactor = config.FOV / this.cameraZ;
+            let worldX = centeredX / scaleFactor;
+            let worldY = centeredY / scaleFactor;
+            let worldZ = 0; 
+            
+            if (this.cameraRotationZ !== 0) {
+                let angleZ = ThreeDWorld.sexagesimalToRadian(this.cameraRotationZ); 
+                let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
+                let newY = worldX * Math.sin(angleZ) + worldY * Math.cos(angleZ);
+                worldX = newX;
+                worldY = newY;
+            }
+
+            if (this.cameraRotationX !== 0) {
+                let angleX = ThreeDWorld.sexagesimalToRadian(this.cameraRotationX);
+                let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
+                let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
+                worldY = newY;
+            }
+
+            figure.translateX(worldX);
+            figure.translateY(worldY);
 
             this.figures.push(figure);
-			Sound.ping();
+            Sound.ping();
+        }
+
+        applyCameraRotation = (point) => {
+            let x = point[0];
+            let y = point[1];
+            let z = point[2];
+                        
+            let angleX = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationX); 
+            let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
+            let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
+            y = newY;
+            z = newZ;
+
+            let angleZ = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationZ);
+            let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
+            newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
+            x = newX;
+            y = newY;
+            
+            return [x, y, z];
         }
     }
     class Figure {
@@ -278,11 +332,27 @@
         }
     }
 
+    let addSpecialControls = () => {
+        let grow = () => {
+            world.cameraZ -= 10;
+            if (world.cameraZ < 100) world.cameraZ = 100;
+        }
+        Browser.addButton("btnGrow", "+", grow);
+
+        let shrink = () => {
+            world.cameraZ += 10;
+            if (world.cameraZ < 100) world.cameraZ = 100;
+        }
+        Browser.addButton("btnShrink", "-", shrink);
+    }
+
     let init = () => {
         initCanvas();
         world = new ThreeDWorld();
         addEvents();
         window.requestAnimationFrame(loop)
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -295,17 +365,33 @@
             if (!mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
+
+        canvas.addEventListener('mousedown', function (e) {
+            if (e.shiftKey) {
+                isCameraDragging = true;
+            } else {
+                isCameraDragging = false;
+            }
+        });
+
+        canvas.addEventListener('mouseup', function (e) {
+            isCameraDragging = false;
+        });
     }
 
-    window.trackMouse = (x, y) => {
-        if (clicking) {    
+    window.trackMouse = (x, y) => {        
+        if (isCameraDragging) {    
+            world.cameraRotationZ += movX * 0.1; 
+            world.cameraRotationX += movY * 0.1; 
+
+            const maxPitch = 89;
+            if (world.cameraRotationX > maxPitch) world.cameraRotationX = maxPitch;
+            if (world.cameraRotationX < -maxPitch) world.cameraRotationX = -maxPitch;
+            
+        } else if (clicking) {    
             world.figures.forEach(figure => {
-                figure.translateX(-halfWidth);
-                figure.translateY(-halfHeight);
                 figure.rotateX(movY);
                 figure.rotateY(movX);
-                figure.translateX(halfWidth);
-                figure.translateY(halfHeight);
             });
         }
     }
