@@ -3,6 +3,8 @@
         random: Objects.getRandomObject()
     };
 
+    let isCameraDragging = false;
+
     const figureTypes = [
         {
             name: "letterV",
@@ -75,6 +77,8 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
+            this.cameraRotationX = 0; 
+            this.cameraRotationZ = 0;
         }
 
         draw = () => {
@@ -84,10 +88,19 @@
                 this.drawFiguresVertices();
         }
 
-        worldToScreen = (point) => {
-            const scaleFactor = config.FOV / (config.FOV + point[2]);
-            const projectedX = point[0] * scaleFactor;
-            const projectedY = point[1] * scaleFactor;
+         worldToScreen = (point) => {
+            // 1. Aplicar la rotación de la cámara (rotación inversa al mundo)
+            const rotatedPoint = this.applyCameraRotation(point); 
+            
+            const x = rotatedPoint[0];
+            const y = rotatedPoint[1];
+            const z = rotatedPoint[2];
+
+            // 2. Proyectar (usando la coordenada Z ya rotada)
+            const scaleFactor = config.FOV / (config.FOV + z);
+            const projectedX = x * scaleFactor;
+            const projectedY = y * scaleFactor;
+            
             return [projectedX, projectedY];
         }
 
@@ -147,6 +160,32 @@
 
             this.figures.push(figure);
 			Sound.ping();
+        }
+
+        // Aplica la rotación inversa de la cámara a un punto (x, y, z)
+        applyCameraRotation = (point) => {
+            let x = point[0];
+            let y = point[1];
+            let z = point[2];
+            
+            // --- Rotación Inversa en X (Pitch) ---
+            // La rotación de la figura ya está en el objeto Figure. 
+            // Aquí se rotan las coordenadas del punto respecto a la cámara.
+            
+            let angleX = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationX); // Inverso
+            let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
+            let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
+            y = newY;
+            z = newZ;
+
+            // --- Rotación Inversa en Z (Yaw) ---
+            let angleZ = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationZ); // Inverso
+            let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
+            newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
+            x = newX;
+            y = newY;
+            
+            return [x, y, z];
         }
     }
     class Figure {
@@ -278,11 +317,25 @@
         }
     }
 
+    let addSpecialControls = () => {
+        let grow = () => {
+            config.FOV += 10000;
+        }
+        Browser.addButton("btnGrow", "+", grow);
+
+        let shrink = () => {
+            config.FOV -= 10000;
+        }
+        Browser.addButton("btnShrink", "-", shrink);
+    }
+
     let init = () => {
         initCanvas();
         world = new ThreeDWorld();
         addEvents();
         window.requestAnimationFrame(loop)
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -295,10 +348,47 @@
             if (!mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
+
+        canvas.addEventListener('wheel', function(e) {
+            // e.deltaY es negativo si la rueda va hacia arriba (acercar), positivo hacia abajo (alejar)
+            const zoomAmount = e.deltaY * 5; // Ajusta el factor para una sensibilidad cómoda
+            
+            // Si la rueda va hacia abajo (e.deltaY > 0), el zoomAmount es positivo, lo que *aumenta* el FOV, alejando
+            // Si la rueda va hacia arriba (e.deltaY < 0), el zoomAmount es negativo, lo que *disminuye* el FOV, acercando
+            world.addDistance(zoomAmount); 
+            
+            e.preventDefault(); // Evita el scroll de la página
+        });
+
+        canvas.addEventListener('mousedown', function (e) {
+            // Verificar si una tecla de modificador (ej: Shift) está presionada para rotar la cámara
+            if (e.shiftKey) {
+                isCameraDragging = true;
+            } else {
+                isCameraDragging = false;
+            }
+        });
+
+        canvas.addEventListener('mouseup', function (e) {
+            isCameraDragging = false;
+        });
     }
 
     window.trackMouse = (x, y) => {
-        if (clicking) {    
+     // 'movX' y 'movY' son la diferencia de movimiento del mouse desde el último fotograma
+        
+        if (isCameraDragging) {    
+            // Rotar la cámara (modificar los ángulos en ThreeDWorld)
+            world.cameraRotationZ += movX * 0.1; // Rotación horizontal (Yaw)
+            world.cameraRotationX += movY * 0.1; // Rotación vertical (Pitch)
+
+            // Opcional: Limitar la rotación vertical para evitar el "gimbal lock"
+            const maxPitch = 89;
+            if (world.cameraRotationX > maxPitch) world.cameraRotationX = maxPitch;
+            if (world.cameraRotationX < -maxPitch) world.cameraRotationX = -maxPitch;
+            
+        } else if (clicking) {    
+            // Rotación de figuras existente
             world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
