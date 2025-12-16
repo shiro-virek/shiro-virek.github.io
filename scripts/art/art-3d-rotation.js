@@ -89,21 +89,15 @@
                 this.drawFiguresVertices();
         }
 
-         worldToScreen = (point) => {
-            // 1. Aplicar rotación
+        worldToScreen = (point) => {
             const rotatedPoint = this.applyCameraRotation(point); 
             
             const x = rotatedPoint[0];
             const y = rotatedPoint[1];
             const z = rotatedPoint[2];
 
-            // 2. Proyectar
-            // La magia está aquí: (Lente) / (Profundidad del punto + Distancia de la Cámara)
-            // Si this.cameraZ disminuye, el denominador baja y el objeto se ve más grande.
-            
-            // Evitamos división por cero o invertir la imagen si la cámara cruza el objeto
             let depth = z + this.cameraZ;
-            if (depth < 1) depth = 1; // "Clipping" muy básico para no romper la pantalla
+            if (depth < 1) depth = 1; 
 
             const scaleFactor = config.FOV / depth;
             
@@ -153,37 +147,64 @@
             }
         }
 
-        addFigure(x, y) {
+addFigure(x, y) {
             let figure = new Figure();
 
             figure.vertices = Objects.clone(config.figureInfo.vertices);
             figure.edges = Objects.clone(config.figureInfo.edges);
 
-            figure.translateX(x);
-            figure.translateY(y);
+            // --- CORRECCIÓN DE POSICIÓN ---
+            
+            // 1. COMPENSAR EL ZOOM (Des-escalar)
+            // Calculamos cuánto se redujo la imagen para volver a ampliar las coordenadas
+            const scaleFactor = config.FOV / this.cameraZ;
+            let worldX = x / scaleFactor;
+            let worldY = y / scaleFactor;
+            let worldZ = 0; // Asumimos que creamos la figura en la profundidad 0
+
+            // 2. COMPENSAR LA ROTACIÓN DE CÁMARA (Des-rotar)
+            // Si la cámara está rotada, debemos rotar el punto de aparición en sentido contrario
+            // para que coincida con lo que ves en pantalla.
+            
+            // Inversa de Rotación Z (Yaw)
+            if (this.cameraRotationZ !== 0) {
+                let angleZ = ThreeDWorld.sexagesimalToRadian(this.cameraRotationZ); 
+                let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
+                let newY = worldX * Math.sin(angleZ) + worldY * Math.cos(angleZ);
+                worldX = newX;
+                worldY = newY;
+            }
+
+            // Inversa de Rotación X (Pitch)
+            if (this.cameraRotationX !== 0) {
+                let angleX = ThreeDWorld.sexagesimalToRadian(this.cameraRotationX);
+                // Al rotar en X, la Y de pantalla afecta a la Y y Z del mundo
+                let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
+                let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
+                worldY = newY;
+                // worldZ = newZ; // No necesitamos mover la figura en Z, solo colocarla en X,Y correctos
+            }
+
+            // Aplicamos las coordenadas corregidas
+            figure.translateX(worldX);
+            figure.translateY(worldY);
 
             this.figures.push(figure);
-			Sound.ping();
+            Sound.ping();
         }
 
-        // Aplica la rotación inversa de la cámara a un punto (x, y, z)
         applyCameraRotation = (point) => {
             let x = point[0];
             let y = point[1];
             let z = point[2];
-            
-            // --- Rotación Inversa en X (Pitch) ---
-            // La rotación de la figura ya está en el objeto Figure. 
-            // Aquí se rotan las coordenadas del punto respecto a la cámara.
-            
-            let angleX = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationX); // Inverso
+                        
+            let angleX = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationX); 
             let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
             let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
             y = newY;
             z = newZ;
 
-            // --- Rotación Inversa en Z (Yaw) ---
-            let angleZ = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationZ); // Inverso
+            let angleZ = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationZ);
             let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
             newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
             x = newX;
@@ -356,7 +377,6 @@
 		});
 
         canvas.addEventListener('mousedown', function (e) {
-            // Verificar si una tecla de modificador (ej: Shift) está presionada para rotar la cámara
             if (e.shiftKey) {
                 isCameraDragging = true;
             } else {
@@ -369,21 +389,16 @@
         });
     }
 
-    window.trackMouse = (x, y) => {
-     // 'movX' y 'movY' son la diferencia de movimiento del mouse desde el último fotograma
-        
+    window.trackMouse = (x, y) => {        
         if (isCameraDragging) {    
-            // Rotar la cámara (modificar los ángulos en ThreeDWorld)
-            world.cameraRotationZ += movX * 0.1; // Rotación horizontal (Yaw)
-            world.cameraRotationX += movY * 0.1; // Rotación vertical (Pitch)
+            world.cameraRotationZ += movX * 0.1; 
+            world.cameraRotationX += movY * 0.1; 
 
-            // Opcional: Limitar la rotación vertical para evitar el "gimbal lock"
             const maxPitch = 89;
             if (world.cameraRotationX > maxPitch) world.cameraRotationX = maxPitch;
             if (world.cameraRotationX < -maxPitch) world.cameraRotationX = -maxPitch;
             
         } else if (clicking) {    
-            // Rotación de figuras existente
             world.figures.forEach(figure => {
                 figure.translateX(-halfWidth);
                 figure.translateY(-halfHeight);
