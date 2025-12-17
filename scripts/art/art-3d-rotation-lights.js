@@ -271,7 +271,7 @@ class Figure {
             const lightDirection = [0, 0, 1]; 
             const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
             
-            const lightness = Numbers.scale(dotProduct, 0, 2000, 30, 100); 
+            const lightness = Numbers.scale(dotProduct, 0, 2000, 20, 70); 
 
             if (lightness < 0) return 0;
             if (lightness > 100) return 100;
