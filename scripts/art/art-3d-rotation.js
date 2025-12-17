@@ -1,9 +1,8 @@
 {        
     const globals = {
-        random: Objects.getRandomObject()
+        random: Objects.getRandomObject(),
+        world: null,
     };
-
-    let isCameraDragging = false;
 
     const figureTypes = [
         {
@@ -65,13 +64,95 @@
                 [6, 7], [6, 10], [6, 11], [7, 8], [7, 11],
                 [8, 9], [8, 11], [9, 10], [9, 11], [10, 11]
             ]
+        },
+        {
+            "name": "star",
+            "vertices": [
+                [0, 30, 0],    
+                [7, 11, 0],    
+                [29, 9, 0],    
+                [11, -4, 0],   
+                [18, -24, 0],  
+                [0, -11, 0],   
+                [-18, -24, 0], 
+                [-11, -4, 0],  
+                [-29, 9, 0],   
+                [-7, 11, 0],  
+
+                [0, 30, 20],   
+                [7, 11, 20],   
+                [29, 9, 20],   
+                [11, -4, 20],  
+                [18, -24, 20], 
+                [0, -11, 20],  
+                [-18, -24, 20],
+                [-11, -4, 20], 
+                [-29, 9, 20],  
+                [-7, 11, 20]   
+            ],
+            "edges": [
+                [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 0],
+                [10, 11], [11, 12], [12, 13], [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 10],
+                [0, 10], [1, 11], [2, 12], [3, 13], [4, 14], [5, 15], [6, 16], [7, 17], [8, 18], [9, 19]
+            ]
+        },
+        {
+            name: "star",
+            vertices: [
+                // --- CARA FRONTAL (Z = 10) ---
+                // Definidos en sentido Anti-Horario comenzando desde arriba
+                [0, -30, 10],   // 0: Punta Superior
+                [-7, -10, 10],  // 1: Interior Arriba-Izq
+                [-28, -9, 10],  // 2: Punta Izquierda
+                [-11, 4, 10],   // 3: Interior Abajo-Izq
+                [-18, 24, 10],  // 4: Punta Abajo-Izq
+                [0, 12, 10],    // 5: Interior Abajo
+                [18, 24, 10],   // 6: Punta Abajo-Der
+                [11, 4, 10],    // 7: Interior Abajo-Der
+                [28, -9, 10],   // 8: Punta Derecha
+                [7, -10, 10],   // 9: Interior Arriba-Der
+
+                // --- CARA TRASERA (Z = -10) ---
+                // Mismas coordenadas X,Y pero Z negativo
+                [0, -30, -10],   // 10: Punta Superior
+                [-7, -10, -10],  // 11: Interior Arriba-Izq
+                [-28, -9, -10],  // 12: Punta Izquierda
+                [-11, 4, -10],   // 13: Interior Abajo-Izq
+                [-18, 24, -10],  // 14: Punta Abajo-Izq
+                [0, 12, -10],    // 15: Interior Abajo
+                [18, 24, -10],   // 16: Punta Abajo-Der
+                [11, 4, -10],    // 17: Interior Abajo-Der
+                [28, -9, -10],   // 18: Punta Derecha
+                [7, -10, -10]    // 19: Interior Arriba-Der
+            ],
+            faces: [
+                // 1. Tapa Frontal (Polígono de 10 vértices)
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                
+                // 2. Tapa Trasera (Orden inverso para que la normal apunte atrás)
+                [10, 19, 18, 17, 16, 15, 14, 13, 12, 11],
+
+                // 3. Caras Laterales (Conectan frente con fondo)
+                [0, 1, 11, 10], // Lado Superior Izq
+                [1, 2, 12, 11], // Lado Punta Izq Sup
+                [2, 3, 13, 12], // Lado Punta Izq Inf
+                [3, 4, 14, 13], // Lado Abajo Izq
+                [4, 5, 15, 14], // Lado Abajo Centro Izq
+                [5, 6, 16, 15], // Lado Abajo Centro Der
+                [6, 7, 17, 16], // Lado Abajo Der
+                [7, 8, 18, 17], // Lado Punta Der Inf
+                [8, 9, 19, 18], // Lado Punta Der Sup
+                [9, 0, 10, 19]  // Lado Superior Der
+            ]
         }
+
     ];
 
     const config = {
         FOV: 800,
         drawEdges: globals.random.nextBool(),
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
+        rotationMode: 0,
     };    
 
     class ThreeDWorld {
@@ -131,10 +212,6 @@
             return [projectedX, projectedY];
         }
 
-        static sexagesimalToRadian = (degrees) => {
-            return degrees * (Math.PI / 180);
-        }
-
         drawFigures = () => {
             for (let i = this.figures.length - 1; i >= 0; i--) {
                 this.figures[i].drawFigure(ctx);
@@ -162,7 +239,7 @@
             let worldZ = 0; 
             
             if (this.cameraRotationZ !== 0) {
-                let angleZ = ThreeDWorld.sexagesimalToRadian(this.cameraRotationZ); 
+                let angleZ = Trigonometry.sexagesimalToRadian(this.cameraRotationZ); 
                 let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
                 let newY = worldX * Math.sin(angleZ) + worldY * Math.cos(angleZ);
                 worldX = newX;
@@ -170,7 +247,7 @@
             }
 
             if (this.cameraRotationX !== 0) {
-                let angleX = ThreeDWorld.sexagesimalToRadian(this.cameraRotationX);
+                let angleX = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
                 let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
                 let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
                 worldY = newY;
@@ -188,13 +265,13 @@
             let y = point[1];
             let z = point[2];
                         
-            let angleX = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationX); 
+            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
             let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
             let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
             y = newY;
             z = newZ;
 
-            let angleZ = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationZ);
+            let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
             let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
             newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
             x = newX;
@@ -210,7 +287,7 @@
         }
 
         rotateZ = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
@@ -220,7 +297,7 @@
         }
 
         rotateY = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
@@ -230,7 +307,7 @@
         }
 
         rotateX = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
@@ -305,14 +382,14 @@
         }
 
         drawEdge = (p0, p1, color) => {
-            let point2d0 = world.worldToScreen(p0);
-            let point2d1 = world.worldToScreen(p1);
+            let point2d0 = globals.world.worldToScreen(p0);
+            let point2d1 = globals.world.worldToScreen(p1);
 
             Drawing.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
         }
 
         drawVertex = (point, color) => {
-            let vertex = world.worldToScreen(point);
+            let vertex = globals.world.worldToScreen(point);
 
             let newColor = `hsl(${Numbers.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
 
@@ -334,21 +411,27 @@
 
     let addSpecialControls = () => {
         let grow = () => {
-            world.cameraZ -= 10;
-            if (world.cameraZ < 100) world.cameraZ = 100;
+            globals.world.cameraZ -= 10;
+            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
         }
         Browser.addButton("btnGrow", "+", grow);
 
         let shrink = () => {
-            world.cameraZ += 10;
-            if (world.cameraZ < 100) world.cameraZ = 100;
+            globals.world.cameraZ += 10;
+            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
         }
         Browser.addButton("btnShrink", "-", shrink);
+
+        let toggleRotation = () => {
+            config.rotationMode = config.rotationMode == 1 ? 0 : 1;
+        }
+        Browser.addButton("btnToggleRotation", "🔄", toggleRotation);
+        
     }
 
     let init = () => {
         initCanvas();
-        world = new ThreeDWorld();
+        globals.world = new ThreeDWorld();
         addEvents();
         window.requestAnimationFrame(loop)
 
@@ -358,51 +441,41 @@
     let addEvents = () => {
 		canvas.addEventListener('touchend', e => {
             if (!mouseMoved)
-                world.addFigure(e.offsetX, e.offsetY);
+                globals.world.addFigure(e.offsetX, e.offsetY);
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
             if (!mouseMoved)
-                world.addFigure(e.offsetX, e.offsetY);
+                globals.world.addFigure(e.offsetX, e.offsetY);
 		});
-
-        canvas.addEventListener('mousedown', function (e) {
-            if (e.shiftKey) {
-                isCameraDragging = true;
-            } else {
-                isCameraDragging = false;
-            }
-        });
-
-        canvas.addEventListener('mouseup', function (e) {
-            isCameraDragging = false;
-        });
     }
 
     window.trackMouse = (x, y) => {        
-        if (isCameraDragging) {    
-            world.cameraRotationZ += movX * 0.1; 
-            world.cameraRotationX += movY * 0.1; 
+        if (clicking) {
+            if (config.rotationMode) {    
+                globals.world.cameraRotationZ += movX * 0.1; 
+                globals.world.cameraRotationX += movY * 0.1; 
 
-            const maxPitch = 89;
-            if (world.cameraRotationX > maxPitch) world.cameraRotationX = maxPitch;
-            if (world.cameraRotationX < -maxPitch) world.cameraRotationX = -maxPitch;
-            
-        } else if (clicking) {    
-            world.figures.forEach(figure => {
-                figure.rotateX(movY);
-                figure.rotateY(movX);
-            });
+                const maxPitch = 89;
+                if (globals.world.cameraRotationX > maxPitch) globals.world.cameraRotationX = maxPitch;
+                if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
+                
+            } else {               
+                globals.world.figures.forEach(figure => {
+                    figure.rotateX(movY);
+                    figure.rotateY(movX);
+                });
+            }
         }
     }
 
     window.draw = () => {
         drawBackground(ctx, canvas);
-        world.draw();
+        globals.world.draw();
     }
 
 	window.clearCanvas = () => {		
-        world.figures = [];
+        globals.world.figures = [];
 	}
 
 	window.magic = () => {  
