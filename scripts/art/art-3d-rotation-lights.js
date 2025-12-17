@@ -1,6 +1,6 @@
 {
     const figureTypes = [
-       {
+        {
             name: "cube",
             vertices: [
                 [-20, -20, -20],
@@ -40,7 +40,7 @@
                 [5, 11, 6, 0]
             ]
         },
-          {
+        {
             name: "pyramid",
             vertices: [
                 [-20, -20, -20], 
@@ -72,7 +72,6 @@
                 [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
             ]
         },
-      
     ];
 
     const globals = {
@@ -279,23 +278,36 @@
             return sumZ / this.vertices.length;
         }
 
-        draw = () => {
-            let facesToDraw = this.faces.map(faceIndices => {
+    draw = () => {
+            let facesToDraw = [];
+
+            this.faces.forEach(faceIndices => {
                 const rotatedVertices = faceIndices.map(index => 
                     globals.world.applyCameraRotation(this.vertices[index])
                 );
 
-                let sumZ = 0;
-                for (let i = 0; i < rotatedVertices.length; i++) {
-                    sumZ += rotatedVertices[i][2];
-                }
-                const avgZ = sumZ / rotatedVertices.length;
+                for (let i = 1; i < rotatedVertices.length - 1; i++) {
+                    const tVerts = [
+                        rotatedVertices[0],            
+                        rotatedVertices[i],            
+                        rotatedVertices[i + 1]         
+                    ];
+                    
+                    const tIndices = [
+                        faceIndices[0],
+                        faceIndices[i],
+                        faceIndices[i + 1]
+                    ];
 
-                return {
-                    originalIndices: faceIndices, 
-                    rotatedVertices: rotatedVertices,
-                    avgZ: avgZ 
-                };
+                    let sumZ = tVerts[0][2] + tVerts[1][2] + tVerts[2][2];
+                    const avgZ = sumZ / 3;
+
+                    facesToDraw.push({
+                        originalIndices: tIndices,
+                        rotatedVertices: tVerts,
+                        avgZ: avgZ
+                    });
+                }
             });
 
             facesToDraw.sort((a, b) => b.avgZ - a.avgZ);
@@ -333,7 +345,7 @@
         }
 
         drawFace = (indices, rotatedVerticesForLight) => {
-            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${this.getLightness(rotatedVerticesForLight)}%)`;
+            let color = `hsl(${this.hue}, ${100}%, ${this.getLightness(rotatedVerticesForLight)}%)`;
             
             ctx.beginPath();
             let vertex = globals.world.worldToScreen(this.vertices[indices[0]]);
@@ -344,7 +356,10 @@
                 ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
             ctx.fill();
+            ctx.stroke();
         }
     }
 

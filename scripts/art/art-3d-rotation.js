@@ -95,7 +95,57 @@
                 [10, 11], [11, 12], [12, 13], [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 10],
                 [0, 10], [1, 11], [2, 12], [3, 13], [4, 14], [5, 15], [6, 16], [7, 17], [8, 18], [9, 19]
             ]
+        },
+        {
+            name: "star",
+            vertices: [
+                // --- CARA FRONTAL (Z = 10) ---
+                // Definidos en sentido Anti-Horario comenzando desde arriba
+                [0, -30, 10],   // 0: Punta Superior
+                [-7, -10, 10],  // 1: Interior Arriba-Izq
+                [-28, -9, 10],  // 2: Punta Izquierda
+                [-11, 4, 10],   // 3: Interior Abajo-Izq
+                [-18, 24, 10],  // 4: Punta Abajo-Izq
+                [0, 12, 10],    // 5: Interior Abajo
+                [18, 24, 10],   // 6: Punta Abajo-Der
+                [11, 4, 10],    // 7: Interior Abajo-Der
+                [28, -9, 10],   // 8: Punta Derecha
+                [7, -10, 10],   // 9: Interior Arriba-Der
+
+                // --- CARA TRASERA (Z = -10) ---
+                // Mismas coordenadas X,Y pero Z negativo
+                [0, -30, -10],   // 10: Punta Superior
+                [-7, -10, -10],  // 11: Interior Arriba-Izq
+                [-28, -9, -10],  // 12: Punta Izquierda
+                [-11, 4, -10],   // 13: Interior Abajo-Izq
+                [-18, 24, -10],  // 14: Punta Abajo-Izq
+                [0, 12, -10],    // 15: Interior Abajo
+                [18, 24, -10],   // 16: Punta Abajo-Der
+                [11, 4, -10],    // 17: Interior Abajo-Der
+                [28, -9, -10],   // 18: Punta Derecha
+                [7, -10, -10]    // 19: Interior Arriba-Der
+            ],
+            faces: [
+                // 1. Tapa Frontal (Polígono de 10 vértices)
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                
+                // 2. Tapa Trasera (Orden inverso para que la normal apunte atrás)
+                [10, 19, 18, 17, 16, 15, 14, 13, 12, 11],
+
+                // 3. Caras Laterales (Conectan frente con fondo)
+                [0, 1, 11, 10], // Lado Superior Izq
+                [1, 2, 12, 11], // Lado Punta Izq Sup
+                [2, 3, 13, 12], // Lado Punta Izq Inf
+                [3, 4, 14, 13], // Lado Abajo Izq
+                [4, 5, 15, 14], // Lado Abajo Centro Izq
+                [5, 6, 16, 15], // Lado Abajo Centro Der
+                [6, 7, 17, 16], // Lado Abajo Der
+                [7, 8, 18, 17], // Lado Punta Der Inf
+                [8, 9, 19, 18], // Lado Punta Der Sup
+                [9, 0, 10, 19]  // Lado Superior Der
+            ]
         }
+
     ];
 
     const config = {
