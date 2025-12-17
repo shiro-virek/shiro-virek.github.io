@@ -142,7 +142,8 @@
         getAverageZ = () => {
             let sumZ = 0;
             for (let i = 0; i < this.vertices.length; i++) {
-                sumZ += this.vertices[i][2];
+                let rotatedVertex = globals.world.applyCameraRotation(this.vertices[i]);
+                sumZ += rotatedVertex[2];
             }
             
             let result = sumZ / this.vertices.length;
@@ -259,8 +260,12 @@
         }
 
         shouldDrawFace = (vertices) => {
-            const vector1 = Trigonometry.subtractVectors(vertices[1], vertices[0]);
-            const vector2 = Trigonometry.subtractVectors(vertices[2], vertices[0]);
+            const v0 = globals.world.applyCameraRotation(vertices[0]);
+            const v1 = globals.world.applyCameraRotation(vertices[1]);
+            const v2 = globals.world.applyCameraRotation(vertices[2]);
+
+            const vector1 = Trigonometry.subtractVectors(v1, v0);
+            const vector2 = Trigonometry.subtractVectors(v2, v0);
     
             const normal = Trigonometry.crossProduct(vector1, vector2);
     
@@ -270,8 +275,12 @@
         }
 
         getLightness = (vertices) => {
-            const vector1 = Trigonometry.subtractVectors(vertices[1], vertices[0]);
-            const vector2 = Trigonometry.subtractVectors(vertices[2], vertices[0]);
+            const v0 = globals.world.applyCameraRotation(vertices[0]);
+            const v1 = globals.world.applyCameraRotation(vertices[1]);
+            const v2 = globals.world.applyCameraRotation(vertices[2]);
+
+            const vector1 = Trigonometry.subtractVectors(v1, v0);
+            const vector2 = Trigonometry.subtractVectors(v2, v0);
 
             const normal = Trigonometry.crossProduct(vector1, vector2);
         
@@ -279,10 +288,13 @@
         
             const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
             
-            const lightness = Numbers.scale(dotProduct, -1000, 0, 50, 100);
+            const lightness = Numbers.scale(dotProduct, -2000, 2000, 30, 90); 
+
+            if (lightness < 0) return 0;
+            if (lightness > 100) return 100;
 
             return lightness;
-        }   
+        }
 
         drawFace = (vertices) => {
             ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${this.getLightness(vertices)}%)`;
