@@ -1,6 +1,7 @@
 {        
     const globals = {
-        random: Objects.getRandomObject()
+        random: Objects.getRandomObject(),
+        world: null,
     };
 
     const figureTypes = [
@@ -161,10 +162,6 @@
             return [projectedX, projectedY];
         }
 
-        static sexagesimalToRadian = (degrees) => {
-            return degrees * (Math.PI / 180);
-        }
-
         drawFigures = () => {
             for (let i = this.figures.length - 1; i >= 0; i--) {
                 this.figures[i].drawFigure(ctx);
@@ -192,7 +189,7 @@
             let worldZ = 0; 
             
             if (this.cameraRotationZ !== 0) {
-                let angleZ = ThreeDWorld.sexagesimalToRadian(this.cameraRotationZ); 
+                let angleZ = Trigonometry.sexagesimalToRadian(this.cameraRotationZ); 
                 let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
                 let newY = worldX * Math.sin(angleZ) + worldY * Math.cos(angleZ);
                 worldX = newX;
@@ -200,7 +197,7 @@
             }
 
             if (this.cameraRotationX !== 0) {
-                let angleX = ThreeDWorld.sexagesimalToRadian(this.cameraRotationX);
+                let angleX = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
                 let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
                 let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
                 worldY = newY;
@@ -218,13 +215,13 @@
             let y = point[1];
             let z = point[2];
                         
-            let angleX = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationX); 
+            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
             let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
             let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
             y = newY;
             z = newZ;
 
-            let angleZ = ThreeDWorld.sexagesimalToRadian(-this.cameraRotationZ);
+            let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
             let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
             newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
             x = newX;
@@ -240,7 +237,7 @@
         }
 
         rotateZ = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
@@ -250,7 +247,7 @@
         }
 
         rotateY = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
@@ -260,7 +257,7 @@
         }
 
         rotateX = (angle) => {
-            angle = ThreeDWorld.sexagesimalToRadian(angle);
+            angle = Trigonometry.sexagesimalToRadian(angle);
 
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
@@ -335,14 +332,14 @@
         }
 
         drawEdge = (p0, p1, color) => {
-            let point2d0 = world.worldToScreen(p0);
-            let point2d1 = world.worldToScreen(p1);
+            let point2d0 = globals.world.worldToScreen(p0);
+            let point2d1 = globals.world.worldToScreen(p1);
 
             Drawing.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
         }
 
         drawVertex = (point, color) => {
-            let vertex = world.worldToScreen(point);
+            let vertex = globals.world.worldToScreen(point);
 
             let newColor = `hsl(${Numbers.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
 
@@ -364,14 +361,14 @@
 
     let addSpecialControls = () => {
         let grow = () => {
-            world.cameraZ -= 10;
-            if (world.cameraZ < 100) world.cameraZ = 100;
+            globals.world.cameraZ -= 10;
+            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
         }
         Browser.addButton("btnGrow", "+", grow);
 
         let shrink = () => {
-            world.cameraZ += 10;
-            if (world.cameraZ < 100) world.cameraZ = 100;
+            globals.world.cameraZ += 10;
+            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
         }
         Browser.addButton("btnShrink", "-", shrink);
 
@@ -384,7 +381,7 @@
 
     let init = () => {
         initCanvas();
-        world = new ThreeDWorld();
+        globals.world = new ThreeDWorld();
         addEvents();
         window.requestAnimationFrame(loop)
 
@@ -394,39 +391,41 @@
     let addEvents = () => {
 		canvas.addEventListener('touchend', e => {
             if (!mouseMoved)
-                world.addFigure(e.offsetX, e.offsetY);
+                globals.world.addFigure(e.offsetX, e.offsetY);
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
             if (!mouseMoved)
-                world.addFigure(e.offsetX, e.offsetY);
+                globals.world.addFigure(e.offsetX, e.offsetY);
 		});
     }
 
     window.trackMouse = (x, y) => {        
-        if (config.rotationMode) {    
-            world.cameraRotationZ += movX * 0.1; 
-            world.cameraRotationX += movY * 0.1; 
+        if (clicking) {
+            if (config.rotationMode) {    
+                globals.world.cameraRotationZ += movX * 0.1; 
+                globals.world.cameraRotationX += movY * 0.1; 
 
-            const maxPitch = 89;
-            if (world.cameraRotationX > maxPitch) world.cameraRotationX = maxPitch;
-            if (world.cameraRotationX < -maxPitch) world.cameraRotationX = -maxPitch;
-            
-        } else if (clicking) {    
-            world.figures.forEach(figure => {
-                figure.rotateX(movY);
-                figure.rotateY(movX);
-            });
+                const maxPitch = 89;
+                if (globals.world.cameraRotationX > maxPitch) globals.world.cameraRotationX = maxPitch;
+                if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
+                
+            } else {               
+                globals.world.figures.forEach(figure => {
+                    figure.rotateX(movY);
+                    figure.rotateY(movX);
+                });
+            }
         }
     }
 
     window.draw = () => {
         drawBackground(ctx, canvas);
-        world.draw();
+        globals.world.draw();
     }
 
 	window.clearCanvas = () => {		
-        world.figures = [];
+        globals.world.figures = [];
 	}
 
 	window.magic = () => {  
