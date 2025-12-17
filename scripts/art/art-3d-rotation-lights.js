@@ -1,6 +1,6 @@
 {
     const figureTypes = [
-        {
+       {
             name: "cube",
             vertices: [
                 [-20, -20, -20],
@@ -20,7 +20,59 @@
                 [0, 3, 7, 4],
                 [4, 7, 6, 5]
             ]
-        }
+        },
+        {
+            name: "hex_prism",
+            vertices: [
+                [-15, 20, -26], [15, 20, -26], [30, 20, 0], 
+                [15, 20, 26], [-15, 20, 26], [-30, 20, 0],
+                [-15, -20, -26], [15, -20, -26], [30, -20, 0], 
+                [15, -20, 26], [-15, -20, 26], [-30, -20, 0]
+            ],
+            faces: [
+                [0, 1, 2, 3, 4, 5], 
+                [11, 10, 9, 8, 7, 6],    
+                [0, 6, 7, 1],
+                [1, 7, 8, 2],
+                [2, 8, 9, 3],
+                [3, 9, 10, 4],
+                [4, 10, 11, 5],
+                [5, 11, 6, 0]
+            ]
+        },
+          {
+            name: "pyramid",
+            vertices: [
+                [-20, -20, -20], 
+                [20, -20, -20],  
+                [20, -20, 20],   
+                [-20, -20, 20],  
+                [0, 20, 0]       
+            ],
+            faces: [
+                [3, 2, 1, 0],
+                [0, 1, 4],   
+                [1, 2, 4],   
+                [2, 3, 4],  
+                [3, 0, 4]     
+            ]
+        },
+        {
+            name: "octahedron",
+            vertices: [
+                [0, -30, 0], 
+                [0, 30, 0], 
+                [-20, 0, -20], 
+                [20, 0, -20],  
+                [20, 0, 20],   
+                [-20, 0, 20]   
+            ],
+            faces: [
+                [1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2],
+                [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
+            ]
+        },
+      
     ];
 
     const globals = {
@@ -132,7 +184,7 @@
         }
     }
 
-class Figure {
+    class Figure {
         constructor() {
             this.vertices = [];
             this.edges = [];
@@ -229,17 +281,19 @@ class Figure {
 
         draw = () => {
             let facesToDraw = this.faces.map(faceIndices => {
-                const v0 = globals.world.applyCameraRotation(this.vertices[faceIndices[0]]);
-                const v1 = globals.world.applyCameraRotation(this.vertices[faceIndices[1]]);
-                const v2 = globals.world.applyCameraRotation(this.vertices[faceIndices[2]]);
-        
-                const v3 = globals.world.applyCameraRotation(this.vertices[faceIndices[3]]);
-                
-                const avgZ = (v0[2] + v1[2] + v2[2] + v3[2]) / 4;
+                const rotatedVertices = faceIndices.map(index => 
+                    globals.world.applyCameraRotation(this.vertices[index])
+                );
+
+                let sumZ = 0;
+                for (let i = 0; i < rotatedVertices.length; i++) {
+                    sumZ += rotatedVertices[i][2];
+                }
+                const avgZ = sumZ / rotatedVertices.length;
 
                 return {
                     originalIndices: faceIndices, 
-                    rotatedVertices: [v0, v1, v2], 
+                    rotatedVertices: rotatedVertices,
                     avgZ: avgZ 
                 };
             });
