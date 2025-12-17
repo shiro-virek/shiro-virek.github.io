@@ -3,8 +3,6 @@
         random: Objects.getRandomObject()
     };
 
-    let isCameraDragging = false;
-
     const figureTypes = [
         {
             name: "letterV",
@@ -72,6 +70,7 @@
         FOV: 800,
         drawEdges: globals.random.nextBool(),
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
+        rotationMode: 0,
     };    
 
     class ThreeDWorld {
@@ -344,6 +343,12 @@
             if (world.cameraZ < 100) world.cameraZ = 100;
         }
         Browser.addButton("btnShrink", "-", shrink);
+
+        let toggleRotation = () => {
+            config.rotationMode = config.rotationMode == 1 ? 0 : 1;
+        }
+        Browser.addButton("btnToggleRotation", "🔄", toggleRotation);
+        
     }
 
     let init = () => {
@@ -365,22 +370,10 @@
             if (!mouseMoved)
                 world.addFigure(e.offsetX, e.offsetY);
 		});
-
-        canvas.addEventListener('mousedown', function (e) {
-            if (e.shiftKey) {
-                isCameraDragging = true;
-            } else {
-                isCameraDragging = false;
-            }
-        });
-
-        canvas.addEventListener('mouseup', function (e) {
-            isCameraDragging = false;
-        });
     }
 
     window.trackMouse = (x, y) => {        
-        if (isCameraDragging) {    
+        if (config.rotationMode) {    
             world.cameraRotationZ += movX * 0.1; 
             world.cameraRotationX += movY * 0.1; 
 
