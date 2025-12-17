@@ -44,7 +44,7 @@
         }
 
         draw = () => {
-            this.figures.sort((a, b) => {
+            this.figures.sort((b, a) => {
                 const avgA = a.getAverageZ();
                 const avgB = b.getAverageZ();
                 if (isNaN(avgA) || isNaN(avgB)) {
@@ -132,32 +132,16 @@
         }
     }
 
-    class Figure {
+class Figure {
         constructor() {
             this.vertices = [];
             this.edges = [];
+            this.faces = []; 
             this.hue = globals.random.nextInt(1, 360);
-        }
-
-        getAverageZ = () => {
-            let sumZ = 0;
-            for (let i = 0; i < this.vertices.length; i++) {
-                let rotatedVertex = globals.world.applyCameraRotation(this.vertices[i]);
-                sumZ += rotatedVertex[2];
-            }
-            
-            let result = sumZ / this.vertices.length;
-            
-            if (isNaN(result)) {
-                return 0; 
-            }
-            
-            return result;
         }
 
         rotateZ = (angle) => {
             angle = Trigonometry.sexagesimalToRadian(angle);
-
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
                 this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); 
@@ -167,7 +151,6 @@
 
         rotateY = (angle) => {
             angle = Trigonometry.sexagesimalToRadian(angle);
-
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
                 this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); 
@@ -177,29 +160,10 @@
 
         rotateX = (angle) => {
             angle = Trigonometry.sexagesimalToRadian(angle);
-
             for (let i = this.vertices.length - 1; i >= 0; i--) {
                 let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
                 this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); 
                 this.vertices[i][1] = y;
-            }
-        }
-
-        translateX = (distance) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] += distance;
-            }
-        }
-
-        translateY = (distance) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][1] += distance;
-            }
-        }
-
-        translateZ = (distance) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][2] += distance;
             }
         }
 
@@ -250,60 +214,79 @@
             }
         }
 
+        translateX = (d) => { for(let v of this.vertices) v[0]+=d; }
+        translateY = (d) => { for(let v of this.vertices) v[1]+=d; }
+        translateZ = (d) => { for(let v of this.vertices) v[2]+=d; }
+
+        getAverageZ = () => {
+            let sumZ = 0;
+            for (let i = 0; i < this.vertices.length; i++) {
+                let rotatedVertex = globals.world.applyCameraRotation(this.vertices[i]);
+                sumZ += rotatedVertex[2];
+            }
+            return sumZ / this.vertices.length;
+        }
+
         draw = () => {
-            this.faces.forEach(face => {
-                const faceVertices = face.map(index => this.vertices[index]);
-                if (this.shouldDrawFace(faceVertices)) {
-                    this.drawFace(faceVertices);                        
+            let facesToDraw = this.faces.map(faceIndices => {
+                const v0 = globals.world.applyCameraRotation(this.vertices[faceIndices[0]]);
+                const v1 = globals.world.applyCameraRotation(this.vertices[faceIndices[1]]);
+                const v2 = globals.world.applyCameraRotation(this.vertices[faceIndices[2]]);
+        
+                const v3 = globals.world.applyCameraRotation(this.vertices[faceIndices[3]]);
+                
+                const avgZ = (v0[2] + v1[2] + v2[2] + v3[2]) / 4;
+
+                return {
+                    originalIndices: faceIndices, 
+                    rotatedVertices: [v0, v1, v2], 
+                    avgZ: avgZ 
+                };
+            });
+
+            facesToDraw.sort((a, b) => b.avgZ - a.avgZ);
+
+            facesToDraw.forEach(item => {
+                if (this.shouldDrawFace(item.rotatedVertices)) {
+                    this.drawFace(item.originalIndices, item.rotatedVertices);                        
                 }
             });
         }
 
-        shouldDrawFace = (vertices) => {
-            const v0 = globals.world.applyCameraRotation(vertices[0]);
-            const v1 = globals.world.applyCameraRotation(vertices[1]);
-            const v2 = globals.world.applyCameraRotation(vertices[2]);
-
-            const vector1 = Trigonometry.subtractVectors(v1, v0);
-            const vector2 = Trigonometry.subtractVectors(v2, v0);
+        shouldDrawFace = (rotatedVertices) => {
+            const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
+            const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
     
             const normal = Trigonometry.crossProduct(vector1, vector2);
-    
             const cameraDirection = [0, 0, 1];
-    
-            return Trigonometry.dotProduct(normal, cameraDirection) < 0;
+            
+            return Trigonometry.dotProduct(normal, cameraDirection) > 0;
         }
 
-        getLightness = (vertices) => {
-            const v0 = globals.world.applyCameraRotation(vertices[0]);
-            const v1 = globals.world.applyCameraRotation(vertices[1]);
-            const v2 = globals.world.applyCameraRotation(vertices[2]);
-
-            const vector1 = Trigonometry.subtractVectors(v1, v0);
-            const vector2 = Trigonometry.subtractVectors(v2, v0);
-
+        getLightness = (rotatedVertices) => {
+            const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
+            const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
             const normal = Trigonometry.crossProduct(vector1, vector2);
         
             const lightDirection = [0, 0, 1]; 
-        
             const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
             
-            const lightness = Numbers.scale(dotProduct, -2000, 2000, 30, 90); 
+            const lightness = Numbers.scale(dotProduct, 0, 2000, 30, 100); 
 
             if (lightness < 0) return 0;
             if (lightness > 100) return 100;
-
             return lightness;
         }
 
-        drawFace = (vertices) => {
-            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${this.getLightness(vertices)}%)`;
+        drawFace = (indices, rotatedVerticesForLight) => {
+            ctx.fillStyle = `hsl(${this.hue}, ${100}%, ${this.getLightness(rotatedVerticesForLight)}%)`;
+            
             ctx.beginPath();
-
-            let vertex = globals.world.worldToScreen(vertices[0]);
+            let vertex = globals.world.worldToScreen(this.vertices[indices[0]]);
             ctx.moveTo(vertex[0], vertex[1]);
-            for (let i = 1; i < vertices.length; i++) {
-                vertex = globals.world.worldToScreen(vertices[i]);
+            
+            for (let i = 1; i < indices.length; i++) {
+                vertex = globals.world.worldToScreen(this.vertices[indices[i]]);
                 ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
