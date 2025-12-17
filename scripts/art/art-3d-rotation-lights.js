@@ -76,11 +76,6 @@
             return [projectedX, projectedY];    
         }
 
-        addDistance = (distance) => {
-            if (config.FOV + distance > 0)
-                config.FOV += distance;
-        }
-
         addFigure = (x, y) => {
             let centeredX = x - halfWidth;
             let centeredY = y - halfHeight;
@@ -308,6 +303,26 @@
         
     }
 
+    let addSpecialControls = () => {
+        let grow = () => {
+            globals.world.cameraZ -= 10;
+            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
+        }
+        Browser.addButton("btnGrow", "+", grow);
+
+        let shrink = () => {
+            globals.world.cameraZ += 10;
+            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
+        }
+        Browser.addButton("btnShrink", "-", shrink);
+
+        let toggleRotation = () => {
+            config.rotationMode = config.rotationMode == 1 ? 0 : 1;
+        }
+        Browser.addButton("btnToggleRotation", "🔄", toggleRotation);
+        
+    }
+
     let init = () => {	
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
@@ -315,7 +330,8 @@
         globals.world = new ThreeDWorld();
         addEvents();
         if (globals.random.nextBool()) setInitialFigures();
-        window.requestAnimationFrame(loop)
+        window.requestAnimationFrame(loop);
+        addSpecialControls();
     }
 
     let addEvents = () => {
