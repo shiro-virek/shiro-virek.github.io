@@ -1,4 +1,4 @@
-# creative-coding-lab
+# shiro-virek.github.io
 
 This is my creative coding playground 🧪⚗️
 
