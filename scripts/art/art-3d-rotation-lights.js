@@ -95,13 +95,15 @@
         }
 
         draw = () => {
-            this.figures.sort((b, a) => {
-                const avgA = a.getAverageZ();
-                const avgB = b.getAverageZ();
-                if (isNaN(avgA) || isNaN(avgB)) {
-                    return 0; 
-                }
-                return avgA - avgB;
+            this.figures.forEach(figure => {
+                figure.cachedZ = figure.getAverageZ();
+            });
+
+            this.figures.sort((a, b) => {
+                if (isNaN(a.cachedZ)) return 1; 
+                if (isNaN(b.cachedZ)) return -1;
+                
+                return b.cachedZ - a.cachedZ;
             });
             
             this.figures.forEach(figure => {          
