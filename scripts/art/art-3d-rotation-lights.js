@@ -278,13 +278,22 @@
             return sumZ / this.vertices.length;
         }
 
-    draw = () => {
+        draw = () => {
             let facesToDraw = [];
 
             this.faces.forEach(faceIndices => {
                 const rotatedVertices = faceIndices.map(index => 
                     globals.world.applyCameraRotation(this.vertices[index])
                 );
+
+                let faceLightness = 0;
+                if (rotatedVertices.length >= 3) {
+                    faceLightness = this.getLightness([
+                        rotatedVertices[0], 
+                        rotatedVertices[1], 
+                        rotatedVertices[2]
+                    ]);
+                }
 
                 for (let i = 1; i < rotatedVertices.length - 1; i++) {
                     const tVerts = [
@@ -305,7 +314,8 @@
                     facesToDraw.push({
                         originalIndices: tIndices,
                         rotatedVertices: tVerts,
-                        avgZ: avgZ
+                        avgZ: avgZ,
+                        lightness: faceLightness 
                     });
                 }
             });
@@ -314,7 +324,7 @@
 
             facesToDraw.forEach(item => {
                 if (this.shouldDrawFace(item.rotatedVertices)) {
-                    this.drawFace(item.originalIndices, item.rotatedVertices);                        
+                    this.drawFace(item.originalIndices, item.lightness);                        
                 }
             });
         }
@@ -332,20 +342,31 @@
         getLightness = (rotatedVertices) => {
             const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
             const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
-            const normal = Trigonometry.crossProduct(vector1, vector2);
+            
+            let normal = Trigonometry.crossProduct(vector1, vector2);
         
-            const lightDirection = [0, 0, 1]; 
+            let magnitude = Math.sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
+
+            if (magnitude === 0) magnitude = 1;
+
+            normal[0] /= magnitude;
+            normal[1] /= magnitude;
+            normal[2] /= magnitude;
+            // -----------------------------------
+
+            const lightDirection = [0, 0, 1];
+        
             const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
             
-            const lightness = Numbers.scale(dotProduct, 0, 2000, 20, 70); 
+            const lightness = Numbers.scale(dotProduct, 0, 1, 20, 70); 
 
             if (lightness < 0) return 0;
             if (lightness > 100) return 100;
             return lightness;
         }
 
-        drawFace = (indices, rotatedVerticesForLight) => {
-            let color = `hsl(${this.hue}, ${100}%, ${this.getLightness(rotatedVerticesForLight)}%)`;
+        drawFace = (indices, lightness) => {
+            let color = `hsl(${this.hue}, ${100}%, ${lightness}%)`;
             
             ctx.beginPath();
             let vertex = globals.world.worldToScreen(this.vertices[indices[0]]);
@@ -356,8 +377,9 @@
                 ctx.lineTo(vertex[0], vertex[1]);
             }
             ctx.closePath();
+            
             ctx.fillStyle = color;
-            ctx.strokeStyle = color;
+            ctx.strokeStyle = color; 
             ctx.fill();
             ctx.stroke();
         }
