@@ -71,7 +71,7 @@
                 [1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2],
                 [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
             ]
-        },
+        }
     ];
 
     const globals = {
@@ -89,13 +89,13 @@
     class ThreeDWorld {
         constructor() {
             this.figures = [];
-            
-            this.cameraX = 0;
-            this.cameraY = 0;
-            this.cameraZ = -500; 
 
-            this.cameraRotationX = 0;
-            this.cameraRotationZ = 0; 
+            this.cameraX = 0;
+            this.cameraY = -150; 
+            this.cameraZ = -700;
+
+            this.cameraRotationX = 25;
+            this.cameraRotationZ = 0;
         }
 
         draw = () => {
@@ -178,7 +178,7 @@
             if (this.cameraRotationX < -90) this.cameraRotationX = -90;
         }
 
-        addFigure = (screenX, screenY) => {
+        addFigure = (screenX, screenY, fig = config.figureInfo) => {
             const spawnDistance = 500; 
 
             let centeredX = screenX - halfWidth;
@@ -205,8 +205,8 @@
             let worldZ = zFinal + this.cameraZ;
 
             let figure = new Figure();
-            figure.vertices = Objects.clone(config.figureInfo.vertices);
-            figure.faces = Objects.clone(config.figureInfo.faces);
+            figure.vertices = Objects.clone(fig.vertices);
+            figure.faces = Objects.clone(fig.faces);
 
             figure.translateX(worldX);
             figure.translateY(worldY);
@@ -440,7 +440,6 @@
     }
 
     let setInitialFigures = () => {
-        
     }
 
     let addSpecialControls = () => {
@@ -505,7 +504,7 @@
         initCanvas();
         globals.world = new ThreeDWorld();
         addEvents();
-        if (globals.random.nextBool()) setInitialFigures();
+        setInitialFigures();
         window.requestAnimationFrame(loop);
         addSpecialControls();
     }
