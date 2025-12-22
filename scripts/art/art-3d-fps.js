@@ -477,25 +477,26 @@
         }
         Browser.addButton("btnXKey", "⤵️", xKey);
         
-        let cKey = () => {
-            globals.world.rotate(0, -rotSpeed)
-        }
-        Browser.addButton("btnCKey", "⤵️", cKey);
-
-        let vKey = () => {
-            globals.world.rotate(0, rotSpeed);
-        }
-        Browser.addButton("btnVKey", "⤵️", vKey);
-
         let bKey = () => {
             globals.world.rotate(rotSpeed, 0);
         }
-        Browser.addButton("btnBKey", "⤵️", bKey);
+        Browser.addButton("btnBKey", "⏫", bKey);
 
         let nKey = () => {
             globals.world.rotate(-rotSpeed, 0);
         }
-        Browser.addButton("btnNKey", "⤵️", nKey);
+        Browser.addButton("btnNKey", "⏬", nKey);
+        
+        let vKey = () => {
+            globals.world.rotate(0, rotSpeed);
+        }
+        Browser.addButton("btnVKey", "⏪", vKey);
+
+        let cKey = () => {
+            globals.world.rotate(0, -rotSpeed)
+        }
+        Browser.addButton("btnCKey", "⏩", cKey);
+
     }
 
     let init = () => {	
