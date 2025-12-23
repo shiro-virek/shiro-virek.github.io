@@ -46,6 +46,33 @@ class Browser {
         });
     }
 
+    static addJoystick = () => {
+        const container = document.body;
+
+        const button = document.createElement("button");
+        button.classList.add("joystick");
+        button.style.position = "absolute";
+                
+        const moveButton = (e) => {
+            const width = button.offsetWidth;
+            const height = button.offsetHeight;
+
+            button.style.left = `${e.clientX - (width / 2)}px`;
+            button.style.top  = `${e.clientY - (height / 2)}px`;
+        };
+
+        button.addEventListener("mousedown", () => {
+            document.addEventListener("mousemove", moveButton);
+        });
+
+        document.addEventListener("mouseup", () => {
+            document.removeEventListener("mousemove", moveButton);
+        });
+
+        container.appendChild(button); 
+
+    }
+
     static addMenu = (items) => {
         const container = document.getElementById("menuLateral");
 
