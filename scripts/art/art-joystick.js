@@ -2,6 +2,7 @@
     const globals = {
         random: null,
         character: null,
+        joystick: null,
     };
 
     const config = {
@@ -36,7 +37,8 @@
         }
         Browser.addButton("btnPause", "⏸️", pause);
 
-        Browser.addJoystick(100, 100);
+        globals.joystick = new Joystick(100, 100);
+        globals.joystick.add();
     }
 
     let addEvents = () => {
