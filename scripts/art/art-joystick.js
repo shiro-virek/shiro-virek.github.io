@@ -22,7 +22,7 @@
         }
         Browser.addButton("btnPause", "⏸️", pause);
 
-        Browser.addJoystick();
+        Browser.addJoystick(100, 100);
     }
 
     let addEvents = () => {

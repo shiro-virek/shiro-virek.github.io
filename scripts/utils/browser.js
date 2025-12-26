@@ -45,32 +45,56 @@ class Browser {
             button.classList.add("visible");
         });
     }
-
-    static addJoystick = () => {
+    
+    static addJoystick = (x, y) => {
         const container = document.body;
-
         const button = document.createElement("button");
-        button.classList.add("joystick");
-        button.style.position = "absolute";
-                
-        const moveButton = (e) => {
-            const width = button.offsetWidth;
-            const height = button.offsetHeight;
 
-            button.style.left = `${e.clientX - (width / 2)}px`;
-            button.style.top  = `${e.clientY - (height / 2)}px`;
+        button.classList.add("joystick");
+        
+        // Estilos críticos para la lógica
+        button.style.position = "absolute";
+        // Esto centra el botón sobre la coordenada X,Y automáticamente
+        // Sin necesidad de restar el ancho/alto manualmente
+        button.style.transform = "translate(-50%, -50%)"; 
+        
+        // Posición inicial
+        button.style.left = `${x}px`;
+        button.style.top  = `${y}px`;
+
+        // Primero lo agregamos al DOM (Importante hacerlo antes si necesitaras medirlo, 
+        // pero con el truco del transform ya no es crítico, aunque es buena práctica).
+        container.appendChild(button); 
+
+        // Función para mover
+        const moveButton = (e) => {
+            // Simplemente asignamos la posición del mouse. 
+            // El CSS se encarga de centrarlo.
+            button.style.left = `${e.clientX}px`;
+            button.style.top  = `${e.clientY}px`;
+        };
+
+        // Función para soltar y limpiar
+        const stopDrag = () => {
+            document.removeEventListener("mousemove", moveButton);
+            document.removeEventListener("mouseup", stopDrag);
+            
+            // Vuelve al inicio
+            button.style.left = `${x}px`;
+            button.style.top  = `${y}px`;
+            // Opcional: Agregar una transición suave de retorno
+            // button.style.transition = "all 0.2s"; 
         };
 
         button.addEventListener("mousedown", () => {
+            // Opcional: Quitar transición si la pusiste para que el arrastre sea instantáneo
+            // button.style.transition = "none";
+            
             document.addEventListener("mousemove", moveButton);
+            // Agregamos el mouseup AQUÍ, no afuera. 
+            // Solo nos interesa escuchar el "soltar" si antes hubo un "clic".
+            document.addEventListener("mouseup", stopDrag);
         });
-
-        document.addEventListener("mouseup", () => {
-            document.removeEventListener("mousemove", moveButton);
-        });
-
-        container.appendChild(button); 
-
     }
 
     static addMenu = (items) => {
