@@ -2,6 +2,10 @@ class Joystick {
     constructor (originX, originY) {
         this.originX = originX;
         this.originY = originY;
+        this.angle = 0;
+        this.force = 0;
+        this.deltaX = 0;
+        this.deltaY = 0;
     }
 
     add = () => {
@@ -65,9 +69,14 @@ class Joystick {
             let deltaY = (e.clientY ? e.clientY : e.changedTouches[0].pageY) - this.originY;
 
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const angle = Math.atan2(deltaY, deltaX);
+
+            this.force = distance;
+            this.angle = angle;
+            this.deltaX = deltaX;
+            this.deltaY = deltaY;
 
             if (distance > maxRadius) {
-                const angle = Math.atan2(deltaY, deltaX);
                 
                 deltaX = Math.cos(angle) * maxRadius;
                 deltaY = Math.sin(angle) * maxRadius;
@@ -88,6 +97,11 @@ class Joystick {
             
             targetX = 0; 
             targetY = 0;
+
+            this.deltaX = 0;
+            this.deltaY = 0;
+            this.force = 0;
+            this.angle = 0;
             
             if (!animating) {
                 animating = true;

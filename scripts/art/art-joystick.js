@@ -50,6 +50,9 @@
     window.draw = () => {
         drawBackground(ctx, canvas);
 
+        globals.character.x += globals.joystick.deltaX / 10;
+        globals.character.y += globals.joystick.deltaY / 10;
+
         globals.character.draw();
     }
 
