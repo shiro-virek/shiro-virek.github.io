@@ -62,6 +62,7 @@ class Browser {
 
         const stiffness = 0.05; 
         const friction = 0.85; 
+        const maxRadius = 60; 
 
         let posX = 0, posY = 0;       
         let velX = 0, velY = 0;       
@@ -102,8 +103,18 @@ class Browser {
         }
 
         const moveButton = (e) => {
-            const deltaX = e.clientX - originX;
-            const deltaY = e.clientY - originY;
+            let deltaX = e.clientX - originX;
+            let deltaY = e.clientY - originY;
+
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if (distance > maxRadius) {
+                const angle = Math.atan2(deltaY, deltaX);
+                
+                deltaX = Math.cos(angle) * maxRadius;
+                deltaY = Math.sin(angle) * maxRadius;
+            }
+
             posX = deltaX;
             posY = deltaY;
 
