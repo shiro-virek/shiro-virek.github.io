@@ -103,8 +103,8 @@ class Browser {
         }
 
         const moveButton = (e) => {
-            let deltaX = e.clientX - originX;
-            let deltaY = e.clientY - originY;
+            let deltaX = (e.clientX ? e.clientX : e.changedTouches[0].pageX) - originX;
+            let deltaY = (e.clientY ? e.clientY : e.changedTouches[0].pageY) - originY;
 
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
@@ -143,6 +143,9 @@ class Browser {
 
             document.addEventListener("mousemove", moveButton);
             document.addEventListener("mouseup", stopDrag);
+
+            document.addEventListener("touchmove", moveButton);
+            document.addEventListener("touchend", stopDrag);
         });
     }
 

@@ -1,11 +1,24 @@
 {
     const globals = {
-        random: null
+        random: null,
+        character: null,
     };
 
     const config = {
         randomize: true,
     };    
+
+    class Character {
+        constructor (x, y){
+            this.x = x;
+            this.y = y;
+            this.radio = 15;
+        }
+
+        draw = () => {
+            Drawing.drawCircle(ctx, this.x, this.y, this.radio, Browser.getCssVariable("--main-color"));
+        }
+    }
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
@@ -14,6 +27,7 @@
         addEvents();
         window.requestAnimationFrame(loop);
         addSpecialControls();
+        globals.character = new Character(halfWidth, halfHeight);
     }
 
     let addSpecialControls = () => {
@@ -33,6 +47,8 @@
     
     window.draw = () => {
         drawBackground(ctx, canvas);
+
+        globals.character.draw();
     }
 
     window.trackMouse = (x, y) => {
