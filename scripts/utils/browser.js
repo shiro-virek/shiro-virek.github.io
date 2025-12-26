@@ -46,34 +46,90 @@ class Browser {
         });
     }
 
-    static addJoystick = (x, y) => {
+    static addJoystick = (originX, originY) => {
         const container = document.body;
         const button = document.createElement("button");
 
         button.classList.add("joystick");
-        
         button.style.position = "absolute";
-
-        button.style.transform = "translate(-50%, -50%)"; 
         
-        button.style.left = `${x}px`;
-        button.style.top  = `${y}px`;
+        button.style.left = `${originX}px`;
+        button.style.top  = `${originY}px`;
+        
+        button.style.transform = "translate(-50%, -50%) translate(0px, 0px)"; 
+
         container.appendChild(button); 
 
+        const stiffness = 0.05; 
+        const friction = 0.85; 
+
+        let posX = 0, posY = 0;       
+        let velX = 0, velY = 0;       
+        let targetX = 0, targetY = 0; 
+        
+        let animating = false;
+        let dragFrame; 
+
+        const updateVisuals = () => {
+            button.style.transform = `translate(-50%, -50%) translate(${posX}px, ${posY}px)`;
+        }
+
+        const physicsLoop = () => {
+            const distanceX = targetX - posX;
+            const distanceY = targetY - posY;
+
+            const forceX = distanceX * stiffness;
+            const forceY = distanceY * stiffness;
+
+            velX += forceX;
+            velY += forceY;
+
+            velX *= friction;
+            velY *= friction;
+
+            posX += velX;
+            posY += velY;
+
+            updateVisuals();
+
+            if (Math.abs(velX) < 0.01 && Math.abs(velY) < 0.01 && Math.abs(distanceX) < 0.1) {
+                animating = false; 
+                posX = 0; posY = 0; 
+                updateVisuals();
+            } else {
+                dragFrame = requestAnimationFrame(physicsLoop);
+            }
+        }
+
         const moveButton = (e) => {
-            button.style.left = `${e.clientX}px`;
-            button.style.top  = `${e.clientY}px`;
+            const deltaX = e.clientX - originX;
+            const deltaY = e.clientY - originY;
+            posX = deltaX;
+            posY = deltaY;
+
+            velX = 0;
+            velY = 0;
+
+            updateVisuals();
         };
 
         const stopDrag = () => {
             document.removeEventListener("mousemove", moveButton);
             document.removeEventListener("mouseup", stopDrag);
             
-            button.style.left = `${x}px`;
-            button.style.top  = `${y}px`;
+            targetX = 0; 
+            targetY = 0;
+            
+            if (!animating) {
+                animating = true;
+                physicsLoop();
+            }
         };
 
-        button.addEventListener("mousedown", () => {            
+        button.addEventListener("mousedown", () => {
+            cancelAnimationFrame(dragFrame);
+            animating = false;
+
             document.addEventListener("mousemove", moveButton);
             document.addEventListener("mouseup", stopDrag);
         });
