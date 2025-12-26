@@ -40,6 +40,8 @@ const art = [
                 { "name": "screen-video", "display": "Video"},
                 { "name": "clay-2", "display": "Clay 2"},
                 { "name": "3d-fps", "display": "3D FPS"},
+                { "name": "joystick", "display": "Joystick"},
+                //{ "name": "elastic", "display": "Elastic"},
             ];
 const scripts = [];
 
