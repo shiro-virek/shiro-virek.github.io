@@ -32,7 +32,7 @@
     }
 
     let addSpecialControls = () => {
-        globals.joystick = new Joystick(100, 100);
+        globals.joystick = new Joystick(100, height - 100);
         globals.joystick.add();
     }
 
@@ -47,6 +47,14 @@
 
         globals.character.x += globals.joystick.deltaX / 10;
         globals.character.y += globals.joystick.deltaY / 10;
+        if (globals.character.x - globals.character.radio <= 0)
+            globals.character.x = globals.character.radio;
+        if (globals.character.x + globals.character.radio >= width) 
+            globals.character.x = width - globals.character.radio;
+        if (globals.character.y - globals.character.radio <= 0) 
+            globals.character.y = globals.character.radio;
+        if (globals.character.y + globals.character.radio >= height) 
+            globals.character.y = height - globals.character.radio;
 
         globals.character.draw();
     }
