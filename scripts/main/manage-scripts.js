@@ -41,7 +41,7 @@ const art = [
                 { "name": "clay-2", "display": "Clay 2"},
                 { "name": "3d-fps", "display": "3D FPS"},
                 { "name": "joystick", "display": "Joystick"},
-                //{ "name": "elastic", "display": "Elastic"},
+                { "name": "mesh", "display": "Mesh"},
             ];
 const scripts = [];
 
