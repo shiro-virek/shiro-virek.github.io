@@ -109,7 +109,7 @@ class Joystick {
             }
         };
 
-        button.addEventListener("mousedown", () => {
+        const moveJoystick = () => {
             cancelAnimationFrame(dragFrame);
             animating = false;
 
@@ -118,7 +118,10 @@ class Joystick {
 
             document.addEventListener("touchmove", moveButton);
             document.addEventListener("touchend", stopDrag);
-        });
+        }
+
+        button.addEventListener("touchstart", moveJoystick);
+        button.addEventListener("mousedown", moveJoystick);
     }
 
 }

@@ -32,11 +32,6 @@
     }
 
     let addSpecialControls = () => {
-        let pause = () => {
-            config.pause = true;
-        }
-        Browser.addButton("btnPause", "⏸️", pause);
-
         globals.joystick = new Joystick(100, 100);
         globals.joystick.add();
     }
