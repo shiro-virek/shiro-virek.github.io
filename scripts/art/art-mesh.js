@@ -12,6 +12,7 @@
         dotPadding : 20,
         dotRadio : 10,
         hue : 150,
+        maxRadius: 100,
     };    
 
 
@@ -52,7 +53,7 @@
         }
     }
 
-     class Dot {
+    class Dot {
         constructor(column, row) {
             this.radio = config.dotRadio;
             this.row = row;
@@ -61,6 +62,12 @@
             this.y = config.dotMargin + row * config.dotPadding + row * this.radio;
             this.on = true;
             this.color = `hsl(${0}, 0%, 50%)`;
+            this.velX = 0;
+            this.velY = 0;
+            this.targetX = 0;
+            this.targetY = 0; 
+            this.originX = this.x;
+            this.originY = this.y;
         }
 
         draw = (ctx) => {
@@ -84,9 +91,69 @@
             let xDot = config.dotMargin + this.column * config.dotPadding + this.column * config.dotRadio
             let yDot = config.dotMargin + this.row * config.dotPadding + this.row * config.dotRadio;
 
-            let dist = Math.sqrt(Math.pow(xDot - xMouse, 2) + Math.pow(yDot - yMouse, 2));
-            let angle = Trigonometry.angleBetweenTwoPoints(xDot, yDot, xMouse, yMouse);
+            let deltaX = xMouse - xDot 
+            let deltaY = yMouse - yDot;
+
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const angle = Math.atan2(deltaY, deltaX);
+
+            /*
+            if (distance > config.maxRadius) {                
+                deltaX = Math.cos(angle) * config.maxRadius;
+                deltaY = Math.sin(angle) * config.maxRadius;
+            }
+                */
+                
+            this.x = xMouse + deltaX * distance * 0.01;
+            this.y = yMouse + deltaY * distance * 0.01;
+
+            this.velX = 0;
+            this.velY = 0;
+
         }
+/*
+        physicsLoop = () => {
+            const distanceX = this.targetX - this.x;
+            const distanceY = this.targetY - this.y;
+
+            const forceX = distanceX * stiffness;
+            const forceY = distanceY * stiffness;
+
+            this.velX += forceX;
+            this.velY += forceY;
+
+            this.velX *= friction;
+            this.velY *= friction;
+
+            this.x += velX;
+            this.y += velY;
+
+            //updateVisuals();
+
+            if (Math.abs(velX) < 0.01 && Math.abs(velY) < 0.01 && Math.abs(distanceX) < 0.1) {
+                //animating = false; 
+                this.x = 0; 
+                this.y = 0; 
+                //updateVisuals();
+            } else {
+                //dragFrame = requestAnimationFrame(physicsLoop);
+            }
+        }
+*/
+        stopDrag = () => {
+            this.targetX = 0; 
+            this.targetY = 0;
+
+            this.deltaX = 0;
+            this.deltaY = 0;
+            this.force = 0;
+            this.angle = 0;
+            
+            //if (!animating) {
+                //animating = true;
+                physicsLoop();
+            //}
+        };
     }
 
 
@@ -115,9 +182,9 @@
 
     window.trackMouse = (x, y) => {
         if (clicking){   
-            for (let x = 0; x < config.dotsColumns; x++) {
-                for (let y = 0; y < config.dotsRows; y++) {
-                    globals.mesh.dots[x][y].update(x, y);
+            for (let xi = 0; xi < config.dotsColumns; xi++) {
+                for (let yi = 0; yi < config.dotsRows; yi++) {
+                    globals.mesh.dots[xi][yi].update(x, y);
                 }
             }
         }
