@@ -13,6 +13,8 @@
         dotRadio : 10,
         hue : 150,
         maxRadius: 100,
+        stiffness: 0.05,
+        friction: 0.85,
     };    
 
 
@@ -88,7 +90,6 @@
         }
 
         update = (xMouse, yMouse) => {
-
             let deltaX = xMouse - this.originX; 
             let deltaY = yMouse - this.originY;
 
@@ -109,48 +110,36 @@
             this.velY = 0;
 
         }
-/*
-        physicsLoop = () => {
-            const distanceX = this.targetX - this.x;
-            const distanceY = this.targetY - this.y;
 
-            const forceX = distanceX * stiffness;
-            const forceY = distanceY * stiffness;
+        physicsLoop = () => {
+            const distanceX = this.originX - this.x;
+            const distanceY = this.originY - this.y;
+
+            const forceX = distanceX * config.stiffness;
+            const forceY = distanceY * config.stiffness;
 
             this.velX += forceX;
             this.velY += forceY;
 
-            this.velX *= friction;
-            this.velY *= friction;
+            this.velX *= config.friction;
+            this.velY *= config.friction;
 
-            this.x += velX;
-            this.y += velY;
+            this.x += this.velX;
+            this.y += this.velY;
 
-            //updateVisuals();
-
-            if (Math.abs(velX) < 0.01 && Math.abs(velY) < 0.01 && Math.abs(distanceX) < 0.1) {
-                //animating = false; 
-                this.x = 0; 
-                this.y = 0; 
-                //updateVisuals();
-            } else {
-                //dragFrame = requestAnimationFrame(physicsLoop);
+            if (Math.abs(this.velX) < 0.01 && Math.abs(this.velY) < 0.01 && Math.abs(distanceX) < 0.1) {
+                this.x = this.originX; 
+                this.y = this.originY; 
             }
         }
-*/
-        stopDrag = () => {
-            this.targetX = 0; 
-            this.targetY = 0;
 
+        stopDrag = () => {
             this.deltaX = 0;
             this.deltaY = 0;
             this.force = 0;
             this.angle = 0;
             
-            //if (!animating) {
-                //animating = true;
-                physicsLoop();
-            //}
+            this.physicsLoop();
         };
     }
 
@@ -167,6 +156,9 @@
     }
 
     let addEvents = () => {
+        canvas.addEventListener('mouseup', e => {
+            stopDrag();
+        }, false);
     }
 
     let randomize = () => {
@@ -175,6 +167,15 @@
     
     window.draw = () => {
         drawBackground(ctx, canvas);
+        
+        if (!clicking){ 
+            for (let xi = 0; xi < config.dotsColumns; xi++) {
+                for (let yi = 0; yi < config.dotsRows; yi++) {
+                    globals.mesh.dots[xi][yi].stopDrag(); 
+                }
+            }
+        }
+            
         globals.mesh.draw(ctx);
     }
 
@@ -184,7 +185,7 @@
                 for (let yi = 0; yi < config.dotsRows; yi++) {
                     globals.mesh.dots[xi][yi].update(x, y);
                 }
-            }
+            }       
         }
     }
     
