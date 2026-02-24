@@ -88,11 +88,9 @@
         }
 
         update = (xMouse, yMouse) => {
-            let xDot = config.dotMargin + this.column * config.dotPadding + this.column * config.dotRadio
-            let yDot = config.dotMargin + this.row * config.dotPadding + this.row * config.dotRadio;
 
-            let deltaX = xMouse - xDot 
-            let deltaY = yMouse - yDot;
+            let deltaX = xMouse - this.originX; 
+            let deltaY = yMouse - this.originY;
 
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             const angle = Math.atan2(deltaY, deltaX);
