@@ -63,7 +63,7 @@
             this.x = config.dotMargin + column * config.dotPadding + column * this.radio;
             this.y = config.dotMargin + row * config.dotPadding + row * this.radio;
             this.on = true;
-            this.color = `hsl(${0}, 0%, 50%)`;
+            this.color = `hsl(${config.hue}, 100%, 50%)`;
             this.velX = 0;
             this.velY = 0;
             this.targetX = 0;
@@ -132,8 +132,8 @@
         config.dotsRows = Math.floor(height / (config.dotRadio + config.dotPadding));
         config.dotsColumns = Math.floor(width / (config.dotRadio + config.dotPadding));
 		globals.random = Objects.getRandomObject();
-        globals.mesh = new Mesh();
         if (config.randomize) randomize();
+        globals.mesh = new Mesh();
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);
