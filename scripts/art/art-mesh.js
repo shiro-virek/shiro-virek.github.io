@@ -89,19 +89,6 @@
             }
         }
 
-        update = (xMouse, yMouse) => {
-            let deltaX = xMouse - this.originX; 
-            let deltaY = yMouse - this.originY;
-
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const angle = Math.atan2(deltaY, deltaX);
-                
-            let newX = xMouse + deltaX * distance * 0.01;
-            let newY = yMouse + deltaY * distance * 0.01;
-
-            this.physicsLoop(newX, newY);
-        }
-
         physicsLoop = (targetX, targetY) => {
             const distanceX = targetX - this.x;
             const distanceY = targetY - this.y;
@@ -132,6 +119,12 @@
             
             this.physicsLoop(this.originX, this.originY);
         };
+
+        update = (xMouse, yMouse, updateFunction) => {
+            let result = updateFunction(xMouse, yMouse, this.originX, this.originY);
+
+            this.physicsLoop(result.newX, result.newY);
+        }
     }
 
 
@@ -147,15 +140,26 @@
     }
 
     let addEvents = () => {
-        canvas.addEventListener('mouseup', e => {
-            stopDrag();
-        }, false);
     }
 
     let randomize = () => {
         config.hue = globals.random.nextInt(0, 360);
     }
-    
+
+
+    let updateFunction1 = (xMouse, yMouse, originX, originY) => {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: xMouse + deltaX * distance * 0.01,
+            newY: yMouse + deltaY * distance * 0.01
+        };
+    }
+
     window.draw = () => {
         drawBackground(ctx, canvas);
         
@@ -174,7 +178,7 @@
         if (clicking){   
             for (let xi = 0; xi < config.dotsColumns; xi++) {
                 for (let yi = 0; yi < config.dotsRows; yi++) {
-                    globals.mesh.dots[xi][yi].update(x, y);
+                    globals.mesh.dots[xi][yi].update(x, y, updateFunction1);
                 }
             }       
         }
