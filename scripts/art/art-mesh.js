@@ -95,25 +95,16 @@
 
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             const angle = Math.atan2(deltaY, deltaX);
-
-            /*
-            if (distance > config.maxRadius) {                
-                deltaX = Math.cos(angle) * config.maxRadius;
-                deltaY = Math.sin(angle) * config.maxRadius;
-            }
-                */
                 
-            this.x = xMouse + deltaX * distance * 0.01;
-            this.y = yMouse + deltaY * distance * 0.01;
+            let newX = xMouse + deltaX * distance * 0.01;
+            let newY = yMouse + deltaY * distance * 0.01;
 
-            this.velX = 0;
-            this.velY = 0;
-
+            this.physicsLoop(newX, newY);
         }
 
-        physicsLoop = () => {
-            const distanceX = this.originX - this.x;
-            const distanceY = this.originY - this.y;
+        physicsLoop = (targetX, targetY) => {
+            const distanceX = targetX - this.x;
+            const distanceY = targetY - this.y;
 
             const forceX = distanceX * config.stiffness;
             const forceY = distanceY * config.stiffness;
@@ -128,8 +119,8 @@
             this.y += this.velY;
 
             if (Math.abs(this.velX) < 0.01 && Math.abs(this.velY) < 0.01 && Math.abs(distanceX) < 0.1) {
-                this.x = this.originX; 
-                this.y = this.originY; 
+                this.x = targetX; 
+                this.y = targetY; 
             }
         }
 
@@ -139,7 +130,7 @@
             this.force = 0;
             this.angle = 0;
             
-            this.physicsLoop();
+            this.physicsLoop(this.originX, this.originY);
         };
     }
 
