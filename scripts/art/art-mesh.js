@@ -15,6 +15,7 @@
         maxRadius: 100,
         stiffness: 0.05,
         friction: 0.85,
+        functions: [updateFunction1]
     };    
 
 
@@ -120,13 +121,14 @@
             this.physicsLoop(this.originX, this.originY);
         };
 
-        update = (xMouse, yMouse, updateFunction) => {
-            let result = updateFunction(xMouse, yMouse, this.originX, this.originY);
+        update = (xMouse, yMouse) => {
+            const modifierFunction = config.functions[config.functionIndex];
+        
+            let result = modifierFunction(xMouse, yMouse, this.originX, this.originY);
 
             this.physicsLoop(result.newX, result.newY);
         }
     }
-
 
     let init = () => {
         config.dotsRows = Math.floor(height / (config.dotRadio + config.dotPadding));
@@ -143,11 +145,12 @@
     }
 
     let randomize = () => {
+        config.functionIndex = globals.random.nextInt(0, config.functions.length - 1);
         config.hue = globals.random.nextInt(0, 360);
     }
 
 
-    let updateFunction1 = (xMouse, yMouse, originX, originY) => {
+    function updateFunction1(xMouse, yMouse, originX, originY) {
         let deltaX = xMouse - originX; 
         let deltaY = yMouse - originY;
 
@@ -178,7 +181,7 @@
         if (clicking){   
             for (let xi = 0; xi < config.dotsColumns; xi++) {
                 for (let yi = 0; yi < config.dotsRows; yi++) {
-                    globals.mesh.dots[xi][yi].update(x, y, updateFunction1);
+                    globals.mesh.dots[xi][yi].update(x, y);
                 }
             }       
         }
