@@ -15,7 +15,8 @@
         maxRadius: 100,
         stiffness: 0.05,
         friction: 0.85,
-        functions: [updateFunction1, updateFunction2, updateFunction3, updateFunction4, updateFunction5, updateFunction6, updateFunction7]
+        functions: [updateFunction1, updateFunction2, updateFunction3, updateFunction4, updateFunction5, updateFunction6, 
+            updateFunction7, updateFunction8, updateFunction9, updateFunction10, updateFunction11]
     };    
 
 
@@ -182,8 +183,8 @@
         const angle = Math.atan2(deltaY, deltaX);
             
         return {
-            newX: xMouse + Numbers.scale(Math.cos(angle + 90), -1, 1, -100, 100),
-            newY: yMouse + Numbers.scale(Math.sin(angle + 90), -1, 1, -100, 100)
+            newX: xMouse + Numbers.scale(Math.cos(angle + 90), -1, 1, -config.maxRadius, config.maxRadius),
+            newY: yMouse + Numbers.scale(Math.sin(angle + 90), -1, 1, -config.maxRadius, config.maxRadius)
         };
     }
 
@@ -194,8 +195,8 @@
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             
         return {
-            newX: xMouse + Numbers.scale(Math.cos(distance), -1, 1, -100, 100),
-            newY: yMouse + Numbers.scale(Math.sin(distance), -1, 1, -100, 100)
+            newX: xMouse + Numbers.scale(Math.cos(distance), -1, 1, -config.maxRadius, config.maxRadius),
+            newY: yMouse + Numbers.scale(Math.sin(distance), -1, 1, -config.maxRadius, config.maxRadius)
         };
     }
     
@@ -220,8 +221,8 @@
         const angle = Math.atan2(deltaY, deltaX);
             
         return {
-            newX: xMouse + Numbers.scale(Math.cos(distance), -1, 1, -100, 100) + Numbers.scale(Math.cos(angle), -1, 1, -100, 100),
-            newY: yMouse + Numbers.scale(Math.sin(distance), -1, 1, -100, 100) + Numbers.scale(Math.sin(angle), -1, 1, -100, 100)
+            newX: xMouse + Numbers.scale(Math.cos(distance), -1, 1, -config.maxRadius, config.maxRadius) + Numbers.scale(Math.cos(angle), -1, 1, -config.maxRadius, config.maxRadius),
+            newY: yMouse + Numbers.scale(Math.sin(distance), -1, 1, -config.maxRadius, config.maxRadius) + Numbers.scale(Math.sin(angle), -1, 1, -config.maxRadius, config.maxRadius)
         };
     }
 
@@ -233,10 +234,65 @@
         const angle = Math.atan2(deltaY, deltaX);
             
         return {
-            newX: originX + Numbers.scale(Math.cos((originX + xMouse) * Trigonometry.RAD_CONST), -1, 1, -100, 100),
-            newY: originY + Numbers.scale(Math.sin((originY + yMouse) * Trigonometry.RAD_CONST), -1, 1, -100, 100)
+            newX: originX + Numbers.scale(Math.cos((originX + xMouse) * Trigonometry.RAD_CONST), -1, 1, -config.maxRadius, config.maxRadius),
+            newY: originY + Numbers.scale(Math.sin((originY + yMouse) * Trigonometry.RAD_CONST), -1, 1, -config.maxRadius, config.maxRadius)
         };
     }
+
+
+    function updateFunction8(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeInOutQuart(Numbers.scale(distance, 0, width, 0, 1)) * Math.cos(angle) * config.maxRadius,
+            newY: originY + Numbers.easings.easeInOutQuart(Numbers.scale(distance, 0, height, 0, 1)) * Math.sin(angle) * config.maxRadius
+        };
+    }
+
+    function updateFunction9(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeInOutQuart(Numbers.scale(distance, 0, width, 0, 1)) * config.maxRadius - config.maxRadius,
+            newY: originY + Numbers.easings.easeInOutQuart(Numbers.scale(distance, 0, height, 0, 1)) * config.maxRadius - config.maxRadius
+        };
+    }
+
+
+    function updateFunction10(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeOutBack(Numbers.scale(distance, 0, width, 0, 1)) * config.maxRadius - config.maxRadius,
+            newY: originY + Numbers.easings.easeOutBack(Numbers.scale(distance, 0, height, 0, 1)) * config.maxRadius - 100
+        };
+    }
+
+    function updateFunction11(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, width, 0, 1)) * Math.cos(angle) * config.maxRadius,
+            newY: originY + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, height, 0, 1)) * Math.sin(angle) * config.maxRadius
+        };
+    }
+
 
     window.draw = () => {
         drawBackground(ctx, canvas);
