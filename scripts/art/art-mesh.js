@@ -15,7 +15,7 @@
         maxRadius: 100,
         stiffness: 0.05,
         friction: 0.85,
-        functions: [updateFunction1]
+        functions: [updateFunction1, updateFunction2, updateFunction3, updateFunction4, updateFunction5, updateFunction6, updateFunction7]
     };    
 
 
@@ -149,8 +149,19 @@
         config.hue = globals.random.nextInt(0, 360);
     }
 
-
     function updateFunction1(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+        return {
+            newX: xMouse + deltaX * distance * 0.015,
+            newY: yMouse + deltaY * distance * 0.015
+        };
+    }
+
+    function updateFunction2(xMouse, yMouse, originX, originY) {
         let deltaX = xMouse - originX; 
         let deltaY = yMouse - originY;
 
@@ -158,8 +169,72 @@
         const angle = Math.atan2(deltaY, deltaX);
             
         return {
-            newX: xMouse + deltaX * distance * 0.01,
-            newY: yMouse + deltaY * distance * 0.01
+            newX: xMouse * Numbers.scale(deltaX * distance, -width, width, 0.95, 1.05),
+            newY: yMouse * Numbers.scale(deltaY * distance, -height, height, 0.95, 1.05)
+        };
+    }
+
+    function updateFunction3(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: xMouse + Numbers.scale(Math.cos(angle + 90), -1, 1, -100, 100),
+            newY: yMouse + Numbers.scale(Math.sin(angle + 90), -1, 1, -100, 100)
+        };
+    }
+
+    function updateFunction4(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+        return {
+            newX: xMouse + Numbers.scale(Math.cos(distance), -1, 1, -100, 100),
+            newY: yMouse + Numbers.scale(Math.sin(distance), -1, 1, -100, 100)
+        };
+    }
+    
+    function updateFunction5(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: Math.cos((originX + xMouse) * Trigonometry.RAD_CONST) * width,
+            newY: Math.sin((originY + yMouse) * Trigonometry.RAD_CONST) * height
+        };
+    }
+
+    function updateFunction6(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: xMouse + Numbers.scale(Math.cos(distance), -1, 1, -100, 100) + Numbers.scale(Math.cos(angle), -1, 1, -100, 100),
+            newY: yMouse + Numbers.scale(Math.sin(distance), -1, 1, -100, 100) + Numbers.scale(Math.sin(angle), -1, 1, -100, 100)
+        };
+    }
+
+    function updateFunction7(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.scale(Math.cos((originX + xMouse) * Trigonometry.RAD_CONST), -1, 1, -100, 100),
+            newY: originY + Numbers.scale(Math.sin((originY + yMouse) * Trigonometry.RAD_CONST), -1, 1, -100, 100)
         };
     }
 
