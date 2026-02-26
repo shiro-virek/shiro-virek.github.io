@@ -16,7 +16,7 @@
         stiffness: 0.05,
         friction: 0.85,
         functions: [updateFunction1, updateFunction2, updateFunction3, updateFunction4, updateFunction5, updateFunction6, 
-            updateFunction7, updateFunction8, updateFunction9, updateFunction10, updateFunction11]
+            updateFunction7, updateFunction8, updateFunction9, updateFunction10]
     };    
 
 
@@ -266,21 +266,7 @@
         };
     }
 
-
     function updateFunction10(xMouse, yMouse, originX, originY) {
-        let deltaX = xMouse - originX; 
-        let deltaY = yMouse - originY;
-
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const angle = Math.atan2(deltaY, deltaX);
-            
-        return {
-            newX: originX + Numbers.easings.easeOutBack(Numbers.scale(distance, 0, width, 0, 1)) * config.maxRadius - config.maxRadius,
-            newY: originY + Numbers.easings.easeOutBack(Numbers.scale(distance, 0, height, 0, 1)) * config.maxRadius - 100
-        };
-    }
-
-    function updateFunction11(xMouse, yMouse, originX, originY) {
         let deltaX = xMouse - originX; 
         let deltaY = yMouse - originY;
 
@@ -303,19 +289,18 @@
                     globals.mesh.dots[xi][yi].stopDrag(); 
                 }
             }
+        }else{
+            for (let xi = 0; xi < config.dotsColumns; xi++) {
+                for (let yi = 0; yi < config.dotsRows; yi++) {
+                    globals.mesh.dots[xi][yi].update(mouseX, mouseY);
+                }
+            }       
         }
             
         globals.mesh.draw(ctx);
     }
 
     window.trackMouse = (x, y) => {
-        if (clicking){   
-            for (let xi = 0; xi < config.dotsColumns; xi++) {
-                for (let yi = 0; yi < config.dotsRows; yi++) {
-                    globals.mesh.dots[xi][yi].update(x, y);
-                }
-            }       
-        }
     }
     
     window.clearCanvas = () => {
