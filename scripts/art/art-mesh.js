@@ -12,11 +12,12 @@
         dotPadding : 20,
         dotRadio : 10,
         hue : 150,
-        maxRadius: 100,
+        maxRadius: 200,
         stiffness: 0.05,
         friction: 0.85,
         functions: [updateFunction1, updateFunction2, updateFunction3, updateFunction4, updateFunction5, updateFunction6, 
-            updateFunction7, updateFunction8, updateFunction9, updateFunction10]
+            updateFunction7, updateFunction8, updateFunction9, updateFunction10, updateFunction11, updateFunction12, 
+            updateFunction13, updateFunction14, updateFunction15, updateFunction16],
     };    
 
 
@@ -279,6 +280,86 @@
         };
     }
 
+
+
+    function updateFunction11(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.scale(originX+xMouse*-0.5, 0, width, -config.maxRadius, config.maxRadius),
+            newY: originY + Numbers.scale(originY+yMouse*-0.5, 0, height, -config.maxRadius, config.maxRadius)
+        };
+    }
+
+    function updateFunction12(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, width, 0, 1)) * Math.cos(angle) * -config.maxRadius,
+            newY: originY + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, height, 0, 1)) * Math.sin(angle) * -config.maxRadius
+        };
+    }
+
+    function updateFunction13(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, width, 0, 1)) * Math.cos(angle+90) * config.maxRadius,
+            newY: originY + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, height, 0, 1)) * Math.sin(angle-90) * config.maxRadius
+        };
+    }
+
+
+    function updateFunction14(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, width, 0, 1)) * Math.cos(angle+Numbers.scale(originX, 0, width, 0, 1)) * config.maxRadius,
+            newY: originY + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, height, 0, 1)) * Math.sin(angle+Numbers.scale(originY, 0, height, 0, 1)) * config.maxRadius
+        };
+    }
+
+    function updateFunction15(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, width, 0, 1)) * Math.cos(angle+originX) * config.maxRadius,
+            newY: originY + Numbers.easings.easeOutQuart(Numbers.scale(distance, 0, height, 0, 1)) * Math.sin(angle+originY) * config.maxRadius
+        };
+    }
+
+    function updateFunction16(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.scale(Math.cos(angle+180), -1, 1, -config.maxRadius, config.maxRadius),
+            newY: originY + Numbers.scale(Math.sin(angle+180), -1, 1, -config.maxRadius, config.maxRadius)
+        };
+    }
 
     window.draw = () => {
         drawBackground(ctx, canvas);
