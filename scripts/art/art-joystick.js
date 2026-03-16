@@ -43,6 +43,29 @@
                 this.y = height - this.radius;
         }
 
+        checkWallCollisionBounce() {
+            if (this.x - this.radius <= 0){
+                this.x = this.radius + 10;
+                  this.rotationAngle += 3.14;
+
+            }
+            if (this.x + this.radius >= width) {
+                this.x = width - this.radius - 10;
+                  this.rotationAngle += 3.14;
+
+            }
+            if (this.y - this.radius <= 0) {
+                this.y = this.radius + 10;
+                  this.rotationAngle += 3.14;
+
+            }
+            if (this.y + this.radius >= height) {
+                this.y = height - this.radius - 10;
+                  this.rotationAngle += 3.14;
+            }
+          
+        }
+
         updateMouth = () => {
             if (this.openingMouth)
                 if (this.mouthAngle < 2.5)
@@ -94,7 +117,7 @@
         globals.character.moveJoystick();
 
         globals.character.checkWallCollision();
-        globals.foe.checkWallCollision();
+        globals.foe.checkWallCollisionBounce();
 
         globals.foe.draw();        
         globals.character.draw();
