@@ -189,4 +189,23 @@ class Drawing {
         }
         return imgData;
     }
+
+    static drawPacman(ctx, x, y, radius, mouthAngle, rotationAngle, color='Yellow'){
+        const halfMouthAngle = mouthAngle / 2;
+        const startAngle = rotationAngle + halfMouthAngle;
+        const endAngle = rotationAngle + (2 * Math.PI - halfMouthAngle);
+
+        ctx.beginPath();
+
+        ctx.moveTo(x, y);
+
+        ctx.arc(x, y, radius, startAngle, endAngle, false);
+
+        ctx.lineTo(x, y);
+
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        ctx.closePath();
+    }
 }

@@ -16,11 +16,27 @@
             this.x = x;
             this.y = y;
             this.radius = 15;
+            this.mouthAngle = 1;
+            this.openingMouth = true;
             this.color = Browser.getCssVariable("--main-color");
         }
 
+        updateMouth = () => {
+            if (this.openingMouth)
+                if (this.mouthAngle < 2.5)
+                    this.mouthAngle += 0.3
+                else
+                    this.openingMouth = false;
+            else
+                if (this.mouthAngle > 0)
+                    this.mouthAngle -= 0.3
+                else
+                    this.openingMouth = true;
+        }
+
         draw = () => {
-            Drawing.drawCircle(ctx, this.x, this.y, this.radius, this.color);
+            this.updateMouth();
+            Drawing.drawPacman(ctx, this.x, this.y, this.radius, this.mouthAngle, globals.joystick.angle, this.color);
         }
     }
 
@@ -74,7 +90,6 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {  
-
         }
     }
     

@@ -101,7 +101,6 @@ class Joystick {
             this.deltaX = 0;
             this.deltaY = 0;
             this.force = 0;
-            this.angle = 0;
             
             if (!animating) {
                 animating = true;
