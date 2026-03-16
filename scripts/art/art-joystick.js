@@ -22,9 +22,25 @@
             this.color = Browser.getCssVariable("--main-color");
         }
         
-        move(distance) {
+        moveAuto(distance) {
             this.x += Math.cos(this.rotationAngle) * distance;
             this.y += Math.sin(this.rotationAngle) * distance;
+        }
+
+        moveJoystick() {
+            this.x += globals.joystick.deltaX / 10;
+            this.y += globals.joystick.deltaY / 10;
+        }
+
+        checkWallCollision() {
+            if (this.x - this.radius <= 0)
+                this.x = this.radius;
+            if (this.x + this.radius >= width) 
+                this.x = width - this.radius;
+            if (this.y - this.radius <= 0) 
+                this.y = this.radius;
+            if (this.y + this.radius >= height) 
+                this.y = height - this.radius;
         }
 
         updateMouth = () => {
@@ -72,20 +88,13 @@
     window.draw = () => {
         drawBackground(ctx, canvas);
 
-        globals.character.x += globals.joystick.deltaX / 10;
-        globals.character.y += globals.joystick.deltaY / 10;
-        if (globals.character.x - globals.character.radius <= 0)
-            globals.character.x = globals.character.radius;
-        if (globals.character.x + globals.character.radius >= width) 
-            globals.character.x = width - globals.character.radius;
-        if (globals.character.y - globals.character.radius <= 0) 
-            globals.character.y = globals.character.radius;
-        if (globals.character.y + globals.character.radius >= height) 
-            globals.character.y = height - globals.character.radius;
-
         globals.character.rotationAngle = globals.joystick.angle;
-        globals.foe.rotationAngle += globals.random.nextBool()? 0.05 : -0.05;
-        globals.foe.move(1);
+        globals.foe.rotationAngle += globals.random.nextBool()? 0.1 : -0.1;
+        globals.foe.moveAuto(1);
+        globals.character.moveJoystick();
+
+        globals.character.checkWallCollision();
+        globals.foe.checkWallCollision();
 
         globals.foe.draw();        
         globals.character.draw();
