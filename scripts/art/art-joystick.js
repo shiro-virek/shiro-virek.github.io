@@ -21,6 +21,11 @@
             this.openingMouth = true;
             this.color = Browser.getCssVariable("--main-color");
         }
+        
+        move(distance) {
+            this.x += Math.cos(this.rotationAngle) * distance;
+            this.y += Math.sin(this.rotationAngle) * distance;
+        }
 
         updateMouth = () => {
             if (this.openingMouth)
@@ -79,7 +84,10 @@
             globals.character.y = height - globals.character.radius;
 
         globals.character.rotationAngle = globals.joystick.angle;
-        globals.foe.draw();
+        globals.foe.rotationAngle += globals.random.nextBool()? 0.05 : -0.05;
+        globals.foe.move(1);
+
+        globals.foe.draw();        
         globals.character.draw();
         Browser.setInfo(`${globals.points}`);
 
