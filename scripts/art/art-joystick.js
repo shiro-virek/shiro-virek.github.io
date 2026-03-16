@@ -2,6 +2,8 @@
     const globals = {
         random: null,
         character: null,
+        foe: null,
+        points: 0,
         joystick: null,
     };
 
@@ -13,11 +15,12 @@
         constructor (x, y){
             this.x = x;
             this.y = y;
-            this.radio = 15;
+            this.radius = 15;
+            this.color = Browser.getCssVariable("--main-color");
         }
 
         draw = () => {
-            Drawing.drawCircle(ctx, this.x, this.y, this.radio, Browser.getCssVariable("--main-color"));
+            Drawing.drawCircle(ctx, this.x, this.y, this.radius, this.color);
         }
     }
 
@@ -40,6 +43,8 @@
     }
 
     let randomize = () => {
+        globals.foe = new Character(globals.random.nextInt(1, width), globals.random.nextInt(1, height));
+        globals.foe.color = "#FFF";
     }
     
     window.draw = () => {
@@ -47,16 +52,24 @@
 
         globals.character.x += globals.joystick.deltaX / 10;
         globals.character.y += globals.joystick.deltaY / 10;
-        if (globals.character.x - globals.character.radio <= 0)
-            globals.character.x = globals.character.radio;
-        if (globals.character.x + globals.character.radio >= width) 
-            globals.character.x = width - globals.character.radio;
-        if (globals.character.y - globals.character.radio <= 0) 
-            globals.character.y = globals.character.radio;
-        if (globals.character.y + globals.character.radio >= height) 
-            globals.character.y = height - globals.character.radio;
+        if (globals.character.x - globals.character.radius <= 0)
+            globals.character.x = globals.character.radius;
+        if (globals.character.x + globals.character.radius >= width) 
+            globals.character.x = width - globals.character.radius;
+        if (globals.character.y - globals.character.radius <= 0) 
+            globals.character.y = globals.character.radius;
+        if (globals.character.y + globals.character.radius >= height) 
+            globals.character.y = height - globals.character.radius;
 
+        globals.foe.draw();
         globals.character.draw();
+        Browser.setInfo(`${globals.points}`);
+
+        if (Collisions.checkCircleCollision(globals.character, globals.foe)) {
+            globals.points++;
+            Sound.ping(200);
+            randomize();
+        }
     }
 
     window.trackMouse = (x, y) => {

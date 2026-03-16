@@ -25,6 +25,10 @@ class Browser {
         document.getElementById("artTitle").textContent = title;
     }
 
+    static setInfo = (title) => {
+        document.getElementById("artInfo").textContent = title;
+    }
+
     static getCssVariable = (varName) => {
         const styles = getComputedStyle(document.documentElement);
         const variable = styles.getPropertyValue(varName).trim()

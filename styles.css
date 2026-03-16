@@ -1,5 +1,5 @@
 :root {
-	--main-color: rgba(111, 0, 255, 0.4);
+	--main-color: rgba(128, 74, 255, 0.4);
 }
 
 html, body {
@@ -15,6 +15,13 @@ html, body {
 	position: fixed;
 	top: 5px;
 	right: 5px;
+	z-index: 9999;
+}
+
+.art-info {
+	position: fixed;
+	top: 5px;
+	left: 5px;
 	z-index: 9999;
 }
 
