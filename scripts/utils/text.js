@@ -17,12 +17,19 @@ class Text {
         return random.getRandomFromArray(vowels);
     }
 
-    static generateWord = (random, minLetters=1, maxLetters=8) => {
+    static isVowel = (c) => {
+        return "aeiou".includes(c.toLowerCase());
+    }
+
+    static generateWord = (random, minLetters=1, maxLetters=6) => {
         let word = ""
         let letters = random.nextInt(minLetters, maxLetters);
+        console.log(letters);
         for (let i=0; i<=letters; i++){
             let putConsonant = random.nextBool();
             if (putConsonant) word += Text.getRandomConsonant(random); 
+            const regex = /[aeiou]{2}$/i; 
+            if (regex.test(word)) continue;
             word += Text.getRandomVowel(random);
         }
         return Text.capitalizeFirstLetter(word);
