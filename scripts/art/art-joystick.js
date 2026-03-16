@@ -17,6 +17,7 @@
             this.y = y;
             this.radius = 15;
             this.mouthAngle = 1;
+            this.rotationAngle = 0;
             this.openingMouth = true;
             this.color = Browser.getCssVariable("--main-color");
         }
@@ -36,7 +37,7 @@
 
         draw = () => {
             this.updateMouth();
-            Drawing.drawPacman(ctx, this.x, this.y, this.radius, this.mouthAngle, globals.joystick.angle, this.color);
+            Drawing.drawPacman(ctx, this.x, this.y, this.radius, this.mouthAngle, this.rotationAngle, this.color);
         }
     }
 
@@ -77,6 +78,7 @@
         if (globals.character.y + globals.character.radius >= height) 
             globals.character.y = height - globals.character.radius;
 
+        globals.character.rotationAngle = globals.joystick.angle;
         globals.foe.draw();
         globals.character.draw();
         Browser.setInfo(`${globals.points}`);
