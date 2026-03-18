@@ -93,10 +93,10 @@
             this.figures = [];
 
             this.cameraX = 0;
-            this.cameraY = 0; 
-            this.cameraZ = -700;
+            this.cameraY = -200; 
+            this.cameraZ = 0;
 
-            this.cameraRotationX = 0;
+            this.cameraRotationX = 5;
             this.cameraRotationZ = 0;
         }
 
