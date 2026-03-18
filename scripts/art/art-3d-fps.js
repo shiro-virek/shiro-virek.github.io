@@ -537,11 +537,11 @@
         drawBackground(ctx, canvas);
         globals.world.draw();
 
-        globals.world.moveForward(-globals.joystickL.deltaY / 10);
-        globals.world.moveRight(globals.joystickL.deltaX / 10);
+        globals.world.moveForward(-globals.joystickL.deltaY / 50);
+        globals.world.moveRight(globals.joystickL.deltaX / 50);
 
-        globals.world.rotate(globals.joystickR.deltaY / 50, 0);
-        globals.world.rotate(0, globals.joystickR.deltaX / 50);
+        globals.world.rotate(globals.joystickR.deltaY / 300, 0);
+        globals.world.rotate(0, globals.joystickR.deltaX / 300);
     }
 
     let randomize = () => {        
