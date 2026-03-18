@@ -530,20 +530,6 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {
-            if (config.rotationMode) {    
-                globals.world.cameraRotationZ += movX * 0.1; 
-                globals.world.cameraRotationX += movY * 0.1; 
-
-                const maxPitch = 89;
-                if (globals.world.cameraRotationX > maxPitch) globals.world.cameraRotationX = maxPitch;
-                if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
-                
-            } else {               
-                globals.world.figures.forEach(figure => {
-                    figure.rotateX(movY);
-                    figure.rotateY(movX);
-                });
-            }
         }
     }
     
@@ -554,8 +540,8 @@
         globals.world.moveForward(-globals.joystickL.deltaY / 10);
         globals.world.moveRight(globals.joystickL.deltaX / 10);
 
-        globals.world.rotate(globals.joystickR.deltaY / 30, 0);
-        globals.world.rotate(0, globals.joystickR.deltaX / 30);
+        globals.world.rotate(globals.joystickR.deltaY / 50, 0);
+        globals.world.rotate(0, globals.joystickR.deltaX / 50);
     }
 
     let randomize = () => {        
