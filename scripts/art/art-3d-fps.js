@@ -93,10 +93,10 @@
             this.figures = [];
 
             this.cameraX = 0;
-            this.cameraY = -150; 
+            this.cameraY = 0; 
             this.cameraZ = -700;
 
-            this.cameraRotationX = 25;
+            this.cameraRotationX = 0;
             this.cameraRotationZ = 0;
         }
 
@@ -442,6 +442,65 @@
     }
 
     let setInitialFigures = () => {
+        for (let x = -2000; x <= 2000; x += 500) {
+            for (let z = -2000; z <= 2000; z += 500) {
+                let floorTile = new Figure();
+                floorTile.vertices = Objects.clone(figureTypes[0].vertices);
+                floorTile.faces = Objects.clone(figureTypes[0].faces);
+                
+                floorTile.scaleX(10); 
+                floorTile.scaleZ(10); 
+                floorTile.scaleY(0.1); 
+
+                floorTile.translateX(x);
+                floorTile.translateY(50); 
+                floorTile.translateZ(z);
+                
+                floorTile.hue = 200; 
+                globals.world.figures.push(floorTile);
+            }
+        }
+
+        
+        for (let i = 0; i < 15; i++) {
+            let building = new Figure();
+            building.vertices = Objects.clone(figureTypes[0].vertices);
+            building.faces = Objects.clone(figureTypes[0].faces);
+            
+            let h = globals.random.nextInt(5, 15);
+            building.scaleY(h); 
+            building.scaleX(2);
+            building.scaleZ(2);
+            
+            let posX = globals.random.nextInt(-1500, 1500);
+            let posZ = globals.random.nextInt(-1500, 1500);
+            
+            building.translateX(posX);
+            building.translateY(50 - (h * 20)); 
+            building.translateZ(posZ);
+            
+            globals.world.figures.push(building);
+        }
+
+        
+        for (let i = 0; i < 10; i++) {
+            let pyramid = new Figure();
+            pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
+            pyramid.faces = Objects.clone(figureTypes[2].faces);
+            
+            pyramid.rotateX(180)
+            
+            let posX = globals.random.nextInt(-2000, 2000);
+            let posZ = globals.random.nextInt(-2000, 2000);
+            
+            pyramid.translateX(posX);
+            pyramid.translateY(50); 
+            pyramid.translateZ(posZ);
+            
+            pyramid.hue = 30; 
+            globals.world.figures.push(pyramid);
+        }
+            
     }
 
     let addSpecialControls = () => {
@@ -540,8 +599,8 @@
         globals.world.moveForward(-globals.joystickL.deltaY / 50);
         globals.world.moveRight(globals.joystickL.deltaX / 50);
 
-        globals.world.rotate(globals.joystickR.deltaY / 300, 0);
-        globals.world.rotate(0, globals.joystickR.deltaX / 300);
+        globals.world.rotate(-globals.joystickR.deltaY / 150, 0);
+        globals.world.rotate(0, -globals.joystickR.deltaX / 150);
     }
 
     let randomize = () => {        
