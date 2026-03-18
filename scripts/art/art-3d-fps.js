@@ -93,10 +93,10 @@
             this.figures = [];
 
             this.cameraX = 0;
-            this.cameraY = -150; 
-            this.cameraZ = -700;
+            this.cameraY = -200; 
+            this.cameraZ = 0;
 
-            this.cameraRotationX = 25;
+            this.cameraRotationX = 5;
             this.cameraRotationZ = 0;
         }
 
@@ -140,31 +140,35 @@
             let z = point[2] - this.cameraZ;
             
             let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
-            let dx = x * Math.cos(angleZ) - z * Math.sin(angleZ);
-            let dz = x * Math.sin(angleZ) + z * Math.cos(angleZ);
-            x = dx;
-            z = dz;
+            let cosZ = Math.cos(angleZ);
+            let sinZ = Math.sin(angleZ);
+            
+            let nx = x * cosZ - z * sinZ;
+            let nz = x * sinZ + z * cosZ;
+            x = nx;
+            z = nz;
 
-            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
-            let dy = y * Math.cos(angleX) - z * Math.sin(angleX);
-            dz = y * Math.sin(angleX) + z * Math.cos(angleX);
-            y = dy;
-            z = dz;
+            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX);
+            let cosX = Math.cos(angleX);
+            let sinX = Math.sin(angleX);
+            
+            let ny = y * cosX - z * sinX;
+            nz = y * sinX + z * cosX;
+            y = ny;
+            z = nz;
             
             return [x, y, z];
         }
-
+                                        
         moveForward = (speed) => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
-            
-            this.cameraX += Math.sin(angleRad) * speed;
+            this.cameraX -= Math.sin(angleRad) * speed;
             this.cameraZ += Math.cos(angleRad) * speed;
         }
 
         moveRight = (speed) => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
-            
-            this.cameraX += Math.sin(angleRad) * speed;
+            this.cameraX -= Math.sin(angleRad) * speed;
             this.cameraZ += Math.cos(angleRad) * speed;
         }
 
@@ -422,6 +426,11 @@
         }
 
         drawFace = (indices, lightness) => {
+            for (let i = 0; i < indices.length; i++) {
+                const viewPoint = globals.world.applyCameraTransform(this.vertices[indices[i]]);
+                if (viewPoint[2] < 10) return; 
+            }
+            
             let color = `hsl(${this.hue}, ${100}%, ${lightness}%)`;
             
             ctx.beginPath();
@@ -442,6 +451,65 @@
     }
 
     let setInitialFigures = () => {
+        for (let x = -2000; x <= 2000; x += 500) {
+            for (let z = -2000; z <= 2000; z += 500) {
+                let floorTile = new Figure();
+                floorTile.vertices = Objects.clone(figureTypes[0].vertices);
+                floorTile.faces = Objects.clone(figureTypes[0].faces);
+                
+                floorTile.scaleX(10); 
+                floorTile.scaleZ(10); 
+                floorTile.scaleY(0.1); 
+
+                floorTile.translateX(x);
+                floorTile.translateY(50); 
+                floorTile.translateZ(z);
+                
+                floorTile.hue = 200; 
+                globals.world.figures.push(floorTile);
+            }
+        }
+        
+        for (let i = 0; i < 15; i++) {
+            let building = new Figure();
+            building.vertices = Objects.clone(figureTypes[0].vertices);
+            building.faces = Objects.clone(figureTypes[0].faces);
+            
+            let h = globals.random.nextInt(5, 15);
+            building.scaleY(h); 
+            building.scaleX(2);
+            building.scaleZ(2);
+            
+            let posX = globals.random.nextInt(-1500, 1500);
+            let posZ = globals.random.nextInt(-1500, 1500);
+            
+            building.translateX(posX);
+            building.translateY(50 - (h * 20)); 
+            building.translateZ(posZ);
+            
+            globals.world.figures.push(building);
+        }
+
+        
+        for (let i = 0; i < 10; i++) {
+            let pyramid = new Figure();
+            pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
+            pyramid.faces = Objects.clone(figureTypes[2].faces);
+
+            pyramid.rotateX(180);
+            pyramid.scale(8); 
+
+            let posX = globals.random.nextInt(-2000, 2000);
+            let posZ = globals.random.nextInt(-2000, 2000);
+
+            pyramid.translateX(posX);
+            pyramid.translateY(50 - 20 * 8); 
+            pyramid.translateZ(posZ);
+            
+            pyramid.hue = 30; 
+            globals.world.figures.push(pyramid);
+        }
+            
     }
 
     let addSpecialControls = () => {
@@ -532,16 +600,18 @@
         if (clicking) {
         }
     }
-    
+            
     window.draw = () => {
         drawBackground(ctx, canvas);
         globals.world.draw();
 
-        globals.world.moveForward(-globals.joystickL.deltaY / 10);
-        globals.world.moveRight(globals.joystickL.deltaX / 10);
+        const forwardSpeed = -globals.joystickL.deltaY / 25; 
+        const sideSpeed = -globals.joystickL.deltaX / 25;
 
-        globals.world.rotate(globals.joystickR.deltaY / 50, 0);
-        globals.world.rotate(0, globals.joystickR.deltaX / 50);
+        if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
+        if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
+
+        globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
     }
 
     let randomize = () => {        
