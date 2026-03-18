@@ -422,6 +422,11 @@
         }
 
         drawFace = (indices, lightness) => {
+            for (let i = 0; i < indices.length; i++) {
+                const viewPoint = globals.world.applyCameraTransform(this.vertices[indices[i]]);
+                if (viewPoint[2] < 10) return; 
+            }
+            
             let color = `hsl(${this.hue}, ${100}%, ${lightness}%)`;
             
             ctx.beginPath();
