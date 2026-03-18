@@ -618,7 +618,7 @@
 
         // Rotación: Joystick Derecho
         // Quitamos el menos al segundo parámetro para que derecha sea derecha
-        globals.world.rotate(globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
+        globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
     }
 
     let randomize = () => {        
