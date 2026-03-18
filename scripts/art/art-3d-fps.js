@@ -465,7 +465,6 @@
                 globals.world.figures.push(floorTile);
             }
         }
-
         
         for (let i = 0; i < 15; i++) {
             let building = new Figure();
@@ -492,14 +491,15 @@
             let pyramid = new Figure();
             pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
             pyramid.faces = Objects.clone(figureTypes[2].faces);
-            
-            pyramid.rotateX(180)
-            
+
+            pyramid.rotateX(180);
+            pyramid.scale(8); 
+
             let posX = globals.random.nextInt(-2000, 2000);
             let posZ = globals.random.nextInt(-2000, 2000);
-            
+
             pyramid.translateX(posX);
-            pyramid.translateY(50); 
+            pyramid.translateY(50 - 20 * 8); 
             pyramid.translateZ(posZ);
             
             pyramid.hue = 30; 
