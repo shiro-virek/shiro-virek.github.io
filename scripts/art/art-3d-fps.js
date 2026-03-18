@@ -554,7 +554,7 @@
         globals.world.moveForward(-globals.joystickL.deltaY / 10);
         globals.world.moveRight(globals.joystickL.deltaX / 10);
 
-        globals.world.rotate(-globals.joystickR.deltaY / 30, 0);
+        globals.world.rotate(globals.joystickR.deltaY / 30, 0);
         globals.world.rotate(0, globals.joystickR.deltaX / 30);
     }
 
