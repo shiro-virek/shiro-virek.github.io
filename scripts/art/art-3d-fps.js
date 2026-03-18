@@ -139,32 +139,40 @@
             let y = point[1] - this.cameraY;
             let z = point[2] - this.cameraZ;
             
+            // Rotación Yaw (Horizontal)
             let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
-            let dx = x * Math.cos(angleZ) - z * Math.sin(angleZ);
-            let dz = x * Math.sin(angleZ) + z * Math.cos(angleZ);
-            x = dx;
-            z = dz;
+            let cosZ = Math.cos(angleZ);
+            let sinZ = Math.sin(angleZ);
+            
+            let nx = x * cosZ - z * sinZ;
+            let nz = x * sinZ + z * cosZ;
+            x = nx;
+            z = nz;
 
-            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
-            let dy = y * Math.cos(angleX) - z * Math.sin(angleX);
-            dz = y * Math.sin(angleX) + z * Math.cos(angleX);
-            y = dy;
-            z = dz;
+            // Rotación Pitch (Vertical)
+            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX);
+            let cosX = Math.cos(angleX);
+            let sinX = Math.sin(angleX);
+            
+            let ny = y * cosX - z * sinX;
+            nz = y * sinX + z * cosX;
+            y = ny;
+            z = nz;
             
             return [x, y, z];
         }
-
+                                        
         moveForward = (speed) => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
-            
-            this.cameraX += Math.sin(angleRad) * speed;
+            // Avance relativo a la rotación actual
+            this.cameraX -= Math.sin(angleRad) * speed;
             this.cameraZ += Math.cos(angleRad) * speed;
         }
 
         moveRight = (speed) => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
-            
-            this.cameraX += Math.sin(angleRad) * speed;
+            // Lateral relativo a la rotación actual
+            this.cameraX -= Math.sin(angleRad) * speed;
             this.cameraZ += Math.cos(angleRad) * speed;
         }
 
@@ -596,16 +604,21 @@
         if (clicking) {
         }
     }
-    
+            
     window.draw = () => {
         drawBackground(ctx, canvas);
         globals.world.draw();
 
-        globals.world.moveForward(-globals.joystickL.deltaY / 50);
-        globals.world.moveRight(globals.joystickL.deltaX / 50);
+        // Movimiento: Joystick Izquierdo
+        const forwardSpeed = -globals.joystickL.deltaY / 25; 
+        const sideSpeed = -globals.joystickL.deltaX / 25;
 
-        globals.world.rotate(-globals.joystickR.deltaY / 150, 0);
-        globals.world.rotate(0, -globals.joystickR.deltaX / 150);
+        if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
+        if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
+
+        // Rotación: Joystick Derecho
+        // Quitamos el menos al segundo parámetro para que derecha sea derecha
+        globals.world.rotate(globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
     }
 
     let randomize = () => {        
