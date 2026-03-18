@@ -469,7 +469,8 @@
                 globals.world.figures.push(floorTile);
             }
         }
-        
+
+		/*
         for (let i = 0; i < 15; i++) {
             let building = new Figure();
             building.vertices = Objects.clone(figureTypes[0].vertices);
@@ -509,7 +510,7 @@
             pyramid.hue = 30; 
             globals.world.figures.push(pyramid);
         }
-            
+            */
     }
 
     let addSpecialControls = () => {
