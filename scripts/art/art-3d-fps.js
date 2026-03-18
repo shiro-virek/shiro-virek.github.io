@@ -76,7 +76,9 @@
 
     const globals = {
         random: Objects.getRandomObject(),
-        world: null
+        world: null,
+        joystickL: null,
+        joystickR: null,
     }
 
     const config = {
@@ -496,6 +498,11 @@
         }
         Browser.addButton("btnCKey", "⏩", cKey);
 
+        globals.joystickL = new Joystick(100, height - 100);
+        globals.joystickL.add();
+
+        globals.joystickR = new Joystick(width - 100, height - 100);
+        globals.joystickR.add();
     }
 
     let init = () => {	
@@ -543,6 +550,12 @@
     window.draw = () => {
         drawBackground(ctx, canvas);
         globals.world.draw();
+
+        globals.world.moveForward(-globals.joystickL.deltaY / 10);
+        globals.world.moveRight(globals.joystickL.deltaX / 10);
+
+        globals.world.rotate(-globals.joystickR.deltaY / 30, 0);
+        globals.world.rotate(0, globals.joystickR.deltaX / 30);
     }
 
     let randomize = () => {        

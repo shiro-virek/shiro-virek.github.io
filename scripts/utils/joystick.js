@@ -14,12 +14,12 @@ class Joystick {
 
         button.classList.add("joystick");
         button.style.position = "absolute";
-        
         button.style.left = `${this.originX}px`;
         button.style.top  = `${this.originY}px`;
+        button.style.touchAction = "none"; 
+        button.style.userSelect = "none";
         
         button.style.transform = "translate(-50%, -50%) translate(0px, 0px)"; 
-
         container.appendChild(button); 
 
         const stiffness = 0.05; 
@@ -29,7 +29,6 @@ class Joystick {
         let posX = 0, posY = 0;       
         let velX = 0, velY = 0;       
         let targetX = 0, targetY = 0; 
-        
         let animating = false;
         let dragFrame; 
 
@@ -40,16 +39,10 @@ class Joystick {
         const physicsLoop = () => {
             const distanceX = targetX - posX;
             const distanceY = targetY - posY;
-
-            const forceX = distanceX * stiffness;
-            const forceY = distanceY * stiffness;
-
-            velX += forceX;
-            velY += forceY;
-
+            velX += distanceX * stiffness;
+            velY += distanceY * stiffness;
             velX *= friction;
             velY *= friction;
-
             posX += velX;
             posY += velY;
 
@@ -65,39 +58,40 @@ class Joystick {
         }
 
         const moveButton = (e) => {
-            let deltaX = (e.clientX ? e.clientX : e.changedTouches[0].pageX) - this.originX;
-            let deltaY = (e.clientY ? e.clientY : e.changedTouches[0].pageY) - this.originY;
+            let deltaX = e.clientX - this.originX;
+            let deltaY = e.clientY - this.originY;
 
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             const angle = Math.atan2(deltaY, deltaX);
 
-            this.force = distance;
             this.angle = angle;
-            this.deltaX = deltaX;
-            this.deltaY = deltaY;
-
+            
             if (distance > maxRadius) {
-                
                 deltaX = Math.cos(angle) * maxRadius;
                 deltaY = Math.sin(angle) * maxRadius;
+                this.force = maxRadius;
+            } else {
+                this.force = distance;
             }
 
+            this.deltaX = deltaX;
+            this.deltaY = deltaY;
             posX = deltaX;
             posY = deltaY;
-
             velX = 0;
             velY = 0;
 
             updateVisuals();
         };
 
-        const stopDrag = () => {
-            document.removeEventListener("mousemove", moveButton);
-            document.removeEventListener("mouseup", stopDrag);
+        const stopDrag = (e) => {
+            button.releasePointerCapture(e.pointerId);
+            
+            button.removeEventListener("pointermove", moveButton);
+            button.removeEventListener("pointerup", stopDrag);
             
             targetX = 0; 
             targetY = 0;
-
             this.deltaX = 0;
             this.deltaY = 0;
             this.force = 0;
@@ -108,19 +102,16 @@ class Joystick {
             }
         };
 
-        const moveJoystick = () => {
+        const startDrag = (e) => {
             cancelAnimationFrame(dragFrame);
             animating = false;
 
-            document.addEventListener("mousemove", moveButton);
-            document.addEventListener("mouseup", stopDrag);
+            button.setPointerCapture(e.pointerId);
 
-            document.addEventListener("touchmove", moveButton);
-            document.addEventListener("touchend", stopDrag);
+            button.addEventListener("pointermove", moveButton);
+            button.addEventListener("pointerup", stopDrag);
         }
 
-        button.addEventListener("touchstart", moveJoystick);
-        button.addEventListener("mousedown", moveJoystick);
+        button.addEventListener("pointerdown", startDrag);
     }
-
 }
