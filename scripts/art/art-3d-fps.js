@@ -139,7 +139,6 @@
             let y = point[1] - this.cameraY;
             let z = point[2] - this.cameraZ;
             
-            // Rotación Yaw (Horizontal)
             let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
             let cosZ = Math.cos(angleZ);
             let sinZ = Math.sin(angleZ);
@@ -149,7 +148,6 @@
             x = nx;
             z = nz;
 
-            // Rotación Pitch (Vertical)
             let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX);
             let cosX = Math.cos(angleX);
             let sinX = Math.sin(angleX);
@@ -164,14 +162,12 @@
                                         
         moveForward = (speed) => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
-            // Avance relativo a la rotación actual
             this.cameraX -= Math.sin(angleRad) * speed;
             this.cameraZ += Math.cos(angleRad) * speed;
         }
 
         moveRight = (speed) => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
-            // Lateral relativo a la rotación actual
             this.cameraX -= Math.sin(angleRad) * speed;
             this.cameraZ += Math.cos(angleRad) * speed;
         }
@@ -609,15 +605,12 @@
         drawBackground(ctx, canvas);
         globals.world.draw();
 
-        // Movimiento: Joystick Izquierdo
         const forwardSpeed = -globals.joystickL.deltaY / 25; 
         const sideSpeed = -globals.joystickL.deltaX / 25;
 
         if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
         if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
 
-        // Rotación: Joystick Derecho
-        // Quitamos el menos al segundo parámetro para que derecha sea derecha
         globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
     }
 
