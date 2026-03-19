@@ -172,8 +172,12 @@
             this.cameraZ += Math.cos(angleRad) * speed;
         }
 
-        moveUp = (speed) => {
+        moveCameraY = (speed) => {
             this.cameraY += speed;
+        }
+
+        moveCameraX = (speed) => {
+            this.cameraX += speed;
         }
 
         rotate = (dPitch, dYaw) => {
@@ -514,59 +518,6 @@
     }
 
     let addSpecialControls = () => {
-        const speed = 5;       
-        const rotSpeed = 2;    
-
-        let wKey = () => {
-            globals.world.moveForward(speed);
-        }
-        Browser.addButton("btnWKey", "⬆️", wKey);
-
-        let aKey = () => {
-            globals.world.moveForward(-speed);
-        }        
-        Browser.addButton("btnAKey", "⬇️", aKey);
-
-        let sKey = () => {
-            globals.world.moveRight(-speed);
-        }        
-        Browser.addButton("btnSKey", "⬅️", sKey);
-
-        let dKey = () => {
-            globals.world.moveRight(speed);
-        }
-        Browser.addButton("btnDKey", "➡️", dKey);
-
-        let zKey = () => {
-            globals.world.moveUp(-speed);
-        }
-        Browser.addButton("btnZKey", "⤴️", zKey);
-
-        let xKey = () => {
-            globals.world.moveUp(speed);
-        }
-        Browser.addButton("btnXKey", "⤵️", xKey);
-        
-        let bKey = () => {
-            globals.world.rotate(rotSpeed, 0);
-        }
-        Browser.addButton("btnBKey", "⏫", bKey);
-
-        let nKey = () => {
-            globals.world.rotate(-rotSpeed, 0);
-        }
-        Browser.addButton("btnNKey", "⏬", nKey);
-        
-        let vKey = () => {
-            globals.world.rotate(0, rotSpeed);
-        }
-        Browser.addButton("btnVKey", "⏪", vKey);
-
-        let cKey = () => {
-            globals.world.rotate(0, -rotSpeed)
-        }
-        Browser.addButton("btnCKey", "⏩", cKey);
-
         globals.joystickL = new Joystick(100, height - 100);
         globals.joystickL.add();
 
@@ -611,8 +562,10 @@
 
         if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
         if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
-
-        globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
+        
+        //globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
+        globals.world.moveCameraX(globals.joystickR.deltaX / 150);
+        globals.world.moveCameraY(globals.joystickR.deltaY / 150);
     }
 
     let randomize = () => {        
