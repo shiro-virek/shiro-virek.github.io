@@ -173,11 +173,15 @@
         }
 
         moveCameraY = (speed) => {
-            this.cameraY += speed;
+            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
+            this.cameraX -= Math.sin(angleRad) * speed;
+            this.cameraY += Math.cos(angleRad) * speed;
         }
 
         moveCameraX = (speed) => {
-            this.cameraX += speed;
+            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
+            this.cameraX += Math.sin(angleRad) * speed;
+            this.cameraY -= Math.cos(angleRad) * speed;
         }
 
         rotate = (dPitch, dYaw) => {
@@ -518,6 +522,17 @@
     }
 
     let addSpecialControls = () => {
+        let toggleRotation = () => {
+            if (config.rotationMode === 0) {
+                config.rotationMode = 1;
+                document.getElementById('btnToggleRotation').textContent = '🔃';
+            } else {
+                config.rotationMode = 0;
+                document.getElementById('btnToggleRotation').textContent = '🔁';
+            }                
+        }
+        Browser.addButton("btnToggleRotation", "🔁", toggleRotation);
+
         globals.joystickL = new Joystick(100, height - 100);
         globals.joystickL.add();
 
@@ -563,9 +578,12 @@
         if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
         if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
         
-        //globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
-        globals.world.moveCameraX(globals.joystickR.deltaX / 150);
-        globals.world.moveCameraY(globals.joystickR.deltaY / 150);
+        if (config.rotationMode === 0) {
+            globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
+        } else if (config.rotationMode === 1) {
+            globals.world.moveCameraX(globals.joystickR.deltaX / 30);
+            globals.world.moveCameraY(globals.joystickR.deltaY / 30);
+        }
     }
 
     let randomize = () => {        
