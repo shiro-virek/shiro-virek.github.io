@@ -101,20 +101,72 @@
         }
 
         draw = () => {
+            let allFaces = [];
+
             this.figures.forEach(figure => {
-                figure.cachedZ = figure.getAverageZ();
+                figure.faces.forEach(faceIndices => {
+                    const viewVertices = faceIndices.map(index => 
+                        this.applyCameraTransform(figure.vertices[index])
+                    );
+
+                    let isBehindCamera = false;
+                    for (let v of viewVertices) {
+                        if (v[2] <= 1) {
+                            isBehindCamera = true;
+                            break;
+                        }
+                    }
+                    if (isBehindCamera) return;
+
+                    if (figure.shouldDrawFace(viewVertices)) {
+                        let sumZ = 0;
+                        viewVertices.forEach(v => sumZ += v[2]);
+                        const avgZ = sumZ / viewVertices.length;
+
+                        allFaces.push({
+                            worldVertices: faceIndices.map(index => figure.vertices[index]),
+                            viewZ: avgZ,
+                            hue: figure.hue,
+                            lightness: figure.getLightness(viewVertices)
+                        });
+                    }
+                });
             });
 
-            this.figures.sort((a, b) => {
-                if (isNaN(a.cachedZ)) return 1; 
-                if (isNaN(b.cachedZ)) return -1;
-                
-                return b.cachedZ - a.cachedZ;
+            allFaces.sort((a, b) => b.viewZ - a.viewZ);
+
+            allFaces.forEach(face => {
+                this.drawSingleFace(face);
             });
+        }
+
+        drawSingleFace = (face) => {
+            const dist = face.viewZ;
             
-            this.figures.forEach(figure => {          
-                figure.draw();       
-            });
+            // Aplicamos tu neblina
+            let alpha = Numbers.scale(dist, 2000, 3000, 1, 0);
+            if (alpha < 0) alpha = 0;
+            if (alpha > 1) alpha = 1;
+
+            const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${alpha})`;
+            
+            ctx.beginPath();
+            // Proyectamos el primer vértice
+            let screenPoint = this.worldToScreen(face.worldVertices[0]);
+            ctx.moveTo(screenPoint[0], screenPoint[1]);
+            
+            // Proyectamos el resto
+            for (let i = 1; i < face.worldVertices.length; i++) {
+                screenPoint = this.worldToScreen(face.worldVertices[i]);
+                ctx.lineTo(screenPoint[0], screenPoint[1]);
+            }
+            
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color; 
+            ctx.lineWidth = 1;    
+            ctx.fill();
+            ctx.stroke();
         }
 
         worldToScreen = (point) => {
