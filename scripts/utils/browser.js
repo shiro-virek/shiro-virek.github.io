@@ -39,6 +39,7 @@ class Browser {
         const container = document.getElementById("specialControls");
 
         const button = document.createElement("button");
+        button.id = id;
         button.textContent = caption;
         button.classList.add("animated-button");
 

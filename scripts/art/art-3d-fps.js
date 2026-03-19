@@ -172,8 +172,10 @@
             this.cameraZ += Math.cos(angleRad) * speed;
         }
 
-        moveUp = (speed) => {
-            this.cameraY += speed;
+        moveCameraY = (speed) => {
+            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
+            this.cameraX -= Math.sin(angleRad) * speed;
+            this.cameraY += Math.cos(angleRad) * speed;
         }
 
         rotate = (dPitch, dYaw) => {
@@ -514,58 +516,16 @@
     }
 
     let addSpecialControls = () => {
-        const speed = 5;       
-        const rotSpeed = 2;    
-
-        let wKey = () => {
-            globals.world.moveForward(speed);
+        let toggleRotation = () => {
+            if (config.rotationMode === 0) {
+                config.rotationMode = 1;
+                document.getElementById('btnToggleRotation').textContent = '🔃';
+            } else {
+                config.rotationMode = 0;
+                document.getElementById('btnToggleRotation').textContent = '🔁';
+            }                
         }
-        Browser.addButton("btnWKey", "⬆️", wKey);
-
-        let aKey = () => {
-            globals.world.moveForward(-speed);
-        }        
-        Browser.addButton("btnAKey", "⬇️", aKey);
-
-        let sKey = () => {
-            globals.world.moveRight(-speed);
-        }        
-        Browser.addButton("btnSKey", "⬅️", sKey);
-
-        let dKey = () => {
-            globals.world.moveRight(speed);
-        }
-        Browser.addButton("btnDKey", "➡️", dKey);
-
-        let zKey = () => {
-            globals.world.moveUp(-speed);
-        }
-        Browser.addButton("btnZKey", "⤴️", zKey);
-
-        let xKey = () => {
-            globals.world.moveUp(speed);
-        }
-        Browser.addButton("btnXKey", "⤵️", xKey);
-        
-        let bKey = () => {
-            globals.world.rotate(rotSpeed, 0);
-        }
-        Browser.addButton("btnBKey", "⏫", bKey);
-
-        let nKey = () => {
-            globals.world.rotate(-rotSpeed, 0);
-        }
-        Browser.addButton("btnNKey", "⏬", nKey);
-        
-        let vKey = () => {
-            globals.world.rotate(0, rotSpeed);
-        }
-        Browser.addButton("btnVKey", "⏪", vKey);
-
-        let cKey = () => {
-            globals.world.rotate(0, -rotSpeed)
-        }
-        Browser.addButton("btnCKey", "⏩", cKey);
+        Browser.addButton("btnToggleRotation", "🔁", toggleRotation);
 
         globals.joystickL = new Joystick(100, height - 100);
         globals.joystickL.add();
@@ -611,8 +571,12 @@
 
         if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
         if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
-
-        globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
+        
+        if (config.rotationMode === 0) {
+            globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
+        } else if (config.rotationMode === 1) {
+            globals.world.moveCameraY(globals.joystickR.deltaY / 30);
+        }
     }
 
     let randomize = () => {        
