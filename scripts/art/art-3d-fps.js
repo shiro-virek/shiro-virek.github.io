@@ -433,7 +433,14 @@
                 if (viewPoint[2] < 10) return; 
             }
             
-            let color = `hsl(${this.hue}, ${100}%, ${lightness}%)`;
+            const distPoint = globals.world.applyCameraTransform(this.vertices[indices[0]]);
+            const distance = distPoint[2];
+            
+            let alpha = Numbers.scale(distance, 2000, 3000, 1, 0);
+            if (alpha < 0) alpha = 0;
+            if (alpha > 1) alpha = 1;
+
+            let color = `hsla(${this.hue}, 100%, ${lightness}%, ${alpha})`;
             
             ctx.beginPath();
             let vertex = globals.world.worldToScreen(this.vertices[indices[0]]);
@@ -447,6 +454,7 @@
             
             ctx.fillStyle = color;
             ctx.strokeStyle = color; 
+            ctx.lineWidth = 1;    
             ctx.fill();
             ctx.stroke();
         }
@@ -472,7 +480,6 @@
             }
         }
 
-		/*
         for (let i = 0; i < 15; i++) {
             let building = new Figure();
             building.vertices = Objects.clone(figureTypes[0].vertices);
@@ -512,7 +519,7 @@
             pyramid.hue = 30; 
             globals.world.figures.push(pyramid);
         }
-            */
+            
     }
 
     let addSpecialControls = () => {
