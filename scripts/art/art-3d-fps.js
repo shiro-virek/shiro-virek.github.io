@@ -173,15 +173,9 @@
         }
 
         moveCameraY = (speed) => {
-            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
+            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
             this.cameraX -= Math.sin(angleRad) * speed;
             this.cameraY += Math.cos(angleRad) * speed;
-        }
-
-        moveCameraX = (speed) => {
-            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
-            this.cameraX += Math.sin(angleRad) * speed;
-            this.cameraY -= Math.cos(angleRad) * speed;
         }
 
         rotate = (dPitch, dYaw) => {
@@ -581,7 +575,6 @@
         if (config.rotationMode === 0) {
             globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
         } else if (config.rotationMode === 1) {
-            globals.world.moveCameraX(globals.joystickR.deltaX / 30);
             globals.world.moveCameraY(globals.joystickR.deltaY / 30);
         }
     }
