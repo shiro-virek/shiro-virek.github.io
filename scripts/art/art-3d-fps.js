@@ -305,6 +305,38 @@
             ctx.lineTo(halfWidth, halfHeight + size);
             ctx.stroke();
         }
+
+        checkShoot = () => {
+            let targetFigure = null;
+            let minZ = Infinity;
+
+            this.figures.forEach((figure, index) => {
+                if (figure.breakable === false) return;
+                figure.faces.forEach(faceIndices => {
+                    const rotatedVertices = faceIndices.map(i => 
+                        this.applyCameraTransform(figure.vertices[i])
+                    );
+
+                    if (rotatedVertices.some(v => v[2] <= 1)) return;
+                    if (!figure.shouldDrawFace(rotatedVertices)) return;
+
+                    const screenPoints = faceIndices.map(i => this.worldToScreen(figure.vertices[i]));
+
+                    if (Trigonometry.isPointInPoly([halfWidth, halfHeight], screenPoints)) {
+                        let avgZ = figure.getAverageZ();
+                        if (avgZ < minZ) {
+                            minZ = avgZ;
+                            targetFigure = index; 
+                        }
+                    }
+                });
+            });
+
+            if (targetFigure !== null) {
+                Sound.bang();
+                this.figures.splice(targetFigure, 1);
+            }
+        }
     }
 
     class Figure {
@@ -537,6 +569,8 @@
                 floorTile.translateZ(z);
                 
                 floorTile.hue = 200; 
+
+                floorTile.breakable = false;
                 globals.world.figures.push(floorTile);
             }
         }
@@ -558,6 +592,7 @@
             building.translateY(50 - (h * 20)); 
             building.translateZ(posZ);
             
+            building.breakable = true;
             globals.world.figures.push(building);
         }
 
@@ -578,6 +613,8 @@
             pyramid.translateZ(posZ);
             
             pyramid.hue = 30; 
+
+            pyramid.breakable = true;
             globals.world.figures.push(pyramid);
         }
             
@@ -596,8 +633,10 @@
         Browser.addButton("btnToggleRotation", "🔁", toggleRotation);
 
         let shoot = () => {      
-            Sound.ping(10);               
+            Sound.ping(10); 
+            globals.world.checkShoot();   
         }
+
         Browser.addButton("btnShoot", "🔫", shoot);
 
         globals.joystickL = new Joystick(100, height - 100);
