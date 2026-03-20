@@ -149,6 +149,21 @@
             this.translateInfiniteFloor();
         }
 
+        checkWallCollision = (nextX, nextZ) => {
+            for (let fig of this.figures) {
+                if (fig.infinite) continue; 
+
+                let dx = nextX - fig.center[0];
+                let dz = nextZ - fig.center[2];
+                let dist = Math.sqrt(dx*dx + dz*dz);
+
+                if (dist < fig.collisionRadius + 20) {
+                    return true; 
+                }
+            }
+            return false;
+        }
+
         translateInfiniteFloor = () => {
             if (this.cameraX < globals.floorCenterX - config.tileSize) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
@@ -388,6 +403,7 @@
             this.edges = [];
             this.faces = []; 
             this.hue = globals.random.nextInt(1, 360);
+            this.setupCollision();
         }
 
         rotateZ = (angle) => {
@@ -475,6 +491,35 @@
                 sumZ += rotatedVertex[2];
             }
             return sumZ / this.vertices.length;
+        }
+
+        setupCollision = () => {
+            let minX = Infinity, maxX = -Infinity;
+            let minY = Infinity, maxY = -Infinity;
+            let minZ = Infinity, maxZ = -Infinity;
+
+            this.vertices.forEach(v => {
+                if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
+                if (v[1] < minY) minY = v[1]; if (v[1] > maxY) maxY = v[1];
+                if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
+            });
+
+            this.center = [
+                (minX + maxX) / 2,
+                (minY + maxY) / 2,
+                (minZ + maxZ) / 2
+            ];
+
+            let maxDistSq = 0;
+            this.vertices.forEach(v => {
+                let dx = v[0] - this.center[0];
+                let dy = v[1] - this.center[1];
+                let dz = v[2] - this.center[2];
+                let distSq = dx*dx + dy*dy + dz*dz;
+                if (distSq > maxDistSq) maxDistSq = distSq;
+            });
+
+            this.collisionRadius = Math.sqrt(maxDistSq);
         }
 
         draw = () => {
@@ -616,6 +661,7 @@
 
                 floorTile.breakable = false;
                 floorTile.infinite = true;
+                floorTile.setupCollision();
                 globals.world.figures.push(floorTile);
             }
         }
@@ -642,6 +688,7 @@
             
             building.breakable = true;
             building.infinite = false;
+            building.setupCollision();
             globals.world.figures.push(building);
         }
     }
@@ -668,6 +715,7 @@
 
             pyramid.breakable = true;
             pyramid.infinite = false;
+            pyramid.setupCollision();
             globals.world.figures.push(pyramid);
         }
     }
@@ -741,10 +789,28 @@
 
         const forwardSpeed = -globals.joystickL.deltaY / 10; 
         const sideSpeed = -globals.joystickL.deltaX / 10;
-
-        if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
-        if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
         
+        let angleRad = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ);
+        
+        let nextX_f = globals.world.cameraX - Math.sin(angleRad) * forwardSpeed;
+        let nextZ_f = globals.world.cameraZ + Math.cos(angleRad) * forwardSpeed;
+        
+        let angleRadR = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ + 90);
+        let nextX_r = globals.world.cameraX - Math.sin(angleRadR) * sideSpeed;
+        let nextZ_r = globals.world.cameraZ + Math.cos(angleRadR) * sideSpeed;
+
+        if (Math.abs(forwardSpeed) > 0.1) {
+            if (!globals.world.checkWallCollision(nextX_f, nextZ_f)) {
+                globals.world.moveForward(forwardSpeed);
+            }
+        }
+        
+        if (Math.abs(sideSpeed) > 0.1) {
+            if (!globals.world.checkWallCollision(nextX_r, nextZ_r)) {
+                globals.world.moveRight(sideSpeed);
+            }
+        }
+
         if (config.rotationMode === 0) {
             globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
         } else if (config.rotationMode === 1) {
