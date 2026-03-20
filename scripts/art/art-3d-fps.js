@@ -596,9 +596,7 @@
         }
     }
 
-    let setInitialFigures = () => {
-        globals.columns = Math.ceil((config.floorSize * 2) / config.tileSize);
-        globals.rows = Math.ceil((config.floorSize * 2) / config.tileSize);
+    let addFloor = () => {
 
         for (let x = -config.floorSize; x <= config.floorSize; x += config.tileSize) {
             for (let z = -config.floorSize; z <= config.floorSize; z += config.tileSize) {
@@ -621,6 +619,9 @@
                 globals.world.figures.push(floorTile);
             }
         }
+    }   
+
+    let addBuildings = () => {
 
         for (let i = 0; i < 15; i++) {
             let building = new Figure();
@@ -643,8 +644,11 @@
             building.infinite = false;
             globals.world.figures.push(building);
         }
+    }
 
-        
+    let addPyramids = () => {
+
+
         for (let i = 0; i < 10; i++) {
             let pyramid = new Figure();
             pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
@@ -666,7 +670,15 @@
             pyramid.infinite = false;
             globals.world.figures.push(pyramid);
         }
-            
+    }
+
+    let setInitialFigures = () => {
+        globals.columns = Math.ceil((config.floorSize * 2) / config.tileSize);
+        globals.rows = Math.ceil((config.floorSize * 2) / config.tileSize);
+
+        addFloor();
+        addBuildings();
+        addPyramids();
     }
 
     let addSpecialControls = () => {
