@@ -83,7 +83,7 @@
 
     const config = {
         randomize: true,
-        FOV: 800,
+        FOV: 1000,
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
         rotationMode: 0,
     };    
@@ -143,7 +143,6 @@
         drawSingleFace = (face) => {
             const dist = face.viewZ;
             
-            // Aplicamos tu neblina
             let alpha = Numbers.scale(dist, 2000, 3000, 1, 0);
             if (alpha < 0) alpha = 0;
             if (alpha > 1) alpha = 1;
@@ -151,11 +150,9 @@
             const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${alpha})`;
             
             ctx.beginPath();
-            // Proyectamos el primer vértice
             let screenPoint = this.worldToScreen(face.worldVertices[0]);
             ctx.moveTo(screenPoint[0], screenPoint[1]);
             
-            // Proyectamos el resto
             for (let i = 1; i < face.worldVertices.length; i++) {
                 screenPoint = this.worldToScreen(face.worldVertices[i]);
                 ctx.lineTo(screenPoint[0], screenPoint[1]);
@@ -295,6 +292,50 @@
             y = newY;
             
             return [x, y, z];
+        }
+
+        drawCrossHair = () => {
+            const size = 10;
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(halfWidth - size, halfHeight);
+            ctx.lineTo(halfWidth + size, halfHeight);
+            ctx.moveTo(halfWidth, halfHeight - size);
+            ctx.lineTo(halfWidth, halfHeight + size);
+            ctx.stroke();
+        }
+
+        checkShoot = () => {
+            let targetFigure = null;
+            let minZ = Infinity;
+
+            this.figures.forEach((figure, index) => {
+                if (figure.breakable === false) return;
+                figure.faces.forEach(faceIndices => {
+                    const rotatedVertices = faceIndices.map(i => 
+                        this.applyCameraTransform(figure.vertices[i])
+                    );
+
+                    if (rotatedVertices.some(v => v[2] <= 1)) return;
+                    if (!figure.shouldDrawFace(rotatedVertices)) return;
+
+                    const screenPoints = faceIndices.map(i => this.worldToScreen(figure.vertices[i]));
+
+                    if (Trigonometry.isPointInPoly([halfWidth, halfHeight], screenPoints)) {
+                        let avgZ = figure.getAverageZ();
+                        if (avgZ < minZ) {
+                            minZ = avgZ;
+                            targetFigure = index; 
+                        }
+                    }
+                });
+            });
+
+            if (targetFigure !== null) {
+                Sound.bang();
+                this.figures.splice(targetFigure, 1);
+            }
         }
     }
 
@@ -528,6 +569,8 @@
                 floorTile.translateZ(z);
                 
                 floorTile.hue = 200; 
+
+                floorTile.breakable = false;
                 globals.world.figures.push(floorTile);
             }
         }
@@ -549,6 +592,7 @@
             building.translateY(50 - (h * 20)); 
             building.translateZ(posZ);
             
+            building.breakable = true;
             globals.world.figures.push(building);
         }
 
@@ -569,6 +613,8 @@
             pyramid.translateZ(posZ);
             
             pyramid.hue = 30; 
+
+            pyramid.breakable = true;
             globals.world.figures.push(pyramid);
         }
             
@@ -585,6 +631,13 @@
             }                
         }
         Browser.addButton("btnToggleRotation", "🔁", toggleRotation);
+
+        let shoot = () => {      
+            Sound.ping(10); 
+            globals.world.checkShoot();   
+        }
+
+        Browser.addButton("btnShoot", "🔫", shoot);
 
         globals.joystickL = new Joystick(100, height - 100);
         globals.joystickL.add();
@@ -636,6 +689,8 @@
         } else if (config.rotationMode === 1) {
             globals.world.moveCameraY(globals.joystickR.deltaY / 30);
         }
+
+        globals.world.drawCrossHair();
     }
 
     let randomize = () => {        

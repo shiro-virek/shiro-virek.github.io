@@ -17,6 +17,23 @@ class Trigonometry {
         return { r: r, theta: theta };
     }
 
+    static isPointInPoly = (point, polygon) => {        
+        let x = point[0], y = point[1];
+        let inside = false;
+        
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            let xi = polygon[i][0], yi = polygon[i][1];
+            let xj = polygon[j][0], yj = polygon[j][1];
+            
+            let intersect = ((yi > y) != (yj > y))
+                && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                
+            if (intersect) inside = !inside;
+        }
+        
+        return inside;
+    };
+
     static angleBetweenTwoPoints = (x1, y1, x2, y2) => {
         let angle = Math.atan2(y2 - y1, x2 - x1);
         angle *= 180 / Math.PI;
