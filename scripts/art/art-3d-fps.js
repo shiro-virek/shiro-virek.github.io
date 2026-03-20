@@ -78,7 +78,11 @@
         random: Objects.getRandomObject(),
         world: null,
         joystickL: null,
-        joystickR: null,
+        joystickR: null,     
+        rows: 0,
+        columns: 0,   
+        floorCenterX: 0,
+        floorCenterZ: 0,
     }
 
     const config = {
@@ -86,6 +90,8 @@
         FOV: 1000,
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
         rotationMode: 0,
+        tileSize: 500,
+        floorSize: 2000,
     };    
 
     class ThreeDWorld {
@@ -138,6 +144,43 @@
             allFaces.forEach(face => {
                 this.drawSingleFace(face);
             });
+
+
+            this.translateInfiniteFloor();
+        }
+
+        translateInfiniteFloor = () => {
+            if (this.cameraX < globals.floorCenterX - config.tileSize) {
+                globals.world.figures.filter(face => face.infinite).forEach(face => {    
+                    face.translateX(-config.tileSize);          
+                });
+
+                globals.floorCenterX -= config.tileSize;
+            }    
+                        
+            if (this.cameraX > globals.floorCenterX + config.tileSize) {
+                globals.world.figures.filter(face => face.infinite).forEach(face => {    
+                    face.translateX(config.tileSize);          
+                });
+
+                globals.floorCenterX += config.tileSize;
+            }    
+
+            if (this.cameraZ < globals.floorCenterZ - config.tileSize) {
+                globals.world.figures.filter(face => face.infinite).forEach(face => {    
+                    face.translateZ(-config.tileSize);          
+                });
+
+                globals.floorCenterZ -= config.tileSize;
+            }    
+                        
+            if (this.cameraZ > globals.floorCenterZ + config.tileSize) {
+                globals.world.figures.filter(face => face.infinite).forEach(face => {    
+                    face.translateZ(config.tileSize);          
+                });
+
+                globals.floorCenterZ += config.tileSize;
+            }    
         }
 
         drawSingleFace = (face) => {
@@ -554,8 +597,11 @@
     }
 
     let setInitialFigures = () => {
-        for (let x = -2000; x <= 2000; x += 500) {
-            for (let z = -2000; z <= 2000; z += 500) {
+        globals.columns = Math.ceil((config.floorSize * 2) / config.tileSize);
+        globals.rows = Math.ceil((config.floorSize * 2) / config.tileSize);
+
+        for (let x = -config.floorSize; x <= config.floorSize; x += config.tileSize) {
+            for (let z = -config.floorSize; z <= config.floorSize; z += config.tileSize) {
                 let floorTile = new Figure();
                 floorTile.vertices = Objects.clone(figureTypes[0].vertices);
                 floorTile.faces = Objects.clone(figureTypes[0].faces);
@@ -571,6 +617,7 @@
                 floorTile.hue = 200; 
 
                 floorTile.breakable = false;
+                floorTile.infinite = true;
                 globals.world.figures.push(floorTile);
             }
         }
@@ -593,6 +640,7 @@
             building.translateZ(posZ);
             
             building.breakable = true;
+            building.infinite = false;
             globals.world.figures.push(building);
         }
 
@@ -615,6 +663,7 @@
             pyramid.hue = 30; 
 
             pyramid.breakable = true;
+            pyramid.infinite = false;
             globals.world.figures.push(pyramid);
         }
             
@@ -678,8 +727,8 @@
         drawBackground(ctx, canvas);
         globals.world.draw();
 
-        const forwardSpeed = -globals.joystickL.deltaY / 25; 
-        const sideSpeed = -globals.joystickL.deltaX / 25;
+        const forwardSpeed = -globals.joystickL.deltaY / 10; 
+        const sideSpeed = -globals.joystickL.deltaX / 10;
 
         if (Math.abs(forwardSpeed) > 0.1) globals.world.moveForward(forwardSpeed);
         if (Math.abs(sideSpeed) > 0.1) globals.world.moveRight(sideSpeed);
