@@ -733,7 +733,7 @@
         let toggleRotation = () => {
             if (config.rotationMode === 0) {
                 config.rotationMode = 1;
-                document.getElementById('btnToggleRotation').textContent = '🔃';
+                document.getElementById('btnToggleRotation').textContent = '🪽';
             } else {
                 config.rotationMode = 0;
                 document.getElementById('btnToggleRotation').textContent = '🔁';
@@ -802,7 +802,9 @@
         if (Math.abs(forwardSpeed) > 0.1) {
             if (!globals.world.checkWallCollision(nextX_f, nextZ_f)) {
                 globals.world.moveForward(forwardSpeed);
-            }
+            }else{
+				Sound.ping(100);
+			}
         }
         
         if (Math.abs(sideSpeed) > 0.1) {
