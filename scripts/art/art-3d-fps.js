@@ -93,7 +93,7 @@
         rotationMode: 0,
         tileSize: 500,
         floorSize: 2000,
-        worldSize: 5000,
+        worldSize: 7000,
     };    
 
     class ThreeDWorld {
@@ -612,7 +612,7 @@
             const distPoint = globals.world.applyCameraTransform(this.vertices[indices[0]]);
             const distance = distPoint[2];
             
-            let alpha = Numbers.scale(distance, 2000, 3000, 1, 0);
+            let alpha = Numbers.scale(distance, 2000, 5000, 1, 0);
             if (alpha < 0) alpha = 0;
             if (alpha > 1) alpha = 1;
 
