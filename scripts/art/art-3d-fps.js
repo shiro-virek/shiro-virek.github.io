@@ -83,6 +83,7 @@
         columns: 0,   
         floorCenterX: 0,
         floorCenterZ: 0,
+        points: 0,
     }
 
     const config = {
@@ -92,6 +93,7 @@
         rotationMode: 0,
         tileSize: 500,
         floorSize: 2000,
+        worldSize: 5000,
     };    
 
     class ThreeDWorld {
@@ -150,14 +152,18 @@
         }
 
         checkWallCollision = (nextX, nextZ) => {
+            const playerSize = 40; 
+
             for (let fig of this.figures) {
-                if (fig.infinite) continue; 
+                if (!fig.solid) continue; 
 
-                let dx = nextX - fig.center[0];
-                let dz = nextZ - fig.center[2];
-                let dist = Math.sqrt(dx*dx + dz*dz);
+                const collisionX = nextX + playerSize > fig.bounds.minX && 
+                                nextX - playerSize < fig.bounds.maxX;
+                                
+                const collisionZ = nextZ + playerSize > fig.bounds.minZ && 
+                                nextZ - playerSize < fig.bounds.maxZ;
 
-                if (dist < fig.collisionRadius + 20) {
+                if (collisionX && collisionZ) {
                     return true; 
                 }
             }
@@ -393,12 +399,16 @@
             if (targetFigure !== null) {
                 Sound.bang();
                 this.figures.splice(targetFigure, 1);
+                globals.points += 1;
             }
         }
     }
 
     class Figure {
         constructor() {
+            this.solid = false;
+            this.infinite = false;
+            this.breakable = false;
             this.vertices = [];
             this.edges = [];
             this.faces = []; 
@@ -495,31 +505,16 @@
 
         setupCollision = () => {
             let minX = Infinity, maxX = -Infinity;
-            let minY = Infinity, maxY = -Infinity;
             let minZ = Infinity, maxZ = -Infinity;
 
             this.vertices.forEach(v => {
                 if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
-                if (v[1] < minY) minY = v[1]; if (v[1] > maxY) maxY = v[1];
                 if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
             });
 
-            this.center = [
-                (minX + maxX) / 2,
-                (minY + maxY) / 2,
-                (minZ + maxZ) / 2
-            ];
-
-            let maxDistSq = 0;
-            this.vertices.forEach(v => {
-                let dx = v[0] - this.center[0];
-                let dy = v[1] - this.center[1];
-                let dz = v[2] - this.center[2];
-                let distSq = dx*dx + dy*dy + dz*dz;
-                if (distSq > maxDistSq) maxDistSq = distSq;
-            });
-
-            this.collisionRadius = Math.sqrt(maxDistSq);
+            this.bounds = { minX, maxX, minZ, maxZ };
+            
+            this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
         }
 
         draw = () => {
@@ -641,6 +636,38 @@
         }
     }
 
+    let addWalls = () => {
+        for (let i = 1; i <=4; i++) {          
+            let wall = new Figure();
+            wall.vertices = Objects.clone(figureTypes[0].vertices);
+            wall.faces = Objects.clone(figureTypes[0].faces);
+
+            wall.scaleX(config.worldSize / 20);
+            wall.scaleY(20);
+
+            if (i % 2 === 0) {
+                wall.rotateY(90);
+            }
+
+            switch(i) {
+                case 1: wall.translateX(0); wall.translateZ(-config.worldSize); break;
+                case 2: wall.translateX(config.worldSize); wall.translateZ(0); break;
+                case 3: wall.translateX(0); wall.translateZ(config.worldSize); break;
+                case 4: wall.translateX(-config.worldSize); wall.translateZ(0); break;
+            }
+
+            wall.translateY(-300);
+
+            wall.hue = 0;
+
+            wall.breakable = false;
+            wall.infinite = false;
+            wall.solid = true;
+            wall.setupCollision();
+            globals.world.figures.push(wall);        
+        }
+    }
+
     let addFloor = () => {
 
         for (let x = -config.floorSize; x <= config.floorSize; x += config.tileSize) {
@@ -661,6 +688,7 @@
 
                 floorTile.breakable = false;
                 floorTile.infinite = true;
+                floorTile.solid = false;
                 floorTile.setupCollision();
                 globals.world.figures.push(floorTile);
             }
@@ -688,6 +716,7 @@
             
             building.breakable = true;
             building.infinite = false;
+            building.solid = true;
             building.setupCollision();
             globals.world.figures.push(building);
         }
@@ -715,6 +744,7 @@
 
             pyramid.breakable = true;
             pyramid.infinite = false;
+            pyramid.solid = true;
             pyramid.setupCollision();
             globals.world.figures.push(pyramid);
         }
@@ -726,7 +756,8 @@
 
         addFloor();
         addBuildings();
-        addPyramids();
+        //addPyramids();
+        addWalls();
     }
 
     let addSpecialControls = () => {
@@ -803,7 +834,7 @@
             if (!globals.world.checkWallCollision(nextX_f, nextZ_f)) {
                 globals.world.moveForward(forwardSpeed);
             }else{
-				Sound.ping(100);
+				Sound.hit();
 			}
         }
         
@@ -820,6 +851,8 @@
         }
 
         globals.world.drawCrossHair();
+
+        Browser.setInfo(`${globals.points}`);
     }
 
     let randomize = () => {        
