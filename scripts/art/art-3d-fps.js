@@ -108,6 +108,15 @@
             this.cameraRotationZ = 0;
         }
 
+        drawMap = () => {
+            let mapSize = 100;
+            console.log(this.cameraX, this.cameraZ);
+            Drawing.drawRectangle(ctx, 10, 10, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
+            let xPlayer = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
+            let zPlayer = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
+            Drawing.drawCircle(ctx, xPlayer, zPlayer, 3, 'rgba(255,0,0,0.5)');   
+        }   
+
         draw = () => {
             let allFaces = [];
 
@@ -170,8 +179,8 @@
             return false;
         }
 
-        translateInfiniteFloor = () => {
-            if (this.cameraX < globals.floorCenterX - config.tileSize) {
+        translateInfiniteFloor = () => {    
+            if (this.cameraX < globals.floorCenterX - config.tileSize && this.cameraX > -config.worldSize + config.tileSize * 3) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(-config.tileSize);          
                 });
@@ -179,7 +188,7 @@
                 globals.floorCenterX -= config.tileSize;
             }    
                         
-            if (this.cameraX > globals.floorCenterX + config.tileSize) {
+            if (this.cameraX > globals.floorCenterX + config.tileSize && this.cameraX < config.worldSize - config.tileSize * 3) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(config.tileSize);          
                 });
@@ -187,7 +196,7 @@
                 globals.floorCenterX += config.tileSize;
             }    
 
-            if (this.cameraZ < globals.floorCenterZ - config.tileSize) {
+            if (this.cameraZ < globals.floorCenterZ - config.tileSize && this.cameraZ > -config.worldSize + config.tileSize * 3) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(-config.tileSize);          
                 });
@@ -195,7 +204,7 @@
                 globals.floorCenterZ -= config.tileSize;
             }    
                         
-            if (this.cameraZ > globals.floorCenterZ + config.tileSize) {
+            if (this.cameraZ > globals.floorCenterZ + config.tileSize && this.cameraZ < config.worldSize - config.tileSize * 3) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(config.tileSize);          
                 });
@@ -637,34 +646,38 @@
     }
 
     let addWalls = () => {
-        for (let i = 1; i <=4; i++) {          
-            let wall = new Figure();
-            wall.vertices = Objects.clone(figureTypes[0].vertices);
-            wall.faces = Objects.clone(figureTypes[0].faces);
+        for (let i = 1; i <=4; i++) {         
+            let segmentSize = 400;
+            let segments = config.worldSize * 2 / segmentSize;
+            for (let j = -segments; j < segments; j++) {
+                let wall = new Figure();
+                wall.vertices = Objects.clone(figureTypes[0].vertices);
+                wall.faces = Objects.clone(figureTypes[0].faces);
 
-            wall.scaleX(config.worldSize / 20);
-            wall.scaleY(20);
+                wall.scaleX(segmentSize / 40);
+                wall.scaleY(20);
 
-            if (i % 2 === 0) {
-                wall.rotateY(90);
-            }
+                if (i % 2 === 0) {
+                    wall.rotateY(90);
+                }
 
-            switch(i) {
-                case 1: wall.translateX(0); wall.translateZ(-config.worldSize); break;
-                case 2: wall.translateX(config.worldSize); wall.translateZ(0); break;
-                case 3: wall.translateX(0); wall.translateZ(config.worldSize); break;
-                case 4: wall.translateX(-config.worldSize); wall.translateZ(0); break;
-            }
+                switch(i) {
+                    case 1: wall.translateX(j*segmentSize); wall.translateZ(-config.worldSize); break;
+                    case 2: wall.translateX(config.worldSize); wall.translateZ(j*segmentSize); break;
+                    case 3: wall.translateX(j*segmentSize); wall.translateZ(config.worldSize); break;
+                    case 4: wall.translateX(-config.worldSize); wall.translateZ(j*segmentSize); break;
+                }
 
-            wall.translateY(-300);
+                wall.translateY(-300);
 
-            wall.hue = 0;
+                wall.hue = 0;
 
-            wall.breakable = false;
-            wall.infinite = false;
-            wall.solid = true;
-            wall.setupCollision();
-            globals.world.figures.push(wall);        
+                wall.breakable = false;
+                wall.infinite = false;
+                wall.solid = true;
+                wall.setupCollision();
+                globals.world.figures.push(wall);   
+            }           
         }
     }
 
@@ -853,6 +866,8 @@
         globals.world.drawCrossHair();
 
         Browser.setInfo(`${globals.points}`);
+
+        globals.world.drawMap();
     }
 
     let randomize = () => {        
