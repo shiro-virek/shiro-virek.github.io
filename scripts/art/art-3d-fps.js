@@ -110,11 +110,16 @@
 
         drawMap = () => {
             let mapSize = 100;
-            console.log(this.cameraX, this.cameraZ);
+            
             Drawing.drawRectangle(ctx, 10, 10, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
+
             let xPlayer = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
             let zPlayer = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
             Drawing.drawCircle(ctx, xPlayer, zPlayer, 3, 'rgba(255,0,0,0.5)');   
+
+            let xSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
+            let zSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
+            Drawing.drawCircle(ctx, xSecret, zSecret, 3, 'rgba(0,255,0,0.5)'); 
         }   
 
         draw = () => {
@@ -407,8 +412,18 @@
 
             if (targetFigure !== null) {
                 Sound.bang();
+                let secretFound = false;
+
+                if (this.figures[targetFigure].secret) {
+                    secretFound = true;
+                }
+
                 this.figures.splice(targetFigure, 1);
                 globals.points += 1;
+
+                if (secretFound) {
+                    addSecretObject();
+                }
             }
         }
     }
@@ -418,6 +433,7 @@
             this.solid = false;
             this.infinite = false;
             this.breakable = false;
+            this.secret = false;
             this.vertices = [];
             this.edges = [];
             this.faces = []; 
@@ -763,6 +779,34 @@
         }
     }
 
+    let addSecretObject = () => {
+        let pyramid = new Figure();
+        pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
+        pyramid.faces = Objects.clone(figureTypes[2].faces);
+
+        pyramid.rotateX(180);
+        pyramid.scale(8); 
+
+        let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
+        let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+
+        globals.secretX = posX;
+        globals.secretZ = posZ;
+
+        pyramid.translateX(posX);
+        pyramid.translateY(50 - 20 * 8); 
+        pyramid.translateZ(posZ);
+        
+        pyramid.hue = 100; 
+
+        pyramid.breakable = true;
+        pyramid.infinite = false;
+        pyramid.solid = true;
+        pyramid.secret = true;
+        pyramid.setupCollision();
+        globals.world.figures.push(pyramid);        
+    }
+
     let setInitialFigures = () => {
         globals.columns = Math.ceil((config.floorSize * 2) / config.tileSize);
         globals.rows = Math.ceil((config.floorSize * 2) / config.tileSize);
@@ -771,6 +815,7 @@
         addBuildings();
         //addPyramids();
         addWalls();
+        addSecretObject();
     }
 
     let addSpecialControls = () => {
