@@ -115,11 +115,11 @@
 
             let xPlayer = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
             let zPlayer = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
-            Drawing.drawCircle(ctx, xPlayer, zPlayer, 3, 'rgba(255,0,0,0.5)');   
+            Drawing.drawCircle(ctx, xPlayer, 10 + mapSize - zPlayer, 3, 'rgba(255,0,0,0.5)');   
 
             let xSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
             let zSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
-            Drawing.drawCircle(ctx, xSecret, zSecret, 3, 'rgba(0,255,0,0.5)'); 
+            Drawing.drawCircle(ctx, xSecret, 10 + mapSize - zSecret, 3, 'rgba(0,255,0,0.5)'); 
         }   
 
         draw = () => {
