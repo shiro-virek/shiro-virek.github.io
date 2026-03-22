@@ -871,7 +871,7 @@
         if (clicking) {
         }
     }
-            
+
     window.draw = () => {
         drawBackground(ctx, canvas);
         globals.world.draw();
@@ -880,25 +880,23 @@
         const sideSpeed = -globals.joystickL.deltaX / 10;
         
         let angleRad = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ);
-        
-        let nextX_f = globals.world.cameraX - Math.sin(angleRad) * forwardSpeed;
-        let nextZ_f = globals.world.cameraZ + Math.cos(angleRad) * forwardSpeed;
-        
         let angleRadR = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ + 90);
-        let nextX_r = globals.world.cameraX - Math.sin(angleRadR) * sideSpeed;
-        let nextZ_r = globals.world.cameraZ + Math.cos(angleRadR) * sideSpeed;
 
-        if (Math.abs(forwardSpeed) > 0.1) {
-            if (!globals.world.checkWallCollision(nextX_f, nextZ_f)) {
-                globals.world.moveForward(forwardSpeed);
-            }else{
-				Sound.hit();
-			}
-        }
-        
-        if (Math.abs(sideSpeed) > 0.1) {
-            if (!globals.world.checkWallCollision(nextX_r, nextZ_r)) {
-                globals.world.moveRight(sideSpeed);
+        let dx = (-Math.sin(angleRad) * forwardSpeed) + (-Math.sin(angleRadR) * sideSpeed);
+        let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
+
+        if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {
+            
+            if (!globals.world.checkWallCollision(globals.world.cameraX + dx, globals.world.cameraZ)) {
+                globals.world.cameraX += dx;
+            } else {
+                Sound.hit(); 
+            }
+
+            if (!globals.world.checkWallCollision(globals.world.cameraX, globals.world.cameraZ + dz)) {
+                globals.world.cameraZ += dz;
+            } else {
+                Sound.hit();
             }
         }
 
@@ -909,9 +907,7 @@
         }
 
         globals.world.drawCrossHair();
-
         Browser.setInfo(`${globals.points}`);
-
         globals.world.drawMap();
     }
 
