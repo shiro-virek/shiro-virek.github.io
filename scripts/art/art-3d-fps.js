@@ -185,7 +185,7 @@
         }
 
         translateInfiniteFloor = () => {    
-            if (this.cameraX < globals.floorCenterX - config.tileSize && this.cameraX > -config.worldSize + config.tileSize * 3) {
+            if (this.cameraX < globals.floorCenterX - config.tileSize && this.cameraX > -config.worldSize + config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(-config.tileSize);          
                 });
@@ -193,7 +193,7 @@
                 globals.floorCenterX -= config.tileSize;
             }    
                         
-            if (this.cameraX > globals.floorCenterX + config.tileSize && this.cameraX < config.worldSize - config.tileSize * 3) {
+            if (this.cameraX > globals.floorCenterX + config.tileSize && this.cameraX < config.worldSize - config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(config.tileSize);          
                 });
@@ -201,7 +201,7 @@
                 globals.floorCenterX += config.tileSize;
             }    
 
-            if (this.cameraZ < globals.floorCenterZ - config.tileSize && this.cameraZ > -config.worldSize + config.tileSize * 3) {
+            if (this.cameraZ < globals.floorCenterZ - config.tileSize && this.cameraZ > -config.worldSize + config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(-config.tileSize);          
                 });
@@ -209,7 +209,7 @@
                 globals.floorCenterZ -= config.tileSize;
             }    
                         
-            if (this.cameraZ > globals.floorCenterZ + config.tileSize && this.cameraZ < config.worldSize - config.tileSize * 3) {
+            if (this.cameraZ > globals.floorCenterZ + config.tileSize && this.cameraZ < config.worldSize - config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(config.tileSize);          
                 });
