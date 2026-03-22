@@ -83,6 +83,7 @@
         columns: 0,   
         floorCenterX: 0,
         floorCenterZ: 0,
+        points: 0,
     }
 
     const config = {
@@ -92,6 +93,7 @@
         rotationMode: 0,
         tileSize: 500,
         floorSize: 2000,
+        worldSize: 7000,
     };    
 
     class ThreeDWorld {
@@ -105,6 +107,20 @@
             this.cameraRotationX = 5;
             this.cameraRotationZ = 0;
         }
+
+        drawMap = () => {
+            let mapSize = 100;
+            
+            Drawing.drawRectangle(ctx, 10, 10, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
+
+            let xPlayer = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
+            let zPlayer = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
+            Drawing.drawCircle(ctx, xPlayer, 10 + mapSize - zPlayer, 3, 'rgba(255,0,0,0.5)');   
+
+            let xSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
+            let zSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
+            Drawing.drawCircle(ctx, xSecret, 10 + mapSize - zSecret, 3, 'rgba(0,255,0,0.5)'); 
+        }   
 
         draw = () => {
             let allFaces = [];
@@ -150,22 +166,26 @@
         }
 
         checkWallCollision = (nextX, nextZ) => {
+            const playerSize = 40; 
+
             for (let fig of this.figures) {
-                if (fig.infinite) continue; 
+                if (!fig.solid) continue; 
 
-                let dx = nextX - fig.center[0];
-                let dz = nextZ - fig.center[2];
-                let dist = Math.sqrt(dx*dx + dz*dz);
+                const collisionX = nextX + playerSize > fig.bounds.minX && 
+                                nextX - playerSize < fig.bounds.maxX;
+                                
+                const collisionZ = nextZ + playerSize > fig.bounds.minZ && 
+                                nextZ - playerSize < fig.bounds.maxZ;
 
-                if (dist < fig.collisionRadius + 20) {
+                if (collisionX && collisionZ) {
                     return true; 
                 }
             }
             return false;
         }
 
-        translateInfiniteFloor = () => {
-            if (this.cameraX < globals.floorCenterX - config.tileSize) {
+        translateInfiniteFloor = () => {    
+            if (this.cameraX < globals.floorCenterX - config.tileSize && this.cameraX > -config.worldSize + config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(-config.tileSize);          
                 });
@@ -173,7 +193,7 @@
                 globals.floorCenterX -= config.tileSize;
             }    
                         
-            if (this.cameraX > globals.floorCenterX + config.tileSize) {
+            if (this.cameraX > globals.floorCenterX + config.tileSize && this.cameraX < config.worldSize - config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(config.tileSize);          
                 });
@@ -181,7 +201,7 @@
                 globals.floorCenterX += config.tileSize;
             }    
 
-            if (this.cameraZ < globals.floorCenterZ - config.tileSize) {
+            if (this.cameraZ < globals.floorCenterZ - config.tileSize && this.cameraZ > -config.worldSize + config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(-config.tileSize);          
                 });
@@ -189,7 +209,7 @@
                 globals.floorCenterZ -= config.tileSize;
             }    
                         
-            if (this.cameraZ > globals.floorCenterZ + config.tileSize) {
+            if (this.cameraZ > globals.floorCenterZ + config.tileSize && this.cameraZ < config.worldSize - config.tileSize * 4) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(config.tileSize);          
                 });
@@ -392,13 +412,28 @@
 
             if (targetFigure !== null) {
                 Sound.bang();
+                let secretFound = false;
+
+                if (this.figures[targetFigure].secret) {
+                    secretFound = true;
+                }
+
                 this.figures.splice(targetFigure, 1);
+                globals.points += 1;
+
+                if (secretFound) {
+                    addSecretObject();
+                }
             }
         }
     }
 
     class Figure {
         constructor() {
+            this.solid = false;
+            this.infinite = false;
+            this.breakable = false;
+            this.secret = false;
             this.vertices = [];
             this.edges = [];
             this.faces = []; 
@@ -495,31 +530,16 @@
 
         setupCollision = () => {
             let minX = Infinity, maxX = -Infinity;
-            let minY = Infinity, maxY = -Infinity;
             let minZ = Infinity, maxZ = -Infinity;
 
             this.vertices.forEach(v => {
                 if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
-                if (v[1] < minY) minY = v[1]; if (v[1] > maxY) maxY = v[1];
                 if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
             });
 
-            this.center = [
-                (minX + maxX) / 2,
-                (minY + maxY) / 2,
-                (minZ + maxZ) / 2
-            ];
-
-            let maxDistSq = 0;
-            this.vertices.forEach(v => {
-                let dx = v[0] - this.center[0];
-                let dy = v[1] - this.center[1];
-                let dz = v[2] - this.center[2];
-                let distSq = dx*dx + dy*dy + dz*dz;
-                if (distSq > maxDistSq) maxDistSq = distSq;
-            });
-
-            this.collisionRadius = Math.sqrt(maxDistSq);
+            this.bounds = { minX, maxX, minZ, maxZ };
+            
+            this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
         }
 
         draw = () => {
@@ -617,7 +637,7 @@
             const distPoint = globals.world.applyCameraTransform(this.vertices[indices[0]]);
             const distance = distPoint[2];
             
-            let alpha = Numbers.scale(distance, 2000, 3000, 1, 0);
+            let alpha = Numbers.scale(distance, 2000, 5000, 1, 0);
             if (alpha < 0) alpha = 0;
             if (alpha > 1) alpha = 1;
 
@@ -641,6 +661,42 @@
         }
     }
 
+    let addWalls = () => {
+        for (let i = 1; i <=4; i++) {         
+            let segmentSize = 400;
+            let segments = config.worldSize * 2 / segmentSize;
+            for (let j = -segments; j < segments; j++) {
+                let wall = new Figure();
+                wall.vertices = Objects.clone(figureTypes[0].vertices);
+                wall.faces = Objects.clone(figureTypes[0].faces);
+
+                wall.scaleX(segmentSize / 40);
+                wall.scaleY(20);
+
+                if (i % 2 === 0) {
+                    wall.rotateY(90);
+                }
+
+                switch(i) {
+                    case 1: wall.translateX(j*segmentSize); wall.translateZ(-config.worldSize); break;
+                    case 2: wall.translateX(config.worldSize); wall.translateZ(j*segmentSize); break;
+                    case 3: wall.translateX(j*segmentSize); wall.translateZ(config.worldSize); break;
+                    case 4: wall.translateX(-config.worldSize); wall.translateZ(j*segmentSize); break;
+                }
+
+                wall.translateY(-300);
+
+                wall.hue = 0;
+
+                wall.breakable = false;
+                wall.infinite = false;
+                wall.solid = true;
+                wall.setupCollision();
+                globals.world.figures.push(wall);   
+            }           
+        }
+    }
+
     let addFloor = () => {
 
         for (let x = -config.floorSize; x <= config.floorSize; x += config.tileSize) {
@@ -661,6 +717,7 @@
 
                 floorTile.breakable = false;
                 floorTile.infinite = true;
+                floorTile.solid = false;
                 floorTile.setupCollision();
                 globals.world.figures.push(floorTile);
             }
@@ -669,7 +726,7 @@
 
     let addBuildings = () => {
 
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 50; i++) {
             let building = new Figure();
             building.vertices = Objects.clone(figureTypes[0].vertices);
             building.faces = Objects.clone(figureTypes[0].faces);
@@ -679,8 +736,8 @@
             building.scaleX(2);
             building.scaleZ(2);
             
-            let posX = globals.random.nextInt(-1500, 1500);
-            let posZ = globals.random.nextInt(-1500, 1500);
+            let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
+            let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
             
             building.translateX(posX);
             building.translateY(50 - (h * 20)); 
@@ -688,6 +745,7 @@
             
             building.breakable = true;
             building.infinite = false;
+            building.solid = true;
             building.setupCollision();
             globals.world.figures.push(building);
         }
@@ -715,9 +773,38 @@
 
             pyramid.breakable = true;
             pyramid.infinite = false;
+            pyramid.solid = true;
             pyramid.setupCollision();
             globals.world.figures.push(pyramid);
         }
+    }
+
+    let addSecretObject = () => {
+        let pyramid = new Figure();
+        pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
+        pyramid.faces = Objects.clone(figureTypes[2].faces);
+
+        pyramid.rotateX(180);
+        pyramid.scale(8); 
+
+        let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
+        let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+
+        globals.secretX = posX;
+        globals.secretZ = posZ;
+
+        pyramid.translateX(posX);
+        pyramid.translateY(50 - 20 * 8); 
+        pyramid.translateZ(posZ);
+        
+        pyramid.hue = 100; 
+
+        pyramid.breakable = true;
+        pyramid.infinite = false;
+        pyramid.solid = true;
+        pyramid.secret = true;
+        pyramid.setupCollision();
+        globals.world.figures.push(pyramid);        
     }
 
     let setInitialFigures = () => {
@@ -726,7 +813,9 @@
 
         addFloor();
         addBuildings();
-        addPyramids();
+        //addPyramids();
+        addWalls();
+        addSecretObject();
     }
 
     let addSpecialControls = () => {
@@ -782,7 +871,7 @@
         if (clicking) {
         }
     }
-            
+
     window.draw = () => {
         drawBackground(ctx, canvas);
         globals.world.draw();
@@ -791,25 +880,23 @@
         const sideSpeed = -globals.joystickL.deltaX / 10;
         
         let angleRad = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ);
-        
-        let nextX_f = globals.world.cameraX - Math.sin(angleRad) * forwardSpeed;
-        let nextZ_f = globals.world.cameraZ + Math.cos(angleRad) * forwardSpeed;
-        
         let angleRadR = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ + 90);
-        let nextX_r = globals.world.cameraX - Math.sin(angleRadR) * sideSpeed;
-        let nextZ_r = globals.world.cameraZ + Math.cos(angleRadR) * sideSpeed;
 
-        if (Math.abs(forwardSpeed) > 0.1) {
-            if (!globals.world.checkWallCollision(nextX_f, nextZ_f)) {
-                globals.world.moveForward(forwardSpeed);
-            }else{
-				Sound.ping(100);
-			}
-        }
-        
-        if (Math.abs(sideSpeed) > 0.1) {
-            if (!globals.world.checkWallCollision(nextX_r, nextZ_r)) {
-                globals.world.moveRight(sideSpeed);
+        let dx = (-Math.sin(angleRad) * forwardSpeed) + (-Math.sin(angleRadR) * sideSpeed);
+        let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
+
+        if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {
+            
+            if (!globals.world.checkWallCollision(globals.world.cameraX + dx, globals.world.cameraZ)) {
+                globals.world.cameraX += dx;
+            } else {
+                Sound.hit(); 
+            }
+
+            if (!globals.world.checkWallCollision(globals.world.cameraX, globals.world.cameraZ + dz)) {
+                globals.world.cameraZ += dz;
+            } else {
+                Sound.hit();
             }
         }
 
@@ -820,6 +907,8 @@
         }
 
         globals.world.drawCrossHair();
+        Browser.setInfo(`${globals.points}`);
+        globals.world.drawMap();
     }
 
     let randomize = () => {        
