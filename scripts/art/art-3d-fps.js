@@ -726,7 +726,7 @@
 
     let addBuildings = () => {
 
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 50; i++) {
             let building = new Figure();
             building.vertices = Objects.clone(figureTypes[0].vertices);
             building.faces = Objects.clone(figureTypes[0].faces);
@@ -736,8 +736,8 @@
             building.scaleX(2);
             building.scaleZ(2);
             
-            let posX = globals.random.nextInt(-1500, 1500);
-            let posZ = globals.random.nextInt(-1500, 1500);
+            let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
+            let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
             
             building.translateX(posX);
             building.translateY(50 - (h * 20)); 
