@@ -95,7 +95,6 @@
         floorSize: 2000,
         worldSize: 7000,
         floorHue: 0,
-        fadeOutSpeed: 0.02,
     };    
 
     class ThreeDWorld {
@@ -128,6 +127,7 @@
                 piece.isDebris = true;
                 piece.hue = originalHue;
                 piece.breakable = false;
+                piece.fadeOutSpeed = 0.01 + (Math.random() * 0.02);
 
                 let dirX = piece.center[0] - origin[0];
                 let dirY = piece.center[1] - origin[1]; 
@@ -502,6 +502,7 @@
             this.vy = 0;
             this.vz = 0; 
             this.gravity = 0.5; 
+            this.fadeOutSpeed = 0;
             this.setupCollision();
         }
 
@@ -949,7 +950,7 @@
                 fig.translateY(fig.vy);
                 fig.translateZ(fig.vz);
 
-                fig.life -= config.fadeOutSpeed;
+                fig.life -= fig.fadeOutSpeed;
 
                 if (fig.life <= 0) {
                     globals.world.figures.splice(i, 1);
