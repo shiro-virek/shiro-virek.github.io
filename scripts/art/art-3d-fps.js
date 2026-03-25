@@ -108,19 +108,26 @@
             this.cameraRotationZ = 0;
         }
 
+
         drawMap = () => {
             let mapSize = 100;
+            let mapX = 10;
+            let mapY = 10;
             
-            Drawing.drawRectangle(ctx, 10, 10, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
+            Drawing.drawRectangle(ctx, mapX, mapY, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
 
-            let xPlayer = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
-            let zPlayer = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
-            Drawing.drawCircle(ctx, xPlayer, 10 + mapSize - zPlayer, 3, 'rgba(255,0,0,0.5)');   
+            let rawX = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, mapX, mapX + mapSize);
+            let rawZ = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, mapY, mapY + mapSize);
+            
+            let xPlayer = Math.max(mapX, Math.min(mapX + mapSize, rawX));
+            let zPlayer = Math.max(mapY, Math.min(mapY + mapSize, rawZ));
+            
+            Drawing.drawCircle(ctx, xPlayer, mapY + mapSize - (zPlayer - mapY), 3, 'rgba(255,0,0,0.5)');   
 
             let xSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
             let zSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
             Drawing.drawCircle(ctx, xSecret, 10 + mapSize - zSecret, 3, 'rgba(0,255,0,0.5)'); 
-        }   
+        } 
 
         draw = () => {
             let allFaces = [];
@@ -166,7 +173,7 @@
         }
 
         checkWallCollision = (nextX, nextZ) => {
-            const playerSize = 40; 
+            const playerSize = 60; 
 
             for (let fig of this.figures) {
                 if (!fig.solid) continue; 
@@ -665,7 +672,7 @@
         let cubeSize = 40;
         for (let i = 1; i <=4; i++) {         
             let segmentSize = config.worldSize / 20;
-            let segments = config.worldSize / segmentSize;
+            let segments = config.worldSize / segmentSize + 1;
             for (let j = -segments; j < segments; j++) {
                 let wall = new Figure();
                 wall.vertices = Objects.clone(figureTypes[0].vertices);
@@ -679,10 +686,10 @@
                 }
 
                 switch(i) {
-                    case 1: wall.translateX(j*segmentSize); wall.translateZ(-config.worldSize-cubeSize); break;
-                    case 2: wall.translateX(config.worldSize+cubeSize); wall.translateZ(j*segmentSize); break;
-                    case 3: wall.translateX(j*segmentSize); wall.translateZ(config.worldSize+cubeSize); break;
-                    case 4: wall.translateX(-config.worldSize-cubeSize); wall.translateZ(j*segmentSize); break;
+                    case 1: wall.translateX(j*segmentSize); wall.translateZ(-config.worldSize); break;
+                    case 2: wall.translateX(config.worldSize); wall.translateZ(j*segmentSize); break;
+                    case 3: wall.translateX(j*segmentSize); wall.translateZ(config.worldSize); break;
+                    case 4: wall.translateX(-config.worldSize); wall.translateZ(j*segmentSize); break;
                 }
 
                 wall.translateY(-300);
