@@ -662,15 +662,16 @@
     }
 
     let addWalls = () => {
+        let cubeSize = 40;
         for (let i = 1; i <=4; i++) {         
-            let segmentSize = 400;
-            let segments = config.worldSize * 2 / segmentSize;
+            let segmentSize = config.worldSize / 20;
+            let segments = config.worldSize / segmentSize;
             for (let j = -segments; j < segments; j++) {
                 let wall = new Figure();
                 wall.vertices = Objects.clone(figureTypes[0].vertices);
-                wall.faces = Objects.clone(figureTypes[0].faces);
+                wall.faces = Objects.clone(figureTypes[0].faces);            
 
-                wall.scaleX(segmentSize / 40);
+                wall.scaleX(segmentSize / cubeSize);
                 wall.scaleY(20);
 
                 if (i % 2 === 0) {
@@ -678,10 +679,10 @@
                 }
 
                 switch(i) {
-                    case 1: wall.translateX(j*segmentSize); wall.translateZ(-config.worldSize); break;
-                    case 2: wall.translateX(config.worldSize); wall.translateZ(j*segmentSize); break;
-                    case 3: wall.translateX(j*segmentSize); wall.translateZ(config.worldSize); break;
-                    case 4: wall.translateX(-config.worldSize); wall.translateZ(j*segmentSize); break;
+                    case 1: wall.translateX(j*segmentSize); wall.translateZ(-config.worldSize-cubeSize); break;
+                    case 2: wall.translateX(config.worldSize+cubeSize); wall.translateZ(j*segmentSize); break;
+                    case 3: wall.translateX(j*segmentSize); wall.translateZ(config.worldSize+cubeSize); break;
+                    case 4: wall.translateX(-config.worldSize-cubeSize); wall.translateZ(j*segmentSize); break;
                 }
 
                 wall.translateY(-300);
