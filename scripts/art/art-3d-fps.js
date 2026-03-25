@@ -95,6 +95,7 @@
         floorSize: 2000,
         worldSize: 7000,
         floorHue: 0,
+        fadeOutSpeed: 0.02,
     };    
 
     class ThreeDWorld {
@@ -107,6 +108,42 @@
 
             this.cameraRotationX = 5;
             this.cameraRotationZ = 0;
+        }
+
+        fragmentFigure = (originalFig) => {
+            const originalHue = originalFig.hue;
+            const origin = originalFig.center; 
+
+            originalFig.faces.forEach((faceIndices, index) => {
+                let piece = new Figure();
+                
+                piece.vertices = faceIndices.map(vIdx => Objects.clone(originalFig.vertices[vIdx]));
+                
+                const newFaceIndices = [];
+                for (let i = 0; i < faceIndices.length; i++) newFaceIndices.push(i);
+                piece.faces = [newFaceIndices];
+
+                piece.setupCollision();
+                
+                piece.isDebris = true;
+                piece.hue = originalHue;
+                piece.breakable = false;
+
+                let dirX = piece.center[0] - origin[0];
+                let dirY = piece.center[1] - origin[1]; 
+                let dirZ = piece.center[2] - origin[2];
+
+                let mag = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
+                if (mag === 0) mag = 1; 
+
+                let force = 15; 
+                piece.vx = (dirX / mag) * force + (Math.random() * 4 - 2); 
+                piece.vz = (dirZ / mag) * force + (Math.random() * 4 - 2);
+                
+                piece.vy = (Math.random() * -10 - 5); 
+
+                this.figures.push(piece);
+            });
         }
 
         drawMap = () => {
@@ -169,6 +206,7 @@
                             worldVertices: faceIndices.map(index => figure.vertices[index]),
                             viewZ: avgZ,
                             hue: figure.hue,
+                            life: figure.isDebris ? figure.life : 1.0,
                             lightness: figure.getLightness(viewVertices)
                         });
                     }
@@ -240,12 +278,14 @@
 
         drawSingleFace = (face) => {
             const dist = face.viewZ;
-            
-            let alpha = Numbers.scale(dist, 2000, 3000, 1, 0);
-            if (alpha < 0) alpha = 0;
-            if (alpha > 1) alpha = 1;
+            let fogAlpha = Numbers.scale(dist, 2000, 5000, 1, 0);
+            if (fogAlpha < 0) fogAlpha = 0;
 
-            const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${alpha})`;
+            let finalAlpha = fogAlpha * face.life;
+            if (finalAlpha < 0) finalAlpha = 0;
+            if (finalAlpha > 1) finalAlpha = 1;
+
+            const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${finalAlpha.toFixed(2)})`;
             
             ctx.beginPath();
             let screenPoint = this.worldToScreen(face.worldVertices[0]);
@@ -437,6 +477,9 @@
                     addSecretObject();
                 }
 
+                globals.world.shakeIntensity = 30;
+                this.fragmentFigure(this.figures[targetFigure]);
+
                 this.figures.splice(targetFigure, 1);
                 globals.points += 1;
             }
@@ -453,6 +496,12 @@
             this.edges = [];
             this.faces = []; 
             this.hue = globals.random.nextInt(1, 360);
+            this.isDebris = false;
+            this.life = 1.0;
+            this.vx = 0; 
+            this.vy = 0;
+            this.vz = 0; 
+            this.gravity = 0.5; 
             this.setupCollision();
         }
 
@@ -890,6 +939,31 @@
 
     window.draw = () => {
         drawBackground(ctx, canvas);
+
+        for (let i = globals.world.figures.length - 1; i >= 0; i--) {
+            let fig = globals.world.figures[i];
+            
+            if (fig.isDebris) {
+                fig.vy += fig.gravity;
+                fig.translateX(fig.vx);
+                fig.translateY(fig.vy);
+                fig.translateZ(fig.vz);
+
+                fig.life -= config.fadeOutSpeed;
+
+                if (fig.life <= 0) {
+                    globals.world.figures.splice(i, 1);
+                    continue;
+                }
+
+                if (fig.center[1] > 50) {
+                    fig.translateY(50 - fig.center[1]);
+                    fig.vy *= -0.5; 
+                    fig.vx *= 0.8; 
+                    fig.vz *= 0.8;
+                }
+            }
+        }
         globals.world.draw();
 
         const forwardSpeed = -globals.joystickL.deltaY / 10; 
