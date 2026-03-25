@@ -423,17 +423,15 @@
 
             if (targetFigure !== null) {
                 Sound.bang();
-                let secretFound = false;
 
                 if (this.figures[targetFigure].secret) {
-                    secretFound = true;
+                    addSecretObject();
                 }
 
                 this.figures.splice(targetFigure, 1);
                 globals.points += 1;
 
                 if (secretFound) {
-                    addSecretObject();
                 }
             }
         }
