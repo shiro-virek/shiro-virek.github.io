@@ -113,6 +113,15 @@
             let mapSize = 100;
             let mapX = 10;
             let mapY = 10;
+
+            this.figures.forEach(element => { 
+                if (!element.solid) return;
+                let rawX = Numbers.scale(element.center[0], -config.worldSize, config.worldSize, mapX, mapX + mapSize);
+                let rawZ = Numbers.scale(element.center[2], -config.worldSize, config.worldSize, mapY, mapY + mapSize); 
+                let x = Math.max(mapX, Math.min(mapX + mapSize, rawX));
+                let z = Math.max(mapY, Math.min(mapY + mapSize, rawZ));
+                Drawing.drawCircle(ctx, x, mapY + mapSize - (z - mapY), 2, 'rgba(100,100,100,0.5)');
+            });
             
             Drawing.drawRectangle(ctx, mapX, mapY, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
 
@@ -130,7 +139,7 @@
             let xSecret = Math.max(mapX, Math.min(mapX + mapSize, rawXSecret));
             let zSecret = Math.max(mapY, Math.min(mapY + mapSize, rawZSecret));
             
-            Drawing.drawCircle(ctx, xSecret, mapY + mapSize - (zSecret - mapY), 3, 'rgba(0,255,0,0.5)'); 
+            Drawing.drawCircle(ctx, xSecret, mapY + mapSize - (zSecret - mapY), 3, 'rgba(0,255,0,0.5)');           
         } 
 
         draw = () => {
