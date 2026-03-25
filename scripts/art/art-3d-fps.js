@@ -94,6 +94,7 @@
         tileSize: 500,
         floorSize: 2000,
         worldSize: 7000,
+        floorHue: 0,
     };    
 
     class ThreeDWorld {
@@ -108,19 +109,75 @@
             this.cameraRotationZ = 0;
         }
 
+        fragmentFigure = (originalFig) => {
+            const originalHue = originalFig.hue;
+            const origin = originalFig.center; 
+
+            originalFig.faces.forEach((faceIndices, index) => {
+                let piece = new Figure();
+                
+                piece.vertices = faceIndices.map(vIdx => Objects.clone(originalFig.vertices[vIdx]));
+                
+                const newFaceIndices = [];
+                for (let i = 0; i < faceIndices.length; i++) newFaceIndices.push(i);
+                piece.faces = [newFaceIndices];
+
+                piece.setupCollision();
+                
+                piece.isDebris = true;
+                piece.hue = originalHue;
+                piece.breakable = false;
+                piece.fadeOutSpeed = 0.01 + (Math.random() * 0.02);
+
+                let dirX = piece.center[0] - origin[0];
+                let dirY = piece.center[1] - origin[1]; 
+                let dirZ = piece.center[2] - origin[2];
+
+                let mag = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
+                if (mag === 0) mag = 1; 
+
+                let force = 15; 
+                piece.vx = (dirX / mag) * force + (Math.random() * 4 - 2); 
+                piece.vz = (dirZ / mag) * force + (Math.random() * 4 - 2);
+                
+                piece.vy = (Math.random() * -10 - 5); 
+
+                this.figures.push(piece);
+            });
+        }
+
         drawMap = () => {
             let mapSize = 100;
+            let mapX = 10;
+            let mapY = 10;
+
+            this.figures.forEach(element => { 
+                if (!element.solid) return;
+                let rawX = Numbers.scale(element.center[0], -config.worldSize, config.worldSize, mapX, mapX + mapSize);
+                let rawZ = Numbers.scale(element.center[2], -config.worldSize, config.worldSize, mapY, mapY + mapSize); 
+                let x = Math.max(mapX, Math.min(mapX + mapSize, rawX));
+                let z = Math.max(mapY, Math.min(mapY + mapSize, rawZ));
+                Drawing.drawCircle(ctx, x, mapY + mapSize - (z - mapY), 2, 'rgba(100,100,100,0.5)');
+            });
             
-            Drawing.drawRectangle(ctx, 10, 10, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
+            Drawing.drawRectangle(ctx, mapX, mapY, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
 
-            let xPlayer = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
-            let zPlayer = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
-            Drawing.drawCircle(ctx, xPlayer, 10 + mapSize - zPlayer, 3, 'rgba(255,0,0,0.5)');   
+            let rawX = Numbers.scale(this.cameraX, -config.worldSize, config.worldSize, mapX, mapX + mapSize);
+            let rawZ = Numbers.scale(this.cameraZ, -config.worldSize, config.worldSize, mapY, mapY + mapSize);
+            
+            let xPlayer = Math.max(mapX, Math.min(mapX + mapSize, rawX));
+            let zPlayer = Math.max(mapY, Math.min(mapY + mapSize, rawZ));
+            
+            Drawing.drawCircle(ctx, xPlayer, mapY + mapSize - (zPlayer - mapY), 3, 'rgba(255,0,0,0.5)');   
 
-            let xSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
-            let zSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
-            Drawing.drawCircle(ctx, xSecret, 10 + mapSize - zSecret, 3, 'rgba(0,255,0,0.5)'); 
-        }   
+            let rawXSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, mapX, mapX + mapSize);
+            let rawZSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, mapY, mapY + mapSize);          
+        
+            let xSecret = Math.max(mapX, Math.min(mapX + mapSize, rawXSecret));
+            let zSecret = Math.max(mapY, Math.min(mapY + mapSize, rawZSecret));
+            
+            Drawing.drawCircle(ctx, xSecret, mapY + mapSize - (zSecret - mapY), 3, 'rgba(0,255,0,0.5)');           
+        } 
 
         draw = () => {
             let allFaces = [];
@@ -149,6 +206,7 @@
                             worldVertices: faceIndices.map(index => figure.vertices[index]),
                             viewZ: avgZ,
                             hue: figure.hue,
+                            life: figure.isDebris ? figure.life : 1.0,
                             lightness: figure.getLightness(viewVertices)
                         });
                     }
@@ -166,7 +224,7 @@
         }
 
         checkWallCollision = (nextX, nextZ) => {
-            const playerSize = 40; 
+            const playerSize = 60; 
 
             for (let fig of this.figures) {
                 if (!fig.solid) continue; 
@@ -220,12 +278,14 @@
 
         drawSingleFace = (face) => {
             const dist = face.viewZ;
-            
-            let alpha = Numbers.scale(dist, 2000, 3000, 1, 0);
-            if (alpha < 0) alpha = 0;
-            if (alpha > 1) alpha = 1;
+            let fogAlpha = Numbers.scale(dist, 2000, 5000, 1, 0);
+            if (fogAlpha < 0) fogAlpha = 0;
 
-            const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${alpha})`;
+            let finalAlpha = fogAlpha * face.life;
+            if (finalAlpha < 0) finalAlpha = 0;
+            if (finalAlpha > 1) finalAlpha = 1;
+
+            const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${finalAlpha.toFixed(2)})`;
             
             ctx.beginPath();
             let screenPoint = this.worldToScreen(face.worldVertices[0]);
@@ -412,18 +472,16 @@
 
             if (targetFigure !== null) {
                 Sound.bang();
-                let secretFound = false;
 
                 if (this.figures[targetFigure].secret) {
-                    secretFound = true;
+                    addSecretObject();
                 }
+
+                globals.world.shakeIntensity = 30;
+                this.fragmentFigure(this.figures[targetFigure]);
 
                 this.figures.splice(targetFigure, 1);
                 globals.points += 1;
-
-                if (secretFound) {
-                    addSecretObject();
-                }
             }
         }
     }
@@ -438,6 +496,13 @@
             this.edges = [];
             this.faces = []; 
             this.hue = globals.random.nextInt(1, 360);
+            this.isDebris = false;
+            this.life = 1.0;
+            this.vx = 0; 
+            this.vy = 0;
+            this.vz = 0; 
+            this.gravity = 0.5; 
+            this.fadeOutSpeed = 0;
             this.setupCollision();
         }
 
@@ -662,15 +727,16 @@
     }
 
     let addWalls = () => {
+        let cubeSize = 40;
         for (let i = 1; i <=4; i++) {         
-            let segmentSize = 400;
-            let segments = config.worldSize * 2 / segmentSize;
+            let segmentSize = config.worldSize / 20;
+            let segments = config.worldSize / segmentSize + 1;
             for (let j = -segments; j < segments; j++) {
                 let wall = new Figure();
                 wall.vertices = Objects.clone(figureTypes[0].vertices);
-                wall.faces = Objects.clone(figureTypes[0].faces);
+                wall.faces = Objects.clone(figureTypes[0].faces);            
 
-                wall.scaleX(segmentSize / 40);
+                wall.scaleX(segmentSize / cubeSize);
                 wall.scaleY(20);
 
                 if (i % 2 === 0) {
@@ -686,7 +752,7 @@
 
                 wall.translateY(-300);
 
-                wall.hue = 0;
+                wall.hue = config.floorHue;
 
                 wall.breakable = false;
                 wall.infinite = false;
@@ -713,7 +779,7 @@
                 floorTile.translateY(50); 
                 floorTile.translateZ(z);
                 
-                floorTile.hue = 200; 
+                floorTile.hue = config.floorHue; 
 
                 floorTile.breakable = false;
                 floorTile.infinite = true;
@@ -874,6 +940,31 @@
 
     window.draw = () => {
         drawBackground(ctx, canvas);
+
+        for (let i = globals.world.figures.length - 1; i >= 0; i--) {
+            let fig = globals.world.figures[i];
+            
+            if (fig.isDebris) {
+                fig.vy += fig.gravity;
+                fig.translateX(fig.vx);
+                fig.translateY(fig.vy);
+                fig.translateZ(fig.vz);
+
+                fig.life -= fig.fadeOutSpeed;
+
+                if (fig.life <= 0) {
+                    globals.world.figures.splice(i, 1);
+                    continue;
+                }
+
+                if (fig.center[1] > 50) {
+                    fig.translateY(50 - fig.center[1]);
+                    fig.vy *= -0.5; 
+                    fig.vx *= 0.8; 
+                    fig.vz *= 0.8;
+                }
+            }
+        }
         globals.world.draw();
 
         const forwardSpeed = -globals.joystickL.deltaY / 10; 
@@ -911,7 +1002,8 @@
         globals.world.drawMap();
     }
 
-    let randomize = () => {        
+    let randomize = () => {      
+        config.floorHue = globals.random.nextInt(1, 360);  
     }
 
 	window.clearCanvas = () => {		
