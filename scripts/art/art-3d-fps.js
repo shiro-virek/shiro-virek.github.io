@@ -109,7 +109,6 @@
             this.cameraRotationZ = 0;
         }
 
-
         drawMap = () => {
             let mapSize = 100;
             let mapX = 10;
@@ -125,13 +124,13 @@
             
             Drawing.drawCircle(ctx, xPlayer, mapY + mapSize - (zPlayer - mapY), 3, 'rgba(255,0,0,0.5)');   
 
-            let rawXSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
-            let rawZSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
+            let rawXSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, mapX, mapX + mapSize);
+            let rawZSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, mapY, mapY + mapSize);          
         
             let xSecret = Math.max(mapX, Math.min(mapX + mapSize, rawXSecret));
             let zSecret = Math.max(mapY, Math.min(mapY + mapSize, rawZSecret));
             
-            Drawing.drawCircle(ctx, xSecret, 10 + mapSize - zSecret, 3, 'rgba(0,255,0,0.5)'); 
+            Drawing.drawCircle(ctx, xSecret, mapY + mapSize - (zSecret - mapY), 3, 'rgba(0,255,0,0.5)'); 
         } 
 
         draw = () => {
@@ -699,7 +698,7 @@
 
                 wall.translateY(-300);
 
-                wall.hue = 0;
+                wall.hue = config.floorHue;
 
                 wall.breakable = false;
                 wall.infinite = false;
