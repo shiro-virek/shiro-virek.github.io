@@ -430,9 +430,6 @@
 
                 this.figures.splice(targetFigure, 1);
                 globals.points += 1;
-
-                if (secretFound) {
-                }
             }
         }
     }
