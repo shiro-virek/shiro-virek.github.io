@@ -94,6 +94,7 @@
         tileSize: 500,
         floorSize: 2000,
         worldSize: 7000,
+        floorHue: 0,
     };    
 
     class ThreeDWorld {
@@ -124,8 +125,12 @@
             
             Drawing.drawCircle(ctx, xPlayer, mapY + mapSize - (zPlayer - mapY), 3, 'rgba(255,0,0,0.5)');   
 
-            let xSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
-            let zSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
+            let rawXSecret = Numbers.scale(globals.secretX, -config.worldSize, config.worldSize, 10, 10 + mapSize);
+            let rawZSecret = Numbers.scale(globals.secretZ, -config.worldSize, config.worldSize, 10, 10 + mapSize);          
+        
+            let xSecret = Math.max(mapX, Math.min(mapX + mapSize, rawXSecret));
+            let zSecret = Math.max(mapY, Math.min(mapY + mapSize, rawZSecret));
+            
             Drawing.drawCircle(ctx, xSecret, 10 + mapSize - zSecret, 3, 'rgba(0,255,0,0.5)'); 
         } 
 
@@ -721,7 +726,7 @@
                 floorTile.translateY(50); 
                 floorTile.translateZ(z);
                 
-                floorTile.hue = 200; 
+                floorTile.hue = config.floorHue; 
 
                 floorTile.breakable = false;
                 floorTile.infinite = true;
@@ -919,7 +924,8 @@
         globals.world.drawMap();
     }
 
-    let randomize = () => {        
+    let randomize = () => {      
+        config.floorHue = globals.random.nextInt(1, 360);  
     }
 
 	window.clearCanvas = () => {		
