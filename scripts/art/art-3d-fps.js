@@ -148,14 +148,32 @@
 
         drawHorizon = () => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
-
             let horizonY = halfHeight + (Math.tan(angleRad) * config.FOV);
 
-            ctx.fillStyle = '#1a1a2e'; 
+            let skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
+            
+            skyGradient.addColorStop(0, '#001a1a'); 
+            skyGradient.addColorStop(0.5, '#004d4d'); 
+            skyGradient.addColorStop(1, '#00ffff44'); 
+
+            ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, width, horizonY);
 
-            ctx.fillStyle = '#0f0f1a'; 
+            let voidGradient = ctx.createLinearGradient(0, horizonY, 0, height);
+            
+            voidGradient.addColorStop(0, '#00ffff22'); 
+            voidGradient.addColorStop(0.3, '#003333'); 
+            voidGradient.addColorStop(1, '#000000');  
+
+            ctx.fillStyle = voidGradient;
             ctx.fillRect(0, horizonY, width, height - horizonY);
+
+            ctx.strokeStyle = `hsla(180, 100%, 50%, 0.15)`; 
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, horizonY);
+            ctx.lineTo(width, horizonY);
+            ctx.stroke();
         }
 
         drawMap = () => {
