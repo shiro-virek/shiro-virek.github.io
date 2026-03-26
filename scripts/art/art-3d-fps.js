@@ -477,7 +477,8 @@
 
             figure.solid = true;
             figure.breakable = true;
-
+            figure.setupCollision();
+			
             this.figures.push(figure);
         }
         
