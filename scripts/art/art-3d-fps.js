@@ -146,6 +146,18 @@
             });
         }
 
+        drawHorizon = () => {
+            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
+
+            let horizonY = halfHeight + (Math.tan(angleRad) * config.FOV);
+
+            ctx.fillStyle = '#1a1a2e'; 
+            ctx.fillRect(0, 0, width, horizonY);
+
+            ctx.fillStyle = '#0f0f1a'; 
+            ctx.fillRect(0, horizonY, width, height - horizonY);
+        }
+
         drawMap = () => {
             let mapSize = 100;
             let mapX = 10;
@@ -444,6 +456,9 @@
             figure.translateZ(worldZ); 
 
             figure.cachedZ = figure.getAverageZ();
+
+            figure.solid = true;
+            figure.breakable = true;
 
             this.figures.push(figure);
         }
@@ -978,6 +993,8 @@
 
     window.draw = () => {
         drawBackground(ctx, canvas);
+
+        globals.world.drawHorizon();
 
         for (let i = globals.world.figures.length - 1; i >= 0; i--) {
             let fig = globals.world.figures[i];
