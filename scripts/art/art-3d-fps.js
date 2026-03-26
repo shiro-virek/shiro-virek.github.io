@@ -92,8 +92,8 @@
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
         rotationMode: 0,
         tileSize: 500,
-        floorSize: 2000,
-        worldSize: 7000,
+        floorSize: 4000,
+        worldSize: 10000,
         floorHue: 0,
     };    
 
