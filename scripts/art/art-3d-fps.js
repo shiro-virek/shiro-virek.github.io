@@ -179,6 +179,44 @@
             Drawing.drawCircle(ctx, xSecret, mapY + mapSize - (zSecret - mapY), 3, 'rgba(0,255,0,0.5)');           
         } 
 
+        drawCompass = () => {
+            const compassSize = 30;
+            const margin = 60;
+            let compassX = width - margin - compassSize / 2;
+            let compassY = margin;
+            Drawing.drawCircle(ctx, compassX, compassY, compassSize, 'rgba(255,255,255,0.5)');
+            Drawing.drawCircle(ctx, compassX, compassY, 2, 'rgba(255,255,255,0.5)');  
+
+            ctx.font = "bolder 10px Arial";
+
+            let factor = 0.8;
+            let fixX = -3;
+            let fixY = 3;
+
+			ctx.fillStyle = "#FF0000";
+            let degrees = this.cameraRotationZ;
+            let northX = fixX + compassX + Math.sin(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+            let northY = fixY + compassY - Math.cos(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+			ctx.fillText(`N`, northX, northY);	
+
+			ctx.fillStyle = "#FFF";
+            degrees += 90;
+            northX = fixX + compassX + Math.sin(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+            northY = fixY + compassY - Math.cos(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+			ctx.fillText(`W`, northX, northY);
+            
+            degrees += 90;
+            northX = fixX + compassX + Math.sin(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+            northY = fixY + compassY - Math.cos(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+			ctx.fillText(`E`, northX, northY);
+
+            degrees += 90;
+            northX = fixX + compassX + Math.sin(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+            northY = fixY + compassY - Math.cos(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
+			ctx.fillText(`S`, northX, northY);
+	
+        }
+
         draw = () => {
             let allFaces = [];
 
@@ -773,8 +811,8 @@
                 floorTile.vertices = Objects.clone(figureTypes[0].vertices);
                 floorTile.faces = Objects.clone(figureTypes[0].faces);
                 
-                floorTile.scaleX(10); 
-                floorTile.scaleZ(10); 
+                floorTile.scaleX(11); 
+                floorTile.scaleZ(11); 
                 floorTile.scaleY(0.1); 
 
                 floorTile.translateX(x);
@@ -1002,6 +1040,7 @@
         globals.world.drawCrossHair();
         Browser.setInfo(`${globals.points}`);
         globals.world.drawMap();
+        globals.world.drawCompass();
     }
 
     let randomize = () => {      
