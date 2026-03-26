@@ -187,9 +187,7 @@
             Drawing.drawCircle(ctx, compassX, compassY, compassSize, 'rgba(255,255,255,0.5)');
             Drawing.drawCircle(ctx, compassX, compassY, 2, 'rgba(255,255,255,0.5)');  
 
-            ctx.font = "bolder 10px Arial";
-
-            let factor = 0.8;
+			let factor = 0.8;
             let fixX = -3;
             let fixY = 3;
 
@@ -203,17 +201,17 @@
             degrees += 90;
             northX = fixX + compassX + Math.sin(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
             northY = fixY + compassY - Math.cos(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
-			ctx.fillText(`W`, northX, northY);
+			ctx.fillText(`E`, northX, northY);
             
             degrees += 90;
             northX = fixX + compassX + Math.sin(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
             northY = fixY + compassY - Math.cos(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
-			ctx.fillText(`E`, northX, northY);
+			ctx.fillText(`S`, northX, northY);
 
             degrees += 90;
             northX = fixX + compassX + Math.sin(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
             northY = fixY + compassY - Math.cos(Trigonometry.sexagesimalToRadian(degrees)) * compassSize * factor;
-			ctx.fillText(`S`, northX, northY);
+			ctx.fillText(`W`, northX, northY);
 	
         }
 
