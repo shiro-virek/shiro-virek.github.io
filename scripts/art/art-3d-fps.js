@@ -442,6 +442,8 @@
             ctx.moveTo(halfWidth, halfHeight - size);
             ctx.lineTo(halfWidth, halfHeight + size);
             ctx.stroke();
+
+			Drawing.drawCircle(ctx, halfWidth, halfHeight, size * 1.5, 'rgba(255,255,255,0.3)');
         }
 
         checkShoot = () => {
