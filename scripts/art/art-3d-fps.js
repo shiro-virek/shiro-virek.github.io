@@ -576,7 +576,7 @@
                     addSecretObject();
                 }else{
 					if (this.figures[targetFigure].isEnemy) 
-                    	globals.points += enemyPoints
+                    	globals.points += config.enemyPoints
 					else
 						globals.point += 1;
 				}
@@ -1108,7 +1108,7 @@
         }
     }
 
-    let checkCollisions = () => {
+    let moveCharacter = () => {
         const forwardSpeed = -globals.joystickL.deltaY / 5; 
         const sideSpeed = -globals.joystickL.deltaX / 5;
         
@@ -1142,7 +1142,7 @@
 
     let moveCamera = () => {
         if (config.rotationMode === 0) {
-            globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
+            globals.world.rotate(-globals.joystickR.deltaY / 100, -globals.joystickR.deltaX / 100);
         } else if (config.rotationMode === 1) {
             globals.world.moveCameraY(globals.joystickR.deltaY / 30);
         }
@@ -1169,7 +1169,7 @@
         globals.world.drawHorizon();
         updateObjects();
         globals.world.draw();
-        checkCollisions();
+        moveCharacter();
         moveCamera();
 
         globals.world.drawCrossHair();
