@@ -180,7 +180,7 @@
         drawMap = () => {
             let mapSize = 100;
             let mapX = 10;
-            let mapY = 10;
+            let mapY = 30;
 
             this.figures.forEach(element => { 
                 if (!element.solid) return;
@@ -290,10 +290,8 @@
             this.translateInfiniteFloor();
         }
 
-        checkCollision = (currentX, currentZ, movementX, movementZ) => {
+        checkCollision = (nextX, nextZ) => {
             const playerSize = 60; 
-            let nextX = currentX + movementX;
-            let nextZ = currentZ + movementZ;
 
             for (let fig of this.figures) {
                 if (!fig.solid) continue; 
@@ -908,11 +906,11 @@
 
             let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
             let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+
             enemy.scale(5);
             enemy.translateX(posX);
             enemy.translateY(50 - 20); 
-            enemy.translateZ(posZ);
-        
+            enemy.translateZ(posZ);        
             
             enemy.hue = 0; 
 
@@ -1083,13 +1081,13 @@
         let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
 
         if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {            
-            if (!globals.world.checkCollision(globals.world.cameraX, globals.world.cameraZ, dx, 0)) {
+            if (!globals.world.checkCollision(globals.world.cameraX + dx, globals.world.cameraZ)) {
                 globals.world.cameraX += dx;
             } else {
                 Sound.hit(); 
             }
 
-            if (!globals.world.checkCollision(globals.world.cameraX, globals.world.cameraZ, 0, dz)) {
+            if (!globals.world.checkCollision(globals.world.cameraX, globals.world.cameraZ + dz)) {
                 globals.world.cameraZ += dz;
             } else {
                 Sound.hit();
@@ -1120,7 +1118,7 @@
         moveCamera();
 
         globals.world.drawCrossHair();
-        Browser.setInfo(`${globals.points}`);
+        Browser.setInfo(`${globals.points} pts. - ${globals.life}%`);
         globals.world.drawMap();
         globals.world.drawCompass();
     }
