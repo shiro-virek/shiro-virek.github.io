@@ -152,23 +152,23 @@
 
             let skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
             
-            skyGradient.addColorStop(0, '#001a1a'); 
-            skyGradient.addColorStop(0.5, '#004d4d'); 
-            skyGradient.addColorStop(1, '#00ffff44'); 
+            skyGradient.addColorStop(0, `hsl(${config.skyShift}, 100%, 5%)`); 
+            skyGradient.addColorStop(0.5, `hsl(${config.skyShift}, 100%, 20%)`); 
+            skyGradient.addColorStop(1, `hsl(${config.skyShift}, 100%, 60%)`); 
 
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, width, horizonY);
 
             let voidGradient = ctx.createLinearGradient(0, horizonY, 0, height);
             
-            voidGradient.addColorStop(0, '#00ffff22'); 
-            voidGradient.addColorStop(0.3, '#003333'); 
-            voidGradient.addColorStop(1, '#000000');  
+            voidGradient.addColorStop(0, `hsla(${config.skyShift}, 100%, 50%, 0.13)`); 
+            voidGradient.addColorStop(0.3, `hsla(${config.skyShift}, 100%, 50%, 0.2)`); 
+            voidGradient.addColorStop(1, `hsla(${config.skyShift}, 100%, 50%, 0.4)`);  
 
             ctx.fillStyle = voidGradient;
             ctx.fillRect(0, horizonY, width, height - horizonY);
 
-            ctx.strokeStyle = `hsla(180, 100%, 50%, 0.15)`; 
+            ctx.strokeStyle = `hsla(${config.skyShift}, 100%, 50%, 0.15)`; 
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(0, horizonY);
@@ -1079,6 +1079,7 @@
 
     let randomize = () => {      
         config.floorHue = globals.random.nextInt(1, 360);  
+        config.skyShift = globals.random.nextInt(0, 360);
     }
 
 	window.clearCanvas = () => {		
