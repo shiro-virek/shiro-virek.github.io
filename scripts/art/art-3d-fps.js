@@ -1127,6 +1127,16 @@
         }
     }
 
+    let checkPoints = () => {
+        if (globals.life <= 0) {
+            Browser.setInfo(`Game Over!`);           	
+            globals.world.figures = [];
+        }else if (globals.points >= 50) {
+            Sound.tada();
+            Browser.setInfo(`You Win!`);
+        }
+    }
+
     window.trackMouse = (x, y) => {
         if (clicking) {
         }
@@ -1145,6 +1155,8 @@
         Browser.setInfo(`${globals.points} pts. - ${globals.life}%`);
         globals.world.drawMap();
         globals.world.drawCompass();
+
+        checkPoints();
     }
 
     let randomize = () => {      
