@@ -569,6 +569,7 @@
             this.faces = []; 
             this.hue = globals.random.nextInt(1, 360);
             this.isDebris = false;
+            this.isEnemy = false;
             this.life = 1.0;
             this.vx = 0; 
             this.vy = 0;
@@ -889,9 +890,31 @@
         }
     }
 
+    let addEnemies = () => {
+        for (let i = 0; i < 20; i++) {
+            let enemy = new Figure();
+            enemy.vertices = Objects.clone(figureTypes[1].vertices); 
+            enemy.faces = Objects.clone(figureTypes[1].faces);
+
+            let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
+            let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+
+            enemy.translateX(posX);
+            enemy.translateY(50 - 20); 
+            enemy.translateZ(posZ);
+            
+            enemy.hue = 0; 
+
+            enemy.breakable = true;
+            enemy.infinite = false;
+            enemy.solid = true;
+            enemy.isEnemy = true;
+            enemy.setupCollision();
+            globals.world.figures.push(enemy);
+        }
+    }
+
     let addPyramids = () => {
-
-
         for (let i = 0; i < 10; i++) {
             let pyramid = new Figure();
             pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
@@ -954,6 +977,7 @@
         //addPyramids();
         addWalls();
         addSecretObject();
+        addEnemies();
     }
 
     let addSpecialControls = () => {
