@@ -188,7 +188,7 @@
                 let rawZ = Numbers.scale(element.center[2], -config.worldSize, config.worldSize, mapY, mapY + mapSize); 
                 let x = Math.max(mapX, Math.min(mapX + mapSize, rawX));
                 let z = Math.max(mapY, Math.min(mapY + mapSize, rawZ));
-                Drawing.drawCircle(ctx, x, mapY + mapSize - (z - mapY), 2, 'rgba(100,100,100,0.5)');
+                Drawing.drawCircle(ctx, x, mapY + mapSize - (z - mapY), 2, element.isEnemy? 'rgba(255,0,0,0.5)': 'rgba(100,100,100,0.5)');
             });
             
             Drawing.drawRectangle(ctx, mapX, mapY, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
@@ -566,6 +566,7 @@
                 Sound.bang();
 
                 if (this.figures[targetFigure].secret) {
+                    globals.points += 5;
                     addSecretObject();
                 }
 
@@ -1101,6 +1102,8 @@
 
         if (globals.world.checkCollisionEnemy(globals.world.cameraX + dx, globals.world.cameraZ + dz)) {
             globals.life -=  1;
+            globals.world.cameraZ -= 100 * Math.cos(angleRad);
+            globals.world.cameraX += 100 * Math.sin(angleRad);
             Sound.error();
         }else{                
             if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {            
@@ -1152,7 +1155,7 @@
         moveCamera();
 
         globals.world.drawCrossHair();
-        Browser.setInfo(`${globals.points} pts. - ${globals.life}%`);
+        Browser.setInfo(`Life ${globals.life}% ${globals.points} pts.`);
         globals.world.drawMap();
         globals.world.drawCompass();
 
