@@ -100,6 +100,8 @@
         secretPoints: 10,
 		enemyDamage: 5,
 		enemyPoints: 5,
+		enemyCount: 40,
+		buildingsCount: 80,
     };    
 
     class ThreeDWorld {
@@ -574,9 +576,9 @@
                     addSecretObject();
                 }else{
 					if (this.figures[targetFigure].isEnemy) 
-                    	globals.points += 1
+                    	globals.points += enemyPoints
 					else
-						globals.point += enemyPoints;
+						globals.point += 1;
 				}
 
                 globals.world.shakeIntensity = 30;
@@ -902,7 +904,7 @@
 
     let addBuildings = () => {
 
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < config.buildingsCount; i++) {
             let building = new Figure();
             building.vertices = Objects.clone(figureTypes[0].vertices);
             building.faces = Objects.clone(figureTypes[0].faces);
@@ -928,7 +930,7 @@
     }
 
     let addEnemies = () => {
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < config.enemyCount; i++) {
             let enemy = new Figure();
             enemy.vertices = Objects.clone(figureTypes[1].vertices); 
             enemy.faces = Objects.clone(figureTypes[1].faces);
