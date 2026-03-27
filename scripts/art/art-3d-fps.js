@@ -98,6 +98,8 @@
         floorHue: 0,
         enemiesSpeed: 10,
         secretPoints: 10,
+		enemyDamage: 5,
+		enemyPoints: 5,
     };    
 
     class ThreeDWorld {
@@ -570,8 +572,12 @@
                 if (this.figures[targetFigure].secret) {
                     globals.points += config.secretPoints;
                     addSecretObject();
-                }else
-                    globals.points += 1;
+                }else{
+					if (this.figures[targetFigure].isEnemy) 
+                    	globals.points += 1
+					else
+						globals.point += enemyPoints;
+				}
 
                 globals.world.shakeIntensity = 30;
                 this.fragmentFigure(this.figures[targetFigure]);
@@ -1101,8 +1107,8 @@
     }
 
     let checkCollisions = () => {
-        const forwardSpeed = -globals.joystickL.deltaY / 10; 
-        const sideSpeed = -globals.joystickL.deltaX / 10;
+        const forwardSpeed = -globals.joystickL.deltaY / 5; 
+        const sideSpeed = -globals.joystickL.deltaX / 5;
         
         let angleRad = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ);
         let angleRadR = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ + 90);
@@ -1111,7 +1117,7 @@
         let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
 
         if (globals.world.checkCollisionEnemy(globals.world.cameraX + dx, globals.world.cameraZ + dz)) {
-            globals.life -=  1;
+            globals.life -= config.enemyDamage;
             globals.world.cameraZ -= 100 * Math.cos(angleRad);
             globals.world.cameraX += 100 * Math.sin(angleRad);
             Sound.error();
