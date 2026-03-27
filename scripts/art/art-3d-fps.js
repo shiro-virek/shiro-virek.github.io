@@ -312,7 +312,7 @@
         checkCollisionEnemy = (nextX, nextZ) => {
             const playerSize = 60; 
 
-            for (let fig of this.figures) {
+            for (let fig of this.figures.filter(f => f.isEnemy)) {
                 if (!fig.solid) continue; 
 
                 const collisionX = nextX + playerSize > fig.bounds.minX && 
@@ -928,7 +928,7 @@
 
             enemy.scale(5);
             enemy.translateX(posX);
-            enemy.translateY(50 - 20); 
+            enemy.translateY(50 - 20*5); 
             enemy.translateZ(posZ);        
             
             enemy.hue = 0; 
@@ -1099,17 +1099,22 @@
         let dx = (-Math.sin(angleRad) * forwardSpeed) + (-Math.sin(angleRadR) * sideSpeed);
         let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
 
-        if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {            
-            if (!globals.world.checkCollisionObject(globals.world.cameraX + dx, globals.world.cameraZ)) {
-                globals.world.cameraX += dx;
-            } else {
-                Sound.hit(); 
-            }
+        if (globals.world.checkCollisionEnemy(globals.world.cameraX + dx, globals.world.cameraZ + dz)) {
+            globals.life -=  1;
+            Sound.error();
+        }else{                
+            if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {            
+                if (!globals.world.checkCollisionObject(globals.world.cameraX + dx, globals.world.cameraZ)) {
+                    globals.world.cameraX += dx;
+                } else {
+                    Sound.hit(); 
+                }
 
-            if (!globals.world.checkCollisionObject(globals.world.cameraX, globals.world.cameraZ + dz)) {
-                globals.world.cameraZ += dz;
-            } else {
-                Sound.hit();
+                if (!globals.world.checkCollisionObject(globals.world.cameraX, globals.world.cameraZ + dz)) {
+                    globals.world.cameraZ += dz;
+                } else {
+                    Sound.hit();
+                }
             }
         }
     }
