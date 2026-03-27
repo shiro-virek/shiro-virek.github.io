@@ -96,6 +96,8 @@
         floorSize: 4000,
         worldSize: 10000,
         floorHue: 0,
+        enemiesSpeed: 10,
+        secretPoints: 10,
     };    
 
     class ThreeDWorld {
@@ -566,15 +568,16 @@
                 Sound.bang();
 
                 if (this.figures[targetFigure].secret) {
-                    globals.points += 5;
+                    globals.points += config.secretPoints;
                     addSecretObject();
-                }
+                }else
+                    globals.points += 1;
 
                 globals.world.shakeIntensity = 30;
                 this.fragmentFigure(this.figures[targetFigure]);
 
                 this.figures.splice(targetFigure, 1);
-                globals.points += 1;
+            
             }
         }
     }
@@ -1064,7 +1067,14 @@
 
             if (fig.isEnemy) {
                 fig.rotationAngle += globals.random.nextBool()? 0.1 : -0.1;
-                fig.moveAuto(3);    
+                fig.moveAuto(config.enemiesSpeed);    
+
+                if ((fig.center[0] <= -config.worldSize)
+                    || (fig.center[0] >= config.worldSize)
+                    || (fig.center[2] <= -config.worldSize)
+                    || (fig.center[2] >= config.worldSize)) {
+                    fig.rotationAngle += 3.14;
+                }
             }
 
             if (fig.isDebris) {
