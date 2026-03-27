@@ -908,10 +908,11 @@
 
             let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
             let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
-
+            enemy.scale(5);
             enemy.translateX(posX);
             enemy.translateY(50 - 20); 
             enemy.translateZ(posZ);
+        
             
             enemy.hue = 0; 
 
