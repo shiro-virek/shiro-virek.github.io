@@ -290,7 +290,26 @@
             this.translateInfiniteFloor();
         }
 
-        checkCollision = (nextX, nextZ) => {
+        checkCollisionObject = (nextX, nextZ) => {
+            const playerSize = 60; 
+
+            for (let fig of this.figures.filter(f => !f.isEnemy)) {
+                if (!fig.solid) continue; 
+
+                const collisionX = nextX + playerSize > fig.bounds.minX && 
+                                nextX - playerSize < fig.bounds.maxX;
+                                
+                const collisionZ = nextZ + playerSize > fig.bounds.minZ && 
+                                nextZ - playerSize < fig.bounds.maxZ;
+
+                if (collisionX && collisionZ) {
+                    return true; 
+                }
+            }
+            return false;
+        }
+
+        checkCollisionEnemy = (nextX, nextZ) => {
             const playerSize = 60; 
 
             for (let fig of this.figures) {
@@ -477,7 +496,7 @@
             figure.cachedZ = figure.getAverageZ();
 
             figure.solid = true;
-            figure.breakable = true;
+            figure.breakable = false;
             figure.setupCollision();
 			
             this.figures.push(figure);
@@ -1081,13 +1100,13 @@
         let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
 
         if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {            
-            if (!globals.world.checkCollision(globals.world.cameraX + dx, globals.world.cameraZ)) {
+            if (!globals.world.checkCollisionObject(globals.world.cameraX + dx, globals.world.cameraZ)) {
                 globals.world.cameraX += dx;
             } else {
                 Sound.hit(); 
             }
 
-            if (!globals.world.checkCollision(globals.world.cameraX, globals.world.cameraZ + dz)) {
+            if (!globals.world.checkCollisionObject(globals.world.cameraX, globals.world.cameraZ + dz)) {
                 globals.world.cameraZ += dz;
             } else {
                 Sound.hit();
