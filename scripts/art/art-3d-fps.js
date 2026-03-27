@@ -84,6 +84,7 @@
         floorCenterX: 0,
         floorCenterZ: 0,
         points: 0,
+        life: 100,
     }
 
     const config = {
@@ -152,23 +153,23 @@
 
             let skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
             
-            skyGradient.addColorStop(0, '#001a1a'); 
-            skyGradient.addColorStop(0.5, '#004d4d'); 
-            skyGradient.addColorStop(1, '#00ffff44'); 
+            skyGradient.addColorStop(0, `hsl(${config.skyShift}, 100%, 5%)`); 
+            skyGradient.addColorStop(0.5, `hsl(${config.skyShift}, 100%, 20%)`); 
+            skyGradient.addColorStop(1, `hsl(${config.skyShift}, 100%, 60%)`); 
 
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, width, horizonY);
 
             let voidGradient = ctx.createLinearGradient(0, horizonY, 0, height);
             
-            voidGradient.addColorStop(0, '#00ffff22'); 
-            voidGradient.addColorStop(0.3, '#003333'); 
-            voidGradient.addColorStop(1, '#000000');  
+            voidGradient.addColorStop(0, `hsla(${config.skyShift}, 100%, 50%, 0.13)`); 
+            voidGradient.addColorStop(0.3, `hsla(${config.skyShift}, 100%, 50%, 0.2)`); 
+            voidGradient.addColorStop(1, `hsla(${config.skyShift}, 100%, 50%, 0.4)`);  
 
             ctx.fillStyle = voidGradient;
             ctx.fillRect(0, horizonY, width, height - horizonY);
 
-            ctx.strokeStyle = `hsla(180, 100%, 50%, 0.15)`; 
+            ctx.strokeStyle = `hsla(${config.skyShift}, 100%, 50%, 0.15)`; 
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(0, horizonY);
@@ -179,7 +180,7 @@
         drawMap = () => {
             let mapSize = 100;
             let mapX = 10;
-            let mapY = 10;
+            let mapY = 30;
 
             this.figures.forEach(element => { 
                 if (!element.solid) return;
@@ -187,7 +188,7 @@
                 let rawZ = Numbers.scale(element.center[2], -config.worldSize, config.worldSize, mapY, mapY + mapSize); 
                 let x = Math.max(mapX, Math.min(mapX + mapSize, rawX));
                 let z = Math.max(mapY, Math.min(mapY + mapSize, rawZ));
-                Drawing.drawCircle(ctx, x, mapY + mapSize - (z - mapY), 2, 'rgba(100,100,100,0.5)');
+                Drawing.drawCircle(ctx, x, mapY + mapSize - (z - mapY), 2, element.isEnemy? 'rgba(255,0,0,0.5)': 'rgba(100,100,100,0.5)');
             });
             
             Drawing.drawRectangle(ctx, mapX, mapY, mapSize, mapSize, 'rgba(255,255,255,0.5)');  
@@ -289,10 +290,29 @@
             this.translateInfiniteFloor();
         }
 
-        checkWallCollision = (nextX, nextZ) => {
+        checkCollisionObject = (nextX, nextZ) => {
             const playerSize = 60; 
 
-            for (let fig of this.figures) {
+            for (let fig of this.figures.filter(f => !f.isEnemy)) {
+                if (!fig.solid) continue; 
+
+                const collisionX = nextX + playerSize > fig.bounds.minX && 
+                                nextX - playerSize < fig.bounds.maxX;
+                                
+                const collisionZ = nextZ + playerSize > fig.bounds.minZ && 
+                                nextZ - playerSize < fig.bounds.maxZ;
+
+                if (collisionX && collisionZ) {
+                    return true; 
+                }
+            }
+            return false;
+        }
+
+        checkCollisionEnemy = (nextX, nextZ) => {
+            const playerSize = 60; 
+
+            for (let fig of this.figures.filter(f => f.isEnemy)) {
                 if (!fig.solid) continue; 
 
                 const collisionX = nextX + playerSize > fig.bounds.minX && 
@@ -309,7 +329,7 @@
         }
 
         translateInfiniteFloor = () => {    
-            if (this.cameraX < globals.floorCenterX - config.tileSize && this.cameraX > -config.worldSize + config.tileSize * 4) {
+            if (this.cameraX < globals.floorCenterX - config.tileSize && this.cameraX > -config.worldSize + config.tileSize * (config.floorSize / 1000 * 2)) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(-config.tileSize);          
                 });
@@ -317,7 +337,7 @@
                 globals.floorCenterX -= config.tileSize;
             }    
                         
-            if (this.cameraX > globals.floorCenterX + config.tileSize && this.cameraX < config.worldSize - config.tileSize * 4) {
+            if (this.cameraX > globals.floorCenterX + config.tileSize && this.cameraX < config.worldSize - config.tileSize * (config.floorSize / 1000 * 2)) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateX(config.tileSize);          
                 });
@@ -325,7 +345,7 @@
                 globals.floorCenterX += config.tileSize;
             }    
 
-            if (this.cameraZ < globals.floorCenterZ - config.tileSize && this.cameraZ > -config.worldSize + config.tileSize * 4) {
+            if (this.cameraZ < globals.floorCenterZ - config.tileSize && this.cameraZ > -config.worldSize + config.tileSize * (config.floorSize / 1000 * 2)) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(-config.tileSize);          
                 });
@@ -333,7 +353,7 @@
                 globals.floorCenterZ -= config.tileSize;
             }    
                         
-            if (this.cameraZ > globals.floorCenterZ + config.tileSize && this.cameraZ < config.worldSize - config.tileSize * 4) {
+            if (this.cameraZ > globals.floorCenterZ + config.tileSize && this.cameraZ < config.worldSize - config.tileSize * (config.floorSize / 1000 * 2)) {
                 globals.world.figures.filter(face => face.infinite).forEach(face => {    
                     face.translateZ(config.tileSize);          
                 });
@@ -476,7 +496,7 @@
             figure.cachedZ = figure.getAverageZ();
 
             figure.solid = true;
-            figure.breakable = true;
+            figure.breakable = false;
             figure.setupCollision();
 			
             this.figures.push(figure);
@@ -546,6 +566,7 @@
                 Sound.bang();
 
                 if (this.figures[targetFigure].secret) {
+                    globals.points += 5;
                     addSecretObject();
                 }
 
@@ -569,12 +590,20 @@
             this.faces = []; 
             this.hue = globals.random.nextInt(1, 360);
             this.isDebris = false;
+            this.isEnemy = false;
             this.life = 1.0;
             this.vx = 0; 
             this.vy = 0;
             this.vz = 0; 
             this.gravity = 0.5; 
             this.fadeOutSpeed = 0;
+            this.rotationAngle = 0;
+            this.setupCollision();
+        }
+
+        moveAuto(distance) {
+            this.translateX(Math.cos(this.rotationAngle) * distance);
+            this.translateZ(Math.sin(this.rotationAngle) * distance);
             this.setupCollision();
         }
 
@@ -889,9 +918,32 @@
         }
     }
 
+    let addEnemies = () => {
+        for (let i = 0; i < 20; i++) {
+            let enemy = new Figure();
+            enemy.vertices = Objects.clone(figureTypes[1].vertices); 
+            enemy.faces = Objects.clone(figureTypes[1].faces);
+
+            let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
+            let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+
+            enemy.scale(5);
+            enemy.translateX(posX);
+            enemy.translateY(50 - 20*5); 
+            enemy.translateZ(posZ);        
+            
+            enemy.hue = 0; 
+
+            enemy.breakable = true;
+            enemy.infinite = false;
+            enemy.solid = true;
+            enemy.isEnemy = true;
+            enemy.setupCollision();
+            globals.world.figures.push(enemy);
+        }
+    }
+
     let addPyramids = () => {
-
-
         for (let i = 0; i < 10; i++) {
             let pyramid = new Figure();
             pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
@@ -954,6 +1006,7 @@
         //addPyramids();
         addWalls();
         addSecretObject();
+        addEnemies();
     }
 
     let addSpecialControls = () => {
@@ -1005,19 +1058,15 @@
 		});
     }
 
-    window.trackMouse = (x, y) => {
-        if (clicking) {
-        }
-    }
-
-    window.draw = () => {
-        drawBackground(ctx, canvas);
-
-        globals.world.drawHorizon();
-
+    let updateObjects = () => {
         for (let i = globals.world.figures.length - 1; i >= 0; i--) {
-            let fig = globals.world.figures[i];
-            
+            let fig = globals.world.figures[i];            
+
+            if (fig.isEnemy) {
+                fig.rotationAngle += globals.random.nextBool()? 0.1 : -0.1;
+                fig.moveAuto(3);    
+            }
+
             if (fig.isDebris) {
                 fig.vy += fig.gravity;
                 fig.translateX(fig.vx);
@@ -1039,8 +1088,9 @@
                 }
             }
         }
-        globals.world.draw();
+    }
 
+    let checkCollisions = () => {
         const forwardSpeed = -globals.joystickL.deltaY / 10; 
         const sideSpeed = -globals.joystickL.deltaX / 10;
         
@@ -1050,35 +1100,71 @@
         let dx = (-Math.sin(angleRad) * forwardSpeed) + (-Math.sin(angleRadR) * sideSpeed);
         let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
 
-        if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {
-            
-            if (!globals.world.checkWallCollision(globals.world.cameraX + dx, globals.world.cameraZ)) {
-                globals.world.cameraX += dx;
-            } else {
-                Sound.hit(); 
-            }
+        if (globals.world.checkCollisionEnemy(globals.world.cameraX + dx, globals.world.cameraZ + dz)) {
+            globals.life -=  1;
+            globals.world.cameraZ -= 100 * Math.cos(angleRad);
+            globals.world.cameraX += 100 * Math.sin(angleRad);
+            Sound.error();
+        }else{                
+            if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {            
+                if (!globals.world.checkCollisionObject(globals.world.cameraX + dx, globals.world.cameraZ)) {
+                    globals.world.cameraX += dx;
+                } else {
+                    Sound.hit(); 
+                }
 
-            if (!globals.world.checkWallCollision(globals.world.cameraX, globals.world.cameraZ + dz)) {
-                globals.world.cameraZ += dz;
-            } else {
-                Sound.hit();
+                if (!globals.world.checkCollisionObject(globals.world.cameraX, globals.world.cameraZ + dz)) {
+                    globals.world.cameraZ += dz;
+                } else {
+                    Sound.hit();
+                }
             }
         }
+    }
 
+    let moveCamera = () => {
         if (config.rotationMode === 0) {
             globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
         } else if (config.rotationMode === 1) {
             globals.world.moveCameraY(globals.joystickR.deltaY / 30);
         }
+    }
+
+    let checkPoints = () => {
+        if (globals.life <= 0) {
+            Browser.setInfo(`Game Over!`);           	
+            globals.world.figures = [];
+        }else if (globals.points >= 50) {
+            Sound.tada();
+            Browser.setInfo(`You Win!`);
+        }
+    }
+
+    window.trackMouse = (x, y) => {
+        if (clicking) {
+        }
+    }
+
+    window.draw = () => {
+        drawBackground(ctx, canvas);
+
+        globals.world.drawHorizon();
+        updateObjects();
+        globals.world.draw();
+        checkCollisions();
+        moveCamera();
 
         globals.world.drawCrossHair();
-        Browser.setInfo(`${globals.points}`);
+        Browser.setInfo(`Life ${globals.life}% ${globals.points} pts.`);
         globals.world.drawMap();
         globals.world.drawCompass();
+
+        checkPoints();
     }
 
     let randomize = () => {      
         config.floorHue = globals.random.nextInt(1, 360);  
+        config.skyShift = globals.random.nextInt(0, 360);
     }
 
 	window.clearCanvas = () => {		
