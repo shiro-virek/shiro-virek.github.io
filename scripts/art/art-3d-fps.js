@@ -84,6 +84,7 @@
         floorCenterX: 0,
         floorCenterZ: 0,
         points: 0,
+        life: 100,
     }
 
     const config = {
@@ -1036,16 +1037,7 @@
 		});
     }
 
-    window.trackMouse = (x, y) => {
-        if (clicking) {
-        }
-    }
-
-    window.draw = () => {
-        drawBackground(ctx, canvas);
-
-        globals.world.drawHorizon();
-
+    let updateObjects = () => {
         for (let i = globals.world.figures.length - 1; i >= 0; i--) {
             let fig = globals.world.figures[i];            
 
@@ -1075,8 +1067,9 @@
                 }
             }
         }
-        globals.world.draw();
+    }
 
+    let checkCollisions = () => {
         const forwardSpeed = -globals.joystickL.deltaY / 10; 
         const sideSpeed = -globals.joystickL.deltaX / 10;
         
@@ -1100,12 +1093,29 @@
                 Sound.hit();
             }
         }
+    }
 
+    let moveCamera = () => {
         if (config.rotationMode === 0) {
             globals.world.rotate(-globals.joystickR.deltaY / 150, -globals.joystickR.deltaX / 150);
         } else if (config.rotationMode === 1) {
             globals.world.moveCameraY(globals.joystickR.deltaY / 30);
         }
+    }
+
+    window.trackMouse = (x, y) => {
+        if (clicking) {
+        }
+    }
+
+    window.draw = () => {
+        drawBackground(ctx, canvas);
+
+        globals.world.drawHorizon();
+        updateObjects();
+        globals.world.draw();
+        checkCollisions();
+        moveCamera();
 
         globals.world.drawCrossHair();
         Browser.setInfo(`${globals.points}`);
