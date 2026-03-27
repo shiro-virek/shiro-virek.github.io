@@ -576,6 +576,13 @@
             this.vz = 0; 
             this.gravity = 0.5; 
             this.fadeOutSpeed = 0;
+            this.rotationAngle = 0;
+            this.setupCollision();
+        }
+
+        moveAuto(distance) {
+            this.translateX(Math.cos(this.rotationAngle) * distance);
+            this.translateZ(Math.sin(this.rotationAngle) * distance);
             this.setupCollision();
         }
 
@@ -1040,8 +1047,13 @@
         globals.world.drawHorizon();
 
         for (let i = globals.world.figures.length - 1; i >= 0; i--) {
-            let fig = globals.world.figures[i];
-            
+            let fig = globals.world.figures[i];            
+
+            if (fig.isEnemy) {
+                fig.rotationAngle += globals.random.nextBool()? 0.1 : -0.1;
+                fig.moveAuto(3);    
+            }
+
             if (fig.isDebris) {
                 fig.vy += fig.gravity;
                 fig.translateX(fig.vx);
