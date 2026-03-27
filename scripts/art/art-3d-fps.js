@@ -290,8 +290,10 @@
             this.translateInfiniteFloor();
         }
 
-        checkWallCollision = (nextX, nextZ) => {
+        checkCollision = (currentX, currentZ, movementX, movementZ) => {
             const playerSize = 60; 
+            let nextX = currentX + movementX;
+            let nextZ = currentZ + movementZ;
 
             for (let fig of this.figures) {
                 if (!fig.solid) continue; 
@@ -1079,15 +1081,14 @@
         let dx = (-Math.sin(angleRad) * forwardSpeed) + (-Math.sin(angleRadR) * sideSpeed);
         let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
 
-        if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {
-            
-            if (!globals.world.checkWallCollision(globals.world.cameraX + dx, globals.world.cameraZ)) {
+        if (Math.abs(forwardSpeed) > 0.1 || Math.abs(sideSpeed) > 0.1) {            
+            if (!globals.world.checkCollision(globals.world.cameraX, globals.world.cameraZ, dx, 0)) {
                 globals.world.cameraX += dx;
             } else {
                 Sound.hit(); 
             }
 
-            if (!globals.world.checkWallCollision(globals.world.cameraX, globals.world.cameraZ + dz)) {
+            if (!globals.world.checkCollision(globals.world.cameraX, globals.world.cameraZ, 0, dz)) {
                 globals.world.cameraZ += dz;
             } else {
                 Sound.hit();
