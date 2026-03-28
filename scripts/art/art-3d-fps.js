@@ -1150,10 +1150,11 @@
 
     let checkPoints = () => {
         if (globals.life <= 0) {
-            Browser.setInfo(`Game Over!`);           	
-            globals.world.figures = [];
+            Browser.setInfo(`Game Over!`);   
+			globals.world.figures = [];
         }else if (globals.points >= 50) {
             Browser.setInfo(`You Win!`);
+			globals.world.figures = [];
         }
     }
 
