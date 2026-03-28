@@ -578,7 +578,7 @@
 					if (this.figures[targetFigure].isEnemy) 
                     	globals.points += config.enemyPoints
 					else
-						globals.point += 1;
+						globals.points += 1;
 				}
 
                 globals.world.shakeIntensity = 30;
@@ -1153,7 +1153,6 @@
             Browser.setInfo(`Game Over!`);           	
             globals.world.figures = [];
         }else if (globals.points >= 50) {
-            Sound.tada();
             Browser.setInfo(`You Win!`);
         }
     }
