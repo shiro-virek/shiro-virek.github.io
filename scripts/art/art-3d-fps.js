@@ -1037,7 +1037,7 @@
             globals.world.checkShoot();   
         }
 
-        Browser.addButton("btnShoot", "🔫", shoot);
+        Browser.addButton("btnShoot", "🔫", shoot, -10, 80, 60, 60);
 
         globals.joystickL = new Joystick(100, height - 100);
         globals.joystickL.add();

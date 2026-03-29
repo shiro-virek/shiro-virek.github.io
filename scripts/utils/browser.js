@@ -35,7 +35,7 @@ class Browser {
         return variable;
     }
     
-    static addButton = (id, caption, action) => {
+    static addButton = (id, caption, action, x = 0, y = 0, width = 0, height = 0) => {
         const container = document.getElementById("specialControls");
 
         const button = document.createElement("button");
@@ -43,9 +43,20 @@ class Browser {
         button.textContent = caption;
         button.classList.add("animated-button");
 
-        button.addEventListener("click", action);
+        if (x !== 0 || y !== 0) {
+            button.style.position = "fixed";
+            button.style.left = `${x}px`;
+            button.style.top  = `${y}px`;
+        }
 
-        container.appendChild(button); 
+        if (width !== 0 || height !== 0) {
+            button.style.width = `${width}px`;
+            button.style.height = `${height}px`;
+        }
+
+        button.addEventListener("pointerdown", action);
+
+        container.appendChild(button);
         requestAnimationFrame(() => {
             button.classList.add("visible");
         });
