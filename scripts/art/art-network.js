@@ -10,12 +10,9 @@
         dotsColumns : 50,
         dotMargin : 30,
         dotPadding : 20,
-        dotRadio : 10,
+        dotRadio : 3,
         hue : 150,
-        maxRadius: 200,
     };
-
-
 
     const Figures = Object.freeze({
         Square: Symbol("square"),
@@ -61,7 +58,11 @@
             this.y = config.dotMargin + row * config.dotPadding + row * this.radio;
             this.on = true;
             this.angle = 0;
-            this.color = `hsl(${config.hue}, 100%, 50%)`;
+            this.color = `hsl(${config.hue}, 100%, 50%)`;        
+            this.velX = 0;
+            this.velY = 0;
+            this.originX = this.x;
+            this.originY = this.y;
         }
 
         draw = (ctx) => {
@@ -81,6 +82,11 @@
             }
         }
 
+
+        update = (xMouse, yMouse) => {
+            this.x +=  globals.random.nextRange(-1, 1);
+            this.y +=  globals.random.nextRange(-1, 1);
+        }
     }
 
     let init = () => {
@@ -103,6 +109,13 @@
     
     window.draw = () => {
         drawBackground(ctx, canvas);
+
+        for (let xi = 0; xi < config.dotsColumns; xi++) {
+            for (let yi = 0; yi < config.dotsRows; yi++) {
+                globals.mesh.dots[xi][yi].update(mouseX, mouseY);
+            }
+        }       
+
         globals.mesh.draw(ctx);
     }
 
