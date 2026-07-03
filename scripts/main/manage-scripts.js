@@ -42,6 +42,7 @@ const art = [
                 { "name": "3d-fps", "display": "3D FPS"},
                 { "name": "joystick", "display": "Joystick"},
                 { "name": "mesh", "display": "Mesh"},
+                { "name": "network", "display": "Network"},
             ];
 const scripts = [];
 
