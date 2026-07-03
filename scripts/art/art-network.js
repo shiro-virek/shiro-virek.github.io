@@ -10,7 +10,7 @@
         dotsColumns : 10,
         dotMargin : 30,
         dotPadding : 50,
-        dotRadio : 2,
+        dotradius : 2,
         hue : 150,
 		drawQuadtree: false,
     };
@@ -84,9 +84,9 @@
 
     class Dot {
         constructor(column, row) {
-            this.radio = config.dotRadio;
-            this.x = config.dotMargin + column * config.dotPadding + column * this.radio;
-            this.y = config.dotMargin + row * config.dotPadding + row * this.radio;
+            this.radius = config.dotradius;
+            this.x = config.dotMargin + column * config.dotPadding + column * this.radius;
+            this.y = config.dotMargin + row * config.dotPadding + row * this.radius;
             this.on = true;
             this.angle = 0;
             this.color = `hsl(${config.hue}, 100%, 50%)`;        
@@ -96,37 +96,68 @@
             this.originY = this.y;
         }
 
+        moveAuto(distance) {
+            this.x += Math.cos(this.angle) * distance;
+            this.y += Math.sin(this.angle) * distance;
+        }
+
         draw = (ctx) => {
             switch(globals.mesh.shape){
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x, this.y, this.radio, this.color);
+                    Drawing.drawCircle(ctx, this.x, this.y, this.radius, this.color);
                     break;
                 case Figures.Square:
-                    Drawing.drawSquare(ctx, this.x, this.y, this.radio, this.angle, this.color);
+                    Drawing.drawSquare(ctx, this.x, this.y, this.radius, this.angle, this.color);
                     break;
                 case Figures.Hexagon:
-                    Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 6, this.angle, this.color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 6, this.angle, this.color);
                     break;
                 case Figures.Triangle:
-                    Drawing.drawPolygon(ctx, this.x, this.y, this.radio, 3, this.angle, this.color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 3, this.angle, this.color);
                     break;
             }
         }
 
-        update = (xMouse, yMouse) => {
-            this.x +=  globals.random.nextRange(-1, 1);
-            this.y +=  globals.random.nextRange(-1, 1);
+        checkWallCollisionBounce() {
+            if (this.x - this.radius <= 0){
+                this.x = this.radius + 10;
+                this.angle += 3.14;
+
+            }
+            if (this.x + this.radius >= width) {
+                this.x = width - this.radius - 10;
+                this.angle += 3.14;
+
+            }
+            if (this.y - this.radius <= 0) {
+                this.y = this.radius + 10;
+                this.angle += 3.14;
+
+            }
+            if (this.y + this.radius >= height) {
+                this.y = height - this.radius - 10;
+                this.angle += 3.14;
+            }
+        
         }
 
-        getTop = () => this.y - this.radio;
-        getBottom = () => this.y + this.radio;
-        getLeft = () => this.x - this.radio;
-        getRight = () => this.x + this.radio;
+
+        update = (xMouse, yMouse) => {
+            this.angle += globals.random.nextBool()? 0.1 : -0.1;
+            this.moveAuto(1);
+
+            this.checkWallCollisionBounce();
+        }
+
+        getTop = () => this.y - this.radius;
+        getBottom = () => this.y + this.radius;
+        getLeft = () => this.x - this.radius;
+        getRight = () => this.x + this.radius;
     }
 
     let init = () => {
-        config.dotsRows = Math.floor(height / (config.dotRadio + config.dotPadding));
-        config.dotsColumns = Math.floor(width / (config.dotRadio + config.dotPadding));
+        config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
+        config.dotsColumns = Math.floor(width / (config.dotradius + config.dotPadding));
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         globals.mesh = new Mesh();
