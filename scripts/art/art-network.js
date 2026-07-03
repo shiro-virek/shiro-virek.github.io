@@ -6,12 +6,13 @@
 
     const config = {
         randomize: true,
-        dotsRows: 50,
-        dotsColumns : 50,
+        dotsRows: 10,
+        dotsColumns : 10,
         dotMargin : 30,
-        dotPadding : 20,
-        dotRadio : 3,
+        dotPadding : 50,
+        dotRadio : 2,
         hue : 150,
+		drawQuadtree: false,
     };
 
     const Figures = Object.freeze({
@@ -24,9 +25,11 @@
     class Mesh {
         constructor() {
             this.dots = [];
+			this.quad = Quadtree.generateQuadtree(width, height);
             let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);
             this.shape = Figures[Object.keys(Figures)[rand]];
             this.generateDots();
+
         }
 
         generateDots = () => {
@@ -45,10 +48,38 @@
         draw = (ctx) => {
             for (let x = 0; x <= config.dotsColumns; x++) {
                 for (let y = 0; y <= config.dotsRows; y++) {
+
+			        let returnObjects = [];
+
+			        globals.mesh.quad.retrieve(returnObjects, this.dots[x][y]);
+
+                    for (const element of returnObjects) {
+                    
+                        let catX = Math.abs(this.dots[x][y].x - element.x);
+                        let catY = Math.abs(this.dots[x][y].y - element.y);
+                        let distance = Math.sqrt(catX * catX + catY * catY);
+
+                        if (distance < 50) {
+                            let opacity = Numbers.scale(distance, 50, 0, 0, 100);
+                            let color = `hsl(${config.hue}, 50%, ${opacity}%)`
+                            Drawing.drawLine(ctx, this.dots[x][y].x, this.dots[x][y].y,
+                                             element.x, element.y, 1, color)
+                        }
+                    }
+
                     this.dots[x][y].draw(ctx);
                 }
             }
         }
+
+        populateQuadTree = () => {
+			this.quad.clear();
+			for (let x = 0; x <= config.dotsColumns; x++) {
+				for (let y = 0; y <= config.dotsRows; y++) {
+					this.quad.insert(this.dots[x][y]);
+				}
+			}
+		}
     }
 
     class Dot {
@@ -82,11 +113,15 @@
             }
         }
 
-
         update = (xMouse, yMouse) => {
             this.x +=  globals.random.nextRange(-1, 1);
             this.y +=  globals.random.nextRange(-1, 1);
         }
+
+        getTop = () => this.y - this.radio;
+        getBottom = () => this.y + this.radio;
+        getLeft = () => this.x - this.radio;
+        getRight = () => this.x + this.radio;
     }
 
     let init = () => {
@@ -109,6 +144,11 @@
     
     window.draw = () => {
         drawBackground(ctx, canvas);
+
+        globals.mesh.populateQuadTree();
+
+        if (config.drawQuadtree)
+            globals.mesh.quad.drawQuadtree(ctx, globals.mesh.quad);
 
         for (let xi = 0; xi < config.dotsColumns; xi++) {
             for (let yi = 0; yi < config.dotsRows; yi++) {
