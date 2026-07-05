@@ -16,7 +16,7 @@
         opacity: 1,
         hue : 150,
 		drawQuadtree: false,
-        movementFunctions: [movementFunction1, movementFunction2, movementFunction3],
+        movementFunctions: [movementFunction6], //movementFunction1, movementFunction2, movementFunction3],
         reactionFunctions: [reactionFunction1, reactionFunction2, reactionFunction3, reactionFunction4],
     };
 
@@ -179,6 +179,35 @@
 
     function movementFunction3(xMouse, yMouse, originX, originY, angle) {              
         let distance = 1;
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function movementFunction4(xMouse, yMouse, originX, originY, angle) {              
+        let distance = Trigonometry.distanceBetweenTwoPoints(xMouse, yMouse, originX, originY) * 0.005;
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function movementFunction5(xMouse, yMouse, originX, originY, angle) {              
+        let distance = Numbers.scale(Trigonometry.angleBetweenTwoPoints(xMouse, yMouse, originX, originY), 0, 359, 0.1, 4);
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function movementFunction6(xMouse, yMouse, originX, originY, angle) {   
+        let newAngle = Trigonometry.angleBetweenTwoPoints(xMouse, yMouse, originX, originY);
+        let distance = Numbers.scale(newAngle, 0, 359, 0.1, -1);           
+        angle +=  Numbers.scale(newAngle, 0, 359, -3, 3);
                 
         return {
             newX: originX + Math.cos(angle) * distance,
