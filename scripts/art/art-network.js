@@ -16,7 +16,7 @@
         opacity: 1,
         hue : 150,
 		drawQuadtree: false,
-        movementFunctions: [movementFunction6], //movementFunction1, movementFunction2, movementFunction3],
+        movementFunctions: [movementFunction1, movementFunction2, movementFunction3, movementFunction4, movementFunction5, movementFunction6],
         reactionFunctions: [reactionFunction1, reactionFunction2, reactionFunction3, reactionFunction4],
     };
 
