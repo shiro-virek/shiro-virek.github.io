@@ -11,9 +11,10 @@
         dotMargin : 30,
         dotPadding : 50,
         dotradius : 2,
+        maxRadius: 20,
         hue : 150,
 		drawQuadtree: false,
-        movementFunctions: [movementFunction1],
+        movementFunctions: [movementFunction2],
         reactionFunctions: [reactionFunction1],
     };
 
@@ -164,6 +165,13 @@
         };
     }
 
+    function movementFunction2(xMouse, yMouse, originX, originY, angle) {              
+        return {
+            newX: originX + globals.random.nextRange(2, -2),
+            newY: originY + globals.random.nextRange(2, -2)
+        };
+    }
+
     function reactionFunction1(xMouse, yMouse, dot1, dot2, distance) {
         let opacity = Numbers.scale(distance, 50, 0, 0, 100);
         let color = `hsl(${config.hue}, 50%, ${opacity}%)`
@@ -172,10 +180,11 @@
     }
 
     let init = () => {
-        config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
-        config.dotsColumns = Math.floor(width / (config.dotradius + config.dotPadding));
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
+        config.dotsRadius = globals.random.nextInt(2, config.maxRadius);
+        config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
+        config.dotsColumns = Math.floor(width / (config.dotradius + config.dotPadding));
         globals.mesh = new Mesh();
         initCanvas();
         addEvents();
