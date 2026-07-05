@@ -179,10 +179,19 @@
                             dot2.x, dot2.y, 1, color)
     }
 
+    function reactionFunction1(xMouse, yMouse, dot1, dot2, distance) {
+        let opacity = Numbers.scale(distance, 50, 0, 0, 100);
+        let color = `hsl(${config.hue}, 50%, ${opacity}%)`
+        Drawing.drawLine(ctx, dot1.x, dot1.y,
+                            dot2.x, dot2.y, 1, color)
+    }
+
+
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         config.dotsRadius = globals.random.nextInt(2, config.maxRadius);
+        config.dotPadding = globals.random.nextInt(30, 120)
         config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
         config.dotsColumns = Math.floor(width / (config.dotradius + config.dotPadding));
         globals.mesh = new Mesh();
