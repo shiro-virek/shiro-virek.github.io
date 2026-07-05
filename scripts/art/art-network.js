@@ -12,10 +12,12 @@
         dotPadding : 50,
         dotradius : 2,
         maxRadius: 20,
+        distanceTreshold: 50,
+        opacity: 1,
         hue : 150,
 		drawQuadtree: false,
-        movementFunctions: [movementFunction2],
-        reactionFunctions: [reactionFunction1],
+        movementFunctions: [movementFunction1, movementFunction2, movementFunction3],
+        reactionFunctions: [reactionFunction2],
     };
 
     const Figures = Object.freeze({
@@ -62,7 +64,7 @@
                         let catY = Math.abs(this.dots[x][y].y - element.y);
                         let distance = Math.sqrt(catX * catX + catY * catY);
 
-                        if (distance < 50) {
+                        if (distance < config.distanceTreshold) {
                             const reactionFunction = config.reactionFunctions[config.reactionFunctionIndex];
                                 
                             reactionFunction(mouseX, mouseY, this.dots[x][y], element, distance);
@@ -91,26 +93,29 @@
             this.y = config.dotMargin + row * config.dotPadding + row * this.radius;
             this.on = true;
             this.angle = globals.random.nextInt(0, 359);
-            this.color = `hsl(${config.hue}, 100%, 50%)`;        
+            this.opacity = config.opacity;
+            this.hue = config.hue;    
             this.velX = 0;
             this.velY = 0;
             this.originX = this.x;
-            this.originY = this.y;
+            this.originY = this.y;            
         }
 
         draw = (ctx) => {
+            let color = `hsla(${this.hue}, 100%, 50%, ${this.opacity})`;    
+
             switch(globals.mesh.shape){
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x, this.y, this.radius, this.color);
+                    Drawing.drawCircle(ctx, this.x, this.y, this.radius, color);
                     break;
                 case Figures.Square:
-                    Drawing.drawSquare(ctx, this.x, this.y, this.radius, this.angle, this.color);
+                    Drawing.drawSquare(ctx, this.x, this.y, this.radius, this.angle, color);
                     break;
                 case Figures.Hexagon:
-                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 6, this.angle, this.color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 6, this.angle, color);
                     break;
                 case Figures.Triangle:
-                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 3, this.angle, this.color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 3, this.angle, color);
                     break;
             }
         }
@@ -172,11 +177,13 @@
         };
     }
 
-    function reactionFunction1(xMouse, yMouse, dot1, dot2, distance) {
-        let opacity = Numbers.scale(distance, 50, 0, 0, 100);
-        let color = `hsl(${config.hue}, 50%, ${opacity}%)`
-        Drawing.drawLine(ctx, dot1.x, dot1.y,
-                            dot2.x, dot2.y, 1, color)
+    function movementFunction3(xMouse, yMouse, originX, originY, angle) {              
+        let distance = 1;
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
     }
 
     function reactionFunction1(xMouse, yMouse, dot1, dot2, distance) {
@@ -184,6 +191,11 @@
         let color = `hsl(${config.hue}, 50%, ${opacity}%)`
         Drawing.drawLine(ctx, dot1.x, dot1.y,
                             dot2.x, dot2.y, 1, color)
+    }
+
+    function reactionFunction2 (xMouse, yMouse, dot1, dot2, distance) {
+        let opacity = Numbers.scale(distance, config.distanceTreshold, 0, 1, 0.1);
+        dot1.opacity = opacity;
     }
 
 
