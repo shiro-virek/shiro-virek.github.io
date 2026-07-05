@@ -13,6 +13,8 @@
         dotradius : 2,
         hue : 150,
 		drawQuadtree: false,
+        movementFunctions: [movementFunction1],
+        reactionFunctions: [reactionFunction1],
     };
 
     const Figures = Object.freeze({
@@ -96,11 +98,6 @@
             this.originY = this.y;
         }
 
-        moveAuto(distance) {
-            this.x += Math.cos(this.angle) * distance;
-            this.y += Math.sin(this.angle) * distance;
-        }
-
         draw = (ctx) => {
             switch(globals.mesh.shape){
                 case Figures.Circle:
@@ -141,10 +138,13 @@
         
         }
 
-
         update = (xMouse, yMouse) => {
-            this.angle += globals.random.nextBool()? 0.1 : -0.1;
-            this.moveAuto(1);
+            const movementFunction = config.movementFunctions[config.movementFunctionIndex];
+        
+            let result = movementFunction(xMouse, yMouse, this.x, this.y, this.angle);
+
+            this.x = result.newX;
+            this.y = result.newY;
 
             this.checkWallCollisionBounce();
         }
@@ -154,6 +154,31 @@
         getLeft = () => this.x - this.radius;
         getRight = () => this.x + this.radius;
     }
+
+    function movementFunction1(xMouse, yMouse, originX, originY, angle) {
+        angle += globals.random.nextBool()? 0.1 : -0.1;
+        let distance = 1;
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+
+    function reactionFunction1(xMouse, yMouse, originX, originY) {
+        let deltaX = xMouse - originX; 
+        let deltaY = yMouse - originY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+            
+        return {
+            newX: originX + Numbers.scale(Math.cos((originX + xMouse) * Trigonometry.RAD_CONST), -1, 1, -config.maxRadius, config.maxRadius),
+            newY: originY + Numbers.scale(Math.sin((originY + yMouse) * Trigonometry.RAD_CONST), -1, 1, -config.maxRadius, config.maxRadius)
+        };
+    }
+
 
     let init = () => {
         config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
@@ -170,6 +195,8 @@
     }
 
     let randomize = () => {
+        config.movementFunctionIndex = globals.random.nextInt(0, config.movementFunctions.length - 1);
+        config.reactionFunctionIndex = globals.random.nextInt(0, config.reactionFunctions.length - 1);
         config.hue = globals.random.nextInt(0, 360);
     }
     
