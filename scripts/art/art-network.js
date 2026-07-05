@@ -33,12 +33,12 @@
         }
 
         generateDots = () => {
-            for (let x = 0; x <= config.dotsColumns; x++) {
+            for (let x = 0; x < config.dotsColumns; x++) {
                 this.dots[x] = new Array(config.dotsRows);
             }
 
-            for (let x = 0; x <= config.dotsColumns; x++) {
-                for (let y = 0; y <= config.dotsRows; y++) {
+            for (let x = 0; x < config.dotsColumns; x++) {
+                for (let y = 0; y < config.dotsRows; y++) {
                     let dot = new Dot(x, y);
                     this.dots[x][y] = dot;
                 }
@@ -46,8 +46,8 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= config.dotsColumns; x++) {
-                for (let y = 0; y <= config.dotsRows; y++) {
+            for (let x = 0; x < config.dotsColumns; x++) {
+                for (let y = 0; y < config.dotsRows; y++) {
 
 			        let returnObjects = [];
 
@@ -74,8 +74,8 @@
 
         populateQuadTree = () => {
 			this.quad.clear();
-			for (let x = 0; x <= config.dotsColumns; x++) {
-				for (let y = 0; y <= config.dotsRows; y++) {
+			for (let x = 0; x < config.dotsColumns; x++) {
+				for (let y = 0; y < config.dotsRows; y++) {
 					this.quad.insert(this.dots[x][y]);
 				}
 			}
@@ -88,7 +88,7 @@
             this.x = config.dotMargin + column * config.dotPadding + column * this.radius;
             this.y = config.dotMargin + row * config.dotPadding + row * this.radius;
             this.on = true;
-            this.angle = 0;
+            this.angle = globals.random.nextInt(0, 359);
             this.color = `hsl(${config.hue}, 100%, 50%)`;        
             this.velX = 0;
             this.velY = 0;
