@@ -17,7 +17,7 @@
         hue : 150,
 		drawQuadtree: false,
         movementFunctions: [movementFunction1, movementFunction2, movementFunction3],
-        reactionFunctions: [reactionFunction1, reactionFunction2, reactionFunction3],
+        reactionFunctions: [reactionFunction1, reactionFunction2, reactionFunction3, reactionFunction4],
     };
 
     const Figures = Object.freeze({
@@ -200,6 +200,13 @@
 
     function reactionFunction3 (xMouse, yMouse, dot1, dot2, distance) {
         dot1.radius = config.dotRadius * Numbers.scale(distance, 0, config.distanceTreshold, 0.1, 2.5);
+    }
+
+    function reactionFunction4 (xMouse, yMouse, dot1, dot2, distance) {
+        dot1.hue += Numbers.scale(distance, 0, config.distanceTreshold, -1, 1);
+        if (dot1.hue < 0) dot1.hue = 359;
+        if (dot1.hue > 359) dot1.hue = 0;
+
     }
 
     let init = () => {
