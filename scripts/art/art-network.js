@@ -62,10 +62,9 @@
                         let distance = Math.sqrt(catX * catX + catY * catY);
 
                         if (distance < 50) {
-                            let opacity = Numbers.scale(distance, 50, 0, 0, 100);
-                            let color = `hsl(${config.hue}, 50%, ${opacity}%)`
-                            Drawing.drawLine(ctx, this.dots[x][y].x, this.dots[x][y].y,
-                                             element.x, element.y, 1, color)
+                            const reactionFunction = config.reactionFunctions[config.reactionFunctionIndex];
+                                
+                            reactionFunction(mouseX, mouseY, this.dots[x][y], element, distance);
                         }
                     }
 
@@ -165,20 +164,12 @@
         };
     }
 
-
-    function reactionFunction1(xMouse, yMouse, originX, originY) {
-        let deltaX = xMouse - originX; 
-        let deltaY = yMouse - originY;
-
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const angle = Math.atan2(deltaY, deltaX);
-            
-        return {
-            newX: originX + Numbers.scale(Math.cos((originX + xMouse) * Trigonometry.RAD_CONST), -1, 1, -config.maxRadius, config.maxRadius),
-            newY: originY + Numbers.scale(Math.sin((originY + yMouse) * Trigonometry.RAD_CONST), -1, 1, -config.maxRadius, config.maxRadius)
-        };
+    function reactionFunction1(xMouse, yMouse, dot1, dot2, distance) {
+        let opacity = Numbers.scale(distance, 50, 0, 0, 100);
+        let color = `hsl(${config.hue}, 50%, ${opacity}%)`
+        Drawing.drawLine(ctx, dot1.x, dot1.y,
+                            dot2.x, dot2.y, 1, color)
     }
-
 
     let init = () => {
         config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
