@@ -10,9 +10,14 @@
         dotsColumns : 10,
         dotMargin : 30,
         dotPadding : 50,
-        dotradius : 2,
+        dotRadius : 2,
+        maxRadius: 20,
+        distanceTreshold: 50,
+        opacity: 1,
         hue : 150,
 		drawQuadtree: false,
+        movementFunctions: [movementFunction6], //movementFunction1, movementFunction2, movementFunction3],
+        reactionFunctions: [reactionFunction1, reactionFunction2, reactionFunction3, reactionFunction4],
     };
 
     const Figures = Object.freeze({
@@ -33,12 +38,12 @@
         }
 
         generateDots = () => {
-            for (let x = 0; x <= config.dotsColumns; x++) {
+            for (let x = 0; x < config.dotsColumns; x++) {
                 this.dots[x] = new Array(config.dotsRows);
             }
 
-            for (let x = 0; x <= config.dotsColumns; x++) {
-                for (let y = 0; y <= config.dotsRows; y++) {
+            for (let x = 0; x < config.dotsColumns; x++) {
+                for (let y = 0; y < config.dotsRows; y++) {
                     let dot = new Dot(x, y);
                     this.dots[x][y] = dot;
                 }
@@ -46,8 +51,8 @@
         }
 
         draw = (ctx) => {
-            for (let x = 0; x <= config.dotsColumns; x++) {
-                for (let y = 0; y <= config.dotsRows; y++) {
+            for (let x = 0; x < config.dotsColumns; x++) {
+                for (let y = 0; y < config.dotsRows; y++) {
 
 			        let returnObjects = [];
 
@@ -59,11 +64,10 @@
                         let catY = Math.abs(this.dots[x][y].y - element.y);
                         let distance = Math.sqrt(catX * catX + catY * catY);
 
-                        if (distance < 50) {
-                            let opacity = Numbers.scale(distance, 50, 0, 0, 100);
-                            let color = `hsl(${config.hue}, 50%, ${opacity}%)`
-                            Drawing.drawLine(ctx, this.dots[x][y].x, this.dots[x][y].y,
-                                             element.x, element.y, 1, color)
+                        if (distance < config.distanceTreshold) {
+                            const reactionFunction = config.reactionFunctions[config.reactionFunctionIndex];
+                                
+                            reactionFunction(mouseX, mouseY, this.dots[x][y], element, distance);
                         }
                     }
 
@@ -74,8 +78,8 @@
 
         populateQuadTree = () => {
 			this.quad.clear();
-			for (let x = 0; x <= config.dotsColumns; x++) {
-				for (let y = 0; y <= config.dotsRows; y++) {
+			for (let x = 0; x < config.dotsColumns; x++) {
+				for (let y = 0; y < config.dotsRows; y++) {
 					this.quad.insert(this.dots[x][y]);
 				}
 			}
@@ -84,36 +88,34 @@
 
     class Dot {
         constructor(column, row) {
-            this.radius = config.dotradius;
+            this.radius = config.dotRadius;
             this.x = config.dotMargin + column * config.dotPadding + column * this.radius;
             this.y = config.dotMargin + row * config.dotPadding + row * this.radius;
             this.on = true;
-            this.angle = 0;
-            this.color = `hsl(${config.hue}, 100%, 50%)`;        
+            this.angle = globals.random.nextInt(0, 359);
+            this.opacity = config.opacity;
+            this.hue = config.hue;    
             this.velX = 0;
             this.velY = 0;
             this.originX = this.x;
-            this.originY = this.y;
-        }
-
-        moveAuto(distance) {
-            this.x += Math.cos(this.angle) * distance;
-            this.y += Math.sin(this.angle) * distance;
+            this.originY = this.y;            
         }
 
         draw = (ctx) => {
+            let color = `hsla(${this.hue}, 100%, 50%, ${this.opacity})`;    
+
             switch(globals.mesh.shape){
                 case Figures.Circle:
-                    Drawing.drawCircle(ctx, this.x, this.y, this.radius, this.color);
+                    Drawing.drawCircle(ctx, this.x, this.y, this.radius, color);
                     break;
                 case Figures.Square:
-                    Drawing.drawSquare(ctx, this.x, this.y, this.radius, this.angle, this.color);
+                    Drawing.drawSquare(ctx, this.x, this.y, this.radius, this.angle, color);
                     break;
                 case Figures.Hexagon:
-                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 6, this.angle, this.color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 6, this.angle, color);
                     break;
                 case Figures.Triangle:
-                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 3, this.angle, this.color);
+                    Drawing.drawPolygon(ctx, this.x, this.y, this.radius, 3, this.angle, color);
                     break;
             }
         }
@@ -141,10 +143,13 @@
         
         }
 
-
         update = (xMouse, yMouse) => {
-            this.angle += globals.random.nextBool()? 0.1 : -0.1;
-            this.moveAuto(1);
+            const movementFunction = config.movementFunctions[config.movementFunctionIndex];
+        
+            let result = movementFunction(xMouse, yMouse, this.x, this.y, this.angle);
+
+            this.x = result.newX;
+            this.y = result.newY;
 
             this.checkWallCollisionBounce();
         }
@@ -155,11 +160,91 @@
         getRight = () => this.x + this.radius;
     }
 
+    function movementFunction1(xMouse, yMouse, originX, originY, angle) {
+        angle += globals.random.nextBool()? 0.1 : -0.1;
+        let distance = 1;
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function movementFunction2(xMouse, yMouse, originX, originY, angle) {              
+        return {
+            newX: originX + globals.random.nextRange(2, -2),
+            newY: originY + globals.random.nextRange(2, -2)
+        };
+    }
+
+    function movementFunction3(xMouse, yMouse, originX, originY, angle) {              
+        let distance = 1;
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function movementFunction4(xMouse, yMouse, originX, originY, angle) {              
+        let distance = Trigonometry.distanceBetweenTwoPoints(xMouse, yMouse, originX, originY) * 0.005;
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function movementFunction5(xMouse, yMouse, originX, originY, angle) {              
+        let distance = Numbers.scale(Trigonometry.angleBetweenTwoPoints(xMouse, yMouse, originX, originY), 0, 359, 0.1, 4);
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function movementFunction6(xMouse, yMouse, originX, originY, angle) {   
+        let newAngle = Trigonometry.angleBetweenTwoPoints(xMouse, yMouse, originX, originY);
+        let distance = Numbers.scale(newAngle, 0, 359, 0.1, -1);           
+        angle +=  Numbers.scale(newAngle, 0, 359, -3, 3);
+                
+        return {
+            newX: originX + Math.cos(angle) * distance,
+            newY: originY + Math.sin(angle) * distance
+        };
+    }
+
+    function reactionFunction1(xMouse, yMouse, dot1, dot2, distance) {
+        let opacity = Numbers.scale(distance, 50, 0, 0, 100);
+        let color = `hsl(${config.hue}, 50%, ${opacity}%)`
+        Drawing.drawLine(ctx, dot1.x, dot1.y,
+                            dot2.x, dot2.y, 1, color)
+    }
+
+    function reactionFunction2 (xMouse, yMouse, dot1, dot2, distance) {
+        let opacity = Numbers.scale(distance, config.distanceTreshold, 0, 1, 0.1);
+        dot1.opacity = opacity;
+    }
+
+    function reactionFunction3 (xMouse, yMouse, dot1, dot2, distance) {
+        dot1.radius = config.dotRadius * Numbers.scale(distance, 0, config.distanceTreshold, 0.1, 2.5);
+    }
+
+    function reactionFunction4 (xMouse, yMouse, dot1, dot2, distance) {
+        dot1.hue += Numbers.scale(distance, 0, config.distanceTreshold, -1, 1);
+        if (dot1.hue < 0) dot1.hue = 359;
+        if (dot1.hue > 359) dot1.hue = 0;
+
+    }
+
     let init = () => {
-        config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
-        config.dotsColumns = Math.floor(width / (config.dotradius + config.dotPadding));
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
+        config.dotsRadius = globals.random.nextInt(2, config.maxRadius);
+        config.dotPadding = globals.random.nextInt(30, 120)
+        config.dotsRows = Math.floor(height / (config.dotRadius + config.dotPadding));
+        config.dotsColumns = Math.floor(width / (config.dotRadius + config.dotPadding));
         globals.mesh = new Mesh();
         initCanvas();
         addEvents();
@@ -170,6 +255,8 @@
     }
 
     let randomize = () => {
+        config.movementFunctionIndex = globals.random.nextInt(0, config.movementFunctions.length - 1);
+        config.reactionFunctionIndex = globals.random.nextInt(0, config.reactionFunctions.length - 1);
         config.hue = globals.random.nextInt(0, 360);
     }
     
