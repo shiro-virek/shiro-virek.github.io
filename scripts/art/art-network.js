@@ -10,14 +10,14 @@
         dotsColumns : 10,
         dotMargin : 30,
         dotPadding : 50,
-        dotradius : 2,
+        dotRadius : 2,
         maxRadius: 20,
         distanceTreshold: 50,
         opacity: 1,
         hue : 150,
 		drawQuadtree: false,
         movementFunctions: [movementFunction1, movementFunction2, movementFunction3],
-        reactionFunctions: [reactionFunction2],
+        reactionFunctions: [reactionFunction1, reactionFunction2, reactionFunction3],
     };
 
     const Figures = Object.freeze({
@@ -88,7 +88,7 @@
 
     class Dot {
         constructor(column, row) {
-            this.radius = config.dotradius;
+            this.radius = config.dotRadius;
             this.x = config.dotMargin + column * config.dotPadding + column * this.radius;
             this.y = config.dotMargin + row * config.dotPadding + row * this.radius;
             this.on = true;
@@ -198,14 +198,17 @@
         dot1.opacity = opacity;
     }
 
+    function reactionFunction3 (xMouse, yMouse, dot1, dot2, distance) {
+        dot1.radius = config.dotRadius * Numbers.scale(distance, 0, config.distanceTreshold, 0.1, 2.5);
+    }
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         config.dotsRadius = globals.random.nextInt(2, config.maxRadius);
         config.dotPadding = globals.random.nextInt(30, 120)
-        config.dotsRows = Math.floor(height / (config.dotradius + config.dotPadding));
-        config.dotsColumns = Math.floor(width / (config.dotradius + config.dotPadding));
+        config.dotsRows = Math.floor(height / (config.dotRadius + config.dotPadding));
+        config.dotsColumns = Math.floor(width / (config.dotRadius + config.dotPadding));
         globals.mesh = new Mesh();
         initCanvas();
         addEvents();
