@@ -37,6 +37,14 @@
                 let streetComparisons = [];
 
                 for (const street of globals.city.streets) {
+                    let x1 = street.originX + Math.cos(street.angle * Trigonometry.RAD_CONST) * street.length1;
+                    let y1 = street.originY + Math.sin(street.angle * Trigonometry.RAD_CONST) * street.length1;
+                    let x2 = street.originX + Math.cos((street.angle + 180) * Trigonometry.RAD_CONST) * street.length2;
+                    let y2 = street.originY + Math.sin((street.angle + 180) * Trigonometry.RAD_CONST) * street.length2;
+
+                    if (x1 < 0 || x1 > width || y1 < 0 || y1 > height) street.growing1 = false;
+                    if (x2 < 0 || x2 > width || y2 < 0 || y2 > height) street.growing2 = false;
+
                     for (const street2 of globals.city.streets) {
                         if (street == street2)
                             continue;
@@ -48,20 +56,13 @@
                         }
                         if (found) continue;
 
-                        streetComparisons.push([[street.id, street2.id]]);
-
-                        let x1 = street.originX + Math.cos(street.angle * Trigonometry.RAD_CONST) * street.length1;
-                        let y1 = street.originY + Math.sin(street.angle * Trigonometry.RAD_CONST) * street.length1;
-                        let x2 = street.originX + Math.cos(street.angle + 180 * Trigonometry.RAD_CONST) * street.length2;
-                        let y2 = street.originY + Math.sin(street.angle + 180 * Trigonometry.RAD_CONST) * street.length2;
+                        streetComparisons.push([street.id, street2.id]);
 
                         let x3 = street2.originX + Math.cos(street2.angle * Trigonometry.RAD_CONST) * street2.length1;
                         let y3 = street2.originY + Math.sin(street2.angle * Trigonometry.RAD_CONST) * street2.length1;
                         let x4 = street2.originX + Math.cos((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
                         let y4 = street2.originY + Math.sin((street2.angle + 180) * Trigonometry.RAD_CONST) * street2.length2;
 
-                        if (x1 < 0 || x1 > width || y1 < 0 || y1 > height) street.growing1 = false;
-                        if (x2 < 0 || x2 > width || y2 < 0 || y2 > height) street.growing2 = false;
                         if (x3 < 0 || x3 > width || y3 < 0 || y3 > height) street2.growing1 = false;
                         if (x4 < 0 || x4 > width || y4 < 0 || y4 > height) street2.growing2 = false;
 
@@ -112,7 +113,6 @@
 
                     if (street.growing1) street.length1 += 0.5;
                     if (street.growing2) street.length2 += 0.5;
-
                 }
 			} 
         }
