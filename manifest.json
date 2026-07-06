@@ -20,6 +20,6 @@
     ],
     "background_color": "#000000",
     "display": "fullscreen",
-    "scope": "https://eapelroso.com",
-    "start_url": "https://eapelroso.com"
+    "scope": "/",
+    "start_url": "/"
 }
