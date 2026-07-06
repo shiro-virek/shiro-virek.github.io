@@ -90,6 +90,13 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+    if (e.request.mode === 'navigate') {
+        e.respondWith(
+            caches.match('/index.html')
+        );
+        return;
+    }
+
     e.respondWith(
         caches.match(e.request)
             .then(cachedResponse => {
@@ -107,7 +114,7 @@ self.addEventListener('fetch', (e) => {
                     });
                     return networkResponse;
                 }).catch(() => {
-                    return caches.match('/index.html');
+                    return new Response('', { status: 503 });
                 });
             })
     );
