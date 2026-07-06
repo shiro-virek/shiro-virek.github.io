@@ -4,8 +4,6 @@ A generative art playground and creative coding sandbox built with **zero depend
 
 Explore **40+ interactive generative art scenes**, from particle systems and fractals to cellular automata, 3D wireframes, WebGL shaders, and real-time webcam effects.
 
-🌐 [eapelroso.com](https://eapelroso.com)
-
 ---
 
 ## Features
