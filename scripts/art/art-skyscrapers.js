@@ -39,13 +39,13 @@
 		}
 
 		generateCity = () => {
-			let distance = config.minimumDistanceBetweenBuildings * 1.3
+			let distance = config.minimumDistanceBetweenBuildings * 1.7
 			let buildingCols = Math.floor(width / distance) + 1;
 			let buildingRows = Math.floor(height / distance) + 1;
 			for (let x=0; x < buildingCols; x++) {
 				let tilt = 0;
 				for (let y=0; y < buildingRows; y++) {
-					this.addBuilding(x * distance, y * distance + tilt);
+					this.addBuilding(x * distance + y * 10, y * distance + tilt);
 					tilt += 30;
 				}
 			}
@@ -720,7 +720,6 @@
 		globals.city = new City()
 		globals.city.randomize();
 		addEvents();
-		drawBackground(ctx, canvas);
 		window.requestAnimationFrame(loop);
 	}
 
@@ -730,8 +729,9 @@
 		}, false);
 	}
 	
-	window.draw = () => {
-		drawBackground(ctx, canvas);
+	window.draw = () => {		
+		ctx.fillStyle = `rgb(100, 100, 100)`;
+		ctx.fillRect(0, 0, width, height);
 
 		globals.city.draw();
 	}

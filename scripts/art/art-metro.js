@@ -583,8 +583,8 @@
 	}
 
 	window.draw = () => {
-  ctx.fillStyle = `rgb(255, 255, 255)`;
-  ctx.fillRect(0, 0, width, height);
+		ctx.fillStyle = `rgb(255, 255, 255)`;
+		ctx.fillRect(0, 0, width, height);
 		globals.metroNetwork.draw(ctx);
 	}
 
