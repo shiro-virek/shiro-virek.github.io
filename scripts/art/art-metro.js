@@ -18,7 +18,7 @@
 		restrictAngles: true,
 		showStationNames: true,
 		lineThickness: 10,
-		lineTransferMaxDistance: 30,
+		lineTransferMaxDistance: 40,
 		hslMaxHue: 360,
 		minLineLength: 50,
 		infoMarginTop: 10,
@@ -209,6 +209,8 @@
 				else
 					globals.palette.push(line.hue);
 
+				this.populateQuadTree();
+
 				for (const line of globals.metroNetwork.lines) {
 					for (const station of line.stations) {
 						station.addTransfers(this);
@@ -297,17 +299,11 @@
 		}
 
 		addTransfers = (metroNetwork) => {
-			let returnObjects = [];
-
-			metroNetwork.quad.retrieve(returnObjects, this);
-
-			for (const element of returnObjects) {
-				let otherStation = element;
-
-				if (otherStation == this || otherStation.lineSymbol == this.lineSymbol)
-					continue;
-
-				this.addTransfer(otherStation, this);
+			for (const line of metroNetwork.lines) {
+				if (line.symbol == this.lineSymbol) continue;
+				for (const otherStation of line.stations) {
+					this.addTransfer(otherStation, this);
+				}
 			}
 		}
 
@@ -343,10 +339,10 @@
 			ctx.stroke();
 		}
 
-		getTop = () => this.y;
-		getBottom = () => this.y;
-		getLeft = () => this.x;
-		getRight = () => this.x;
+		getTop = () => this.y - config.stationRadio;
+		getBottom = () => this.y + config.stationRadio;
+		getLeft = () => this.x - config.stationRadio;
+		getRight = () => this.x + config.stationRadio;
 	}
 
 	class Street {
