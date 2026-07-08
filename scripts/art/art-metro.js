@@ -6,6 +6,11 @@
 		palette: []
     };
 
+	const Languages = Object.freeze({
+		Generic: Symbol("generic"),
+		Japanese: Symbol("japanese"),
+	});
+
     const config = {
         randomize: true,
 		restrictAngles: true,
@@ -29,6 +34,7 @@
 		maxNumberOfLines: 15,
 		angleSegmentRange: 2,
 		alphabeticLineSymbol: false,
+		language: Languages.Generic,
     };    
 
 	class metroNetwork {
@@ -73,7 +79,7 @@
 
 			ctx.font = "10px Arial";
 			ctx.fillStyle = "#000";
-			ctx.fillText(`City Metro System`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2);
+			ctx.fillText(`${config.language == Languages.Japanese ? "🇯🇵 " : ""}City Metro System`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2);
 			ctx.fillText(`Stations: ${globals.metroNetwork.getNumberOfStations()}`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight);
 			ctx.fillText(`Lines: ${globals.metroNetwork.lines.length}`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 2);
 			ctx.fillText(`Length: ${Math.floor(globals.metroNetwork.getLinesLength() / 100)} km.`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 3);
@@ -187,7 +193,15 @@
 
 		generateName = () => {
 			let icon = this.generateIcon();
-			return Text.generateName(globals.random, 1, 2) + icon;
+
+			switch (config.language) {
+				case Languages.Generic:					
+					return Text.generateName(globals.random, 1, 2) + icon;
+				case Languages.Japanese:
+					return Text.generateJapaneseName(globals.random, 2, 3) + icon;
+				default:
+					break;
+			}
 		}
 
 		drawStation = (ctx, color) => {			
@@ -544,9 +558,10 @@
 		generatePalette();
 		config.alphabeticLineSymbol = globals.random.nextBool();
 		config.angleSegmentRange = globals.random.nextBool();
-		drawIcons = globals.random.nextBool();
 		config.drawStreets = globals.random.nextBool();
 		generateUrbanAttractors();
+		let rand = globals.random.nextInt(0, Object.keys(Languages).length - 1);
+		config.language = Languages[Object.keys(Languages)[rand]];
 	}
 
 	window.draw = () => {
