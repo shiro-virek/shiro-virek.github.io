@@ -43,6 +43,7 @@ class Text {
         return name;
     }
 
+    /*---------------------------------------------------------------------*/
 
     static getRandomKana = (random) => {        
         const syllables = [
@@ -113,20 +114,14 @@ class Text {
         let hasDakuon = false;
                 
         for (let i = 0; i < syllableCount; i++){
-            let nextSyllable = Text.getRandomKana(random);
-            
-            if (word.length === 0 && nextSyllable === "n") continue; 
-            
+            let nextSyllable = Text.getRandomKana(random);            
+            if (word.length === 0 && nextSyllable === "n") continue;             
             if (lastSyllable === "n" && nextSyllable === "n") continue;
-            
             if (hasDakuon && Text.isDakuon(nextSyllable)) continue; 
-
             if (Text.isYoon(lastSyllable) && Text.isYoon(nextSyllable)) continue;
-
             if ((word.length + nextSyllable.length) > 10) {
                 continue;
             }
-
             word += nextSyllable;
             lastSyllable = nextSyllable;
             if (Text.isDakuon(nextSyllable)) hasDakuon = true;
@@ -144,16 +139,58 @@ class Text {
         return name;
     }    
 
-    /*
-    static letters = {
-        [
-            {
-                symbol: 'A',
-                pixels: [
-                    [0, 1, 0],
-                ]
-            }
-        ]
-    };
-    */
+    /*---------------------------------------------------------------------*/
+
+    static getRandomKoreanInitialConsonant = (random) => {        
+        const syllables = [
+                "g", "n", "d", "r", "m", "b", "s", "j", "ch", "k", "t", "p", "h", "kk", "tt", "pp"       
+            ];
+        return random.getRandomFromArray(syllables);
+    }
+
+    static getRandomKoreanVowel = (random) => {        
+        const syllables = [
+                "a", "eo", "o", "u", "eu", "i", "ae", "e"       
+            ];
+        return random.getRandomFromArray(syllables);
+    }
+
+
+    static getRandomKoreanFinishingConsonant = (random) => {        
+        const syllables = [
+                "n", "m", "ng", "l", "k", "p", "t"       
+            ];
+        return random.getRandomFromArray(syllables);
+    }
+
+
+    static generateKoreanSyllable = (random) => {
+        let syllable = Text.getRandomKoreanInitialConsonant(random) + Text.getRandomKoreanVowel(random);
+        if (random.nextInt(0, 100) < 40) syllable += Text.getRandomKoreanFinishingConsonant(random);
+        return syllable;
+    }
+
+    static generateKoreanWord(random, syllables = 2) {
+        let blocks = [];
+        
+        for (let i = 0; i < syllables; i++) {
+            blocks.push(Text.generateKoreanSyllable(random));
+        }
+        
+        let word = blocks.join("-"); 
+        
+        return Text.capitalizeFirstLetter(word);
+    }
+
+    static generateKoreanName = (random, minWords=1, maxWords=3) => {
+        let name = ""
+        let words = random.nextInt(minWords, maxWords);
+        for (let i=0; i<words; i++){            
+            name += Text.generateKoreanWord(random) + " ";
+        }
+        return name;
+    }    
+
+    /*---------------------------------------------------------------------*/
+   
 }
