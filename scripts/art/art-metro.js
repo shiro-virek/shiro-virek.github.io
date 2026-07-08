@@ -227,16 +227,15 @@
 			Drawing.drawCircle(ctx, this.x, this.y, config.stationRadio, "#FFF");
 
 			if (config.stationColorBorder)
-				Drawing.drawCircleBorder(ctx, this.x, this.y, config.stationRadio, "#000");
+				Drawing.drawCircleBorder(ctx, this.x, this.y, config.stationRadio, "#000")
+			else
+				Drawing.drawCircleBorder(ctx, this.x, this.y, config.stationRadio, "#AAA");
 		}
 
 		drawStationName = (ctx) => {
 			let margin = 10;
 			ctx.font = "10px Arial";           
-			ctx.fillStyle = "white";             
-			ctx.strokeStyle = "black";         
-			ctx.lineWidth = 3;       
-			ctx.strokeText(this.name, this.x + margin, this.y - margin);
+			ctx.fillStyle = "black";   
 			ctx.fillText(this.name, this.x + margin, this.y - margin);
 		}
 
@@ -301,7 +300,7 @@
 		}
 
 		drawStreet = (ctx) => {
-			ctx.strokeStyle = "#222";
+			ctx.strokeStyle = "#CCC";
 			ctx.lineWidth = 6;
 			ctx.lineCap = "square";
 			ctx.beginPath();
