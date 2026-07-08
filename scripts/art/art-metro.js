@@ -18,7 +18,7 @@
 		restrictAngles: true,
 		showStationNames: true,
 		lineThickness: 10,
-		lineTransferMaxDistance: 30,
+		lineTransferMaxDistance: 40,
 		hslMaxHue: 360,
 		minLineLength: 50,
 		infoMarginTop: 10,
@@ -39,7 +39,7 @@
 		language: Languages.Generic,
     };    
 
-	class metroNetwork {
+	class MetroNetwork {
 		constructor() {
 			this.lines = [];
 			this.quad = Quadtree.generateQuadtree(width, height);
@@ -100,7 +100,7 @@
 			ctx.fillText(`Length: ${Math.floor(globals.metroNetwork.getLinesLength() / 100)} km.`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 3);
 			ctx.fillText(`Transfer station`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 4);
 
-			metroNetwork.drawTransferIcon(ctx);
+			MetroNetwork.drawTransferIcon(ctx);
 
 			ctx.lineWidth = 1;
 			for (let i = 0; i < globals.metroNetwork.lines.length; i++) {
@@ -116,6 +116,67 @@
 			let station2 = new Station(config.infoMarginLeft + config.infoPadding + config.infoSymbolSide, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 4 - 5);
 			station1.transfer = station2;
 			station1.drawTransferLine(ctx, true, 10);
+		}
+
+		drawStationLabels = (ctx) => {
+			let placedLabels = [];
+			ctx.font = "10px Arial";
+			ctx.strokeStyle = "white";   
+			ctx.fillStyle = "black";      
+			ctx.lineWidth = 3;       
+
+			for (const line of globals.metroNetwork.lines) {
+				for (const station of line.stations) {
+					let textWidth = ctx.measureText(station.name).width;
+					let textHeight = 10;
+
+					let offsets = [
+						{ dx: config.stationRadio + 5, dy: textHeight / 3 },
+						{ dx: -textWidth - config.stationRadio - 5, dy: textHeight / 3 },
+						{ dx: -textWidth / 2, dy: -config.stationRadio - 5 },
+						{ dx: -textWidth / 2, dy: config.stationRadio + textHeight + 5 },
+						{ dx: config.stationRadio + 5, dy: -config.stationRadio - 3 },
+						{ dx: -textWidth - config.stationRadio - 5, dy: -config.stationRadio - 3 },
+						{ dx: config.stationRadio + 5, dy: config.stationRadio + textHeight + 3 },
+						{ dx: -textWidth - config.stationRadio - 5, dy: config.stationRadio + textHeight + 3 },
+					];
+
+					let placed = false;
+					for (const offset of offsets) {
+						let labelX = station.x + offset.dx;
+						let labelY = station.y + offset.dy;
+						let labelBox = { x: labelX, y: labelY - textHeight, w: textWidth, h: textHeight };
+
+						if (!this.isOverlapping(labelBox, placedLabels)) {	
+							ctx.strokeText(station.name, labelX, labelY);
+							ctx.fillText(station.name, labelX, labelY);
+
+							placedLabels.push(labelBox);
+							placed = true;
+							break;
+						}
+					}
+
+					if (!placed) {
+						ctx.globalAlpha = 0.3;
+						ctx.fillText(station.name, station.x + config.stationRadio + 5, station.y + textHeight / 3);
+						ctx.globalAlpha = 1.0;
+					}
+				}
+			}
+		}
+
+		isOverlapping = (box, placedLabels) => {
+			let padding = 3;
+			for (const placed of placedLabels) {
+				if (box.x < placed.x + placed.w + padding &&
+					box.x + box.w + padding > placed.x &&
+					box.y < placed.y + placed.h + padding &&
+					box.y + box.h + padding > placed.y) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		drawLines = (ctx) => {
@@ -135,11 +196,7 @@
 			}
 
 			if (config.showStationNames) 
-				for (const line of globals.metroNetwork.lines) {
-					for (const station of line.stations) {
-						station.drawStationName(ctx);
-					}
-				}
+				this.drawStationLabels(ctx);
 		}
 
 		addMetroLine = (x, y) => {
@@ -151,6 +208,8 @@
 					globals.metroNetwork.lines.push(line);
 				else
 					globals.palette.push(line.hue);
+
+				this.populateQuadTree();
 
 				for (const line of globals.metroNetwork.lines) {
 					for (const station of line.stations) {
@@ -239,18 +298,12 @@
 			ctx.fillText(this.name, this.x + margin, this.y - margin);
 		}
 
-		addTransfers = (metroNetwork) => {
-			let returnObjects = [];
-
-			metroNetwork.quad.retrieve(returnObjects, this);
-
-			for (const element of returnObjects) {
-				let otherStation = element;
-
-				if (otherStation == this || otherStation.lineSymbol == this.lineSymbol)
-					continue;
-
-				this.addTransfer(otherStation, this);
+		addTransfers = (MetroNetwork) => {
+			for (const line of MetroNetwork.lines) {
+				if (line.symbol == this.lineSymbol) continue;
+				for (const otherStation of line.stations) {
+					this.addTransfer(otherStation, this);
+				}
 			}
 		}
 
@@ -286,10 +339,10 @@
 			ctx.stroke();
 		}
 
-		getTop = () => this.y;
-		getBottom = () => this.y;
-		getLeft = () => this.x;
-		getRight = () => this.x;
+		getTop = () => this.y - config.stationRadio;
+		getBottom = () => this.y + config.stationRadio;
+		getLeft = () => this.x - config.stationRadio;
+		getRight = () => this.x + config.stationRadio;
 	}
 
 	class Street {
@@ -300,7 +353,7 @@
 		}
 
 		drawStreet = (ctx) => {
-			ctx.strokeStyle = "#CCC";
+			ctx.strokeStyle = "#EEE";
 			ctx.lineWidth = 6;
 			ctx.lineCap = "square";
 			ctx.beginPath();
@@ -405,7 +458,7 @@
 				if (
 					(newX < config.infoMarginLeft + config.infoWidth + margin && newY < config.infoMarginTop + infoHeight + margin)
 					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
-					|| isSegmentTooClose(lastX, lastY, newX, newY)
+					|| isSegmentTooClose(lastX, lastY, newX, newY, 40)
 				){
 					if (index == 0) Sound.error();
 					continue;
@@ -518,7 +571,7 @@
 
 	let init = () => {
 		initCanvas();
-		globals.metroNetwork = new metroNetwork()
+		globals.metroNetwork = new MetroNetwork()
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 		addEvents();
@@ -583,8 +636,8 @@
 	}
 
 	window.draw = () => {
-  ctx.fillStyle = `rgb(255, 255, 255)`;
-  ctx.fillRect(0, 0, width, height);
+		ctx.fillStyle = `rgb(255, 255, 255)`;
+		ctx.fillRect(0, 0, width, height);
 		globals.metroNetwork.draw(ctx);
 	}
 

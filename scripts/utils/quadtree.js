@@ -112,10 +112,23 @@ class Quadtree {
         }
     }
 
+    overlaps = (a, b) => {
+        return a.getLeft() < b.getRight() && a.getRight() > b.getLeft()
+            && a.getTop() < b.getBottom() && a.getBottom() > b.getTop();
+    }
+
     retrieve = (returnObjects, rectangle) => {
         let index = this.getIndex(rectangle);
-        if (index != -1 && this.nodes[0] != null) {
-            this.nodes[index].retrieve(returnObjects, rectangle);
+        if (this.nodes[0] != null) {
+            if (index != -1) {
+                this.nodes[index].retrieve(returnObjects, rectangle);
+            } else {
+                for (let i = 0; i < 4; i++) {
+                    if (this.overlaps(rectangle, this.nodes[i].bounds)) {
+                        this.nodes[i].retrieve(returnObjects, rectangle);
+                    }
+                }
+            }
         }
 
         returnObjects.push(...this.lines);

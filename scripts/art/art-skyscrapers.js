@@ -39,13 +39,13 @@
 		}
 
 		generateCity = () => {
-			let distance = config.minimumDistanceBetweenBuildings * 1.3
+			let distance = config.minimumDistanceBetweenBuildings * 1.7
 			let buildingCols = Math.floor(width / distance) + 1;
 			let buildingRows = Math.floor(height / distance) + 1;
 			for (let x=0; x < buildingCols; x++) {
 				let tilt = 0;
 				for (let y=0; y < buildingRows; y++) {
-					this.addBuilding(x * distance, y * distance + tilt);
+					this.addBuilding(x * distance + y * 15, y * distance + tilt);
 					tilt += 30;
 				}
 			}
@@ -183,15 +183,15 @@
 					newModule.firstFloorHeight = 0;
 
 					if (newModule.height >= 20)
-						newModule.windowRows = lastModule.windowRows > 1 ? lastModule.windowRows - 1 : 1;
+						newModule.windowRows = lastModule.windowRows > 1 ? Math.floor(newModule.height * lastModule.windowRows / lastModule.height) : lastModule.windowRows;
 					else
 						newModule.windowRows = 0;
 
 					if (newModule.width >= 20)
-						newModule.windowCols = lastModule.windowCols > 1 ? lastModule.windowCols - 1 : 1;
+						newModule.windowCols = lastModule.windowCols > 1 ? Math.floor(newModule.width * lastModule.windowCols / lastModule.width) : lastModule.windowCols;
 					else
-						newModule.windowCols = 0;
-
+						newModule.windowCols = 0;				
+					
 					newModule.windowType = lastModule.windowType;
 					newModule.margin = lastModule.margin;
 					newModule.CWHue = lastModule.CWHue;
@@ -720,7 +720,6 @@
 		globals.city = new City()
 		globals.city.randomize();
 		addEvents();
-		drawBackground(ctx, canvas);
 		window.requestAnimationFrame(loop);
 	}
 
@@ -730,8 +729,9 @@
 		}, false);
 	}
 	
-	window.draw = () => {
-		drawBackground(ctx, canvas);
+	window.draw = () => {		
+		ctx.fillStyle = `rgb(50, 50, 50)`;
+		ctx.fillRect(0, 0, width, height);
 
 		globals.city.draw();
 	}
