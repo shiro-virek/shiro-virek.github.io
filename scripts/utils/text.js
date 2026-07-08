@@ -171,13 +171,11 @@ class Text {
     }
 
     static generateKoreanWord(random, syllables = 2) {
-        let blocks = [];
+        let word = "";
         
         for (let i = 0; i < syllables; i++) {
-            blocks.push(Text.generateKoreanSyllable(random));
+            word += Text.generateKoreanSyllable(random);
         }
-        
-        let word = blocks.join("-"); 
         
         return Text.capitalizeFirstLetter(word);
     }
