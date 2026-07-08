@@ -182,9 +182,16 @@
 					newModule.height = lastModule.height - heightDecrement;
 					newModule.firstFloorHeight = 0;
 
-					newModule.windowRows = Math.floor(newModule.height * lastModule.windowRows / lastModule.height);
-					newModule.windowCols = Math.floor(newModule.width * lastModule.windowCols / lastModule.width);
+					if (newModule.height >= 20)
+						newModule.windowRows = lastModule.windowRows > 1 ? Math.floor(newModule.height * lastModule.windowRows / lastModule.height) : lastModule.windowRows;
+					else
+						newModule.windowRows = 0;
 
+					if (newModule.width >= 20)
+						newModule.windowCols = lastModule.windowCols > 1 ? Math.floor(newModule.width * lastModule.windowCols / lastModule.width) : lastModule.windowCols;
+					else
+						newModule.windowCols = 0;				
+					
 					newModule.windowType = lastModule.windowType;
 					newModule.margin = lastModule.margin;
 					newModule.CWHue = lastModule.CWHue;
