@@ -107,6 +107,7 @@
 			this.windowRows = this.randomizeRowsNumber();
 			this.windowCols = globals.random.nextInt(1, 5);
 			this.margin = globals.random.nextInt(0, 15);
+			this.padding = globals.random.nextInt(0, 15);
 			this.width = globals.random.nextInt(40, 60);
 			this.CWHue = config.CWHues[globals.random.nextInt(0, config.CWHues.length - 1)];
 			this.CWLight = globals.random.nextInt(10, 50);
@@ -194,6 +195,7 @@
 					
 					newModule.windowType = lastModule.windowType;
 					newModule.margin = lastModule.margin;
+					newModule.padding = lastModule.padding;
 					newModule.CWHue = lastModule.CWHue;
 					newModule.CWLight = lastModule.CWLight;
 					newModule.CWSaturation = lastModule.CWSaturation;
@@ -215,8 +217,8 @@
 		}
 
 		calculateProps = () => {
-			this.windowWidth = ((this.width - (this.margin * (this.windowCols + 1))) / this.windowCols);
-			this.windowHeight = ((this.height - this.firstFloorHeight - (this.margin * (this.windowRows + 1))) / this.windowRows);
+			this.windowWidth = ((this.width - (this.padding * (this.windowCols - 1)) - (this.margin * 2))) / this.windowCols;
+			this.windowHeight = ((this.height - this.firstFloorHeight - (this.padding * (this.windowRows - 1)) - (this.margin * 2))) / this.windowRows;
 			this.windowWidthFactor = Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
 			this.windowHeightFactor = Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * this.windowWidth;
 		}
@@ -449,10 +451,10 @@
 		drawWindows = (ctx) => {
 			for (let ix = 0; ix < this.windowCols; ix++) {
 				for (let iy = 0; iy < this.windowRows; iy++) {
-					let wx = this.x - (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
-					let wy = this.y - this.firstFloorHeight - (Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
-					let wx1 = this.x + (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix)));
-					let wy1 = this.y - this.firstFloorHeight - (Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.margin + this.windowWidth) * ix))) - (this.margin + ((this.margin + this.windowHeight) * iy));
+					let wx = this.x - (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.padding + this.windowWidth) * ix)));
+					let wy = this.y - this.firstFloorHeight - (Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.padding + this.windowWidth) * ix))) - (this.margin + ((this.padding + this.windowHeight) * iy));
+					let wx1 = this.x + (Math.cos(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.padding + this.windowWidth) * ix)));
+					let wy1 = this.y - this.firstFloorHeight - (Math.sin(globals.city.angle * Trigonometry.RAD_CONST) * (this.margin + ((this.padding + this.windowWidth) * ix))) - (this.margin + ((this.padding + this.windowHeight) * iy));
 
 					this.drawLeftWindow(ctx, wx, wy);
 					this.drawRightWindow(ctx, wx1, wy1);
