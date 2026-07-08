@@ -45,7 +45,7 @@
 			for (let x=0; x < buildingCols; x++) {
 				let tilt = 0;
 				for (let y=0; y < buildingRows; y++) {
-					this.addBuilding(x * distance + y * 10, y * distance + tilt);
+					this.addBuilding(x * distance + y * 15, y * distance + tilt);
 					tilt += 30;
 				}
 			}
@@ -730,7 +730,7 @@
 	}
 	
 	window.draw = () => {		
-		ctx.fillStyle = `rgb(100, 100, 100)`;
+		ctx.fillStyle = `rgb(50, 50, 50)`;
 		ctx.fillRect(0, 0, width, height);
 
 		globals.city.draw();
