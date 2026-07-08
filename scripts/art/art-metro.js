@@ -39,7 +39,7 @@
 		language: Languages.Generic,
     };    
 
-	class metroNetwork {
+	class MetroNetwork {
 		constructor() {
 			this.lines = [];
 			this.quad = Quadtree.generateQuadtree(width, height);
@@ -100,7 +100,7 @@
 			ctx.fillText(`Length: ${Math.floor(globals.metroNetwork.getLinesLength() / 100)} km.`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 3);
 			ctx.fillText(`Transfer station`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight * 4);
 
-			metroNetwork.drawTransferIcon(ctx);
+			MetroNetwork.drawTransferIcon(ctx);
 
 			ctx.lineWidth = 1;
 			for (let i = 0; i < globals.metroNetwork.lines.length; i++) {
@@ -298,8 +298,8 @@
 			ctx.fillText(this.name, this.x + margin, this.y - margin);
 		}
 
-		addTransfers = (metroNetwork) => {
-			for (const line of metroNetwork.lines) {
+		addTransfers = (MetroNetwork) => {
+			for (const line of MetroNetwork.lines) {
 				if (line.symbol == this.lineSymbol) continue;
 				for (const otherStation of line.stations) {
 					this.addTransfer(otherStation, this);
@@ -571,7 +571,7 @@
 
 	let init = () => {
 		initCanvas();
-		globals.metroNetwork = new metroNetwork()
+		globals.metroNetwork = new MetroNetwork()
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 		addEvents();
