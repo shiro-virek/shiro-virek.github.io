@@ -199,8 +199,8 @@ class Text {
 
     static getRandomChineseFinishing = (random) => {        
         const syllables = [
-                "a", "o", "e", "i", "u", "ü", "ai", "ei", "ui", "ao", "ou", "iu", "ie", "üe", "er", 
-                "an", "en", "in", "un", "ün", "ang", "eng", "ing", "ong"       
+                "a", "o", "e", "i", "u", "ai", "ei", "ui", "ao", "ou", "iu", "ie", "ue", "er", 
+                "an", "en", "in", "un", "ang", "eng", "ing", "ong"       
             ];
         return random.getRandomFromArray(syllables);
     }

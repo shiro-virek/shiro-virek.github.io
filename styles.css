@@ -84,7 +84,7 @@ html, body {
 
 button {
 	background-color: white; 
-	border: none;
+	border: 1px solid black;
 	color: black;
 	text-align: center;
 	text-decoration: none;
