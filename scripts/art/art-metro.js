@@ -10,6 +10,7 @@
 		Generic: Symbol("generic"),
 		Japanese: Symbol("japanese"),
 		Korean: Symbol("korean"),
+		Chinese: Symbol("chinese"),
 	});
 
     const config = {
@@ -75,6 +76,8 @@
 					return "🇯🇵";	
 				case Languages.Korean:
 					return "🇰🇷";	
+				case Languages.Chinese:
+					return "🇨🇳";	
 				default:
 					return ""
 			}
@@ -213,6 +216,8 @@
 					return Text.generateJapaneseName(globals.random, 1, 2) + icon;
 				case Languages.Korean:
 					return Text.generateKoreanName(globals.random, 1, 2) + icon;
+				case Languages.Chinese:
+					return Text.generateChineseName(globals.random, 1, 2) + icon;
 				default:
 					break;
 			}
