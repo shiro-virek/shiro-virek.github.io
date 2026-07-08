@@ -353,7 +353,7 @@
 		}
 
 		drawStreet = (ctx) => {
-			ctx.strokeStyle = "#CCC";
+			ctx.strokeStyle = "#EEE";
 			ctx.lineWidth = 6;
 			ctx.lineCap = "square";
 			ctx.beginPath();
@@ -458,7 +458,7 @@
 				if (
 					(newX < config.infoMarginLeft + config.infoWidth + margin && newY < config.infoMarginTop + infoHeight + margin)
 					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
-					|| isSegmentTooClose(lastX, lastY, newX, newY)
+					|| isSegmentTooClose(lastX, lastY, newX, newY, 40)
 				){
 					if (index == 0) Sound.error();
 					continue;
