@@ -43,7 +43,7 @@ class Text {
         return name;
     }
 
-    /*---------------------------------------------------------------------*/
+    /*Japanese---------------------------------------------------------------------*/
 
     static getRandomKana = (random) => {        
         const syllables = [
@@ -139,7 +139,7 @@ class Text {
         return name;
     }    
 
-    /*---------------------------------------------------------------------*/
+    /*Korean---------------------------------------------------------------------*/
 
     static getRandomKoreanInitialConsonant = (random) => {        
         const syllables = [
@@ -162,7 +162,6 @@ class Text {
             ];
         return random.getRandomFromArray(syllables);
     }
-
 
     static generateKoreanSyllable = (random) => {
         let syllable = Text.getRandomKoreanInitialConsonant(random) + Text.getRandomKoreanVowel(random);
@@ -189,6 +188,44 @@ class Text {
         return name;
     }    
 
-    /*---------------------------------------------------------------------*/
-   
+    /*Chinese---------------------------------------------------------------------*/
+ 
+      static getRandomChineseInitialConsonant = (random) => {        
+        const syllables = [
+                "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "j", "q", "x", "zh", "ch" , "sh", "r", "z", "c", "s"    
+            ];
+        return random.getRandomFromArray(syllables);
+    }
+
+    static getRandomChineseFinishing = (random) => {        
+        const syllables = [
+                "a", "o", "e", "i", "u", "ü", "ai", "ei", "ui", "ao", "ou", "iu", "ie", "üe", "er", 
+                "an", "en", "in", "un", "ün", "ang", "eng", "ing", "ong"       
+            ];
+        return random.getRandomFromArray(syllables);
+    }
+
+    static generateChineseSyllable = (random) => {
+        let syllable = Text.getRandomChineseInitialConsonant(random) + Text.getRandomChineseFinishing(random);
+        return syllable;
+    }
+
+    static generateChineseWord(random, syllables = 2) {
+        let word = "";
+        
+        for (let i = 0; i < syllables; i++) {
+            word += Text.generateChineseSyllable(random);
+        }
+        
+        return Text.capitalizeFirstLetter(word);
+    }
+
+    static generateChineseName = (random, minWords=1, maxWords=3) => {
+        let name = ""
+        let words = random.nextInt(minWords, maxWords);
+        for (let i=0; i<words; i++){            
+            name += Text.generateChineseWord(random) + " ";
+        }
+        return name;
+    }    
 }
