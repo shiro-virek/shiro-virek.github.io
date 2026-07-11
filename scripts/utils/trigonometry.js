@@ -34,6 +34,15 @@ class Trigonometry {
         return inside;
     };
 
+    static newPointAngleDistance = (x, y, angle, distance) => {  
+        const rad = (angle * Math.PI) / 180;
+
+        const newX = x + distance * Math.cos(rad);
+        const newY = y + distance * Math.sin(rad);
+
+        return { x: newX, y: newY };
+    }
+
     static angleBetweenTwoPoints = (x1, y1, x2, y2) => {
         let angle = Math.atan2(y2 - y1, x2 - x1);
         angle *= 180 / Math.PI;
@@ -46,6 +55,23 @@ class Trigonometry {
         let deltaY = y2 - y1;
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
+
+	static segmentCrossesRect = (x1, y1, x2, y2, r) => {
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.left, r.top, r.right, r.top)) return true;
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.right, r.top, r.right, r.bottom)) return true;
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.right, r.bottom, r.left, r.bottom)) return true;
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.left, r.bottom, r.left, r.top)) return true;
+		return false;
+	}
+		
+
+	static distanceBetweenSegments = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+		let d1 = Math.hypot(x1 - x3, y1 - y3);
+		let d2 = Math.hypot(x2 - x4, y2 - y4);
+		let d3 = Math.hypot(x1 - x4, y1 - y4);
+		let d4 = Math.hypot(x2 - x3, y2 - y3);
+		return Math.min(d1, d2, d3, d4);
+	}
 
     static sexagesimalToRadian = (degrees) => {
         return degrees * (Math.PI / 180);

@@ -18,6 +18,8 @@
 		restrictAngles: true,
 		showStationNames: true,
 		lineThickness: 10,
+		lineMinThickness: 3,
+		lineMaxThickness: 20,
 		lineTransferMaxDistance: 40,
 		hslMaxHue: 360,
 		minLineLength: 50,
@@ -107,7 +109,7 @@
 				Drawing.drawRectangle(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, globals.metroNetwork.lines[i].colorBase());
 				Drawing.drawRectangleBorder(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, "#000");
 				ctx.fillStyle = "#000";
-				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol}`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding * 2 + i * config.infoLineHeight);
+				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol} ${globals.metroNetwork.lines[i].getTransfersText()}`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding * 2 + i * config.infoLineHeight);
 			}
 		}
 
@@ -377,6 +379,22 @@
 			this.symbol = config.alphabeticLineSymbol ? "A" : 1;
 		}
 
+		getTransfersText = () => {	
+			let result = "";
+			for (const station of this.stations) {
+				if (station.transfer != null && !result.includes(station.transfer.lineSymbol)) {
+					result += `${station.transfer.lineSymbol}, `;
+				}
+			}
+
+			if (result.length > 0) {
+				result = result.slice(0, -2);
+				result = `(${result})`;
+			}	
+
+			return result;
+		}
+
 		getAttractedDirection = (x, y, originalDirection) => {
 			if (globals.urbanAttractors.length == 0) return originalDirection;
 
@@ -432,7 +450,13 @@
 			let firstStation = new Station(this.x, this.y, this.symbol);
 			this.stations.push(firstStation);
 			let infoHeight = config.infoMarginTop + config.infoHeaderHeight + config.maxNumberOfLines * config.infoLineHeight;
-			let margin = 10;
+			let margin = 40;
+			let infoRect = {
+				left: config.infoMarginLeft - margin,
+				right: config.infoMarginLeft + config.infoWidth + margin,
+				top: config.infoMarginTop - margin,
+				bottom: infoHeight + margin
+			};
 
 			for (let index = 0; index < numberOfSegments; index++) {
 				let length;
@@ -455,11 +479,21 @@
 				newY = lastY + deltaY;
 				segment = new Segment(newX, newY, length);
 
-				if (
-					(newX < config.infoMarginLeft + config.infoWidth + margin && newY < config.infoMarginTop + infoHeight + margin)
-					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
-					|| isSegmentTooClose(lastX, lastY, newX, newY, 40)
-				){
+				let endpointInInfo =
+					newX > infoRect.left && newX < infoRect.right &&
+					newY > infoRect.top && newY < infoRect.bottom;
+				let segmentCrossesInfo = Trigonometry.segmentCrossesRect(lastX, lastY, newX, newY, infoRect);
+				let offScreen =
+					newX < margin || newX > width - margin ||
+					newY < margin || newY > height - margin;
+				let segmentCrossesEdge =
+					Trigonometry.segmentCrossesRect(lastX, lastY, newX, newY, {
+						left: margin, right: width - margin,
+						top: margin, bottom: height - margin
+					});
+				let tooClose = isSegmentTooClose(lastX, lastY, newX, newY, 40);
+
+				if (endpointInInfo || segmentCrossesInfo || offScreen || segmentCrossesEdge || tooClose) {
 					if (index == 0) Sound.error();
 					continue;
 				}
@@ -531,12 +565,34 @@
 			this.drawStations(ctx);
 		}
 
+		drawSymbol = (ctx, x, y) => {
+			Drawing.drawCircle(ctx, x, y, config.infoSymbolSide, this.colorBase());
+
+			let metrics = ctx.measureText(this.symbol);
+			let textWidth = metrics.width;
+			let textHeight =  metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;;
+
+			console.log(`Symbol: ${this.symbol}, Width: ${textWidth}, Height: ${textHeight}`);
+
+			ctx.font = "bold 15px Arial";
+			ctx.fillStyle = "#FFF";
+			ctx.fillText(this.symbol, x - textWidth / 2, y + textHeight / 2);
+		}
+
 		drawSegments = (ctx) => {
+
+			let angle = Trigonometry.angleBetweenTwoPoints(this.x, this.y, this.segments[1].x, this.segments[1].y) + 180;
+			let { x, y } = Trigonometry.newPointAngleDistance(this.x, this.y, angle, config.infoSymbolSide + 20);
+			
+			this.drawSymbol(ctx, x, y);
+
 			ctx.lineCap = "round";
 			ctx.lineWidth = this.lineThickness;
 			ctx.strokeStyle = this.colorBase();
 			ctx.beginPath();
+
 			ctx.moveTo(this.x, this.y);
+
 			for (const segment of this.segments) {				
 				ctx.lineTo(segment.x, segment.y);
 			}
@@ -598,31 +654,23 @@
 		globals.random.shuffleArray(globals.palette);
 	}
 		
-	function isSegmentTooClose(x1, y1, x2, y2, threshold = 20) {
+	let isSegmentTooClose = (x1, y1, x2, y2, threshold = 20) => {
 		for (const line of globals.metroNetwork.lines) {
 			for (let i = 1; i < line.segments.length; i++) {
 				let s1 = line.segments[i - 1];
 				let s2 = line.segments[i];
-				let dist = distanceBetweenSegments(x1, y1, x2, y2, s1.x, s1.y, s2.x, s2.y);
+				let dist = Trigonometry.distanceBetweenSegments(x1, y1, x2, y2, s1.x, s1.y, s2.x, s2.y);
 				if (dist < threshold) return true;
 			}
 		}
 		return false;
-	}
-		
-	function distanceBetweenSegments(x1, y1, x2, y2, x3, y3, x4, y4) {
-		let d1 = Math.hypot(x1 - x3, y1 - y3);
-		let d2 = Math.hypot(x2 - x4, y2 - y4);
-		let d3 = Math.hypot(x1 - x4, y1 - y4);
-		let d4 = Math.hypot(x2 - x3, y2 - y3);
-		return Math.min(d1, d2, d3, d4);
 	}
 
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
 		config.restrictAngles = globals.random.nextBool();
 		config.showStationNames = globals.random.nextBool();
-		config.lineThickness = globals.random.nextInt(config.lineThickness, config.lineThickness * 2)
+		config.lineThickness = globals.random.nextInt(config.lineMinThickness, config.lineMaxThickness)
 		config.stationColorBorder = globals.random.nextBool();
 		config.stationRadio = globals.random.nextInt(3,10);
 		config.maxNumberOfLines = Math.floor(width * height / 25000);
