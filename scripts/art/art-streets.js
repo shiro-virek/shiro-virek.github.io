@@ -173,7 +173,7 @@
     }
     
     window.clearCanvas = () => {
-		Sound.error();
+        globals.city.streets = [];
     }
 
 	window.magic = () => {  
