@@ -18,6 +18,8 @@
 		restrictAngles: true,
 		showStationNames: true,
 		lineThickness: 10,
+		lineMinThickness: 3,
+		lineMaxThickness: 20,
 		lineTransferMaxDistance: 40,
 		hslMaxHue: 360,
 		minLineLength: 50,
@@ -668,7 +670,7 @@
 		globals.random = Objects.getRandomObject();
 		config.restrictAngles = globals.random.nextBool();
 		config.showStationNames = globals.random.nextBool();
-		config.lineThickness = globals.random.nextInt(config.lineThickness, config.lineThickness * 2)
+		config.lineThickness = globals.random.nextInt(config.lineMinThickness, config.lineMaxThickness)
 		config.stationColorBorder = globals.random.nextBool();
 		config.stationRadio = globals.random.nextInt(3,10);
 		config.maxNumberOfLines = Math.floor(width * height / 25000);
