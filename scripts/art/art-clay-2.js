@@ -12,6 +12,7 @@
         light: [-0.6, -0.6, 0.5],
         radius: 30,
         sign: -1,
+        mirror: false,
     };    
 
     function drawDepression(cx, cy) {
@@ -71,6 +72,12 @@
             config.radius -= 5;
         }
         Browser.addButton("btnShrink", "-", shrink);
+
+
+        let toggleMirror = () => {
+            config.mirror = !config.mirror;
+        }
+        Browser.addButton("btnToggleMirror", "👯", toggleMirror);
     }
     
     window.draw = () => {
@@ -121,7 +128,8 @@
             //let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, x, y);
             let points = Trigonometry.pointsInterpolation(lastPosX, lastPosY, x, y, 10);
             for (const p of points) {                
-                drawDepression(p.x, p.y); 
+                drawDepression(p.x, p.y);    
+                if (config.mirror) drawDepression(width-p.x, p.y); 
             }
         }
     }
