@@ -111,8 +111,8 @@
                         }
                     }
 
-                    if (street.growing1) street.length1 += 0.5;
-                    if (street.growing2) street.length2 += 0.5;
+                    if (street.growing1) street.length1 += 2;
+                    if (street.growing2) street.length2 += 2;
                 }
 			} 
         }
@@ -135,7 +135,7 @@
             this.growing2 = true;
 			this.originX = x;
             this.originY = y;
-            this.angle = globals.random.nextInt(0,360);
+            this.angle =   45 * globals.random.nextInt(1, 8);
             this.length1 = 0;
             this.length2 = 0;
             this.id = id
