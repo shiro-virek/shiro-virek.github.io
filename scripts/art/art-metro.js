@@ -533,15 +533,21 @@
 
 		drawSymbol = (ctx, x, y) => {
 			Drawing.drawCircle(ctx, x, y, config.infoSymbolSide, this.colorBase());
-			ctx.font = "10px Arial";
+
+			let metrics = ctx.measureText(this.symbol);
+			let textWidth = metrics.width;
+			let textHeight =  metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;;
+
+			console.log(`Symbol: ${this.symbol}, Width: ${textWidth}, Height: ${textHeight}`);
+
+			ctx.font = "bold 15px Arial";
 			ctx.fillStyle = "#FFF";
-			ctx.fillText(this.symbol, x, y);
+			ctx.fillText(this.symbol, x - textWidth / 2, y + textHeight / 2);
 		}
 
 		drawSegments = (ctx) => {
 
 			let angle = Trigonometry.angleBetweenTwoPoints(this.x, this.y, this.segments[1].x, this.segments[1].y) + 180;
-			//console.log(this.x + ", " + this.y + " -> " + this.segments[1].x + ", " + this.segments[1].y + " = " + angle);
 			let { x, y } = Trigonometry.newPointAngleDistance(this.x, this.y, angle, config.infoSymbolSide + 20);
 			
 			this.drawSymbol(ctx, x, y);
