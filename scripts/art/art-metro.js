@@ -107,7 +107,7 @@
 				Drawing.drawRectangle(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, globals.metroNetwork.lines[i].colorBase());
 				Drawing.drawRectangleBorder(ctx, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding + i * config.infoLineHeight, config.infoSymbolSide, config.infoSymbolSide, "#000");
 				ctx.fillStyle = "#000";
-				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol}`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding * 2 + i * config.infoLineHeight);
+				ctx.fillText(`Line ${globals.metroNetwork.lines[i].symbol} ${globals.metroNetwork.lines[i].getTransfersText()}`, config.infoMarginLeft + config.infoSymbolSide + config.infoPadding * 2, config.infoMarginTop + config.infoHeaderHeight + config.infoPadding * 2 + i * config.infoLineHeight);
 			}
 		}
 
@@ -375,6 +375,22 @@
 			this.stations = [];
 			this.streets = [];
 			this.symbol = config.alphabeticLineSymbol ? "A" : 1;
+		}
+
+		getTransfersText = () => {	
+			let result = "";
+			for (const station of this.stations) {
+				if (station.transfer != null && !result.includes(station.transfer.lineSymbol)) {
+					result += `${station.transfer.lineSymbol}, `;
+				}
+			}
+
+			if (result.length > 0) {
+				result = result.slice(0, -2);
+				result = `(${result})`;
+			}	
+
+			return result;
 		}
 
 		getAttractedDirection = (x, y, originalDirection) => {
