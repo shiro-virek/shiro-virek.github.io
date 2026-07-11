@@ -34,6 +34,15 @@ class Trigonometry {
         return inside;
     };
 
+    static newPointAngleDistance = (x, y, angle, distance) => {  
+        const rad = (angle * Math.PI) / 180;
+
+        const newX = x + distance * Math.cos(rad);
+        const newY = y + distance * Math.sin(rad);
+
+        return { x: newX, y: newY };
+    }
+
     static angleBetweenTwoPoints = (x1, y1, x2, y2) => {
         let angle = Math.atan2(y2 - y1, x2 - x1);
         angle *= 180 / Math.PI;

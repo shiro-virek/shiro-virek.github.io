@@ -531,12 +531,28 @@
 			this.drawStations(ctx);
 		}
 
+		drawSymbol = (ctx, x, y) => {
+			Drawing.drawCircle(ctx, x, y, config.infoSymbolSide, this.colorBase());
+			ctx.font = "10px Arial";
+			ctx.fillStyle = "#FFF";
+			ctx.fillText(this.symbol, x, y);
+		}
+
 		drawSegments = (ctx) => {
+
+			let angle = Trigonometry.angleBetweenTwoPoints(this.x, this.y, this.segments[1].x, this.segments[1].y) + 180;
+			//console.log(this.x + ", " + this.y + " -> " + this.segments[1].x + ", " + this.segments[1].y + " = " + angle);
+			let { x, y } = Trigonometry.newPointAngleDistance(this.x, this.y, angle, config.infoSymbolSide + 20);
+			
+			this.drawSymbol(ctx, x, y);
+
 			ctx.lineCap = "round";
 			ctx.lineWidth = this.lineThickness;
 			ctx.strokeStyle = this.colorBase();
 			ctx.beginPath();
+
 			ctx.moveTo(this.x, this.y);
+
 			for (const segment of this.segments) {				
 				ctx.lineTo(segment.x, segment.y);
 			}
