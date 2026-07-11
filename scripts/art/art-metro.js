@@ -489,7 +489,7 @@
 						left: margin, right: width - margin,
 						top: margin, bottom: height - margin
 					});
-				let tooClose = Trigonometry.isSegmentTooClose(lastX, lastY, newX, newY, 40);
+				let tooClose = isSegmentTooClose(lastX, lastY, newX, newY, 40);
 
 				if (endpointInInfo || segmentCrossesInfo || offScreen || segmentCrossesEdge || tooClose) {
 					if (index == 0) Sound.error();
