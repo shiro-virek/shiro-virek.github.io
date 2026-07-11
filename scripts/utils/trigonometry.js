@@ -56,6 +56,15 @@ class Trigonometry {
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
+	static segmentCrossesRect = (x1, y1, x2, y2, r) => {
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.left, r.top, r.right, r.top)) return true;
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.right, r.top, r.right, r.bottom)) return true;
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.right, r.bottom, r.left, r.bottom)) return true;
+		if (Trigonometry.segmentsIntersect(x1, y1, x2, y2, r.left, r.bottom, r.left, r.top)) return true;
+		return false;
+	}
+		
+
 	static distanceBetweenSegments = (x1, y1, x2, y2, x3, y3, x4, y4) => {
 		let d1 = Math.hypot(x1 - x3, y1 - y3);
 		let d2 = Math.hypot(x2 - x4, y2 - y4);

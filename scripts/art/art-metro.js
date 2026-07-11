@@ -448,7 +448,13 @@
 			let firstStation = new Station(this.x, this.y, this.symbol);
 			this.stations.push(firstStation);
 			let infoHeight = config.infoMarginTop + config.infoHeaderHeight + config.maxNumberOfLines * config.infoLineHeight;
-			let margin = 10;
+			let margin = 40;
+			let infoRect = {
+				left: config.infoMarginLeft - margin,
+				right: config.infoMarginLeft + config.infoWidth + margin,
+				top: config.infoMarginTop - margin,
+				bottom: infoHeight + margin
+			};
 
 			for (let index = 0; index < numberOfSegments; index++) {
 				let length;
@@ -471,11 +477,21 @@
 				newY = lastY + deltaY;
 				segment = new Segment(newX, newY, length);
 
-				if (
-					(newX < config.infoMarginLeft + config.infoWidth + margin && newY < config.infoMarginTop + infoHeight + margin)
-					|| (newX < margin || newX > width - margin || newY < margin || newY > height - margin)
-					|| isSegmentTooClose(lastX, lastY, newX, newY, 40)
-				){
+				let endpointInInfo =
+					newX > infoRect.left && newX < infoRect.right &&
+					newY > infoRect.top && newY < infoRect.bottom;
+				let segmentCrossesInfo = Trigonometry.segmentCrossesRect(lastX, lastY, newX, newY, infoRect);
+				let offScreen =
+					newX < margin || newX > width - margin ||
+					newY < margin || newY > height - margin;
+				let segmentCrossesEdge =
+					Trigonometry.segmentCrossesRect(lastX, lastY, newX, newY, {
+						left: margin, right: width - margin,
+						top: margin, bottom: height - margin
+					});
+				let tooClose = Trigonometry.isSegmentTooClose(lastX, lastY, newX, newY, 40);
+
+				if (endpointInInfo || segmentCrossesInfo || offScreen || segmentCrossesEdge || tooClose) {
 					if (index == 0) Sound.error();
 					continue;
 				}
@@ -636,7 +652,7 @@
 		globals.random.shuffleArray(globals.palette);
 	}
 		
-	function isSegmentTooClose(x1, y1, x2, y2, threshold = 20) {
+	let isSegmentTooClose = (x1, y1, x2, y2, threshold = 20) => {
 		for (const line of globals.metroNetwork.lines) {
 			for (let i = 1; i < line.segments.length; i++) {
 				let s1 = line.segments[i - 1];
@@ -647,7 +663,6 @@
 		}
 		return false;
 	}
-		
 
 	let randomize = () => {
 		globals.random = Objects.getRandomObject();
