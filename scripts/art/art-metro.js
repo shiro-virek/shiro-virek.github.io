@@ -631,7 +631,8 @@
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
 		addEvents();
-		window.requestAnimationFrame(loop)
+		window.requestAnimationFrame(loop);
+		addSpecialControls();
 	}
 
 	let addEvents = () => {
@@ -683,6 +684,17 @@
 		config.language = Languages[Object.keys(Languages)[rand]];
 	}
 
+
+    let addSpecialControls = () => {
+        let generateNetwork = () => { 
+			window.clearCanvas();
+			globals.metroNetwork.generateNetwork();
+        }
+        
+        Browser.addButton("btnGenerateNetwork", "🚅", generateNetwork);
+    }
+
+
 	window.draw = () => {
 		ctx.fillStyle = `rgb(255, 255, 255)`;
 		ctx.fillRect(0, 0, width, height);
@@ -695,12 +707,6 @@
 	window.clearCanvas = () => {  
 		globals.metroNetwork.lines = [];
 		generatePalette();
-	}
-
-	window.magic = () => {  
-		window.clearCanvas();
-		globals.metroNetwork.generateNetwork();
-        Sound.tada();
 	}
 
     window.upload = () => {

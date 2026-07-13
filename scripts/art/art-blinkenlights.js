@@ -492,6 +492,8 @@
             config.speed += 50;
         }
         Browser.addButton("btnSlow", "🐢", slow);
+
+        Browser.addButton("btnSetRandomRules", "🎲", setRandomRules);
     }
 
     window.draw = () => {
@@ -517,11 +519,6 @@
     
 	window.clearCanvas = () => {        
 		Sound.error();
-	}
-
-	window.magic = () => {  
-		setRandomRules();
-        Sound.tada();
 	}
 
     window.upload = (e) => {

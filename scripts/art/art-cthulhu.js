@@ -167,6 +167,7 @@
 		drawBackground(ctx, canvas);
 		//simulateTouchEvent();
 		window.requestAnimationFrame(loop);
+		addSpecialControls();
 	}
 
 	let isRing = (indexSlice) => {
@@ -204,6 +205,16 @@
 		Touch.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
 	}
 
+
+    let addSpecialControls = () => {
+        let addTentacle = () => {
+			config.tentaclesCount++;
+			globals.slices = [];
+			addSlices(); 
+        }
+        Browser.addButton("btnAddTentacle", "🐙", addTentacle);
+	}
+	
 	window.draw = () => {
 		if (config.rotateAuto) config.rotationAngle += config.rotationIncrement;
 
@@ -240,13 +251,6 @@
 	
 	window.clearCanvas = () => {
 		Sound.error();
-	}
-
-	window.magic = () => { 
-		config.tentaclesCount++;
-		globals.slices = [];
-		addSlices(); 
-		Sound.tada();
 	}
 
     window.upload = () => {

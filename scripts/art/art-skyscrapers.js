@@ -723,7 +723,17 @@
 		globals.city.randomize();
 		addEvents();
 		window.requestAnimationFrame(loop);
+		addSpecialControls();
 	}
+    
+    let addSpecialControls = () => {
+        let generateCity = () => {         
+			window.clearCanvas();
+			globals.city.generateCity();
+        }
+        
+        Browser.addButton("btnGenerateCity", "🏙️", generateCity);
+    }
 
 	let addEvents = () => {
 		canvas.addEventListener('click', e => {
@@ -744,12 +754,6 @@
 	window.clearCanvas = () => {
 		globals.city.buildings = []; 
 		globals.city.buildingsCount = 0;
-	}
-
-	window.magic = () => {  
-		window.clearCanvas();
-		globals.city.generateCity();
-        Sound.tada();
 	}
 
     window.upload = () => {

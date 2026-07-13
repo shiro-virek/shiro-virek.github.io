@@ -67,6 +67,7 @@
         globals.lightLen = Math.hypot(...config.light);
         for (let i = 0; i < 3; i++) config.light[i] /= globals.lightLen;
         window.requestAnimationFrame(loop);
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -77,6 +78,15 @@
         config.radius = globals.random.nextInt(20, 50);
     }
     
+    let addSpecialControls = () => {
+        let toggleLight = () => {            
+            config.light[0] *= -1;
+            config.light[1] *= -1;
+        }
+        
+        Browser.addButton("btnToggleLight", "💡", toggleLight);
+    }
+
     window.draw = () => {
         drawBackground(ctx, canvas);
 
@@ -132,12 +142,6 @@
     window.clearCanvas = () => {
 		Sound.error();
     }
-
-	window.magic = () => {  
-        config.light[0] *= -1;
-        config.light[1] *= -1;
-		Sound.tada();
-	}
 
     window.upload = (e) => {
 		if (e.target.files && e.target.files[0]) {

@@ -195,7 +195,9 @@
 
         addEvents();
 
-        window.requestAnimationFrame(loop)
+        window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -248,6 +250,31 @@
             }
         };
     }
+        
+    let addSpecialControls = () => {
+        let changePattern = () => {            
+            const cx = (config.pixelColumns - 1) / 2;
+            const cy = (config.pixelRows - 1) / 2;
+
+            for (let y = 0; y <= config.pixelRows; y++) {
+                for (let x = 0; x <= config.pixelColumns; x++) {
+                    
+                    const distance = Math.sqrt((x - cx)**2 + (y - cy)**2);
+                    let maxDistance = config.pixelColumns > config.pixelRows ? config.pixelColumns / 2 : config.pixelRows / 2;
+
+                    let angle = Numbers.scale(distance, 0, maxDistance, 0, 360);
+                    globals.pixelScreen.pixels[x][y].angle = angle;
+                    globals.pixelScreen.pixels[x][y].initialAngle = angle;
+
+                    let size = Numbers.scale(distance, 0, maxDistance, config.pixelDiameter, config.pixelDiameter / 3);
+                    globals.pixelScreen.pixels[x][y].diameter = size;
+                    globals.pixelScreen.pixels[x][y].initialDiameter = size;
+                }
+            }
+        }
+        
+        Browser.addButton("btnChangePattern", "🌀", changePattern);
+    }
 
     window.draw = () => {
         globals.pixelScreen.update();
@@ -270,27 +297,6 @@
 
 	window.clearCanvas = () => {
 		Sound.error();
-	}
-
-	window.magic = () => {  
-		const cx = (config.pixelColumns - 1) / 2;
-        const cy = (config.pixelRows - 1) / 2;
-
-        for (let y = 0; y <= config.pixelRows; y++) {
-            for (let x = 0; x <= config.pixelColumns; x++) {
-                
-                const distance = Math.sqrt((x - cx)**2 + (y - cy)**2);
-                let maxDistance = config.pixelColumns > config.pixelRows ? config.pixelColumns / 2 : config.pixelRows / 2;
-
-                let angle = Numbers.scale(distance, 0, maxDistance, 0, 360);
-                globals.pixelScreen.pixels[x][y].angle = angle;
-                globals.pixelScreen.pixels[x][y].initialAngle = angle;
-
-                let size = Numbers.scale(distance, 0, maxDistance, config.pixelDiameter, config.pixelDiameter / 3);
-                globals.pixelScreen.pixels[x][y].diameter = size;
-                globals.pixelScreen.pixels[x][y].initialDiameter = size;
-            }
-        }
 	}
 
     window.upload = (e) => {

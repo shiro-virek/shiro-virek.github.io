@@ -161,6 +161,7 @@
         if (config.randomize) randomize();
         addEvents();
         window.requestAnimationFrame(loop);
+        addSpecialControls();
     }
 
     let addBall = (x, y) => {
@@ -191,6 +192,13 @@
 		config.opacity = globals.random.next(0.1, 1.0);
 	}
 
+    let addSpecialControls = () => {
+        let changeGravity = () => {
+            config.gravity = -config.gravity;
+        }
+        Browser.addButton("btnChangeGravity", "↕️", changeGravity);
+    }
+    
     window.draw = () => {
         drawBackground(ctx, canvas, config.opacity);
 
@@ -214,11 +222,6 @@
     
 	window.clearCanvas = () => {		
 		globals.balls = [];
-	}
-
-	window.magic = () => {  
-        config.gravity = -config.gravity;
-		Sound.tada();
 	}
 
     window.upload = () => {

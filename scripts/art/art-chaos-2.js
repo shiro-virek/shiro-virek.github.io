@@ -388,10 +388,6 @@
 		Sound.error();
     }
 
-	window.magic = () => {  
-		Sound.error();
-	}
-
     window.upload = (e) => {
 		Sound.error();        
     }
