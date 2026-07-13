@@ -505,9 +505,11 @@
         globals.cellScreen.copyBuffer();
         config.mutationCounter++;
 
+        /* 
         if (config.mutationCounter % 100 === 0) {
             setRandomRules();
         }
+        */
 
         if (!config.pause) 
             Browser.sleep(config.speed);

@@ -472,9 +472,12 @@
         globals.cellScreen.copyBuffer();
         
         config.mutationCounter++;
+
+        /* 
         if (config.mutationCounter % 50 === 0) {
             setBalancedRules();
         }
+        */
 
         if (!config.pause) 
             Browser.sleep(config.speed);

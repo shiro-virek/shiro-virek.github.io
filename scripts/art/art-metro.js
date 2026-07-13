@@ -39,6 +39,7 @@
 		angleSegmentRange: 2,
 		alphabeticLineSymbol: false,
 		language: Languages.Generic,
+		maxSegmentLength: 100,
     };    
 
 	class MetroNetwork {
@@ -219,8 +220,58 @@
 					}
 				}
 
+				//this.linkToNetwork(line);
+
 				Sound.ping(100);
 			}
+		}
+
+		linkToNetwork = (line) => {
+			if (globals.metroNetwork.lines.length == 1) return;
+			let hasTransfers = line.stations.reduce(
+				(accumulator, currentValue) => accumulator || currentValue.transfer != null,
+				false,
+			);
+
+			if (hasTransfers) return;
+
+			let lastStation = line.stations.at(-1);
+
+			let distance = Infinity;
+			let closestStation = null;			
+			for (const otherLine of globals.metroNetwork.lines) {
+				if (otherLine === line) continue;
+				for (const station of otherLine.stations) {
+					let dist = Trigonometry.distanceBetweenTwoPoints(station.x, station.y, lastStation.x, lastStation.y);
+
+					if (dist < distance) {
+						distance = dist;
+						closestStation = station;
+					}
+				}
+			}
+
+			if (closestStation != null) {	
+				if (distance > config.maxSegmentLength) {	
+					let segmentLength = Math.ceil(distance / config.maxSegmentLength);
+					for(let i = 1; i <= segmentLength; i++) {
+						let newEntropy = globals.random.nextInt(-10, 10);
+						let newX = newEntropy + lastStation.x + (closestStation.x - lastStation.x) * (i / segmentLength);
+						let newY = newEntropy + lastStation.y + (closestStation.y - lastStation.y) * (i / segmentLength);
+						let newSegment = new Segment(newX, newY, distance / segmentLength);
+						line.segments.push(newSegment);
+						let newStation = new Station(newX, newY, line.symbol);
+						line.stations.push(newStation);
+						newStation.addTransfer(closestStation, newStation);
+					}
+				} else {	
+					let newSegment = new Segment(closestStation.x, closestStation.y, distance);
+					line.segments.push(newSegment);
+					let newStation = new Station(closestStation.x, closestStation.y, line.symbol);
+					line.stations.push(newStation);
+					newStation.addTransfer(closestStation, newStation);
+				}
+			}	
 		}
 
 		populateQuadTree = () => {
@@ -571,8 +622,6 @@
 			let metrics = ctx.measureText(this.symbol);
 			let textWidth = metrics.width;
 			let textHeight =  metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;;
-
-			console.log(`Symbol: ${this.symbol}, Width: ${textWidth}, Height: ${textHeight}`);
 
 			ctx.font = "bold 15px Arial";
 			ctx.fillStyle = "#FFF";
