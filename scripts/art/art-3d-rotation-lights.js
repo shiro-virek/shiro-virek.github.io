@@ -83,7 +83,8 @@
         randomize: true,
         FOV: 800,
         figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
-        rotationMode: 0,
+        tool: 1, // 0: rotate, 1: rotate2, 2: move light
+        lightDirection: [0, 0, 1]
     };    
 
     class ThreeDWorld {
@@ -355,10 +356,8 @@
             normal[1] /= magnitude;
             normal[2] /= magnitude;
             // -----------------------------------
-
-            const lightDirection = [0, 0, 1];
         
-            const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
+            const dotProduct = Trigonometry.dotProduct(normal, config.lightDirection);
             
             const lightness = Numbers.scale(dotProduct, 0, 1, 20, 70); 
 
@@ -403,12 +402,21 @@
             if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
         }
         Browser.addButton("btnShrink", "-", shrink);
-
-        let toggleRotation = () => {
-            config.rotationMode = config.rotationMode == 1 ? 0 : 1;
-        }
-        Browser.addButton("btnToggleRotation", "🔄", toggleRotation);
         
+        let setRotationTool = () => {    
+            config.tool = 0;
+        }        
+        Browser.addButton("btnSetRotationTool", "🔄", setRotationTool);
+
+        let setRotation2Tool = () => {    
+            config.tool = 1;
+        }
+        Browser.addButton("btnSetRotation2Tool", "🔄", setRotation2Tool);
+
+        let setMoveLightTool = () => {    
+            config.tool = 2;
+        }
+        Browser.addButton("btnSetMoveLightTool", "💡", setMoveLightTool);
     }
 
     let init = () => {	
@@ -436,21 +444,38 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {
-            if (config.rotationMode) {    
-                globals.world.cameraRotationZ += movX * 0.1; 
-                globals.world.cameraRotationX += movY * 0.1; 
+            switch (config.tool) {
+                case 0:
+                    globals.world.cameraRotationZ += movX * 0.1; 
+                    globals.world.cameraRotationX += movY * 0.1; 
 
-                const maxPitch = 89;
-                if (globals.world.cameraRotationX > maxPitch) globals.world.cameraRotationX = maxPitch;
-                if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
-                
-            } else {               
-                globals.world.figures.forEach(figure => {
-                    figure.rotateX(movY);
-                    figure.rotateY(movX);
-                });
+                    const maxPitch = 89;
+                    if (globals.world.cameraRotationX > maxPitch) globals.world.cameraRotationX = maxPitch;
+                    if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
+                    break;
+                case 1:              
+                    globals.world.figures.forEach(figure => {
+                        figure.rotateX(movY);
+                        figure.rotateY(movX);
+                    });
+                    break;
+                case 2: 
+                    moveLight(width - x, height - y);
+                    break;
+                default:
+                    break;
             }
         }
+    }
+
+    let moveLight = (cx, cy) => {
+       lightX = cx - width / 2;
+       lightY = cy - height / 2;
+       lightZ = 100;
+       const len = Math.hypot(lightX, lightY, lightZ);
+       config.lightDirection[0] = lightX / len;
+       config.lightDirection[1] = lightY / len;
+       config.lightDirection[2] = lightZ / len;
     }
     
     window.draw = () => {
@@ -458,7 +483,11 @@
         globals.world.draw();
     }
 
-    let randomize = () => {        
+    let randomize = () => {       
+        let changeFigure = () => {
+            config.figureInfo = figureTypes[globals.random.nextInt(0, figureTypes.length - 1)];
+        }
+        Browser.addButton("btnChangeFigure", "🔴", changeFigure); 
     }
 
 	window.clearCanvas = () => {		

@@ -377,6 +377,10 @@
         }
         Browser.addButton("btnToggleRotation", "🔄", toggleRotation);
         
+        let changeFigure = () => {
+            config.figureInfo = figureTypes[globals.random.nextInt(0, figureTypes.length - 1)];
+        }
+        Browser.addButton("btnChangeFigure", "🔴", changeFigure);
     }
 
     let init = () => {
