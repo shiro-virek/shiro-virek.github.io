@@ -19,7 +19,7 @@
             this.mouthAngle = 1;
             this.rotationAngle = 0;
             this.openingMouth = true;
-            this.color = Browser.getCssVariable("--main-color");
+            this.color = `hsl(${globals.random.nextInt(0, 360)}, 100%, 50%)`; //Browser.getCssVariable("--main-color");
         }
         
         moveAuto(distance) {
@@ -104,6 +104,7 @@
     }
 
     let randomize = () => {
+        globals.v
         globals.foe = new Character(globals.random.nextInt(1, width), globals.random.nextInt(1, height));
         globals.foe.color = "#FFF";
     }

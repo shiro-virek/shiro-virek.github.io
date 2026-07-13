@@ -13,6 +13,9 @@
         radius: 30,
         sign: -1,
         mirror: false,
+        r: 255,
+        g: 255,
+        b: 255
     };    
 
     function drawDepression(cx, cy) {
@@ -60,6 +63,9 @@
     let randomize = () => {
         config.radius = globals.random.nextInt(20, 50);
         config.sign = globals.random.nextBool() ? 1 : -1;
+        config.r = globals.random.nextInt(0, 255);
+        config.g = globals.random.nextInt(0, 255);
+        config.b = globals.random.nextInt(0, 255);  
     }
 
     let addSpecialControls = () => {
@@ -86,8 +92,8 @@
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
 
-        const color = Color.parseColor(Browser.getCssVariable("--main-color"));
-        globals.baseImageData = Drawing.createFlatColor(ctx, color.r, color.g, color.b);
+        //const color = Color.parseColor(Browser.getCssVariable("--main-color"));
+        globals.baseImageData = Drawing.createFlatColor(ctx, config.r, config.g, config.b);
                 
         if (!globals.baseImageData) return;      
 
