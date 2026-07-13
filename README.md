@@ -52,7 +52,7 @@ Explore **40+ interactive generative art scenes**, from particle systems and fra
 | Video | Video playback with effects |
 | 3D FPS | First-person 3D walkthrough with virtual joystick|
 | Joystick | Virtual joystick interaction |
-| Network | Network/graph visualization |
+| Particles | Particles visualization |
 
 ---
 

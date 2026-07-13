@@ -14,7 +14,7 @@ const art = [
                 { "name": "chaos", "display": "Chaos"},
                 { "name": "screen", "display": "Screen"},
                 { "name": "conway", "display": "Conway"},
-                { "name": "motion-matrix","display": "Motion matrix"},
+                { "name": "trail","display": "Trail"},
                 { "name": "bouncing-balls","display": "Bouncing balls"},
                 { "name": "cthulhu", "display": "Cthulhu"},
                 { "name": "crt","display": "CRT"},
@@ -41,8 +41,8 @@ const art = [
                 { "name": "clay-2", "display": "Clay 2"},
                 { "name": "3d-fps", "display": "3D FPS"},
                 { "name": "joystick", "display": "Joystick"},
-                { "name": "mesh", "display": "Mesh"},
-                { "name": "network", "display": "Network"},
+                { "name": "chaos-2", "display": "Chaos 2"},
+                { "name": "particles", "display": "Particles"},
             ];
 const scripts = [];
 
