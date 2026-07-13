@@ -458,7 +458,11 @@
         globals.world.draw();
     }
 
-    let randomize = () => {        
+    let randomize = () => {       
+        let changeFigure = () => {
+            config.figureInfo = figureTypes[globals.random.nextInt(0, figureTypes.length - 1)];
+        }
+        Browser.addButton("btnChangeFigure", "🔴", changeFigure); 
     }
 
 	window.clearCanvas = () => {		
