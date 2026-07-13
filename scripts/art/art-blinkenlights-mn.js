@@ -420,9 +420,12 @@
         globals.cellScreen.copyBuffer();
 
         globals.mutationCounter++;
+
+        /* 
         if (globals.mutationCounter % 50 === 0) {
             setRandomRules();
         }
+        */
 
         Browser.sleep(50);
     }
