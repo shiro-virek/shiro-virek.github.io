@@ -321,6 +321,8 @@
         addEvents();
 
         window.requestAnimationFrame(loop);
+
+        addSpecialControls();
     }
 
     let addEvents = () => {  
@@ -406,6 +408,10 @@
         }
     }
 
+    let addSpecialControls = () => {
+        Browser.addButton("btnSetRandomRules", "🎲", setRandomRules);
+    }
+
     window.draw = () => {
         globals.cellScreen.update();
 
@@ -428,11 +434,6 @@
 	window.clearCanvas = () => {  
 		Sound.error();
     }
-
-	window.magic = () => {  
-		setRandomRules();
-        Sound.tada();
-	}
 
     window.upload = () => {
 		Sound.error();

@@ -101,6 +101,7 @@
         config.offsetX = -width * config.scale / 2;
         config.offsetY = -height * config.scale / 2;
         window.requestAnimationFrame(loop);
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -128,6 +129,19 @@
             config.mode = globals.random.nextBool()
         else
             config.mode = 1;
+    }
+
+    let addSpecialControls = () => {
+        let changeZoomMode = () => {
+            const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
+            if (config.functionsWithTwoModes.includes(fractalFunction)){
+                config.mode = !config.mode;
+                Sound.tada();
+            }else{
+                Sound.error();
+            }
+        }
+        Browser.addButton("btnChangeZoomMode", "🔎", changeZoomMode);
     }
     
     window.draw = () => {
@@ -173,16 +187,6 @@
 
 	window.clearCanvas = () => {
 		Sound.error();
-	}
-
-	window.magic = () => {  
-        const fractalFunction = config.fractalFunctions[config.fractalFunctionIndex];
-        if (config.functionsWithTwoModes.includes(fractalFunction)){
-            config.mode = !config.mode;
-            Sound.tada();
-        }else{
-            Sound.error();
-        }
 	}
 
     window.upload = () => {

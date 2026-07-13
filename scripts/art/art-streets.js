@@ -149,6 +149,7 @@
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -158,6 +159,15 @@
     }
 
     let randomize = () => {
+    }
+
+    let addSpecialControls = () => {
+        let generateStreets = () => {     
+            window.clearCanvas();
+            globals.city.generateStreets();
+        }
+        
+        Browser.addButton("btnGenerateStreets", "🛣️", generateStreets);
     }
     
     window.draw = () => {
@@ -175,12 +185,6 @@
     window.clearCanvas = () => {
         globals.city.streets = [];
     }
-
-	window.magic = () => {  
-	    window.clearCanvas();
-		globals.city.generateStreets();
-        Sound.tada();
-	}
 
     window.upload = (e) => {
 		Sound.error();        

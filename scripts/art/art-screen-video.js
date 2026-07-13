@@ -283,10 +283,6 @@
         globals.ledScreen.generateLeds();  
 	}
 
-	window.magic = () => {  
-		Sound.error();
-	}
-
     window.upload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;

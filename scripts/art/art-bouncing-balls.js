@@ -227,11 +227,7 @@
 		globals.ballCollection = new BallCollection();
 	}
 
-	window.magic = () => {  
-		Sound.error();
-	}
-
-    window.upload = () => {
+	window.upload = () => {
 		Sound.error();
     }
 

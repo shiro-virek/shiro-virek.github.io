@@ -149,10 +149,6 @@
 		addParticles();
 	}
 
-	window.magic = () => {  
-		Sound.error();
-	}
-
     window.upload = () => {
 		Sound.error();
     }

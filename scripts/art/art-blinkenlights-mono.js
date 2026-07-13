@@ -459,6 +459,8 @@
             config.speed += 50;
         }
         Browser.addButton("btnSlow", "🐢", slow);
+
+        Browser.addButton("btnSetRandomRules", "🎲", setBalancedRules);
     }
 
     window.draw = () => {
@@ -485,11 +487,6 @@
     window.clearCanvas = () => {
         globals.cellScreen.generateCells(); 
     }
-
-	window.magic = () => {  
-		setBalancedRules();
-        Sound.tada();
-	}
 
     window.upload = (e) => {
         if (e.target.files && e.target.files[0]) {

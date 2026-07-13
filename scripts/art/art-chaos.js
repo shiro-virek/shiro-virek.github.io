@@ -200,7 +200,8 @@
         addModifierFunctions();
         if (config.randomize) randomize();
         addEvents();
-        window.requestAnimationFrame(loop)
+        window.requestAnimationFrame(loop);
+        addSpecialControls();
     }
 
     let addModifierFunctions = () => {
@@ -253,6 +254,14 @@
         globals.semitone.alphaFunction = globals.random.getRandomFromArray(globals.alphaFunctions);
     }
 
+    let addSpecialControls = () => {
+        let trail = () => {          
+		    config.trail = 0.1;
+        }
+        Browser.addButton("btnTrail", "👣", trail);
+    }
+
+
     window.trackMouse = (xMouse, yMouse) => {
         if (clicking){   
             for (let x = 0; x < config.dotsColumns; x++) {
@@ -270,11 +279,6 @@
 
 	window.clearCanvas = () => {
 		Sound.error();
-	}
-
-	window.magic = () => {  
-		Sound.tada();
-		config.trail = 0.1;
 	}
 
     window.upload = () => {

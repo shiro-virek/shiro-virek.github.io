@@ -132,8 +132,13 @@
             window.open('https://en.wikibooks.org/wiki/Fractals/Hopalong', '_blank');
         }
         Browser.addButton("btnInfo", "ℹ️", info);
-    }
 
+        let changeZoomMode = () => {
+            config.mode = !config.mode;
+        }
+        Browser.addButton("btnChangeZoomMode", "🔎", changeZoomMode);
+    }
+    
     window.draw = () => {
         drawBackground(ctx, canvas);
         hopalong(config.maxIterations);
@@ -161,11 +166,6 @@
 
 	window.clearCanvas = () => {
 		Sound.error();
-	}
-
-	window.magic = () => {  
-        config.mode = !config.mode;
-        Sound.tada();
 	}
 
     window.upload = () => {

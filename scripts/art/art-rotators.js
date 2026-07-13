@@ -83,10 +83,6 @@
 		drawBackground(ctx, canvas);
 	}
 
-	window.magic = () => {  
-		Sound.error();
-	}
-
     window.upload = () => {
 		Sound.error();
     }

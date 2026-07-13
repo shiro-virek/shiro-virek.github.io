@@ -87,10 +87,6 @@
 		Sound.error();
 	}
 
-	window.magic = () => {  
-		Sound.error();
-	}
-
     window.upload = () => {
 		Sound.error();
     }
