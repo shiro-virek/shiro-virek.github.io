@@ -100,7 +100,7 @@
         let diffuse = () => {
             diffuseHeightMap();
         }
-        Browser.addButton("btnDiffuse", "💧", diffuse);
+        Browser.addButton("btnDiffuse", "💦", diffuse);
 
         let setDiffuseTool = () => {
             config.tool = 1;
@@ -117,19 +117,15 @@
 
     let diffuseHeightMapClick = (cx, cy) => {
         const copy = globals.heightMap.slice();
+        const strength = 0.5;
         for (let y = -config.radius; y <= config.radius; y++) {
             for (let x = -config.radius; x <= config.radius; x++) {
                 const dist = Math.sqrt(x * x + y * y);
                 if (dist < config.radius) {
                     const idx =  (cy + y) * width + (cx + x);
-                    if (cx + x >= 0 && cx + x < width && cy + y >= 0 && cy + y < height) {
-                        const sum =
-                            copy[idx] +
-                            copy[idx - 1] +
-                            copy[idx + 1] +
-                            copy[idx - width] +
-                            copy[idx + width];
-                            globals.heightMap[idx] = sum / 5 * 0.9;          
+                    if (cx + x > 0 && cx + x < width - 1 && cy + y > 0 && cy + y < height - 1) {
+                        const avg = (copy[idx - 1] + copy[idx + 1] + copy[idx - width] + copy[idx + width]) / 4;
+                        globals.heightMap[idx] = copy[idx] + (avg - copy[idx]) * strength;
                     }
                 }
             }
