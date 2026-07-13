@@ -79,17 +79,36 @@
         }
         Browser.addButton("btnShrink", "-", shrink);
 
-
         let toggleMirror = () => {
             config.mirror = !config.mirror;
         }
         Browser.addButton("btnToggleMirror", "👯", toggleMirror);
 
-
         let toggleOrientation = () => {
             config.sign *= -1;
         }
         Browser.addButton("btnToggleOrientation", "⛰️", toggleOrientation);
+
+        let diffuse = () => {
+            diffuseHeightMap();
+        }
+        Browser.addButton("btnDiffuse", "💧", diffuse);
+    }
+
+    let diffuseHeightMap = () => {
+        const copy = globals.heightMap.slice();
+        for (let y = 1; y < height - 1; y++) {
+            for (let x = 1; x < width - 1; x++) {
+            const idx = y * width + x;
+            const sum =
+                copy[idx] +
+                copy[idx - 1] +
+                copy[idx + 1] +
+                copy[idx - width] +
+                copy[idx + width];
+                globals.heightMap[idx] = sum / 5 * 0.9; 
+            }
+        }
     }
     
     window.draw = () => {
