@@ -39,6 +39,7 @@
 		angleSegmentRange: 2,
 		alphabeticLineSymbol: false,
 		language: Languages.Generic,
+		maxSegmentLength: 100,
     };    
 
 	class MetroNetwork {
@@ -219,7 +220,7 @@
 					}
 				}
 
-				this.linkToNetwork(line);
+				//this.linkToNetwork(line);
 
 				Sound.ping(100);
 			}
@@ -251,11 +252,25 @@
 			}
 
 			if (closestStation != null) {	
-				let newSegment = new Segment(closestStation.x, closestStation.y, distance);
-				line.segments.push(newSegment);
-				let newStation = new Station(closestStation.x, closestStation.y, line.symbol);
-				line.stations.push(newStation);
-				newStation.addTransfer(closestStation, newStation);
+				if (distance > config.maxSegmentLength) {	
+					let segmentLength = Math.ceil(distance / config.maxSegmentLength);
+					for(let i = 1; i <= segmentLength; i++) {
+						let newEntropy = globals.random.nextInt(-10, 10);
+						let newX = newEntropy + lastStation.x + (closestStation.x - lastStation.x) * (i / segmentLength);
+						let newY = newEntropy + lastStation.y + (closestStation.y - lastStation.y) * (i / segmentLength);
+						let newSegment = new Segment(newX, newY, distance / segmentLength);
+						line.segments.push(newSegment);
+						let newStation = new Station(newX, newY, line.symbol);
+						line.stations.push(newStation);
+						newStation.addTransfer(closestStation, newStation);
+					}
+				} else {	
+					let newSegment = new Segment(closestStation.x, closestStation.y, distance);
+					line.segments.push(newSegment);
+					let newStation = new Station(closestStation.x, closestStation.y, line.symbol);
+					line.stations.push(newStation);
+					newStation.addTransfer(closestStation, newStation);
+				}
 			}	
 		}
 
