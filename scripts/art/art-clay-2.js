@@ -15,7 +15,8 @@
         mirror: false,
         r: 255,
         g: 255,
-        b: 255
+        b: 255,
+        tool: 0, // 0: draw, 1: diffuse, 2: move light
     };    
 
     function drawDepression(cx, cy) {
@@ -84,29 +85,80 @@
         }
         Browser.addButton("btnToggleMirror", "👯", toggleMirror);
 
-        let toggleOrientation = () => {
-            config.sign *= -1;
+        let setMountainTool = () => {
+            config.tool = 0;
+            config.sign = -1;
         }
-        Browser.addButton("btnToggleOrientation", "⛰️", toggleOrientation);
+        Browser.addButton("btnSetMountainTool", "⛰️", setMountainTool);
+
+        let setValleyTool = () => {
+            config.tool = 0;
+            config.sign = 1;
+        }
+        Browser.addButton("btnSetValleyTool", "🕳️", setValleyTool);
 
         let diffuse = () => {
             diffuseHeightMap();
         }
         Browser.addButton("btnDiffuse", "💧", diffuse);
+
+        let setDiffuseTool = () => {
+            config.tool = 1;
+        }
+        Browser.addButton("btnSetDiffuseTool", "💧", setDiffuseTool);
+
+        let setMoveLightTool = () => {    
+            config.tool = 2;
+        }
+        Browser.addButton("btnSetMoveLightTool", "💡", setMoveLightTool);
+ 
+    }
+
+
+    let diffuseHeightMapClick = (cx, cy) => {
+        const copy = globals.heightMap.slice();
+        for (let y = -config.radius; y <= config.radius; y++) {
+            for (let x = -config.radius; x <= config.radius; x++) {
+                const dist = Math.sqrt(x * x + y * y);
+                if (dist < config.radius) {
+                    const idx =  (cy + y) * width + (cx + x);
+
+                    if (cx + x >= 0 && cx + x < width && cy + y >= 0 && cy + y < height) {
+                        const sum =
+                            copy[idx] +
+                            copy[idx - 1] +
+                            copy[idx + 1] +
+                            copy[idx - width] +
+                            copy[idx + width];
+                            globals.heightMap[idx] = sum / 5 * 0.9; 
+                    }
+                }
+            }
+        }
+    }
+
+    let moveLight = (cx, cy) => {
+       lightX = cx - width / 2;
+       lightY = cy - height / 2;
+       lightZ = 100;
+       const len = Math.hypot(lightX, lightY, lightZ);
+       config.light[0] = lightX / len;
+       config.light[1] = lightY / len;
+       config.light[2] = lightZ / len;
     }
 
     let diffuseHeightMap = () => {
         const copy = globals.heightMap.slice();
         for (let y = 1; y < height - 1; y++) {
             for (let x = 1; x < width - 1; x++) {
-            const idx = y * width + x;
-            const sum =
-                copy[idx] +
-                copy[idx - 1] +
-                copy[idx + 1] +
-                copy[idx - width] +
-                copy[idx + width];
-                globals.heightMap[idx] = sum / 5 * 0.9; 
+                const idx = y * width + x;
+                const sum =
+                    copy[idx] +
+                    copy[idx - 1] +
+                    copy[idx + 1] +
+                    copy[idx - width] +
+                    copy[idx + width];
+                    globals.heightMap[idx] = sum / 5 * 0.9; 
             }
         }
     }
@@ -158,9 +210,19 @@
         if (clicking) {  
             //let points = Trigonometry.bresenhamLine(lastPosX, lastPosY, x, y);
             let points = Trigonometry.pointsInterpolation(lastPosX, lastPosY, x, y, 10);
-            for (const p of points) {                
-                drawDepression(p.x, p.y);    
-                if (config.mirror) drawDepression(width-p.x, p.y); 
+            for (const p of points) {  
+                switch (config.tool) {
+                    case 0: 
+                        drawDepression(p.x, p.y);    
+                        if (config.mirror) drawDepression(width-p.x, p.y);     
+                        break;
+                    case 1: //diffuse
+                        diffuseHeightMapClick(p.x, p.y);  
+                        break;
+                    case 2: //move light
+                        moveLight(p.x, p.y);
+                        break;
+                }              
             }
         }
     }
