@@ -122,7 +122,6 @@
                 const dist = Math.sqrt(x * x + y * y);
                 if (dist < config.radius) {
                     const idx =  (cy + y) * width + (cx + x);
-
                     if (cx + x >= 0 && cx + x < width && cy + y >= 0 && cy + y < height) {
                         const sum =
                             copy[idx] +
@@ -130,12 +129,13 @@
                             copy[idx + 1] +
                             copy[idx - width] +
                             copy[idx + width];
-                            globals.heightMap[idx] = sum / 5 * 0.9; 
+                            globals.heightMap[idx] = sum / 5 * 0.9;          
                     }
                 }
             }
         }
     }
+
 
     let moveLight = (cx, cy) => {
        lightX = cx - width / 2;
