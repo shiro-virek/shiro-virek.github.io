@@ -114,7 +114,6 @@
  
     }
 
-
     let diffuseHeightMapClick = (cx, cy) => {
         const copy = globals.heightMap.slice();
         const strength = 0.5;
@@ -131,7 +130,6 @@
             }
         }
     }
-
 
     let moveLight = (cx, cy) => {
        lightX = cx - width / 2;
