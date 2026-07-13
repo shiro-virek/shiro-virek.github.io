@@ -12,6 +12,7 @@
 
     const globals = {
         random: null,
+        walkers: [],
     };
 
     const config = {
@@ -25,12 +26,17 @@
             this.lastLineY = height / 2;
             this.lastDirection = Directions.Left;
 
-            this.step = 10;
-            this.hue = 0;
-            this.fixedStep = false;
-            this.changeColor = false;
-            this.transparent = false;
-            this.diagonals = false;
+            if (config.randomize) 
+                this.randomize()
+            else 
+            {
+                this.step = 10;
+                this.hue = 0;
+                this.fixedStep = false;
+                this.changeColor = false;
+                this.transparent = false;
+                this.diagonals = false;
+            }
         }
 
         randomize = () => {
@@ -143,23 +149,34 @@
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
-        globals.walker = new Walker();
-        if (config.randomize) randomize();
+        globals.walkers.push(new Walker());
         initCanvas();
         drawBackground(ctx, canvas);
         addEvents();
         window.requestAnimationFrame(loop);
+        addSpecialControls();
+    }
+    
+    let addSpecialControls = () => {
+        let newWalker = () => {
+            globals.walkers.push(new Walker());
+        }
+        Browser.addButton("btnNewWalker", "➕", newWalker);
     }
 
     let addEvents = () => {
     }
 
     let randomize = () => {
-        globals.walker.randomize();
+        globals.walkers.forEach((walker) => {
+            walker.randomize();
+        });
     }
    
     window.draw = () => {
-        globals.walker.draw(ctx, canvas);
+        globals.walkers.forEach((walker) => {
+            walker.draw(ctx, canvas);
+        });
     }
 
     window.trackMouse = (x, y) => {
