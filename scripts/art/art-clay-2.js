@@ -84,6 +84,12 @@
             config.mirror = !config.mirror;
         }
         Browser.addButton("btnToggleMirror", "👯", toggleMirror);
+
+
+        let toggleOrientation = () => {
+            config.sign *= -1;
+        }
+        Browser.addButton("btnToggleOrientation", "⛰️", toggleOrientation);
     }
     
     window.draw = () => {
@@ -145,8 +151,7 @@
     }
 
 	window.magic = () => {  
-        config.sign *= -1;
-		Sound.tada();
+        Sound.error();
 	}
 
     window.upload = (e) => {
