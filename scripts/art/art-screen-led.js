@@ -148,10 +148,11 @@
 
     window.trackMouse = (xMouse, yMouse) => {
         if (clicking){            
-            let points = Trigonometry.bresenhamLine(Math.floor(lastPosX), Math.floor(lastPosY), Math.floor(xMouse), Math.floor(yMouse));
-            for (const p of points) {                
-                globals.ledScreen.setPixel(p.x, p.y);
-            }                
+            let x1 = Numbers.scale(lastPosX, 0, width, 0, config.ledColumns);
+            let y1 = Numbers.scale(lastPosY, 0, height, 0, config.ledRows);
+            let x2 = Numbers.scale(xMouse, 0, width, 0, config.ledColumns);
+            let y2 = Numbers.scale(yMouse, 0, height, 0, config.ledRows);
+            globals.ledScreen.drawLine(x1, y1, x2, y2);
         }    
     }
 
