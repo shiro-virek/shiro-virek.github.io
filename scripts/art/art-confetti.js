@@ -56,16 +56,16 @@
 		}
 
 		update(delta) {
-			this.yCenter += this.speed * (delta / 16.667);
+			this.yCenter += this.speed * (delta / FRAME_TIME);
 
 			if (this.sin || config.allSin)
 				this.xMovement = (config.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 			else
 				this.xMovement = (config.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 
-			this.angle += 1 * (delta / 16.667);
+			this.angle += 1 * (delta / FRAME_TIME);
 
-			this.life -= 1 * (delta / 16.667);
+			this.life -= 1 * (delta / FRAME_TIME);
 			if (this.life <= 0) {
 				this.setNewParticleObject(true);
 			}

@@ -23,13 +23,13 @@
         }
         
         moveAuto(distance, delta) {
-            let factor = delta / 16.667;
+            let factor = delta / FRAME_TIME;
             this.x += Math.cos(this.rotationAngle) * distance * factor;
             this.y += Math.sin(this.rotationAngle) * distance * factor;
         }
 
         moveJoystick(delta) {
-            let factor = delta / 16.667;
+            let factor = delta / FRAME_TIME;
             this.x += (globals.joystick.deltaX / 10) * factor;
             this.y += (globals.joystick.deltaY / 10) * factor;
         }
@@ -69,7 +69,7 @@
         }
 
         updateMouth = (delta) => {
-            let factor = delta / 16.667;
+            let factor = delta / FRAME_TIME;
             if (this.openingMouth)
                 if (this.mouthAngle < 2.5)
                     this.mouthAngle += 0.3 * factor
@@ -115,7 +115,7 @@
     window.draw = (delta) => {
         drawBackground(ctx, canvas);
 
-        let factor = delta / 16.667;
+        let factor = delta / FRAME_TIME;
         globals.character.rotationAngle = globals.joystick.angle;
         globals.foe.rotationAngle += (globals.random.nextBool()? 0.1 : -0.1) * factor;
         globals.foe.moveAuto(1, delta);

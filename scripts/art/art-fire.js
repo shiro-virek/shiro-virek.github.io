@@ -48,14 +48,14 @@
 				d: this.getDiameter()
 			});
 
-			this.yCenter -= this.speed * (delta / 16.667);
+			this.yCenter -= this.speed * (delta / FRAME_TIME);
 
 			if (this.sin || globals.allSin)
 				this.xMovement = (globals.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 			else
 				this.xMovement = (globals.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 
-			this.life -= 1 * (delta / 16.667);
+			this.life -= 1 * (delta / FRAME_TIME);
 			if (this.life <= 0) {
 				this.setNewFireObject(true);
 			}

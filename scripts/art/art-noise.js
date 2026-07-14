@@ -186,10 +186,10 @@
             config.alternatePixel = globals.random.nextBool();
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas);
         globals.pixelScreen.draw(ctx);
-        globals.time += 0.005;
+        globals.time += 0.005 * (delta / FRAME_TIME);
     }
 
     window.trackMouse = (xMouse, yMouse) => {
