@@ -60,6 +60,13 @@
 
         update = () => {                           
         }
+
+        drawLine = (x1, y1, x2, y2) => {
+            let points = Trigonometry.bresenhamLine(5, 5, 200, 215);
+            for (const p of points) {
+                this.setPixel(p.x, p.y);
+            }
+        }
     }
 
     class Led {
@@ -77,7 +84,6 @@
 
         draw = (ctx) => {
             if (this.on){
-
                 Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius * 2, `hsla(${config.hue}, 100%, 50%, 0.05)`)
                 Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius, `hsla(${config.hue}, 100%, 50%, 0.8)`)
                 Drawing.drawCircle(ctx, this.x + this.radius, this.y + this.radius, this.radius / 2, `hsla(${config.hue}, 100%, 90%, 1.0)`)
@@ -130,6 +136,8 @@
         
         addEvents();
         window.requestAnimationFrame(loop)
+
+        globals.ledScreen.drawLine(5, 5, 200, 215);
     }
 
     let addEvents = () => {        
