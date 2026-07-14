@@ -120,8 +120,9 @@ let initCanvas = () => {
 
 let loop = (timestamp) => {
     let progress = timestamp - lastRender;
+    if (progress > 50) progress = 16.667;
 
-    window.draw();
+    window.draw(progress);
 
     lastRender = timestamp;
     window.requestAnimationFrame(loop);

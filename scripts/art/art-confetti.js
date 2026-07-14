@@ -55,19 +55,18 @@
 			return this.life * config.maximumDiameter / config.maximumLife;
 		}
 
-		update() {
-			this.yCenter += this.speed;
+		update(delta) {
+			this.yCenter += this.speed * (delta / 16.667);
 
 			if (this.sin || config.allSin)
-				this.xMovement = (config.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (config.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 			else
-				this.xMovement = (config.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (config.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 
-			this.angle++;
+			this.angle += 1 * (delta / 16.667);
 
-			if (this.life > 0)
-				this.life--;
-			else {
+			this.life -= 1 * (delta / 16.667);
+			if (this.life <= 0) {
 				this.setNewParticleObject(true);
 			}
 		}
@@ -113,11 +112,11 @@
 		window.requestAnimationFrame(loop)
 	}
 
-	window.draw = () => {
+	window.draw = (delta) => {
 		drawBackground(ctx, canvas);
 
 		for (i = 0; i < config.particlesCount; i++) {
-			globals.objects[i].update();
+			globals.objects[i].update(delta);
 
 			if (globals.objects[i].notFirstTime) {
 				switch (globals.objects[i].shape) {

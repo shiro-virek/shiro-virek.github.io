@@ -22,14 +22,16 @@
             this.color = `hsl(${globals.random.nextInt(0, 360)}, 100%, 50%)`; //Browser.getCssVariable("--main-color");
         }
         
-        moveAuto(distance) {
-            this.x += Math.cos(this.rotationAngle) * distance;
-            this.y += Math.sin(this.rotationAngle) * distance;
+        moveAuto(distance, delta) {
+            let factor = delta / 16.667;
+            this.x += Math.cos(this.rotationAngle) * distance * factor;
+            this.y += Math.sin(this.rotationAngle) * distance * factor;
         }
 
-        moveJoystick() {
-            this.x += globals.joystick.deltaX / 10;
-            this.y += globals.joystick.deltaY / 10;
+        moveJoystick(delta) {
+            let factor = delta / 16.667;
+            this.x += (globals.joystick.deltaX / 10) * factor;
+            this.y += (globals.joystick.deltaY / 10) * factor;
         }
 
         checkWallCollision() {
@@ -66,21 +68,22 @@
         
         }
 
-        updateMouth = () => {
+        updateMouth = (delta) => {
+            let factor = delta / 16.667;
             if (this.openingMouth)
                 if (this.mouthAngle < 2.5)
-                    this.mouthAngle += 0.3
+                    this.mouthAngle += 0.3 * factor
                 else
                     this.openingMouth = false;
             else
                 if (this.mouthAngle > 0)
-                    this.mouthAngle -= 0.3
+                    this.mouthAngle -= 0.3 * factor
                 else
                     this.openingMouth = true;
         }
 
-        draw = () => {
-            this.updateMouth();
+        draw = (delta) => {
+            this.updateMouth(delta);
             Drawing.drawPacman(ctx, this.x, this.y, this.radius, this.mouthAngle, this.rotationAngle, this.color);
         }
     }
@@ -109,19 +112,20 @@
         globals.foe.color = "#FFF";
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas);
 
+        let factor = delta / 16.667;
         globals.character.rotationAngle = globals.joystick.angle;
-        globals.foe.rotationAngle += globals.random.nextBool()? 0.1 : -0.1;
-        globals.foe.moveAuto(1);
-        globals.character.moveJoystick();
+        globals.foe.rotationAngle += (globals.random.nextBool()? 0.1 : -0.1) * factor;
+        globals.foe.moveAuto(1, delta);
+        globals.character.moveJoystick(delta);
 
         globals.character.checkWallCollision();
         globals.foe.checkWallCollisionBounce();
 
-        globals.foe.draw();        
-        globals.character.draw();
+        globals.foe.draw(delta);        
+        globals.character.draw(delta);
         Browser.setInfo(`${globals.points}`);
 
         if (Collisions.checkCircleCollision(globals.character, globals.foe)) {

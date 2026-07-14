@@ -39,7 +39,7 @@
 			return this.life * globals.maximumDiameter / globals.maximumLife;
 		}
 
-		update() {		
+		update(delta) {		
 			if (this.previous.length >= TRAIL_LENGTH)
 				this.previous.shift();
 			this.previous.push({
@@ -48,16 +48,15 @@
 				d: this.getDiameter()
 			});
 
-			this.yCenter -= this.speed;
+			this.yCenter -= this.speed * (delta / 16.667);
 
 			if (this.sin || globals.allSin)
 				this.xMovement = (globals.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 			else
 				this.xMovement = (globals.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 
-			if (this.life > 0)
-				this.life--;
-			else {
+			this.life -= 1 * (delta / 16.667);
+			if (this.life <= 0) {
 				this.setNewFireObject(true);
 			}
 		}
@@ -102,12 +101,12 @@
 		window.requestAnimationFrame(loop)
 	}
 
-	window.draw = () => {		
+	window.draw = (delta) => {		
 		drawBackground(ctx, canvas);
 
 		for (let i = 0; i < globals.particlesCount; i++) {
 			let p = globals.objects[i];
-			p.update();
+			p.update(delta);
 
 			if (!p.notFirstTime) continue;
 
