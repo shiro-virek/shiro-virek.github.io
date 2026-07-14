@@ -86,7 +86,7 @@ let initCanvas = () => {
 		window.trackMouse(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
         lastPosX = e.changedTouches[0].pageX;
         lastPosY = e.changedTouches[0].pageY;
-    });
+    }, { passive: false });
 
     canvas.addEventListener('mousedown', e => {
         mouseMoved = false;
@@ -112,7 +112,7 @@ let initCanvas = () => {
     }, false);   
 
     if (canvas.getContext) {
-        ctx = canvas.getContext('2d', { willReadFrequently: true })
+        ctx = canvas.getContext('2d')
         canvas.width = width;
         canvas.height = height;
     }
