@@ -263,8 +263,8 @@
                     let maxDistance = config.pixelColumns > config.pixelRows ? config.pixelColumns / 2 : config.pixelRows / 2;
 
                     let angle = Numbers.scale(distance, 0, maxDistance, 0, 360);
-                    globals.pixelScreen.pixels[x][y].angle = angle;
-                    globals.pixelScreen.pixels[x][y].initialAngle = angle;
+                    globals.pixelScreen.pixels[x][y].angle += angle;
+                    globals.pixelScreen.pixels[x][y].initialAngle += angle;
 
                     let size = Numbers.scale(distance, 0, maxDistance, config.pixelDiameter, config.pixelDiameter / 3);
                     globals.pixelScreen.pixels[x][y].diameter = size;
