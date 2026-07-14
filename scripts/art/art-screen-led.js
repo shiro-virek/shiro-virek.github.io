@@ -43,9 +43,7 @@
             }
         }
 
-        setPixel = (x, y) => {            
-            let col = Math.round((x - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
-            let row = Math.round((y - config.ledMargin) / ((config.ledDiameter) + config.ledPadding));
+        setPixel = (col, row) => {           
             if (col > config.ledColumns - 1 || row > config.ledRows - 1 || col < 0 || row < 0) return;
             this.leds[col][row].on = true;
         }
@@ -62,9 +60,9 @@
         }
 
         drawLine = (x1, y1, x2, y2) => {
-            let points = Trigonometry.bresenhamLine(5, 5, 200, 215);
+            let points = Trigonometry.bresenhamLine(Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2));
             for (const p of points) {
-                this.setPixel(p.x, p.y);
+                this.setPixel(p.x , p.y);
             }
         }
     }
@@ -137,7 +135,7 @@
         addEvents();
         window.requestAnimationFrame(loop)
 
-        globals.ledScreen.drawLine(5, 5, 200, 215);
+        globals.ledScreen.drawLine(5, 5, 10, 15);
     }
 
     let addEvents = () => {        
