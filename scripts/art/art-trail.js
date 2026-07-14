@@ -90,10 +90,10 @@
             }
         }
 
-        movePixel = (col, row) => {        
-            this.pixels[col][row].diameter += this.pixels[col][row].growing;
+        movePixel = (col, row, delta) => {        
+            this.pixels[col][row].diameter += this.pixels[col][row].growing * (delta / FRAME_TIME);
             this.pixels[col][row].radius = this.pixels[col][row].diameter / 2;
-            this.pixels[col][row].angle += this.pixels[col][row].rotating;
+            this.pixels[col][row].angle += this.pixels[col][row].rotating * (delta / FRAME_TIME);
 
             if ((!this.isPixelClicked(col, row) && config.stopOnBlur)    
                 || (this.pixels[col][row].diameter > config.maxSize) && !config.stopOnBlur){
@@ -101,8 +101,8 @@
                 this.pixels[col][row].rotating = -config.shrinkSpeed      
             }else{
                 if (config.slowDown){
-                    this.pixels[col][row].growing -= 0.005;  
-                    this.pixels[col][row].rotating -= 0.005;                      
+                    this.pixels[col][row].growing -= 0.005 * (delta / FRAME_TIME);  
+                    this.pixels[col][row].rotating -= 0.005 * (delta / FRAME_TIME);                      
                 }
             }
 
@@ -132,10 +132,10 @@
             });
         }
 
-        update = () => {
+        update = (delta) => {
             for (let x = 0; x <= config.pixelColumns; x++) {
                 for (let y = 0; y <= config.pixelRows; y++) {
-                    this.movePixel(x, y);
+                    this.movePixel(x, y, delta);
                 }
             }
         }
@@ -276,8 +276,8 @@
         Browser.addButton("btnChangePattern", "🌀", changePattern);
     }
 
-    window.draw = () => {
-        globals.pixelScreen.update();
+    window.draw = (delta) => {
+        globals.pixelScreen.update(delta);
 
         drawBackground(ctx, canvas);
         globals.pixelScreen.draw(ctx);

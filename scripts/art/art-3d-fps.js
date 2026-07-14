@@ -1069,29 +1069,30 @@
 		});
     }
 
-    let updateObjects = () => {
+    let updateObjects = (delta) => {
         for (let i = globals.world.figures.length - 1; i >= 0; i--) {
             let fig = globals.world.figures[i];            
+            let factor = delta / FRAME_TIME;
 
             if (fig.isEnemy) {
-                fig.rotationAngle += globals.random.nextBool()? 0.1 : -0.1;
-                fig.moveAuto(config.enemiesSpeed);    
+                fig.rotationAngle += (globals.random.nextBool()? 0.1 : -0.1) * factor;
+                fig.moveAuto(config.enemiesSpeed * factor);    
 
                 if ((fig.center[0] <= -config.worldSize)
                     || (fig.center[0] >= config.worldSize)
                     || (fig.center[2] <= -config.worldSize)
                     || (fig.center[2] >= config.worldSize)) {
-                    fig.rotationAngle += 3.14;
+                    fig.rotationAngle += 3.14 * factor;
                 }
             }
 
             if (fig.isDebris) {
-                fig.vy += fig.gravity;
-                fig.translateX(fig.vx);
-                fig.translateY(fig.vy);
-                fig.translateZ(fig.vz);
+                fig.vy += fig.gravity * factor;
+                fig.translateX(fig.vx * factor);
+                fig.translateY(fig.vy * factor);
+                fig.translateZ(fig.vz * factor);
 
-                fig.life -= fig.fadeOutSpeed;
+                fig.life -= fig.fadeOutSpeed * factor;
 
                 if (fig.life <= 0) {
                     globals.world.figures.splice(i, 1);
@@ -1108,15 +1109,16 @@
         }
     }
 
-    let moveCharacter = () => {
+    let moveCharacter = (delta) => {
+        let factor = delta / FRAME_TIME;
         const forwardSpeed = -globals.joystickL.deltaY / 5; 
         const sideSpeed = -globals.joystickL.deltaX / 5;
         
         let angleRad = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ);
         let angleRadR = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ + 90);
 
-        let dx = (-Math.sin(angleRad) * forwardSpeed) + (-Math.sin(angleRadR) * sideSpeed);
-        let dz = (Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed);
+        let dx = ((-Math.sin(angleRad) * forwardSpeed) + (-Math.sin(angleRadR) * sideSpeed)) * factor;
+        let dz = ((Math.cos(angleRad) * forwardSpeed) + (Math.cos(angleRadR) * sideSpeed)) * factor;
 
         if (globals.world.checkCollisionEnemy(globals.world.cameraX + dx, globals.world.cameraZ + dz)) {
             globals.life -= config.enemyDamage;
@@ -1140,11 +1142,12 @@
         }
     }
 
-    let moveCamera = () => {
+    let moveCamera = (delta) => {
+        let factor = delta / FRAME_TIME;
         if (config.rotationMode === 0) {
-            globals.world.rotate(-globals.joystickR.deltaY / 100, -globals.joystickR.deltaX / 100);
+            globals.world.rotate(-globals.joystickR.deltaY / 100 * factor, -globals.joystickR.deltaX / 100 * factor);
         } else if (config.rotationMode === 1) {
-            globals.world.moveCameraY(globals.joystickR.deltaY / 30);
+            globals.world.moveCameraY(globals.joystickR.deltaY / 30 * factor);
         }
     }
 
@@ -1163,14 +1166,14 @@
         }
     }
 
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas);
 
         globals.world.drawHorizon();
-        updateObjects();
+        updateObjects(delta);
         globals.world.draw();
-        moveCharacter();
-        moveCamera();
+        moveCharacter(delta);
+        moveCamera(delta);
 
         globals.world.drawCrossHair();
         Browser.setInfo(`Life ${globals.life}% ${globals.points} pts.`);

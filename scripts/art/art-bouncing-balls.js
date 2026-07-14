@@ -49,11 +49,11 @@
 			Drawing.drawCircle(ctx, this.x, this.y, this.radius, color);
 		}
 
-		move() {
+		move(delta) {
 			this.prevX = this.x;
 			this.prevY = this.y;
-			this.x += this.speedX;
-			this.y += this.speedY;
+			this.x += this.speedX * (delta / FRAME_TIME);
+			this.y += this.speedY * (delta / FRAME_TIME);
 		}
 
 		checkCollisionsBalls() {
@@ -139,9 +139,9 @@
 			this.quad = Quadtree.generateQuadtree(width, height);
 		}
 
-		drawBalls = (ctx) => {
+		drawBalls = (ctx, delta) => {
 			for (const ball of globals.ballCollection.balls) {
-				ball.move();
+				ball.move(delta);
 				ball.checkCollisionsBalls();
 				ball.checkCollisionsWalls();
 				ball.draw(ctx);
@@ -178,11 +178,11 @@
 			}
 		}
 
-		draw = (ctx) => {
+		draw = (ctx, delta) => {
 			if (this.balls.length > 0) {
 				if (config.drawQuadtree)
 					this.quad.drawQuadtree(ctx, this.quad);
-				this.drawBalls(ctx);
+				this.drawBalls(ctx, delta);
 				this.populateQuadTree();
 			}
 		}
@@ -215,9 +215,9 @@
 		config.opacity = globals.random.next(0.1, 1.0);
 	}
 
-	window.draw = () => {
+	window.draw = (delta) => {
 		drawBackground(ctx, canvas, config.opacity);
-		globals.ballCollection.draw(ctx);
+		globals.ballCollection.draw(ctx, delta);
 	}
 
     window.trackMouse = (xMouse, yMouse) => {

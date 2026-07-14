@@ -59,6 +59,10 @@
 	}
 
 	window.draw = (xPointer, yPointer) => {
+		if (yPointer === undefined) {
+			globals.angle += config.angleRotation * (xPointer / FRAME_TIME);
+			return;
+		}
 
 		let distance = Trigonometry.distanceBetweenTwoPoints(lastPosX, lastPosY, xPointer, yPointer);
 		let hue = Numbers.scale(distance, 0, 360, 0, config.colorMapMax);
