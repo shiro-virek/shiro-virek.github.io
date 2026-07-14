@@ -15,21 +15,11 @@
 		allSin: false,
 	};
 	
-	class Color {
-		constructor(r, g, b, a) {
-			this.red = r;
-			this.green = g;
-			this.blue = b;
-			this.alpha = a;
-		}
-
-		getRGBA() {
-			return `rgba(${this.red}, ${this.green}, ${this.blue}, ${this.alpha})`;
-		}
-	}
+	const TRAIL_LENGTH = 5;
 
 	class Particle {
 		constructor() {
+			this.previous = [];
 			this.setNewFireObject();
 		}
 
@@ -45,30 +35,25 @@
 			this.xCenter = globals.random.nextInt(1, width);
 		}
 
-		getColor() {
-			let alpha = this.life / globals.maximumLife;
-			let green = (this.life / 2) * 255 / globals.maximumLife;
-			let col = new Color(255, green, 0, alpha);
-			return col;
-		}
-
 		getDiameter() {
 			return this.life * globals.maximumDiameter / globals.maximumLife;
 		}
 
 		update() {		
-			if (this.previous.length > 5)	
-				this.previous.pop();
-			let copy = Objects.cloneWithMethods(this);
-			copy.previous = [];
-			this.previous.unshift(copy);
+			if (this.previous.length >= TRAIL_LENGTH)
+				this.previous.shift();
+			this.previous.push({
+				x: this.xMovement,
+				y: this.yCenter,
+				d: this.getDiameter()
+			});
 
 			this.yCenter -= this.speed;
 
 			if (this.sin || globals.allSin)
-				this.xMovement = (globals.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (globals.amplitude * (Math.sin(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 			else
-				this.xMovement = (globals.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter; //float
+				this.xMovement = (globals.amplitude * (Math.cos(Trigonometry.degToRad(this.yCenter)))) + this.xCenter;
 
 			if (this.life > 0)
 				this.life--;
@@ -99,8 +84,8 @@
 	}
 
 	let addParticles = () => {
-		for (i = 0; i < globals.particlesCount; i++) {
-			obj = new Particle(false);
+		for (let i = 0; i < globals.particlesCount; i++) {
+			let obj = new Particle(false);
 			globals.objects.push(obj);
 		}
 	}
@@ -120,22 +105,23 @@
 	window.draw = () => {		
 		drawBackground(ctx, canvas);
 
-		for (i = 0; i < globals.particlesCount; i++) {
-			globals.objects[i].update();
+		for (let i = 0; i < globals.particlesCount; i++) {
+			let p = globals.objects[i];
+			p.update();
 
-			let color = globals.objects[i].getColor()
+			if (!p.notFirstTime) continue;
 
-			if (globals.objects[i].notFirstTime){
-				let color2 = Objects.cloneWithMethods(color);
-				
-				globals.objects[i].previous.forEach(function (item) {	
-					color2.alpha *= 0.7;
-					Drawing.drawCircle(ctx, item.xMovement, item.yCenter, item.getDiameter(), color2.getRGBA());
-				});
-				
+			let alpha = p.life / globals.maximumLife;
+			let green = (p.life / 2) * 255 / globals.maximumLife;
 
-				Drawing.drawCircle(ctx, globals.objects[i].xMovement, globals.objects[i].yCenter, globals.objects[i].getDiameter(), color.getRGBA());
-			}				
+			let trailAlpha = alpha;
+			for (let j = 0; j < p.previous.length; j++) {
+				let item = p.previous[j];
+				trailAlpha *= 0.7;
+				Drawing.drawCircle(ctx, item.x, item.y, item.d, `rgba(255,${green},0,${trailAlpha})`);
+			}
+
+			Drawing.drawCircle(ctx, p.xMovement, p.yCenter, p.getDiameter(), `rgba(255,${green},0,${alpha})`);
 		}
 	}
 
