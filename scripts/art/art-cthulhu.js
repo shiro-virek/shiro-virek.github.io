@@ -60,7 +60,7 @@
 			this.y = mouseX - this.radius;
 		}
 
-		update = () => {
+		update = (delta) => {
 			globals.mouseX = globals.mouseX ? globals.mouseX : 0;
 			globals.mouseY = globals.mouseY ? globals.mouseY : 0;
 			this.x = this.x ? this.x : 0;
@@ -84,8 +84,8 @@
 			this.deltaX += speedAxes.x;
 			this.deltaY += speedAxes.y;
 
-			this.x += (this.deltaX / this.speed);
-			this.y += (this.deltaY / this.speed);
+			this.x += (this.deltaX / this.speed) * (delta / FRAME_TIME);
+			this.y += (this.deltaY / this.speed) * (delta / FRAME_TIME);
 		}
 	}
 
@@ -102,16 +102,16 @@
 		}
 	}
 
-	let updateRingShift = () => {
+	let 		updateRingShift = (delta) => {
 		if (globals.timeCounter % config.ringsSpeed == 0) {
 			if (globals.ringShift >= config.ringsDistance)
 				globals.ringShift = 1;
 			else
-				globals.ringShift += 1;
+				globals.ringShift += 1 * (delta / FRAME_TIME);
 		}
 	}
 
-	let updateDistanceToCenter = () => {
+	let updateDistanceToCenter = (delta) => {
 		if (globals.timeCounter % config.centerMovementSpeed == 0) {
 			if (globals.distanceToCenter > config.maxDistanceToCenter)
 				globals.movingToCenter = true;
@@ -120,9 +120,9 @@
 				globals.movingToCenter = false;
 
 			if (globals.movingToCenter)
-				globals.distanceToCenter -= 1;
+				globals.distanceToCenter -= 1 * (delta / FRAME_TIME);
 			else
-				globals.distanceToCenter += 1;
+				globals.distanceToCenter += 1 * (delta / FRAME_TIME);
 		}
 	}
 
@@ -215,13 +215,13 @@
         Browser.addButton("btnAddTentacle", "🐙", addTentacle);
 	}
 	
-	window.draw = () => {
-		if (config.rotateAuto) config.rotationAngle += config.rotationIncrement;
+	window.draw = (delta) => {
+		if (config.rotateAuto) config.rotationAngle += config.rotationIncrement * (delta / FRAME_TIME);
 
 		drawBackground(ctx, canvas);
 		
 		for (let i = 0; i < config.slicesCount * config.tentaclesCount; i++) {
-			globals.slices[i].update();
+			globals.slices[i].update(delta);
 
 			let lightness = Numbers.scale(config.slicesCount-globals.slices[i].index, 0, config.slicesCount, 0, config.lightnessFactor); 
 
@@ -235,9 +235,9 @@
 			tentacleFunction(color, i);
 		}
 
-		updateRingShift();
+		updateRingShift(delta);
 
-		if (config.tentaclesMovement) updateDistanceToCenter();
+		if (config.tentaclesMovement) updateDistanceToCenter(delta);
 
 		globals.timeCounter++;
 	}

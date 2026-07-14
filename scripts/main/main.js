@@ -13,6 +13,7 @@ let initialClickY = 0;
 let movX = 0;
 let movY = 0;
 let lastRender = 0;
+const FRAME_TIME = 1000 / 60;
 let uploader;
 let uploadButton;
 let clicking = false;  
@@ -120,8 +121,9 @@ let initCanvas = () => {
 
 let loop = (timestamp) => {
     let progress = timestamp - lastRender;
+    if (progress > 50) progress = FRAME_TIME;
 
-    window.draw();
+    window.draw(progress);
 
     lastRender = timestamp;
     window.requestAnimationFrame(loop);

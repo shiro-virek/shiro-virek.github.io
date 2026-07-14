@@ -92,21 +92,22 @@
             }
         }
 
-        physicsLoop = (targetX, targetY) => {
+        physicsLoop = (targetX, targetY, delta = FRAME_TIME) => {
             const distanceX = targetX - this.x;
             const distanceY = targetY - this.y;
+            const factor = delta / FRAME_TIME;
 
             const forceX = distanceX * config.stiffness;
             const forceY = distanceY * config.stiffness;
 
-            this.velX += forceX;
-            this.velY += forceY;
+            this.velX += forceX * factor;
+            this.velY += forceY * factor;
 
             this.velX *= config.friction;
             this.velY *= config.friction;
 
-            this.x += this.velX;
-            this.y += this.velY;
+            this.x += this.velX * factor;
+            this.y += this.velY * factor;
 
             if (Math.abs(this.velX) < 0.01 && Math.abs(this.velY) < 0.01 && Math.abs(distanceX) < 0.1) {
                 this.x = targetX; 
@@ -123,12 +124,12 @@
             this.physicsLoop(this.originX, this.originY);
         };
 
-        update = (xMouse, yMouse) => {
+        update = (xMouse, yMouse, delta) => {
             const modifierFunction = config.functions[config.functionIndex];
         
             let result = modifierFunction(xMouse, yMouse, this.originX, this.originY);
 
-            this.physicsLoop(result.newX, result.newY);
+            this.physicsLoop(result.newX, result.newY, delta);
         }
     }
 
@@ -361,7 +362,7 @@
         };
     }
 
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas);
         
         if (!clicking){ 
@@ -373,7 +374,7 @@
         }else{
             for (let xi = 0; xi < config.dotsColumns; xi++) {
                 for (let yi = 0; yi < config.dotsRows; yi++) {
-                    globals.mesh.dots[xi][yi].update(mouseX, mouseY);
+                    globals.mesh.dots[xi][yi].update(mouseX, mouseY, delta);
                 }
             }       
         }

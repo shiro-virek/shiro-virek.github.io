@@ -375,13 +375,13 @@
         }    
     }
 
-    window.draw = () => {
+    window.draw = (delta) => {
         globals.ledScreen.update();
         drawBackground(ctx, canvas);   
         globals.ledScreen.clear();
         if (globals.world.figures.length > 0)  {
-            globals.world.figures[0].rotateY(1);
-            globals.world.figures[0].rotateZ(1);
+            globals.world.figures[0].rotateY(1 * delta / FRAME_TIME);
+            globals.world.figures[0].rotateZ(1 * delta / FRAME_TIME);
         }  
         globals.world.draw();
         globals.ledScreen.draw(ctx);

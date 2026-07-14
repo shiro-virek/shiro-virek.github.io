@@ -75,9 +75,9 @@
             }
         }
 
-        update = () => {
+        update = (delta) => {
             if (this.status == 1){
-                this.noiseTime++;
+                this.noiseTime += 1 * (delta / FRAME_TIME);
 
                 if (this.noiseTime > config.noiseMax){
                     this.status = 2;
@@ -170,8 +170,8 @@
         config.alternatePixel = globals.random.nextBool();   
     }
 
-    window.draw = () => {
-        config.crtScreen.update();
+    window.draw = (delta) => {
+        config.crtScreen.update(delta);
         drawBackground(ctx, canvas);
         config.crtScreen.draw(ctx);
     }

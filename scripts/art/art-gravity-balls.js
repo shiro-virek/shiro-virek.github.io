@@ -134,10 +134,10 @@
             }
         }
 
-        move = () => {
-            this.dy += config.gravity;
-            this.y += this.dy;
-            this.x += this.dx;
+        move = (delta) => {
+            this.dy += config.gravity * (delta / FRAME_TIME);
+            this.y += this.dy * (delta / FRAME_TIME);
+            this.x += this.dx * (delta / FRAME_TIME);
 
             this.dx *= config.damping;
             if (Math.abs(this.dx) < 0.15) this.dx = 0;
@@ -199,7 +199,7 @@
         Browser.addButton("btnChangeGravity", "↕️", changeGravity);
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas, config.opacity);
 
         populateQuadTree();
@@ -208,7 +208,7 @@
             globals.quad.drawQuadtree(ctx, globals.quad);
 
         for (const ball of globals.balls) {
-            ball.move();
+            ball.move(delta);
 
             ball.checkCollisionsBalls();
             ball.checkCollisionsWalls();

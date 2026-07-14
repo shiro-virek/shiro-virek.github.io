@@ -111,8 +111,8 @@
                         }
                     }
 
-                    if (street.growing1) street.length1 += 2;
-                    if (street.growing2) street.length2 += 2;
+                    if (street.growing1) street.length1 += 2 * (delta / FRAME_TIME);
+                    if (street.growing2) street.length2 += 2 * (delta / FRAME_TIME);
                 }
 			} 
         }
@@ -170,9 +170,9 @@
         Browser.addButton("btnGenerateStreets", "🛣️", generateStreets);
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas);
-        globals.city.update();
+        globals.city.update(delta);
         globals.city.draw(ctx);
     }
 

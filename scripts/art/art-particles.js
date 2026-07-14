@@ -50,7 +50,7 @@
             }
         }
 
-        draw = (ctx) => {
+        draw = (ctx, delta) => {
             for (let x = 0; x < config.dotsColumns; x++) {
                 for (let y = 0; y < config.dotsRows; y++) {
 
@@ -67,7 +67,7 @@
                         if (distance < config.distanceTreshold) {
                             const reactionFunction = config.reactionFunctions[config.reactionFunctionIndex];
                                 
-                            reactionFunction(mouseX, mouseY, this.dots[x][y], element, distance);
+                            reactionFunction(mouseX, mouseY, this.dots[x][y], element, distance, delta);
                         }
                     }
 
@@ -143,10 +143,10 @@
         
         }
 
-        update = (xMouse, yMouse) => {
+        update = (xMouse, yMouse, delta) => {
             const movementFunction = config.movementFunctions[config.movementFunctionIndex];
         
-            let result = movementFunction(xMouse, yMouse, this.x, this.y, this.angle);
+            let result = movementFunction(xMouse, yMouse, this.x, this.y, this.angle, delta);
 
             this.x = result.newX;
             this.y = result.newY;
@@ -160,9 +160,10 @@
         getRight = () => this.x + this.radius;
     }
 
-    function movementFunction1(xMouse, yMouse, originX, originY, angle) {
-        angle += globals.random.nextBool()? 0.1 : -0.1;
-        let distance = 1;
+    function movementFunction1(xMouse, yMouse, originX, originY, angle, delta) {
+        let factor = delta / FRAME_TIME;
+        angle += (globals.random.nextBool()? 0.1 : -0.1) * factor;
+        let distance = 1 * factor;
                 
         return {
             newX: originX + Math.cos(angle) * distance,
@@ -170,15 +171,16 @@
         };
     }
 
-    function movementFunction2(xMouse, yMouse, originX, originY, angle) {              
+    function movementFunction2(xMouse, yMouse, originX, originY, angle, delta) {              
+        let factor = delta / FRAME_TIME;
         return {
-            newX: originX + globals.random.nextRange(2, -2),
-            newY: originY + globals.random.nextRange(2, -2)
+            newX: originX + globals.random.nextRange(2, -2) * factor,
+            newY: originY + globals.random.nextRange(2, -2) * factor
         };
     }
 
-    function movementFunction3(xMouse, yMouse, originX, originY, angle) {              
-        let distance = 1;
+    function movementFunction3(xMouse, yMouse, originX, originY, angle, delta) {              
+        let distance = 1 * (delta / FRAME_TIME);
                 
         return {
             newX: originX + Math.cos(angle) * distance,
@@ -204,10 +206,11 @@
         };
     }
 
-    function movementFunction6(xMouse, yMouse, originX, originY, angle) {   
+    function movementFunction6(xMouse, yMouse, originX, originY, angle, delta) {   
+        let factor = delta / FRAME_TIME;
         let newAngle = Trigonometry.angleBetweenTwoPoints(xMouse, yMouse, originX, originY);
-        let distance = Numbers.scale(newAngle, 0, 359, 0.1, -1);           
-        angle +=  Numbers.scale(newAngle, 0, 359, -3, 3);
+        let distance = Numbers.scale(newAngle, 0, 359, 0.1, -1) * factor;           
+        angle +=  Numbers.scale(newAngle, 0, 359, -3, 3) * factor;
                 
         return {
             newX: originX + Math.cos(angle) * distance,
@@ -231,8 +234,8 @@
         dot1.radius = config.dotRadius * Numbers.scale(distance, 0, config.distanceTreshold, 0.1, 2.5);
     }
 
-    function reactionFunction4 (xMouse, yMouse, dot1, dot2, distance) {
-        dot1.hue += Numbers.scale(distance, 0, config.distanceTreshold, -1, 1);
+    function reactionFunction4 (xMouse, yMouse, dot1, dot2, distance, delta) {
+        dot1.hue += Numbers.scale(distance, 0, config.distanceTreshold, -1, 1) * (delta / FRAME_TIME);
         if (dot1.hue < 0) dot1.hue = 359;
         if (dot1.hue > 359) dot1.hue = 0;
 
@@ -260,7 +263,7 @@
         config.hue = globals.random.nextInt(0, 360);
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas);
 
         globals.mesh.populateQuadTree();
@@ -270,11 +273,11 @@
 
         for (let xi = 0; xi < config.dotsColumns; xi++) {
             for (let yi = 0; yi < config.dotsRows; yi++) {
-                globals.mesh.dots[xi][yi].update(mouseX, mouseY);
+                globals.mesh.dots[xi][yi].update(mouseX, mouseY, delta);
             }
         }       
 
-        globals.mesh.draw(ctx);
+        globals.mesh.draw(ctx, delta);
     }
 
     window.trackMouse = (x, y) => {
