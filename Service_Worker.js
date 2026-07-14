@@ -79,6 +79,7 @@ const PRECACHE_URLS = [
     '/scripts/art/art-tree.js',
     '/scripts/art/art-walker.js',
     '/scripts/art/art-webcam.js',
+    '/scripts/art/art-screen-led.js',
 ];
 
 self.addEventListener('install', (e) => {
