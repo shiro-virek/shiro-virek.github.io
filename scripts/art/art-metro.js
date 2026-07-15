@@ -225,10 +225,36 @@
 			}
 		}
 
-		calculateNewPoint = (pA, pB) => {
-			const xC = pB.x;
-			const yC = pA.y + (pB.x - pA.x);
-			
+		calculateNewPoint = (pA, pB, distance) => {
+			let xC = 0;
+			let yC = 0;
+		
+			xC = pB.x;	
+
+			if (pA.x > pB.x) { 		
+				if (pA.y > pB.y) 
+					yC = pA.y - Math.abs(pB.x - pA.x)					
+				else 
+					yC = pA.y + Math.abs(pB.x - pA.x);
+
+				if (Trigonometry.distanceBetweenTwoPoints(pA.x, pA.y, xC, yC) > distance) {
+					yC = pB.y;
+					xC = pA.x - Math.abs(pB.y - pA.y);
+				}
+					
+			}else{				
+				if (pA.y > pB.y) 	
+					yC = pA.y - Math.abs(pB.x - pA.x)				
+				
+				else
+					yC = pA.y + Math.abs(pB.x - pA.x);		
+
+				if (Trigonometry.distanceBetweenTwoPoints(pA.x, pA.y, xC, yC) > distance) {
+					yC = pB.y;
+					xC = pA.x + Math.abs(pB.y - pA.y);
+				}				
+			}
+
 			return { x: xC, y: yC };
 		}
 
@@ -258,38 +284,17 @@
 			}
 
 			if (closestStation != null) {			
-				let newPoint = this.calculateNewPoint(lastStation, closestStation);
-						
-				
+				let newPoint = this.calculateNewPoint(lastStation, closestStation, distance);
+										
 				let newSegment1 = new Segment(newPoint.x, newPoint.y, 0);
 				line.segments.push(newSegment1);
 
-				let newSegment2 = new Segment(newPoint.x, closestStation.y, 0);
+				let newSegment2 = new Segment(closestStation.x, closestStation.y, 0);
 				line.segments.push(newSegment2);
 
-
-				let newStation = new Station(newPoint.x, closestStation.y, line.symbol);
+				let newStation = new Station(closestStation.x, closestStation.y, line.symbol);
 				line.stations.push(newStation);
 				newStation.addTransfer(closestStation, newStation);
-			
-				/*
-						let deltaX = Math.cos(Line.getDirection() * Trigonometry.RAD_CONST) * length;
-						let deltaY = Math.sin(Line.getDirection() * Trigonometry.RAD_CONST) * length;
-						
-						let newX = deltaX + lastStation.x + (closestStation.x - lastStation.x) * (i / segmentLength);
-						let newY = deltaY + lastStation.y + (closestStation.y - lastStation.y) * (i / segmentLength);
-
-						let newSegment1 = new Segment(newX, newY, distance / segmentLength);
-						line.segments.push(newSegment1);
-
-						let newSegment2 = new Segment(newX, newY, distance / segmentLength);
-						line.segments.push(newSegment2);
-
-
-						let newStation = new Station(newX, newY, line.symbol);
-						line.stations.push(newStation);
-						newStation.addTransfer(closestStation, newStation);
-						*/
 			}
 		}
 
