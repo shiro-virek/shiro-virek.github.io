@@ -286,10 +286,10 @@
 			if (closestStation != null) {			
 				let newPoint = this.calculateNewPoint(lastStation, closestStation, distance);
 										
-				let newSegment1 = new Segment(newPoint.x, newPoint.y, 0);
+				let newSegment1 = new Segment(newPoint.x, newPoint.y, Trigonometry.distanceBetweenTwoPoints(lastStation.x, lastStation.y, newPoint.x, newPoint.y));
 				line.segments.push(newSegment1);
 
-				let newSegment2 = new Segment(closestStation.x, closestStation.y, 0);
+				let newSegment2 = new Segment(closestStation.x, closestStation.y, Trigonometry.distanceBetweenTwoPoints(newPoint.x, newPoint.y, closestStation.x, closestStation.y));
 				line.segments.push(newSegment2);
 
 				let newStation = new Station(closestStation.x, closestStation.y, line.symbol);
