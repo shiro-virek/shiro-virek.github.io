@@ -82,6 +82,8 @@
     }
 
     let init = () => {
+        initCanvas();
+
         globals.canvasShader = document.getElementById("canvasShader");
 
         globals.gl = globals.canvasShader.getContext('webgl');
@@ -121,17 +123,14 @@
 
         window.addEventListener('resize', resizeCanvas);
 
-        globals.canvasShader.addEventListener('mousemove', (event) => {
-            const rect = globals.canvasShader.getBoundingClientRect();
-            const mouseX = event.clientX - rect.left;
-            const mouseY = globals.canvasShader.height - (event.clientY - rect.top);
-            globals.gl.uniform2f(globals.mouseUniformLocation, mouseX, mouseY);
-        });
-
         globals.startTime = Date.now();
     }
 
     window.trackMouse = (xMouse, yMouse) => {
+        if (clicking){
+            const mouseY = globals.canvasShader.height - yMouse;
+            globals.gl.uniform2f(globals.mouseUniformLocation, xMouse, mouseY);
+        }
     }
     
     window.clearCanvas = () => {
