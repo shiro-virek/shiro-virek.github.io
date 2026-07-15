@@ -206,20 +206,21 @@
 				let line = new Line(x, y);
 				line.randomize();
 
-				if (line.getLength() > config.minLineLength)
+				if (line.getLength() > config.minLineLength) {
 					globals.metroNetwork.lines.push(line);
-				else
-					globals.palette.push(line.hue);
 
-				this.populateQuadTree();
+					this.populateQuadTree();
 
-				for (const line of globals.metroNetwork.lines) {
-					for (const station of line.stations) {
-						station.addTransfers(this);
+					for (const line of globals.metroNetwork.lines) {
+						for (const station of line.stations) {
+							station.addTransfers(this);
+						}
 					}
-				}
 
-				this.linkToNetwork(line);
+					this.linkToNetwork(line);
+				} else {
+					globals.palette.push(line.hue);
+				}
 
 				Sound.ping(100);
 			}

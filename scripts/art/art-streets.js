@@ -32,7 +32,7 @@
 			} 
 		}
 
-        update = () => {
+        update = (delta) => {
             if (this.streets.length > 0) {	
                 let streetComparisons = [];
 
