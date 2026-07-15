@@ -756,9 +756,5 @@
 		globals.city.buildingsCount = 0;
 	}
 
-    window.upload = () => {
-		Sound.error();
-    }
-
 	init();
 }

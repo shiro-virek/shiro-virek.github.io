@@ -80,9 +80,5 @@
 		Sound.error();
 	}
 
-    window.upload = () => {
-		Sound.error();
-    }
-
     init();
 }

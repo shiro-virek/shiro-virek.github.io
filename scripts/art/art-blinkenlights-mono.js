@@ -461,6 +461,18 @@
         Browser.addButton("btnSlow", "🐢", slow);
 
         Browser.addButton("btnSetRandomRules", "🎲", setBalancedRules);
+
+        let uploader = document.getElementById('uploader');        
+
+        let handleClick = () => {
+            uploader.click();
+        }       
+        
+        Browser.addButton("btnUploadPicture", "🖼️", handleClick);
+
+        uploader.addEventListener('change', function(e) {
+            Upload.uploadPicture(e, globals.img, loadImage);
+        });
     }
 
     window.draw = () => {
@@ -489,33 +501,6 @@
     
     window.clearCanvas = () => {
         globals.cellScreen.generateCells(); 
-    }
-
-    window.upload = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            
-            if (!file.type.match('image.*')) {
-                alert('Please select an image file');
-                return;
-            }
-            
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {                    
-                globals.img.onerror = function() {
-                    alert('Error loading image');
-                };
-            
-                loadImage(event.target.result);
-            };
-            
-            reader.onerror = function() {
-                alert('Error reading file');
-            };
-            
-            reader.readAsDataURL(file);
-        }
     }
 
     init();

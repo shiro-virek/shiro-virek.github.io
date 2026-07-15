@@ -111,7 +111,18 @@
             config.tool = 2;
         }
         Browser.addButton("btnSetMoveLightTool", "💡", setMoveLightTool);
- 
+
+        let uploader = document.getElementById('uploader');        
+
+        let handleClick = () => {
+            uploader.click();
+        }       
+        
+        Browser.addButton("btnUploadPicture", "🖼️", handleClick);
+
+        uploader.addEventListener('change', function(e) {
+            Upload.uploadPicture(e, globals.img);
+        });
     }
 
     let diffuseHeightMapClick = (cx, cy) => {
@@ -223,33 +234,6 @@
 
     window.clearCanvas = () => {		
         globals.heightMap = new Float32Array(width * height);
-    }
-
-    window.upload = (e) => {
-		if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            
-            if (!file.type.match('image.*')) {
-                alert('Please select an image file');
-                return;
-            }
-            
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {                    
-                globals.img.onerror = function() {
-                    alert('Error loading image');
-                };
-                
-                globals.img.src = event.target.result;
-            };
-            
-            reader.onerror = function() {
-                alert('Error reading file');
-            };
-            
-            reader.readAsDataURL(file);
-        }     
     }
 
     init();

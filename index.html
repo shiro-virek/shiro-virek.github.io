@@ -36,6 +36,7 @@
 		<script src="./scripts/utils/specialPixels.js"></script>
 		<script src="./scripts/utils/joystick.js"></script>
 		<script src="./scripts/utils/collisions.js"></script>
+		<script src="./scripts/utils/upload.js"></script>
 		<script src="./scripts/main/main.js"></script>
 		<script src="./scripts/main/manage-scripts.js"></script>
 		<div id="menuLateral" class="menu-lateral">		
@@ -57,8 +58,7 @@
 			<button onclick="reload()" id="randomButton">🎲</button>	
 			<button onclick="reloadParams()" id="randomParamsButton">🔄</button>
 			<button onclick="clearCanvas()" id="clearCanvasButton">❌</button>	
-			<input type="file" id="uploader" style="display: none;" onchange="upload(event)">
-			<button id="uploadButton">📤</button>	
+			<input type="file" id="uploader" style="display: none;">
 			<button onclick="downloadPicture()" id="downloadPictureButton">📸</button>	
 			<button onclick="recordVideo()" id="recordButton">📹</button>
 			<!--<button onclick="loadNextScript()" id="nextButton">></button>-->

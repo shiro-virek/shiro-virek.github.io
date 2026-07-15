@@ -37,11 +37,6 @@ let drawBackground = (ctx, canvas, opacity = 1) => {
 let initCanvas = () => {
     Browser.addMenu(art);
 
-    uploader = document.getElementById('uploader');
-    uploadButton = document.getElementById('uploadButton');
-    uploadButton.addEventListener('click', function() {
-        uploader.click();
-    });
     canvas = document.getElementById("myCanvas");
 
     canvas.addEventListener('mousemove', e => {
