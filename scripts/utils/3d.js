@@ -94,14 +94,15 @@ let figureTypes = [
 
 
 class ThreeDWorld {
-    constructor() {
+    constructor(random) {
+        this.random = random;
         this.figures = [];
         this.cameraRotationX = 0; 
         this.cameraRotationZ = 0;
         this.cameraZ = 1000;
         this.FOV = 800;
-        this.drawEdges = true;// globals.random.nextBool(),
-        this.figureInfo = figureTypes[0]; //figureTypes[globals.random.nextInt(0, figureTypes.length - 1)];
+        this.drawEdges = this.random.nextBool(),
+        this.figureInfo = figureTypes[this.random.nextInt(0, figureTypes.length - 1)];
         this.rotationMode = 0;
     }
     

@@ -1,6 +1,6 @@
 {        
     const globals = {
-        random: Objects.getRandomObject(),
+        random: null,
         world: null,
     };
 
@@ -21,19 +21,24 @@
         Browser.addButton("btnShrink", "-", shrink);
 
         let toggleRotation = () => {
-            config.rotationMode = config.rotationMode == 1 ? 0 : 1;
+            globals.world.rotationMode = globals.world.rotationMode == 1 ? 0 : 1;
         }
         Browser.addButton("btnToggleRotation", "🔄", toggleRotation);
         
         let changeFigure = () => {
-            config.figureInfo = figureTypes[globals.random.nextInt(0, figureTypes.length - 1)];
+            globals.world.figureInfo = figureTypes[globals.random.nextInt(0, figureTypes.length - 1)];
         }
         Browser.addButton("btnChangeFigure", "🔴", changeFigure);
     }
 
+    let randomize = () => {
+		globals.random = Objects.getRandomObject();
+    }
+
     let init = () => {
         initCanvas();
-        globals.world = new ThreeDWorld();
+        randomize();
+        globals.world = new ThreeDWorld(globals.random);
         addEvents();
         window.requestAnimationFrame(loop)
 
@@ -54,7 +59,7 @@
 
     window.trackMouse = (x, y) => {        
         if (clicking) {
-            if (config.rotationMode) {    
+            if (globals.world.rotationMode) {    
                 globals.world.cameraRotationZ += movX * 0.1; 
                 globals.world.cameraRotationX += movY * 0.1; 
 
