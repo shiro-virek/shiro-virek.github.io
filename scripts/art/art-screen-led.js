@@ -21,28 +21,12 @@
         FOV: 800,
     };
     
-    const cube = {
-            name: "cube",
-            vertices: [
-                [0, 0, 0], [30, 0, 0], [0, 30, 0], [30, 30, 0],
-                [0, 0, 30], [30, 0, 30], [0, 30, 30], [30, 30, 30]
-            ],
-            edges: [
-                [0, 1], [1, 3], [2, 3], [0, 2],
-                [4, 5], [5, 7], [7, 6], [4, 6],
-                [0, 4], [1, 5], [3, 7], [2, 6]
-            ]
-        };
-
-    const Figures = Object.freeze({
-		Circle: Symbol("circle"),
-    });
     class LedScreen {
         constructor() {
             this.leds = [];       
             this.generateLeds();          
-			let rand = globals.random.nextInt(0, Object.keys(Figures).length - 1);  
-			this.shape = Figures[Object.keys(Figures)[rand]];
+			let rand = globals.random.nextInt(0, Object.keys(figureTypes).length - 1);  
+			this.shape = figureTypes[Object.keys(figureTypes)[rand]];
         }
 
         clear = () => {
@@ -82,11 +66,15 @@
         update = () => {                           
         }
 
-        drawLine = (x1, y1, x2, y2) => {
+        drawLine = (ctx, x1, y1, x2, y2, color) => {
             let points = Trigonometry.bresenhamLine(Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2));
             for (const p of points) {
                 this.setPixel(p.x , p.y);
             }
+        }
+
+        drawPoint = (ctx, x, y, color) => {
+            this.setPixel(Math.floor(x) , Math.floor(y));
         }
     }
 
@@ -114,198 +102,6 @@
             }
         }
     }
-
-
-
-
-    class ThreeDWorld {
-        constructor() {
-            this.figures = [];
-            this.cameraRotationX = 0; 
-            this.cameraRotationZ = 0;
-            this.cameraZ = 1000;
-        }
-
-        draw = () => {
-            this.drawFigures();
-        }
-
-        worldToScreen = (point) => {
-            const rotatedPoint = this.applyCameraRotation(point); 
-            
-            const x = rotatedPoint[0];
-            const y = rotatedPoint[1];
-            const z = rotatedPoint[2];
-
-            let depth = z + this.cameraZ;
-            if (depth < 1) depth = 1; 
-
-            const scaleFactor = config.FOV / depth;
-            
-            const projectedX = (x * scaleFactor) + config.ledColumns / 2;
-            const projectedY = (y * scaleFactor) + config.ledRows / 2;
-            
-            return [projectedX, projectedY];    
-        }
-
-        drawFigures = () => {
-            for (let i = this.figures.length - 1; i >= 0; i--) {
-                this.figures[i].drawFigure(ctx);
-            }
-        }
-
-        addFigure(x, y) {
-            let centeredX = x - config.ledColumns / 2;
-            let centeredY = y - config.ledRows / 2;
-
-            let figure = new Figure();
-
-            figure.vertices = Objects.clone(cube.vertices);
-            figure.edges = Objects.clone(cube.edges);
-
-            const scaleFactor = config.FOV / this.cameraZ;
-            let worldX = centeredX / scaleFactor;
-            let worldY = centeredY / scaleFactor;
-            let worldZ = 0; 
-            
-            if (this.cameraRotationZ !== 0) {
-                let angleZ = Trigonometry.sexagesimalToRadian(this.cameraRotationZ); 
-                let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
-                let newY = worldX * Math.sin(angleZ) + worldY * Math.cos(angleZ);
-                worldX = newX;
-                worldY = newY;
-            }
-
-            if (this.cameraRotationX !== 0) {
-                let angleX = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
-                let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
-                let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
-                worldY = newY;
-            }
-
-            figure.translateX(worldX);
-            figure.translateY(worldY);
-
-            this.figures.push(figure);
-        }
-
-        applyCameraRotation = (point) => {
-            let x = point[0];
-            let y = point[1];
-            let z = point[2];
-                        
-            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
-            let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
-            let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
-            y = newY;
-            z = newZ;
-
-            let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
-            let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
-            newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
-            x = newX;
-            y = newY;
-            
-            return [x, y, z];
-        }
-    }
-    class Figure {
-        constructor() {
-            this.vertices = [];
-            this.edges = [];
-        }
-
-        rotateZ = (angle) => {
-            angle = Trigonometry.sexagesimalToRadian(angle);
-
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
-                this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); //Y
-                this.vertices[i][0] = x;
-            }
-        }
-
-        rotateY = (angle) => {
-            angle = Trigonometry.sexagesimalToRadian(angle);
-
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
-                this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); //Z
-                this.vertices[i][0] = x;
-            }
-        }
-
-        rotateX = (angle) => {
-            angle = Trigonometry.sexagesimalToRadian(angle);
-
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
-                this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); //Z
-                this.vertices[i][1] = y;
-            }
-        }
-
-        translateX = (distance) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] += distance;
-            }
-        }
-
-        translateY = (distance) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][1] += distance;
-            }
-        }
-
-        translateZ = (distance) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][2] += distance;
-            }
-        }
-
-        scale = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] *= factor;
-                this.vertices[i][1] *= factor;
-                this.vertices[i][2] *= factor;
-            }
-        }
-
-        scaleX = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] *= factor;
-            }
-        }
-
-        scaleY = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][1] *= factor;
-            }
-        }
-
-        scaleZ = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][2] *= factor;
-            }
-        }
-
-        drawEdge = (p0, p1, color) => {
-            let point2d0 = globals.world.worldToScreen(p0);
-            let point2d1 = globals.world.worldToScreen(p1);
-
-            globals.ledScreen.drawLine(point2d0[0], point2d0[1], point2d1[0], point2d1[1]);
-        }
-
-        drawFigure = () => {
-            for (let i = this.edges.length - 1; i >= 0; i--) {
-                this.drawEdge(this.vertices[this.edges[i][0]], this.vertices[this.edges[i][1]]);
-            }
-        }
-    }
-
-
-
-
 
     let loadImage = (source = '../assets/Picture1.jpg') => {
         globals.img.src = source;
@@ -350,7 +146,7 @@
         addEvents();
         window.requestAnimationFrame(loop)
 
-        globals.world = new ThreeDWorld();
+        globals.world = new ThreeDWorld(config.ledColumns, config.ledRows, globals.random, globals.ledScreen.drawLine, globals.ledScreen.drawPoint);
         globals.world.addFigure(0, 0);
         globals.world.figures[0].scaleX(0.4);
         globals.world.figures[0].scaleY(0.4);
@@ -371,7 +167,7 @@
             let y1 = Numbers.scale(lastPosY, 0, height, 0, config.ledRows);
             let x2 = Numbers.scale(xMouse, 0, width, 0, config.ledColumns);
             let y2 = Numbers.scale(yMouse, 0, height, 0, config.ledRows);
-            globals.ledScreen.drawLine(x1, y1, x2, y2);
+            globals.ledScreen.drawLine(ctx, x1, y1, x2, y2, null);
         }    
     }
 
