@@ -259,15 +259,6 @@
     let addSpecialControls = () => {
         let uploader = document.getElementById('uploader');
 
-        let uploadVideo = async (e) => {                    
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const url = URL.createObjectURL(file);
-            
-            loadVideo(url);
-        }
-
         let handleClick = () => {
             uploader.click();
         }       
@@ -275,7 +266,7 @@
         Browser.addButton("btnUploadVideo", "📼", handleClick);
 
         uploader.addEventListener('change', function(e) {
-            uploadVideo(e);
+            Upload.uploadVideo(e, loadVideo);
         });
     }
 
