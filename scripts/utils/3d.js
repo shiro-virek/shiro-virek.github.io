@@ -94,17 +94,18 @@ let figureTypes = [
 
 
 class ThreeDWorld {
-    constructor(width, height, random, drawLine) {
+    constructor(width, height, random, drawLine, drawPoint) {
         this.width = width;
         this.height = height;
         this.random = random;
         this.drawLine = drawLine;
+        this.drawPoint = drawPoint;
         this.figures = [];
         this.cameraRotationX = 0; 
         this.cameraRotationZ = 0;
         this.cameraZ = 1000;
         this.FOV = 800;
-        this.drawEdges = this.random.nextBool(),
+        this.drawEdges = this.random.nextBool();
         this.figureInfo = figureTypes[this.random.nextInt(0, figureTypes.length - 1)];
         this.rotationMode = 0;
     }
@@ -343,7 +344,7 @@ class Figure {
 
         let newColor = `hsl(${Numbers.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
 
-        Drawing.drawDot(ctx, vertex[0], vertex[1], newColor);
+        this.world.drawPoint(ctx, vertex[0], vertex[1], newColor);
     }
 
     drawFigure = () => {
