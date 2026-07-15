@@ -189,9 +189,5 @@
 		Sound.error();
     }
 
-    window.upload = (e) => {
-		Sound.error();        
-    }
-
     init();
 }

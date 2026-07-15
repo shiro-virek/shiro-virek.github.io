@@ -224,9 +224,5 @@
 		globals.balls = [];
 	}
 
-    window.upload = () => {
-		Sound.error();
-    }
-
     init();
 }

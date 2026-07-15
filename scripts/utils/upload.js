@@ -1,5 +1,5 @@
 class Upload {
-    static uploadPicture = async (e, img, loadImage) => {                    
+    static uploadPicture = async (e, img, loadImage = null) => {                    
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             
@@ -15,7 +15,10 @@ class Upload {
                     alert('Error loading image');
                 };
             
-                loadImage(event.target.result);
+                if (loadImage)
+                    loadImage(event.target.result)
+                else
+                    img.src = event.target.result;
             };
             
             reader.onerror = function() {

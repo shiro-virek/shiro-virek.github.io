@@ -782,9 +782,5 @@
 		generatePalette();
 	}
 
-    window.upload = () => {
-		Sound.error();
-    }
-
 	init();
 }

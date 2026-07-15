@@ -153,6 +153,8 @@
         config.offsetY = (canvas.height - totalHeight) / 2;
 
         loadImage();
+
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -170,6 +172,21 @@
         config.alternatePixel = globals.random.nextBool();   
     }
 
+
+    let addSpecialControls = () => {        
+        let uploader = document.getElementById('uploader');        
+
+        let handleClick = () => {
+            uploader.click();
+        }       
+        
+        Browser.addButton("btnUploadPicture", "🖼️", handleClick);
+
+        uploader.addEventListener('change', function(e) {
+            Upload.uploadPicture(e, globals.img, loadImage);
+        });
+    }
+
     window.draw = (delta) => {
         config.crtScreen.update(delta);
         drawBackground(ctx, canvas);
@@ -181,33 +198,6 @@
 
     window.clearCanvas = () => {
 		Sound.error();
-    }
-
-    window.upload = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            
-            if (!file.type.match('image.*')) {
-                alert('Please select an image file');
-                return;
-            }
-            
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {                    
-                globals.img.onerror = function() {
-                    alert('Error loading image');
-                };
-            
-                loadImage(event.target.result, 1);
-            };
-            
-            reader.onerror = function() {
-                alert('Error reading file');
-            };
-            
-            reader.readAsDataURL(file);
-        }
     }
 
     init();

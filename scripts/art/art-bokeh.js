@@ -98,9 +98,5 @@
 		initCanvas();
 	}
 
-    window.upload = () => {
-		Sound.error();
-    }
-
 	init();
 }

@@ -186,9 +186,5 @@
         globals.city.streets = [];
     }
 
-    window.upload = (e) => {
-		Sound.error();        
-    }
-
     init();
 }

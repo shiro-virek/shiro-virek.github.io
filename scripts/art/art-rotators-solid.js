@@ -99,9 +99,5 @@
 		drawBackground(ctx, canvas);
 	}
 
-    window.upload = () => {
-		Sound.error();
-    }
-
 	init();
 }

@@ -1192,9 +1192,5 @@
         globals.world.figures = [];
 	}
 
-    window.upload = () => {
-		Sound.error();
-    }
-
     init();
 }

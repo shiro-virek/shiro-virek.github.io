@@ -143,10 +143,6 @@
 		globals.objects = [];
 		addParticles();
 	}
-
-    window.upload = () => {
-		Sound.error();
-    }
 	
 	init();
 }
