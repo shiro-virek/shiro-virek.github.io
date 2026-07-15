@@ -38,7 +38,7 @@
     let init = () => {
         initCanvas();
         randomize();
-        globals.world = new ThreeDWorld(globals.random);
+        globals.world = new ThreeDWorld(globals.random, Drawing.drawLine);
         addEvents();
         window.requestAnimationFrame(loop)
 

@@ -94,8 +94,9 @@ let figureTypes = [
 
 
 class ThreeDWorld {
-    constructor(random) {
+    constructor(random, drawLine) {
         this.random = random;
+        this.drawLine = drawLine;
         this.figures = [];
         this.cameraRotationX = 0; 
         this.cameraRotationZ = 0;
@@ -332,7 +333,7 @@ class Figure {
         let point2d0 = this.world.worldToScreen(p0);
         let point2d1 = this.world.worldToScreen(p1);
 
-        Drawing.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], 1, color);
+       this.world.drawLine(ctx, point2d0[0], point2d0[1], point2d1[0], point2d1[1], color);
     }
 
     drawVertex = (point, color) => {
