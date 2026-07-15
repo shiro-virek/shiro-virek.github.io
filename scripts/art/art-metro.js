@@ -36,7 +36,6 @@
 		stationColorBorder: false,
 		drawStreets: false,
 		maxNumberOfLines: 15,
-		angleSegmentRange: 2,
 		alphabeticLineSymbol: false,
 		language: Languages.Generic,
 		maxSegmentLength: 100,
@@ -220,10 +219,43 @@
 					}
 				}
 
-				//this.linkToNetwork(line);
+				this.linkToNetwork(line);
 
 				Sound.ping(100);
 			}
+		}
+
+		calculateNewPoint = (pA, pB, distance) => {
+			let xC = 0;
+			let yC = 0;
+		
+			xC = pB.x;	
+
+			if (pA.x > pB.x) { 		
+				if (pA.y > pB.y) 
+					yC = pA.y - Math.abs(pB.x - pA.x)					
+				else 
+					yC = pA.y + Math.abs(pB.x - pA.x);
+
+				if (Trigonometry.distanceBetweenTwoPoints(pA.x, pA.y, xC, yC) > distance) {
+					yC = pB.y;
+					xC = pA.x - Math.abs(pB.y - pA.y);
+				}
+					
+			}else{				
+				if (pA.y > pB.y) 	
+					yC = pA.y - Math.abs(pB.x - pA.x)				
+				
+				else
+					yC = pA.y + Math.abs(pB.x - pA.x);		
+
+				if (Trigonometry.distanceBetweenTwoPoints(pA.x, pA.y, xC, yC) > distance) {
+					yC = pB.y;
+					xC = pA.x + Math.abs(pB.y - pA.y);
+				}				
+			}
+
+			return { x: xC, y: yC };
 		}
 
 		linkToNetwork = (line) => {
@@ -251,27 +283,19 @@
 				}
 			}
 
-			if (closestStation != null) {	
-				if (distance > config.maxSegmentLength) {	
-					let segmentLength = Math.ceil(distance / config.maxSegmentLength);
-					for(let i = 1; i <= segmentLength; i++) {
-						let newEntropy = globals.random.nextInt(-10, 10);
-						let newX = newEntropy + lastStation.x + (closestStation.x - lastStation.x) * (i / segmentLength);
-						let newY = newEntropy + lastStation.y + (closestStation.y - lastStation.y) * (i / segmentLength);
-						let newSegment = new Segment(newX, newY, distance / segmentLength);
-						line.segments.push(newSegment);
-						let newStation = new Station(newX, newY, line.symbol);
-						line.stations.push(newStation);
-						newStation.addTransfer(closestStation, newStation);
-					}
-				} else {	
-					let newSegment = new Segment(closestStation.x, closestStation.y, distance);
-					line.segments.push(newSegment);
-					let newStation = new Station(closestStation.x, closestStation.y, line.symbol);
-					line.stations.push(newStation);
-					newStation.addTransfer(closestStation, newStation);
-				}
-			}	
+			if (closestStation != null) {			
+				let newPoint = this.calculateNewPoint(lastStation, closestStation, distance);
+										
+				let newSegment1 = new Segment(newPoint.x, newPoint.y, Trigonometry.distanceBetweenTwoPoints(lastStation.x, lastStation.y, newPoint.x, newPoint.y));
+				line.segments.push(newSegment1);
+
+				let newSegment2 = new Segment(closestStation.x, closestStation.y, Trigonometry.distanceBetweenTwoPoints(newPoint.x, newPoint.y, closestStation.x, closestStation.y));
+				line.segments.push(newSegment2);
+
+				let newStation = new Station(closestStation.x, closestStation.y, line.symbol);
+				line.stations.push(newStation);
+				newStation.addTransfer(closestStation, newStation);
+			}
 		}
 
 		populateQuadTree = () => {
@@ -519,9 +543,9 @@
 				length = globals.random.nextInt(20, 200);
 
 				if (config.restrictAngles)
-					direction = baseDirection + this.getDirection(lastDirection)
+					direction = baseDirection + Line.getDirection()
 				else
-					direction = this.getAttractedDirection(lastX, lastY, baseDirection + this.getDirection(lastDirection));
+					direction = this.getAttractedDirection(lastX, lastY, baseDirection + Line.getDirection());
 
 				let deltaX = Math.cos(direction * Trigonometry.RAD_CONST) * length;
 				let deltaY = Math.sin(direction * Trigonometry.RAD_CONST) * length;
@@ -607,8 +631,8 @@
 			this.randomizeSegments();
 		}
 
-		getDirection = (lastDirection) => {
-			return 45 * globals.random.nextInt(-config.angleSegmentRange, config.angleSegmentRange);
+		static getDirection = () => {
+			return 45 * globals.random.nextInt(-1, 1);
 		}
 
 		drawMetroLine = (ctx) => {
@@ -726,7 +750,6 @@
 		config.maxNumberOfLines = Math.floor(width * height / 25000);
 		generatePalette();
 		config.alphabeticLineSymbol = globals.random.nextBool();
-		config.angleSegmentRange = globals.random.nextBool();
 		config.drawStreets = globals.random.nextBool();
 		generateUrbanAttractors();
 		let rand = globals.random.nextInt(0, Object.keys(Languages).length - 1);
