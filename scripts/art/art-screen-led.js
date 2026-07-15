@@ -142,7 +142,7 @@
         addEvents();
         window.requestAnimationFrame(loop)
 
-        globals.world = new ThreeDWorld(globals.random, globals.ledScreen.drawLine);
+        globals.world = new ThreeDWorld(config.ledColumns, config.ledRows, globals.random, globals.ledScreen.drawLine);
         globals.world.addFigure(0, 0);
         globals.world.figures[0].scaleX(0.4);
         globals.world.figures[0].scaleY(0.4);

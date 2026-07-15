@@ -94,7 +94,9 @@ let figureTypes = [
 
 
 class ThreeDWorld {
-    constructor(random, drawLine) {
+    constructor(width, height, random, drawLine) {
+        this.width = width;
+        this.height = height;
         this.random = random;
         this.drawLine = drawLine;
         this.figures = [];
@@ -126,8 +128,8 @@ class ThreeDWorld {
 
         const scaleFactor = this.FOV / depth;
         
-        const projectedX = (x * scaleFactor) + halfWidth;
-        const projectedY = (y * scaleFactor) + halfHeight;
+        const projectedX = (x * scaleFactor) + this.width / 2;
+        const projectedY = (y * scaleFactor) + this.height / 2;
         
         return [projectedX, projectedY];    
     }
@@ -169,8 +171,8 @@ class ThreeDWorld {
     }
 
     addFigure(x, y) {
-        let centeredX = x - halfWidth;
-        let centeredY = y - halfHeight;
+        let centeredX = x - this.width / 2;
+        let centeredY = y - this.height / 2;
 
         let figure = new Figure(this);
 
