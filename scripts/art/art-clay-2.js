@@ -5,6 +5,7 @@
         lightLen: null,
         img: new Image(),
         baseImageData: null,
+        imageUploaded: false
     };
 
     const config = {
@@ -122,6 +123,7 @@
 
         uploader.addEventListener('change', function(e) {
             Upload.uploadPicture(e, globals.img);
+            globals.imageUploaded = true;
         });
     }
 
@@ -175,7 +177,9 @@
         const data = imageData.data;
 
         //const color = Color.parseColor(Browser.getCssVariable("--main-color"));
-        globals.baseImageData = Drawing.createFlatColor(ctx, config.r, config.g, config.b);
+        
+        if (!globals.imageUploaded)
+            globals.baseImageData = Drawing.createFlatColor(ctx, config.r, config.g, config.b);
                 
         if (!globals.baseImageData) return;      
 
