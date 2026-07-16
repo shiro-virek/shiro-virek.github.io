@@ -121,16 +121,22 @@ class ThreeDWorld {
         this.cameraRotationZ = 0;
         this.cameraZ = 1000;
         this.FOV = 800;
-        this.drawEdges = this.random.nextBool();
+        this.drawFigureEdges = this.random.nextBool();
+        this.drawFigureVertices = this.random.nextBool();
+        this.drawFigureFaces = this.random.nextBool();
         this.figureInfo = figureTypes[this.random.nextInt(0, figureTypes.length - 1)];
-        this.rotationMode = 0;
+        this.rotationMode = 0;        
     }
     
     draw = () => {
-        if (this.drawEdges)
-            this.drawFigures();
-        else
-            this.drawFiguresVertices();
+        if (this.drawFigureFaces)
+            this.drawFaces();
+
+        if (this.drawFigureEdges)
+            this.drawEdges();
+        
+        if (this.drawFigureVertices)
+            this.drawVertices();
     }
 
     worldToScreen = (point) => {
@@ -175,13 +181,19 @@ class ThreeDWorld {
         return [projectedX, projectedY];
     }
 
-    drawFigures = () => {
+    drawFaces = () => {
         for (let i = this.figures.length - 1; i >= 0; i--) {
-            this.figures[i].drawFigure(ctx);
+            this.figures[i].drawFaces(ctx);
         }
     }
 
-    drawFiguresVertices = () => {
+    drawEdges = () => {
+        for (let i = this.figures.length - 1; i >= 0; i--) {
+            this.figures[i].drawEdges(ctx);
+        }
+    }
+
+    drawVertices = () => {
         for (let i = this.figures.length - 1; i >= 0; i--) {
             this.figures[i].drawVertices(ctx);
         }
@@ -363,7 +375,7 @@ class Figure {
         this.world.drawPoint(ctx, vertex[0], vertex[1], newColor);
     }
 
-    drawFigure = () => {
+    drawEdges = () => {
         for (let i = this.edges.length - 1; i >= 0; i--) {
             this.drawEdge(this.vertices[this.edges[i][0]], this.vertices[this.edges[i][1]]);
         }
@@ -373,6 +385,9 @@ class Figure {
         for (let i = this.vertices.length - 1; i >= 0; i--) {
             this.drawVertex(this.vertices[i]);
         }
+    }
+
+    drawFaces = () => {
     }
 }
 
