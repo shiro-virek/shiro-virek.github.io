@@ -3,24 +3,30 @@
         {
             name: "cube",
             vertices: [
-                [-20, -20, -20],
-                [20, -20, -20],
-                [20, 20, -20],
-                [-20, 20, -20],
-                [-20, -20, 20],
-                [20, -20, 20],
-                [20, 20, 20],
-                [-20, 20, 20]
+                [-20, -20, -20],  // 0: front-bottom-left
+                [ 20, -20, -20],  // 1: front-bottom-right
+                [ 20,  20, -20],  // 2: front-top-right
+                [-20,  20, -20],  // 3: front-top-left
+                [-20, -20,  20],  // 4: back-bottom-left
+                [ 20, -20,  20],  // 5: back-bottom-right
+                [ 20,  20,  20],  // 6: back-top-right
+                [-20,  20,  20]   // 7: back-top-left
+            ],
+            edges: [
+                [0,1],[1,2],[2,3],[3,0],  // front face
+                [4,5],[5,6],[6,7],[7,4],  // back face
+                [0,4],[1,5],[2,6],[3,7]   // connectors
             ],
             faces: [
-                [0, 1, 2, 3],
-                [0, 4, 5, 1],
-                [1, 5, 6, 2],
-                [3, 2, 6, 7],
-                [0, 3, 7, 4],
-                [4, 7, 6, 5]
+                [0,1,2,3],  // front
+                [4,7,6,5],  // back  (note: reversed winding for correct normal)
+                [0,4,5,1],  // bottom
+                [3,7,4,0],  // left
+                [1,5,6,2],  // right
+                [3,2,6,7]   // top
             ]
         },
+        /*
         {
             name: "hex_prism",
             vertices: [
@@ -72,6 +78,7 @@
                 [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
             ]
         },
+        */
     ];
 
     const globals = {
