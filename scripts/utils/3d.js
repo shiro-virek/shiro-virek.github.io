@@ -121,11 +121,12 @@ class ThreeDWorld {
         this.cameraRotationZ = 0;
         this.cameraZ = 1000;
         this.FOV = 800;
-        this.drawFigureEdges = this.random.nextBool();
-        this.drawFigureVertices = this.random.nextBool();
-        this.drawFigureFaces = this.random.nextBool();
+        this.drawFigureEdges = false; //this.random.nextBool();
+        this.drawFigureVertices = false; //this.random.nextBool();
+        this.drawFigureFaces = true; //this.random.nextBool();
         this.figureInfo = figureTypes[this.random.nextInt(0, figureTypes.length - 1)];
-        this.rotationMode = 0;        
+        this.rotationMode = 0;      
+        this.lightDirection = [0, 0, 1]  
     }
     
     draw = () => {
@@ -182,6 +183,17 @@ class ThreeDWorld {
     }
 
     drawFaces = () => {
+        this.figures.forEach(figure => {
+            figure.cachedZ = figure.getAverageZ();
+        });
+
+        this.figures.sort((a, b) => {
+            if (isNaN(a.cachedZ)) return 1; 
+            if (isNaN(b.cachedZ)) return -1;
+            
+            return b.cachedZ - a.cachedZ;
+        });
+
         for (let i = this.figures.length - 1; i >= 0; i--) {
             this.figures[i].drawFaces(ctx);
         }
@@ -207,6 +219,7 @@ class ThreeDWorld {
 
         figure.vertices = Objects.clone(this.figureInfo.vertices);
         figure.edges = Objects.clone(this.figureInfo.edges);
+        figure.faces = Objects.clone(this.figureInfo.faces);
 
         const scaleFactor = this.FOV / this.cameraZ;
         let worldX = centeredX / scaleFactor;
@@ -262,7 +275,9 @@ class Figure {
     constructor(world) {
         this.vertices = [];
         this.edges = [];
+        this.faces = [];
         this.world = world;
+        this.hue = this.world.random.nextInt(1, 360);
     }
 
     rotateZ = (angle) => {
@@ -388,7 +403,118 @@ class Figure {
     }
 
     drawFaces = () => {
+        let facesToDraw = [];
+
+        this.faces.forEach(faceIndices => {
+            const rotatedVertices = faceIndices.map(index => 
+                this.world.applyCameraRotation(this.vertices[index])
+            );
+
+            let faceLightness = 0;
+            if (rotatedVertices.length >= 3) {
+                faceLightness = this.getLightness([
+                    rotatedVertices[0], 
+                    rotatedVertices[1], 
+                    rotatedVertices[2]
+                ]);
+            }
+
+            for (let i = 1; i < rotatedVertices.length - 1; i++) {
+                const tVerts = [
+                    rotatedVertices[0],            
+                    rotatedVertices[i],            
+                    rotatedVertices[i + 1]         
+                ];
+                
+                const tIndices = [
+                    faceIndices[0],
+                    faceIndices[i],
+                    faceIndices[i + 1]
+                ];
+
+                let sumZ = tVerts[0][2] + tVerts[1][2] + tVerts[2][2];
+                const avgZ = sumZ / 3;
+
+                facesToDraw.push({
+                    originalIndices: tIndices,
+                    rotatedVertices: tVerts,
+                    avgZ: avgZ,
+                    lightness: faceLightness 
+                });
+            }
+        });
+
+        facesToDraw.sort((a, b) => b.avgZ - a.avgZ);
+
+        facesToDraw.forEach(item => {
+            if (this.shouldDrawFace(item.rotatedVertices)) {
+                this.drawFace(item.originalIndices, item.lightness);                        
+            }
+        });
     }
+    
+    drawFace = (indices, lightness) => {
+        let color = `hsl(${this.hue}, ${100}%, ${lightness}%)`;
+        
+        ctx.beginPath();
+        let vertex = this.world.worldToScreen(this.vertices[indices[0]]);
+        ctx.moveTo(vertex[0], vertex[1]);
+        
+        for (let i = 1; i < indices.length; i++) {
+            vertex = this.world.worldToScreen(this.vertices[indices[i]]);
+            ctx.lineTo(vertex[0], vertex[1]);
+        }
+        ctx.closePath();
+        
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color; 
+        ctx.fill();
+        ctx.stroke();
+    }
+    
+    shouldDrawFace = (rotatedVertices) => {
+        const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
+        const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
+
+        const normal = Trigonometry.crossProduct(vector1, vector2);
+        const cameraDirection = [0, 0, 1];
+        
+        return Trigonometry.dotProduct(normal, cameraDirection) > 0;
+    }
+
+    getLightness = (rotatedVertices) => {
+        const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
+        const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
+        
+        let normal = Trigonometry.crossProduct(vector1, vector2);
+    
+        let magnitude = Math.sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
+
+        if (magnitude === 0) magnitude = 1;
+
+        normal[0] /= magnitude;
+        normal[1] /= magnitude;
+        normal[2] /= magnitude;
+        // -----------------------------------
+    
+        const dotProduct = Trigonometry.dotProduct(normal, this.world.lightDirection);
+        
+        const lightness = Numbers.scale(dotProduct, 0, 1, 20, 70); 
+
+        if (lightness < 0) return 0;
+        if (lightness > 100) return 100;
+        return lightness;
+    }
+    
+    getAverageZ = () => {
+        let sumZ = 0;
+        for (let i = 0; i < this.vertices.length; i++) {
+            let rotatedVertex = this.world.applyCameraRotation(this.vertices[i]);
+            sumZ += rotatedVertex[2];
+        }
+        return sumZ / this.vertices.length;
+    }
+
 }
 
 class ThreeD {
