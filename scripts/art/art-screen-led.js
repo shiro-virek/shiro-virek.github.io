@@ -25,8 +25,8 @@
         constructor() {
             this.leds = [];       
             this.generateLeds();          
-			let rand = globals.random.nextInt(0, Object.keys(figureTypes).length - 1);  
-			this.shape = figureTypes[Object.keys(figureTypes)[rand]];
+			let rand = globals.random.nextInt(0, Object.keys(primitives).length - 1);  
+			this.shape = primitives[Object.keys(primitives)[rand]];
         }
 
         clear = () => {
@@ -141,26 +141,25 @@
 		globals.random = Objects.getRandomObject(); 
         config.ledDiameter = globals.random.nextInt(5, 20);        
         config.ledPadding = globals.random.nextInt(0, 20);
-        config.ledMargin = config.ledPadding;       
-        if (config.randomize) randomize();
+        config.ledMargin = config.ledPadding;    
         config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
         config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
-        globals.ledScreen = new LedScreen();
-        
-        addEvents();
-        window.requestAnimationFrame(loop)
-
+        globals.ledScreen = new LedScreen();           
         globals.world = new ThreeDWorld(config.ledColumns, config.ledRows, globals.random, globals.ledScreen.drawLine, globals.ledScreen.drawPoint, drawFace);
+        if (config.randomize) randomize();
         globals.world.addFigure(0, 0);
         globals.world.figures[0].scaleX(0.4);
         globals.world.figures[0].scaleY(0.4);
         globals.world.figures[0].scaleZ(0.4);
+
+        addEvents();
+        window.requestAnimationFrame(loop)
     }
 
     let addEvents = () => {        
     }
 
-    let randomize = () => {               
+    let randomize = () => {             
         config.hue = globals.random.nextInt(0, 255);    
         config.alternatePixel = globals.random.nextBool();
         globals.world.drawFigureEdges = globals.random.nextBool();
