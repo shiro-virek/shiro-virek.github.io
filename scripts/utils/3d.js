@@ -1,4 +1,4 @@
-let figureTypes = [
+let primitives = [
     {
     name: "cube",
             vertices: [
@@ -209,7 +209,7 @@ class ThreeDWorld {
         this.drawFigureEdges = this.random.nextBool();
         this.drawFigureVertices = this.random.nextBool();
         this.drawFigureFaces = this.random.nextBool();
-        this.figureInfo = figureTypes[this.random.nextInt(0, figureTypes.length - 1)];
+        this.figureInfo = primitives[this.random.nextInt(0, primitives.length - 1)];
         this.rotationMode = 0;      
         this.lightDirection = [0, 0, 1]  
     }

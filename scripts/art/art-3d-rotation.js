@@ -22,7 +22,7 @@
         Browser.addButton("btnShrink", "-", shrink);
 
         let changeFigure = () => {
-            globals.world.figureInfo = figureTypes[globals.random.nextInt(0, figureTypes.length - 1)];
+            globals.world.figureInfo = primitives[globals.random.nextInt(0, primitives.length - 1)];
         }
         Browser.addButton("btnChangeFigure", "🔴", changeFigure);
         
