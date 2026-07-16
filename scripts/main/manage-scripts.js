@@ -38,7 +38,7 @@ const art = [
                 { "name": "filters", "display": "Filters"},
                 { "name": "screen-video", "display": "Video"},
                 { "name": "clay-2", "display": "Clay 2"},
-                { "name": "3d-fps", "display": "3D FPS"},
+                { "name": "3d-fps", "display": "FPS"},
                 { "name": "joystick", "display": "Joystick"},
                 { "name": "chaos-2", "display": "Chaos 2"},
                 { "name": "particles", "display": "Particles"},
