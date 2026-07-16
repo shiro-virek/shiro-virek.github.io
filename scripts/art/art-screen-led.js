@@ -165,6 +165,7 @@
         globals.world.drawFigureEdges = globals.random.nextBool();
         globals.world.drawFigureVertices = !globals.world.drawFigureEdges;
         globals.world.drawFigureFaces = false;
+        globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)]
     }
 
     window.trackMouse = (xMouse, yMouse) => {
