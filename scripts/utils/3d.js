@@ -194,9 +194,9 @@ class ThreeDWorld {
             return b.cachedZ - a.cachedZ;
         });
 
-        for (let i = this.figures.length - 1; i >= 0; i--) {
-            this.figures[i].drawFaces(ctx);
-        }
+        this.figures.forEach(figure => {
+            figure.drawFaces(ctx);
+        });
     }
 
     drawEdges = () => {
