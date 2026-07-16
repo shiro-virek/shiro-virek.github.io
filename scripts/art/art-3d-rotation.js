@@ -6,7 +6,24 @@
 
     const config = {
         tool: 1, // 0: rotate, 1: rotate2, 2: move light
-    };    
+    };  
+
+    let drawFace = (vertices, lightness, hue) => {
+            let color = `hsl(${hue}, ${100}%, ${lightness}%)`;
+            
+            ctx.beginPath();            
+            ctx.moveTo(vertices[0][0], vertices[0][1]);
+            
+            for (let i = 1; i < vertices.length; i++) {
+                ctx.lineTo(vertices[i][0], vertices[i][1]);
+            }
+            ctx.closePath();
+            
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color; 
+            ctx.fill();
+            ctx.stroke();
+        }
 
     let addSpecialControls = () => {
         let grow = () => {
@@ -52,7 +69,7 @@
     let init = () => {
         initCanvas();        
         globals.random = Objects.getRandomObject();
-        globals.world = new ThreeDWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot);
+        globals.world = new ThreeDWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
         randomize();
         addEvents();
         window.requestAnimationFrame(loop)

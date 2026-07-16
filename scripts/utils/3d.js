@@ -195,12 +195,13 @@ let primitives = [
 
 
 class ThreeDWorld {
-    constructor(width, height, random, drawLine, drawPoint) {
+    constructor(width, height, random, drawLine, drawPoint, drawFace) {
         this.width = width;
         this.height = height;
         this.random = random;
         this.drawLine = drawLine;
         this.drawPoint = drawPoint;
+        this.drawFace = drawFace;
         this.figures = [];
         this.cameraRotationX = 0; 
         this.cameraRotationZ = 0;
@@ -533,30 +534,16 @@ class Figure {
 
         facesToDraw.forEach(item => {
             if (this.shouldDrawFace(item.rotatedVertices)) {
-                this.drawFace(item.originalIndices, item.lightness);                        
+                let vertices1 = [];
+                for (let i = 0; i < item.originalIndices.length; i++) {
+                    vertices1[i] = this.world.worldToScreen(this.vertices[item.originalIndices[i]]);
+                }
+
+                this.world.drawFace(vertices1, item.lightness, this.hue);                    
             }
         });
     }
-    
-    drawFace = (indices, lightness) => {
-        let color = `hsl(${this.hue}, ${100}%, ${lightness}%)`;
         
-        ctx.beginPath();
-        let vertex = this.world.worldToScreen(this.vertices[indices[0]]);
-        ctx.moveTo(vertex[0], vertex[1]);
-        
-        for (let i = 1; i < indices.length; i++) {
-            vertex = this.world.worldToScreen(this.vertices[indices[i]]);
-            ctx.lineTo(vertex[0], vertex[1]);
-        }
-        ctx.closePath();
-        
-        ctx.fillStyle = color;
-        ctx.strokeStyle = color; 
-        ctx.fill();
-        ctx.stroke();
-    }
-    
     shouldDrawFace = (rotatedVertices) => {
         const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
         const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
