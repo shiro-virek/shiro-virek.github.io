@@ -131,8 +131,8 @@
         };
     }
 
-    let drawFace = () => {
-
+    let drawFace = (vertices, lightness, hue) => { 
+  
     }
 
     let init = () => {
@@ -163,6 +163,9 @@
     let randomize = () => {               
         config.hue = globals.random.nextInt(0, 255);    
         config.alternatePixel = globals.random.nextBool();
+        globals.world.drawFigureEdges = globals.random.nextBool();
+        globals.world.drawFigureVertices = !globals.world.drawFigureEdges;
+        globals.world.drawFigureFaces = false;
     }
 
     window.trackMouse = (xMouse, yMouse) => {

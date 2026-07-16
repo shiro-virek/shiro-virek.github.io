@@ -9,21 +9,21 @@
     };  
 
     let drawFace = (vertices, lightness, hue) => {
-            let color = `hsl(${hue}, ${100}%, ${lightness}%)`;
-            
-            ctx.beginPath();            
-            ctx.moveTo(vertices[0][0], vertices[0][1]);
-            
-            for (let i = 1; i < vertices.length; i++) {
-                ctx.lineTo(vertices[i][0], vertices[i][1]);
-            }
-            ctx.closePath();
-            
-            ctx.fillStyle = color;
-            ctx.strokeStyle = color; 
-            ctx.fill();
-            ctx.stroke();
+        let color = `hsl(${hue}, ${100}%, ${lightness}%)`;
+        
+        ctx.beginPath();            
+        ctx.moveTo(vertices[0][0], vertices[0][1]);
+        
+        for (let i = 1; i < vertices.length; i++) {
+            ctx.lineTo(vertices[i][0], vertices[i][1]);
         }
+        ctx.closePath();
+        
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color; 
+        ctx.fill();
+        ctx.stroke();
+    }
 
     let addSpecialControls = () => {
         let grow = () => {
@@ -63,7 +63,7 @@
 		globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)]
         globals.world.drawFigureEdges = globals.random.nextBool();
         globals.world.drawFigureVertices = globals.random.nextBool();
-        globals.world.drawFigureFaces = globals.random.nextBool();
+        globals.world.drawFigureFaces = !(globals.world.drawFigureEdges || globals.world.drawFigureVertices);
     }
 
     let init = () => {
@@ -100,7 +100,7 @@
     }
     
     window.trackMouse = (x, y) => {        
-if (clicking) {
+        if (clicking) {
             switch (config.tool) {
                 case 0:
                     globals.world.cameraRotationZ += movX * 0.1; 
