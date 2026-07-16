@@ -1,177 +1,3 @@
-let primitives = [
-    {
-    name: "cube",
-            vertices: [
-                [-20, -20, -20],  // 0: front-bottom-left
-                [ 20, -20, -20],  // 1: front-bottom-right
-                [ 20,  20, -20],  // 2: front-top-right
-                [-20,  20, -20],  // 3: front-top-left
-                [-20, -20,  20],  // 4: back-bottom-left
-                [ 20, -20,  20],  // 5: back-bottom-right
-                [ 20,  20,  20],  // 6: back-top-right
-                [-20,  20,  20]   // 7: back-top-left
-            ],
-            edges: [
-                [0,1],[1,2],[2,3],[3,0],  // front face
-                [4,5],[5,6],[6,7],[7,4],  // back face
-                [0,4],[1,5],[2,6],[3,7]   // connectors
-            ],
-            faces: [
-                [0,1,2,3],  // front
-                [4,7,6,5],  // back  (note: reversed winding for correct normal)
-                [0,4,5,1],  // bottom
-                [3,7,4,0],  // left
-                [1,5,6,2],  // right
-                [3,2,6,7]   // top
-            ]
-        },
-        {
-            name: "hex_prism",
-            vertices: [
-                [-15, 20, -26], [15, 20, -26], [30, 20, 0], 
-                [15, 20, 26], [-15, 20, 26], [-30, 20, 0],
-                [-15, -20, -26], [15, -20, -26], [30, -20, 0], 
-                [15, -20, 26], [-15, -20, 26], [-30, -20, 0]
-            ],
-            edges: [
-                [0,1],[1,2],[2,3],[3,4],[4,5],[5,0],
-                [6,7],[7,8],[8,9],[9,10],[10,11],[11,6],
-                [0,6],[1,7],[2,8],[3,9],[4,10],[5,11]
-            ],
-            faces: [
-                [0, 1, 2, 3, 4, 5], 
-                [11, 10, 9, 8, 7, 6],    
-                [0, 6, 7, 1],
-                [1, 7, 8, 2],
-                [2, 8, 9, 3],
-                [3, 9, 10, 4],
-                [4, 10, 11, 5],
-                [5, 11, 6, 0]
-            ]
-        },
-        {
-            name: "pyramid",
-            vertices: [
-                [-20, -20, -20], 
-                [20, -20, -20],  
-                [20, -20, 20],   
-                [-20, -20, 20],  
-                [0, 20, 0]       
-            ],
-            edges: [
-                [0,1],[1,2],[2,3],[3,0],
-                [0,4],[1,4],[2,4],[3,4]
-            ],
-            faces: [
-                [3, 2, 1, 0],
-                [0, 1, 4],   
-                [1, 2, 4],   
-                [2, 3, 4],  
-                [3, 0, 4]     
-            ]
-        },
-        {
-            name: "octahedron",
-            vertices: [
-                [0, -30, 0], 
-                [0, 30, 0], 
-                [-20, 0, -20], 
-                [20, 0, -20],  
-                [20, 0, 20],   
-                [-20, 0, 20]   
-            ],
-            edges: [
-                [0,2],[0,3],[0,4],[0,5],
-                [1,2],[1,3],[1,4],[1,5],
-                [2,3],[3,4],[4,5],[5,2]
-            ],
-            faces: [
-                [1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2],
-                [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
-            ]
-        },      
-        {
-            "name": "star",
-            "vertices": [
-                [0, 30, 0],    
-                [7, 11, 0],    
-                [29, 9, 0],    
-                [11, -4, 0],   
-                [18, -24, 0],  
-                [0, -11, 0],   
-                [-18, -24, 0], 
-                [-11, -4, 0],  
-                [-29, 9, 0],   
-                [-7, 11, 0],  
-
-                [0, 30, 20],   
-                [7, 11, 20],   
-                [29, 9, 20],   
-                [11, -4, 20],  
-                [18, -24, 20], 
-                [0, -11, 20],  
-                [-18, -24, 20],
-                [-11, -4, 20], 
-                [-29, 9, 20],  
-                [-7, 11, 20]   
-            ],
-            "edges": [
-                [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 0],
-                [10, 11], [11, 12], [12, 13], [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 10],
-                [0, 10], [1, 11], [2, 12], [3, 13], [4, 14], [5, 15], [6, 16], [7, 17], [8, 18], [9, 19]
-            ],
-            "faces": [
-                [0,9,1],[2,1,3],[4,3,5],[6,5,7],[8,7,9],
-                [1,5,3],[1,7,5],[1,9,7],
-                [10,11,19],[12,13,11],[14,15,13],[16,17,15],[18,19,17],
-                [11,13,15],[11,15,17],[11,17,19],
-                [0,1,11,10],[1,2,12,11],[2,3,13,12],[3,4,14,13],[4,5,15,14],
-                [5,6,16,15],[6,7,17,16],[7,8,18,17],[8,9,19,18],[9,0,10,19]
-            ]
-        },       
-        {
-            name: "pyramid2",
-            vertices: [
-                [10, 0, 10], [10, 20, 20], [0, 20, 0], [20, 20, 0]
-            ],
-            edges: [
-                [0, 1], [0, 2], [0, 3], [1, 2], [2, 3], [1, 3]
-            ],
-            faces: [
-                [0,1,2],[0,3,1],[0,2,3],[1,3,2]
-            ]
-        },
-        {
-            name: "icosahedron",
-            vertices: [
-                [0, 16, 0], [14.304, 7.152, 0], [4.416, 7.152, 13.616],
-                [-11.584, 7.152, 8.416], [-11.584, 7.152, -8.416], [4.416, 7.152, -13.616],
-                [11.584, -7.152, 8.416], [-4.416, -7.152, 13.616], [-14.304, -7.152, 0],
-                [-4.416, -7.152, -13.616], [11.584, -7.152, -8.416], [0, -16, 0]
-            ],
-            edges: [
-                [0, 1], [0, 2], [0, 3], [0, 4], [0, 5],
-                [1, 2], [1, 5], [1, 6], [1, 10],
-                [2, 3], [2, 6], [2, 7],
-                [3, 4], [3, 7], [3, 8],
-                [4, 5], [4, 8], [4, 9],
-                [5, 9], [5, 10],
-                [6, 7], [6, 10], [6, 11],
-                [7, 8], [7, 11],
-                [8, 9], [8, 11],
-                [9, 10], [9, 11],
-                [10, 11]
-            ],
-            faces: [
-                [0,2,1],[0,3,2],[0,4,3],[0,5,4],[0,1,5],
-                [1,2,6],[2,3,7],[3,4,8],[4,5,9],[5,1,10],
-                [2,7,6],[3,8,7],[4,9,8],[5,10,9],[1,6,10],
-                [11,6,7],[11,7,8],[11,8,9],[11,9,10],[11,10,6]
-            ]
-        },
-    ];
-
-
 class ThreeDWorld {
     constructor(width, height, random, drawLine, drawPoint, drawFace) {
         this.width = width;
@@ -604,5 +430,339 @@ class ThreeD {
         return Trigonometry.normalizeVector(normal);
     }
 
+    static generateSphere(radius = 30, latSegs = 8, lonSegs = 8) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let lat = 0; lat <= latSegs; lat++) {
+            const u = (lat / latSegs) * Math.PI;
+            for (let lon = 0; lon <= lonSegs; lon++) {
+                const v = (lon / lonSegs) * 2 * Math.PI;
+                vertices.push([radius * Math.sin(u) * Math.cos(v), radius * Math.cos(u), radius * Math.sin(u) * Math.sin(v)]);
+            }
+        }
+        for (let lat = 0; lat < latSegs; lat++) {
+            for (let lon = 0; lon < lonSegs; lon++) {
+                const v0 = lat * (lonSegs + 1) + lon;
+                const v1 = v0 + 1;
+                const v2 = (lat + 1) * (lonSegs + 1) + lon + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateCylinder(radius = 25, height = 40, segs = 12) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        const halfH = height / 2;
+        for (let i = 0; i < segs; i++) {
+            const angle = (i / segs) * 2 * Math.PI;
+            vertices.push([radius * Math.cos(angle), halfH, radius * Math.sin(angle)]);
+        }
+        for (let i = 0; i < segs; i++) {
+            const angle = (i / segs) * 2 * Math.PI;
+            vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
+        }
+        const topFace = [];
+        for (let i = 0; i < segs; i++) topFace.push(i);
+        faces.push(topFace);
+        const bottomFace = [];
+        for (let i = segs - 1; i >= 0; i--) bottomFace.push(segs + i);
+        faces.push(bottomFace);
+        for (let i = 0; i < segs; i++) {
+            const next = (i + 1) % segs;
+            edges.push([i, next]);
+            edges.push([segs + i, segs + next]);
+            edges.push([i, segs + i]);
+            faces.push([i, next, segs + next, segs + i]);
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateTorus(ringRadius = 30, tubeRadius = 12, ringSegs = 12, tubeSegs = 8) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let i = 0; i <= ringSegs; i++) {
+            const u = (i / ringSegs) * 2 * Math.PI;
+            for (let j = 0; j <= tubeSegs; j++) {
+                const v = (j / tubeSegs) * 2 * Math.PI;
+                vertices.push([(ringRadius + tubeRadius * Math.cos(v)) * Math.cos(u), tubeRadius * Math.sin(v), (ringRadius + tubeRadius * Math.cos(v)) * Math.sin(u)]);
+            }
+        }
+        for (let i = 0; i < ringSegs; i++) {
+            for (let j = 0; j < tubeSegs; j++) {
+                const v0 = i * (tubeSegs + 1) + j;
+                const v1 = v0 + 1;
+                const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateHeart(size = 30, uSegs = 16, vSegs = 10) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let i = 0; i <= uSegs; i++) {
+            const u = (i / uSegs) * 2 * Math.PI;
+            for (let j = 0; j <= vSegs; j++) {
+                const v = (j / vSegs) * Math.PI;
+                const sv = Math.sin(v);
+                const x = sv * (15 * Math.sin(u) - 4 * Math.sin(3 * u));
+                const y = 8 * Math.cos(v);
+                const z = sv * (15 * Math.cos(u) - 5 * Math.cos(2 * u) - 2 * Math.cos(3 * u) - Math.cos(4 * u));
+                vertices.push([x * size / 15, y * size / 15, z * size / 15]);
+            }
+        }
+        for (let i = 0; i < uSegs; i++) {
+            for (let j = 0; j < vSegs; j++) {
+                const v0 = i * (vSegs + 1) + j;
+                const v1 = v0 + 1;
+                const v2 = (i + 1) * (vSegs + 1) + j + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateInfinity(size = 30, tubeRadius = 8, ringSegs = 16, tubeSegs = 8) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let i = 0; i <= ringSegs; i++) {
+            const u = (i / ringSegs) * 2 * Math.PI;
+            const denom = 1 + Math.sin(u) * Math.sin(u);
+            const cx = size * Math.cos(u) / denom;
+            const cy = size * Math.sin(u) * Math.cos(u) / denom;
+            const du = 0.001;
+            const ud = u + du;
+            const denomD = 1 + Math.sin(ud) * Math.sin(ud);
+            const tx = size * Math.cos(ud) / denomD - cx;
+            const ty = size * Math.sin(ud) * Math.cos(ud) / denomD - cy;
+            const tLen = Math.sqrt(tx * tx + ty * ty) || 1;
+            const nx = -ty / tLen;
+            const ny = tx / tLen;
+            for (let j = 0; j <= tubeSegs; j++) {
+                const v = (j / tubeSegs) * 2 * Math.PI;
+                vertices.push([cx + tubeRadius * (Math.cos(v) * nx), cy + tubeRadius * (Math.cos(v) * ny), tubeRadius * Math.sin(v)]);
+            }
+        }
+        for (let i = 0; i < ringSegs; i++) {
+            for (let j = 0; j < tubeSegs; j++) {
+                const v0 = i * (tubeSegs + 1) + j;
+                const v1 = v0 + 1;
+                const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }
+
 
 }
+
+let primitives = [
+ /*   {
+    name: "cube",
+            vertices: [
+                [-20, -20, -20],
+                [ 20, -20, -20],
+                [ 20,  20, -20],
+                [-20,  20, -20],
+                [-20, -20,  20],
+                [ 20, -20,  20],
+                [ 20,  20,  20],
+                [-20,  20,  20]
+            ],
+            edges: [
+                [0,1],[1,2],[2,3],[3,0],
+                [4,5],[5,6],[6,7],[7,4],
+                [0,4],[1,5],[2,6],[3,7]
+            ],
+            faces: [
+                [0,1,2,3],
+                [4,7,6,5],
+                [0,4,5,1],
+                [3,7,4,0],
+                [1,5,6,2],
+                [3,2,6,7]
+            ]
+        },
+        {
+            name: "hex_prism",
+            vertices: [
+                [-15, 20, -26], [15, 20, -26], [30, 20, 0], 
+                [15, 20, 26], [-15, 20, 26], [-30, 20, 0],
+                [-15, -20, -26], [15, -20, -26], [30, -20, 0], 
+                [15, -20, 26], [-15, -20, 26], [-30, -20, 0]
+            ],
+            edges: [
+                [0,1],[1,2],[2,3],[3,4],[4,5],[5,0],
+                [6,7],[7,8],[8,9],[9,10],[10,11],[11,6],
+                [0,6],[1,7],[2,8],[3,9],[4,10],[5,11]
+            ],
+            faces: [
+                [0, 1, 2, 3, 4, 5], 
+                [11, 10, 9, 8, 7, 6],    
+                [0, 6, 7, 1],
+                [1, 7, 8, 2],
+                [2, 8, 9, 3],
+                [3, 9, 10, 4],
+                [4, 10, 11, 5],
+                [5, 11, 6, 0]
+            ]
+        },
+        {
+            name: "pyramid",
+            vertices: [
+                [-20, -20, -20], 
+                [20, -20, -20],  
+                [20, -20, 20],   
+                [-20, -20, 20],  
+                [0, 20, 0]       
+            ],
+            edges: [
+                [0,1],[1,2],[2,3],[3,0],
+                [0,4],[1,4],[2,4],[3,4]
+            ],
+            faces: [
+                [3, 2, 1, 0],
+                [0, 1, 4],   
+                [1, 2, 4],   
+                [2, 3, 4],  
+                [3, 0, 4]     
+            ]
+        },
+        {
+            name: "octahedron",
+            vertices: [
+                [0, -30, 0], 
+                [0, 30, 0], 
+                [-20, 0, -20], 
+                [20, 0, -20],  
+                [20, 0, 20],   
+                [-20, 0, 20]   
+            ],
+            edges: [
+                [0,2],[0,3],[0,4],[0,5],
+                [1,2],[1,3],[1,4],[1,5],
+                [2,3],[3,4],[4,5],[5,2]
+            ],
+            faces: [
+                [1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2],
+                [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
+            ]
+        },      
+        {
+            "name": "star",
+            "vertices": [
+                [0, 30, 0],    
+                [7, 11, 0],    
+                [29, 9, 0],    
+                [11, -4, 0],   
+                [18, -24, 0],  
+                [0, -11, 0],   
+                [-18, -24, 0], 
+                [-11, -4, 0],  
+                [-29, 9, 0],   
+                [-7, 11, 0],  
+
+                [0, 30, 20],   
+                [7, 11, 20],   
+                [29, 9, 20],   
+                [11, -4, 20],  
+                [18, -24, 20], 
+                [0, -11, 20],  
+                [-18, -24, 20],
+                [-11, -4, 20], 
+                [-29, 9, 20],  
+                [-7, 11, 20]   
+            ],
+            "edges": [
+                [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 0],
+                [10, 11], [11, 12], [12, 13], [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 10],
+                [0, 10], [1, 11], [2, 12], [3, 13], [4, 14], [5, 15], [6, 16], [7, 17], [8, 18], [9, 19]
+            ],
+            "faces": [
+                [0,9,1],[2,1,3],[4,3,5],[6,5,7],[8,7,9],
+                [1,5,3],[1,7,5],[1,9,7],
+                [10,11,19],[12,13,11],[14,15,13],[16,17,15],[18,19,17],
+                [11,13,15],[11,15,17],[11,17,19],
+                [0,1,11,10],[1,2,12,11],[2,3,13,12],[3,4,14,13],[4,5,15,14],
+                [5,6,16,15],[6,7,17,16],[7,8,18,17],[8,9,19,18],[9,0,10,19]
+            ]
+        },       
+        {
+            name: "pyramid2",
+            vertices: [
+                [10, 0, 10], [10, 20, 20], [0, 20, 0], [20, 20, 0]
+            ],
+            edges: [
+                [0, 1], [0, 2], [0, 3], [1, 2], [2, 3], [1, 3]
+            ],
+            faces: [
+                [0,1,2],[0,3,1],[0,2,3],[1,3,2]
+            ]
+        },
+        {
+            name: "icosahedron",
+            vertices: [
+                [0, 16, 0], [14.304, 7.152, 0], [4.416, 7.152, 13.616],
+                [-11.584, 7.152, 8.416], [-11.584, 7.152, -8.416], [4.416, 7.152, -13.616],
+                [11.584, -7.152, 8.416], [-4.416, -7.152, 13.616], [-14.304, -7.152, 0],
+                [-4.416, -7.152, -13.616], [11.584, -7.152, -8.416], [0, -16, 0]
+            ],
+            edges: [
+                [0, 1], [0, 2], [0, 3], [0, 4], [0, 5],
+                [1, 2], [1, 5], [1, 6], [1, 10],
+                [2, 3], [2, 6], [2, 7],
+                [3, 4], [3, 7], [3, 8],
+                [4, 5], [4, 8], [4, 9],
+                [5, 9], [5, 10],
+                [6, 7], [6, 10], [6, 11],
+                [7, 8], [7, 11],
+                [8, 9], [8, 11],
+                [9, 10], [9, 11],
+                [10, 11]
+            ],
+            faces: [
+                [0,2,1],[0,3,2],[0,4,3],[0,5,4],[0,1,5],
+                [1,2,6],[2,3,7],[3,4,8],[4,5,9],[5,1,10],
+                [2,7,6],[3,8,7],[4,9,8],[5,10,9],[1,6,10],
+                [11,6,7],[11,7,8],[11,8,9],[11,9,10],[11,10,6]
+            ]
+        },
+        */
+        {
+            name: "sphere",
+            ...ThreeD.generateSphere()
+        },
+        {
+            name: "cylinder",
+            ...ThreeD.generateCylinder()
+        },
+        {
+            name: "torus",
+            ...ThreeD.generateTorus()
+        },
+        {
+            name: "heart",
+            ...ThreeD.generateHeart()
+        },
+        {
+            name: "infinity",
+            ...ThreeD.generateInfinity()
+        },
+    ]
