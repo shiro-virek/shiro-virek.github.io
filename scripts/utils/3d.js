@@ -206,10 +206,10 @@ class ThreeDWorld {
         this.cameraRotationZ = 0;
         this.cameraZ = 1000;
         this.FOV = 800;
-        this.drawFigureEdges = this.random.nextBool();
-        this.drawFigureVertices = this.random.nextBool();
-        this.drawFigureFaces = this.random.nextBool();
-        this.figureInfo = primitives[this.random.nextInt(0, primitives.length - 1)];
+        this.drawFigureEdges = true;
+        this.drawFigureVertices = false;
+        this.drawFigureFaces = false;
+        this.primitive = primitives[0];
         this.rotationMode = 0;      
         this.lightDirection = [0, 0, 1]  
     }
@@ -302,9 +302,9 @@ class ThreeDWorld {
 
         let figure = new Figure(this);
 
-        figure.vertices = Objects.clone(this.figureInfo.vertices);
-        figure.edges = Objects.clone(this.figureInfo.edges);
-        figure.faces = Objects.clone(this.figureInfo.faces);
+        figure.vertices = Objects.clone(this.primitive.vertices);
+        figure.edges = Objects.clone(this.primitive.edges);
+        figure.faces = Objects.clone(this.primitive.faces);
 
         const scaleFactor = this.FOV / this.cameraZ;
         let worldX = centeredX / scaleFactor;

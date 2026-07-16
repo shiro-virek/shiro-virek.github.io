@@ -22,7 +22,7 @@
         Browser.addButton("btnShrink", "-", shrink);
 
         let changeFigure = () => {
-            globals.world.figureInfo = primitives[globals.random.nextInt(0, primitives.length - 1)];
+            globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)];
         }
         Browser.addButton("btnChangeFigure", "🔴", changeFigure);
         
@@ -43,13 +43,17 @@
     }
 
     let randomize = () => {
-		globals.random = Objects.getRandomObject();
+		globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)]
+        globals.world.drawFigureEdges = globals.random.nextBool();
+        globals.world.drawFigureVertices = globals.random.nextBool();
+        globals.world.drawFigureFaces = globals.random.nextBool();
     }
 
     let init = () => {
-        initCanvas();
-        randomize();
+        initCanvas();        
+        globals.random = Objects.getRandomObject();
         globals.world = new ThreeDWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot);
+        randomize();
         addEvents();
         window.requestAnimationFrame(loop)
 
