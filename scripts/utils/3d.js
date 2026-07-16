@@ -121,9 +121,9 @@ class ThreeDWorld {
         this.cameraRotationZ = 0;
         this.cameraZ = 1000;
         this.FOV = 800;
-        this.drawFigureEdges = false; //this.random.nextBool();
-        this.drawFigureVertices = false; //this.random.nextBool();
-        this.drawFigureFaces = true; //this.random.nextBool();
+        this.drawFigureEdges = this.random.nextBool();
+        this.drawFigureVertices = this.random.nextBool();
+        this.drawFigureFaces = this.random.nextBool();
         this.figureInfo = figureTypes[this.random.nextInt(0, figureTypes.length - 1)];
         this.rotationMode = 0;      
         this.lightDirection = [0, 0, 1]  
@@ -133,7 +133,7 @@ class ThreeDWorld {
         if (this.drawFigureFaces)
             this.drawFaces();
 
-        if (this.drawFigureEdges)
+        if (this.drawFigureEdges || (!this.drawFigureFaces && !this.drawFigureEdges && !this.drawFigureVertices))
             this.drawEdges();
         
         if (this.drawFigureVertices)
