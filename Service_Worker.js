@@ -41,7 +41,6 @@ const PRECACHE_URLS = [
     '/scripts/utils/collisions.js',
     '/scripts/art/art-3d-fps.js',
     '/scripts/art/art-3d-rotation.js',
-    '/scripts/art/art-3d-rotation-lights.js',
     '/scripts/art/art-base.js',
     '/scripts/art/art-blinkenlights.js',
     '/scripts/art/art-blinkenlights-mn.js',

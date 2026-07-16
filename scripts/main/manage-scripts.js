@@ -20,7 +20,6 @@ const art = [
                 { "name": "crt","display": "CRT"},
                 { "name": "screen-tones", "display": "Screen 2"},
                 { "name": "rotators-solid", "display": "Rotators 2"},
-                { "name": "3d-rotation-lights", "display": "3D w/lights"},
                 { "name": "distortion","display": "Distortion"},
                 { "name": "blinkenlights","display": "Blinkenlights"},
                 { "name": "blinkenlights-mn", "display": "Cellular automata 2"},
