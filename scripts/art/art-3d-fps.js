@@ -334,13 +334,13 @@
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(halfWidth - size, this.width / 2);
-            ctx.lineTo(halfWidth + size, this.height / 2);
-            ctx.moveTo(halfWidth, this.width / 2 - size);
-            ctx.lineTo(halfWidth, this.height / 2 + size);
+            ctx.moveTo(this.width / 2 - size, this.width / 2);
+            ctx.lineTo(this.width / 2 + size, this.height / 2);
+            ctx.moveTo(this.width / 2, this.width / 2 - size);
+            ctx.lineTo(this.width / 2, this.height / 2 + size);
             ctx.stroke();
 
-			Drawing.drawCircle(ctx, halfWidth, halfHeight, size * 1.5, 'rgba(255,255,255,0.3)');
+			Drawing.drawCircle(ctx, this.width, this.height, size * 1.5, 'rgba(255,255,255,0.3)');
         }
 
         checkShoot = () => {
@@ -359,7 +359,7 @@
 
                     const screenPoints = faceIndices.map(i => this.worldToScreen(figure.vertices[i]));
 
-                    if (Trigonometry.isPointInPoly([halfWidth, halfHeight], screenPoints)) {
+                    if (Trigonometry.isPointInPoly([this.width / 2, this.height / 2], screenPoints)) {
                         let avgZ = figure.getAverageZ();
                         if (avgZ < minZ) {
                             minZ = avgZ;
