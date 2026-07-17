@@ -79,7 +79,7 @@
 
         drawHorizon = () => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
-            let horizonY = halfHeight + (Math.tan(angleRad) * config.FOV);
+            let horizonY = this.width / 2 + (Math.tan(angleRad) * this.FOV);
 
             let skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
             
@@ -283,8 +283,8 @@
         addFigure = (screenX, screenY, fig = config.figureInfo) => {
             const spawnDistance = 500; 
 
-            let centeredX = screenX - halfWidth;
-            let centeredY = screenY - halfHeight;
+            let centeredX = screenX - this.width / 2;
+            let centeredY = screenY - this.height / 2;
 
             let localX = centeredX * spawnDistance / config.FOV;
             let localY = centeredY * spawnDistance / config.FOV;
@@ -328,10 +328,10 @@
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(halfWidth - size, halfHeight);
-            ctx.lineTo(halfWidth + size, halfHeight);
-            ctx.moveTo(halfWidth, halfHeight - size);
-            ctx.lineTo(halfWidth, halfHeight + size);
+            ctx.moveTo(halfWidth - size, this.width / 2);
+            ctx.lineTo(halfWidth + size, this.height / 2);
+            ctx.moveTo(halfWidth, this.width / 2 - size);
+            ctx.lineTo(halfWidth, this.height / 2 + size);
             ctx.stroke();
 
 			Drawing.drawCircle(ctx, halfWidth, halfHeight, size * 1.5, 'rgba(255,255,255,0.3)');
