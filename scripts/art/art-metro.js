@@ -19,26 +19,26 @@
 		showStationNames: true,
 		lineThickness: 10,
 		lineMinThickness: 3,
-		lineMaxThickness: 20,
-		lineTransferMaxDistance: 40,
+		lineMaxThickness: Math.floor(Math.max(width, height) / 70),
+		lineTransferMaxDistance:  Math.floor(Math.max(width, height) / 35),
 		hslMaxHue: 360,
-		minLineLength: 50,
-		infoMarginTop: 10,
-		infoMarginLeft: 10,
-		infoSymbolSide: 15,
-		infoLineHeight: 20,
-		infoHeaderHeight: 100,
-		infoPadding: 10,
-		infoWidth: 120,
+		minLineLength: Math.floor(Math.max(width, height) / 30),
+		infoMarginTop: Math.floor(Math.max(width, height) / 140),
+		infoMarginLeft: Math.floor(Math.max(width, height) / 140),
+		infoSymbolSide: Math.floor(Math.max(width, height) / 90),
+		infoLineHeight: Math.floor(Math.max(width, height) / 70),
+		infoHeaderHeight: Math.floor(Math.max(width, height) / 15),
+		infoPadding: Math.floor(Math.max(width, height) / 140),
+		infoWidth: Math.floor(Math.max(width, height) / 11),
 		drawQuadtree: false,
 		linesLimit: true,
-		stationRadio: 10,
+		stationRadio: Math.floor(Math.max(width, height) / 140),
 		stationColorBorder: false,
 		drawStreets: false,
-		maxNumberOfLines: 15,
+		maxNumberOfLines: Math.floor(Math.max(width, height) / 90),
 		alphabeticLineSymbol: false,
 		language: Languages.Generic,
-		maxSegmentLength: 100,
+		maxSegmentLength:  Math.floor(Math.max(width, height) / 15),
     };    
 
 	class MetroNetwork {
@@ -94,7 +94,7 @@
 			ctx.strokeStyle = '#000000';
 			ctx.strokeRect(config.infoMarginLeft, config.infoMarginTop, infoWidth, infoHeight);
 
-			ctx.font = "10px Arial";
+			ctx.font = `${Math.floor(Math.max(width, height) / 140)}px Arial`;
 			ctx.fillStyle = "#000";
 			ctx.fillText(`${this.getFlag()}City Metro System`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2);
 			ctx.fillText(`Stations: ${globals.metroNetwork.getNumberOfStations()}`, config.infoMarginLeft + config.infoPadding, config.infoMarginTop + config.infoPadding * 2 + config.infoLineHeight);
@@ -122,7 +122,7 @@
 
 		drawStationLabels = (ctx) => {
 			let placedLabels = [];
-			ctx.font = "10px Arial";
+			ctx.font = `${Math.floor(Math.max(width, height) / 140)}px Arial`;
 			ctx.strokeStyle = "white";   
 			ctx.fillStyle = "black";      
 			ctx.lineWidth = 3;       
@@ -648,7 +648,7 @@
 			let textWidth = metrics.width;
 			let textHeight =  metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;;
 
-			ctx.font = "bold 15px Arial";
+			ctx.font = `bold ${Math.floor(Math.max(width, height) / 90)}px Arial`;
 			ctx.fillStyle = "#FFF";
 			ctx.fillText(this.symbol, x - textWidth / 2, y + textHeight / 2);
 		}
