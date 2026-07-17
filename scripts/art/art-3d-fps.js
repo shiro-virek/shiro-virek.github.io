@@ -1,6 +1,6 @@
 {
     const globals = {
-        random: Objects.getRandomObject(),
+        random: null,
         world: null,
         joystickL: null,
         joystickR: null,     
@@ -14,9 +14,6 @@
 
     const config = {
         randomize: true,
-        FOV: 1000,
-        figureInfo: primitives[globals.random.nextInt(0, primitives.length - 1)],
-        rotationMode: 0,
         tileSize: 500,
         floorSize: 4000,
         worldSize: 10000,
@@ -30,8 +27,8 @@
     };    
 
     class FPSWorld extends ThreeDWorld {
-        constructor() {
-            super();
+        constructor(width, height, random, drawLine, drawPoint, drawFace) {
+            super(width, height, random, drawLine, drawPoint, drawFace);
 
             this.cameraMode = 1;
 
@@ -48,7 +45,7 @@
             const origin = originalFig.center; 
 
             originalFig.faces.forEach((faceIndices, index) => {
-                let piece = new Character();
+                let piece = new Character(this);
                 
                 piece.vertices = faceIndices.map(vIdx => Objects.clone(originalFig.vertices[vIdx]));
                 
@@ -180,45 +177,7 @@
         }
 
         draw = () => {
-            let allFaces = [];
-
-            this.figures.forEach(figure => {
-                figure.faces.forEach(faceIndices => {
-                    const viewVertices = faceIndices.map(index => 
-                        this.applyCameraTransform(figure.vertices[index])
-                    );
-
-                    let isBehindCamera = false;
-                    for (let v of viewVertices) {
-                        if (v[2] <= 1) {
-                            isBehindCamera = true;
-                            break;
-                        }
-                    }
-                    if (isBehindCamera) return;
-
-                    if (figure.shouldDrawFace(viewVertices)) {
-                        let sumZ = 0;
-                        viewVertices.forEach(v => sumZ += v[2]);
-                        const avgZ = sumZ / viewVertices.length;
-
-                        allFaces.push({
-                            worldVertices: faceIndices.map(index => figure.vertices[index]),
-                            viewZ: avgZ,
-                            hue: figure.hue,
-                            life: figure.isDebris ? figure.life : 1.0,
-                            lightness: figure.getLightness(viewVertices)
-                        });
-                    }
-                });
-            });
-
-            allFaces.sort((a, b) => b.viewZ - a.viewZ);
-
-            allFaces.forEach(face => {
-                this.drawSingleFace(face);
-            });
-
+            super.draw();
 
             this.translateInfiniteFloor();
         }
@@ -294,33 +253,7 @@
                 globals.floorCenterZ += config.tileSize;
             }    
         }
-      
-        applyCameraTransform = (point) => {
-            let x = point[0] - this.cameraX;
-            let y = point[1] - this.cameraY;
-            let z = point[2] - this.cameraZ;
-            
-            let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
-            let cosZ = Math.cos(angleZ);
-            let sinZ = Math.sin(angleZ);
-            
-            let nx = x * cosZ - z * sinZ;
-            let nz = x * sinZ + z * cosZ;
-            x = nx;
-            z = nz;
-
-            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX);
-            let cosX = Math.cos(angleX);
-            let sinX = Math.sin(angleX);
-            
-            let ny = y * cosX - z * sinX;
-            nz = y * sinX + z * cosX;
-            y = ny;
-            z = nz;
-            
-            return [x, y, z];
-        }
-                                        
+                               
         moveForward = (speed) => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
             this.cameraX -= Math.sin(angleRad) * speed;
@@ -373,7 +306,7 @@
             let worldY = yFinal + this.cameraY;
             let worldZ = zFinal + this.cameraZ;
 
-            let figure = new Character();
+            let figure = new Character(this);
             figure.vertices = Objects.clone(fig.vertices);
             figure.faces = Objects.clone(fig.faces);
 
@@ -453,8 +386,8 @@
     }
 
     class Character extends Figure {
-        constructor() {
-            super();
+        constructor(world) {
+            super(world);
             this.solid = false;
             this.infinite = false;
             this.breakable = false;
@@ -490,89 +423,6 @@
             
             this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
         }
-
-        draw = () => {
-            let facesToDraw = [];
-
-            this.faces.forEach(faceIndices => {
-                const rotatedVertices = faceIndices.map(index => 
-                    globals.world.applyCameraRotation(this.vertices[index])
-                );
-
-                let faceLightness = 0;
-                if (rotatedVertices.length >= 3) {
-                    faceLightness = this.getLightness([
-                        rotatedVertices[0], 
-                        rotatedVertices[1], 
-                        rotatedVertices[2]
-                    ]);
-                }
-
-                for (let i = 1; i < rotatedVertices.length - 1; i++) {
-                    const tVerts = [
-                        rotatedVertices[0],            
-                        rotatedVertices[i],            
-                        rotatedVertices[i + 1]         
-                    ];
-                    
-                    const tIndices = [
-                        faceIndices[0],
-                        faceIndices[i],
-                        faceIndices[i + 1]
-                    ];
-
-                    let sumZ = tVerts[0][2] + tVerts[1][2] + tVerts[2][2];
-                    const avgZ = sumZ / 3;
-
-                    facesToDraw.push({
-                        originalIndices: tIndices,
-                        rotatedVertices: tVerts,
-                        avgZ: avgZ,
-                        lightness: faceLightness 
-                    });
-                }
-            });
-
-            facesToDraw.sort((a, b) => b.avgZ - a.avgZ);
-
-            facesToDraw.forEach(item => {
-                if (this.shouldDrawFace(item.rotatedVertices)) {
-                    this.drawFace(item.originalIndices, item.lightness);                        
-                }
-            });
-        }
-
-        drawFace = (indices, lightness) => {
-            for (let i = 0; i < indices.length; i++) {
-                const viewPoint = globals.world.applyCameraTransform(this.vertices[indices[i]]);
-                if (viewPoint[2] < 10) return; 
-            }
-            
-            const distPoint = globals.world.applyCameraTransform(this.vertices[indices[0]]);
-            const distance = distPoint[2];
-            
-            let alpha = Numbers.scale(distance, 2000, 5000, 1, 0);
-            if (alpha < 0) alpha = 0;
-            if (alpha > 1) alpha = 1;
-
-            let color = `hsla(${this.hue}, 100%, ${lightness}%, ${alpha})`;
-            
-            ctx.beginPath();
-            let vertex = globals.world.worldToScreen(this.vertices[indices[0]]);
-            ctx.moveTo(vertex[0], vertex[1]);
-            
-            for (let i = 1; i < indices.length; i++) {
-                vertex = globals.world.worldToScreen(this.vertices[indices[i]]);
-                ctx.lineTo(vertex[0], vertex[1]);
-            }
-            ctx.closePath();
-            
-            ctx.fillStyle = color;
-            ctx.strokeStyle = color; 
-            ctx.lineWidth = 1;    
-            ctx.fill();
-            ctx.stroke();
-        }
     }
 
     let addWalls = () => {
@@ -581,7 +431,7 @@
             let segmentSize = config.worldSize / 20;
             let segments = config.worldSize / segmentSize + 1;
             for (let j = -segments; j < segments; j++) {
-                let wall = new Character();
+                let wall = new Character(globals.world);
                 wall.vertices = Objects.clone(primitives[0].vertices);
                 wall.faces = Objects.clone(primitives[0].faces);            
 
@@ -616,7 +466,7 @@
 
         for (let x = -config.floorSize; x <= config.floorSize; x += config.tileSize) {
             for (let z = -config.floorSize; z <= config.floorSize; z += config.tileSize) {
-                let floorTile = new Character();
+                let floorTile = new Character(globals.world);
                 floorTile.vertices = Objects.clone(primitives[0].vertices);
                 floorTile.faces = Objects.clone(primitives[0].faces);
                 
@@ -642,17 +492,17 @@
     let addBuildings = () => {
 
         for (let i = 0; i < config.buildingsCount; i++) {
-            let building = new Character();
+            let building = new Character(globals.world);
             building.vertices = Objects.clone(primitives[0].vertices);
             building.faces = Objects.clone(primitives[0].faces);
             
-            let h = globals.random.nextInt(5, 15);
+            let h = globals.world.random.nextInt(5, 15);
             building.scaleY(h); 
             building.scaleX(2);
             building.scaleZ(2);
             
-            let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
-            let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+            let posX = globals.world.random.nextInt(-config.worldSize, config.worldSize);
+            let posZ = globals.world.random.nextInt(-config.worldSize, config.worldSize);
             
             building.translateX(posX);
             building.translateY(50 - (h * 20)); 
@@ -668,12 +518,12 @@
 
     let addEnemies = () => {
         for (let i = 0; i < config.enemyCount; i++) {
-            let enemy = new Character();
+            let enemy = new Character(globals.world);
             enemy.vertices = Objects.clone(primitives[1].vertices); 
             enemy.faces = Objects.clone(primitives[1].faces);
 
-            let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
-            let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+            let posX = globals.world.random.nextInt(-config.worldSize, config.worldSize);
+            let posZ = globals.world.random.nextInt(-config.worldSize, config.worldSize);
 
             enemy.scale(5);
             enemy.translateX(posX);
@@ -693,15 +543,15 @@
 
     let addPyramids = () => {
         for (let i = 0; i < 10; i++) {
-            let pyramid = new Character();
+            let pyramid = new Character(globals.world);
             pyramid.vertices = Objects.clone(primitives[2].vertices); 
             pyramid.faces = Objects.clone(primitives[2].faces);
 
             pyramid.rotateX(180);
             pyramid.scale(8); 
 
-            let posX = globals.random.nextInt(-2000, 2000);
-            let posZ = globals.random.nextInt(-2000, 2000);
+            let posX = globals.world.random.nextInt(-2000, 2000);
+            let posZ = globals.world.random.nextInt(-2000, 2000);
 
             pyramid.translateX(posX);
             pyramid.translateY(50 - 20 * 8); 
@@ -718,15 +568,15 @@
     }
 
     let addSecretObject = () => {
-        let pyramid = new Character();
+        let pyramid = new Character(globals.world);
         pyramid.vertices = Objects.clone(primitives[2].vertices); 
         pyramid.faces = Objects.clone(primitives[2].faces);
 
         pyramid.rotateX(180);
         pyramid.scale(8); 
 
-        let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
-        let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
+        let posX = globals.world.random.nextInt(-config.worldSize, config.worldSize);
+        let posZ = globals.world.random.nextInt(-config.worldSize, config.worldSize);
 
         globals.secretX = posX;
         globals.secretZ = posZ;
@@ -787,7 +637,7 @@
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();
-        globals.world = new FPSWorld();
+        globals.world = new FPSWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
         addEvents();
         setInitialFigures();
         window.requestAnimationFrame(loop);
@@ -812,7 +662,7 @@
             let factor = delta / FRAME_TIME;
 
             if (fig.isEnemy) {
-                fig.rotationAngle += (globals.random.nextBool()? 0.1 : -0.1) * factor;
+                fig.rotationAngle += (globals.world.random.nextBool()? 0.1 : -0.1) * factor;
                 fig.moveAuto(config.enemiesSpeed * factor);    
 
                 if ((fig.center[0] <= -config.worldSize)
@@ -901,6 +751,38 @@
     window.trackMouse = (x, y) => {
         if (clicking) {
         }
+    }
+
+    let drawFace = (vertices, lightness, hue) => {
+        for (let i = 0; i < vertices.length; i++) {
+                const viewPoint = globals.world.applyCameraTransform(this.vertices[i]);
+                if (viewPoint[2] < 10) return; 
+        }
+        
+        const distPoint = globals.world.applyCameraTransform(this.vertices[0]);
+        const distance = distPoint[2];
+        
+        let alpha = Numbers.scale(distance, 2000, 5000, 1, 0);
+        if (alpha < 0) alpha = 0;
+        if (alpha > 1) alpha = 1;
+
+        let color = `hsla(${this.hue}, 100%, ${lightness}%, ${alpha})`;
+        
+        ctx.beginPath();
+        let vertex = globals.world.worldToScreen(this.vertices[0]);
+        ctx.moveTo(vertex[0], vertex[1]);
+        
+        for (let i = 1; i < indices.length; i++) {
+            vertex = globals.world.worldToScreen(this.vertices[i]);
+            ctx.lineTo(vertex[0], vertex[1]);
+        }
+        ctx.closePath();
+        
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color; 
+        ctx.lineWidth = 1;    
+        ctx.fill();
+        ctx.stroke();
     }
 
     window.draw = (delta) => {

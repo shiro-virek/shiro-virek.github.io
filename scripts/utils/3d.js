@@ -21,6 +21,7 @@ class ThreeDWorld {
     }
     
     draw = () => {
+  
         if (this.drawFigureFaces)
             this.drawFaces();
 
@@ -273,8 +274,6 @@ class ThreeDWorld {
                     
 }
 
-
-
 class Figure {
     constructor(world) {
         this.vertices = [];
@@ -377,6 +376,10 @@ class Figure {
             this.vertices[i][0] = this.vertices[i][0] + amount * this.vertices[i][2];
             this.vertices[i][1] = this.vertices[i][1] + amount * this.vertices[i][2];
         }
+    }
+
+    draw = () => {
+
     }
 
     drawEdge = (p0, p1, color) => {
