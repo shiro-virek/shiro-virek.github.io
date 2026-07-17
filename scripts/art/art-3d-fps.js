@@ -38,6 +38,11 @@
 
             this.cameraRotationX = 5;
             this.cameraRotationZ = 0;
+
+            this.drawFigureFaces = true;
+            this.drawFigureEdges = false;
+            this.drawFigureVertices = false;
+
         }
 
         fragmentFigure = (originalFig) => {
@@ -280,7 +285,7 @@
             if (this.cameraRotationX < -90) this.cameraRotationX = -90;
         }
 
-        addFigure = (screenX, screenY, fig = config.figureInfo) => {
+        addFigure = (screenX, screenY, fig = this.primitive) => {
             const spawnDistance = 500; 
 
             let centeredX = screenX - this.width / 2;

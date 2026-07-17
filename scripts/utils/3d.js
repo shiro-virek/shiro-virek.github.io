@@ -20,8 +20,8 @@ class ThreeDWorld {
         this.lightDirection = [0, 0, 1]  
     }
     
-    draw = () => {
-  
+    draw() {
+   
         if (this.drawFigureFaces)
             this.drawFaces();
 
