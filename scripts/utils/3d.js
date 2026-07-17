@@ -302,7 +302,183 @@ class ThreeDWorld {
         
         return [x, y, z];
     }
-                    
+
+
+    static calculateCenter = (vertices, face) => {
+        let center = [0, 0, 0];
+        face.forEach(index => {
+            center[0] += vertices[index][0];
+            center[1] += vertices[index][1];
+            center[2] += vertices[index][2];
+        });
+        center[0] /= face.length;
+        center[1] /= face.length;
+        center[2] /= face.length;
+        return center;
+    }
+        
+    static calculateCameraPosition = (distance, theta, phi) => {
+        const x = distance * Math.sin(theta) * Math.cos(phi);
+        const y = distance * Math.sin(theta) * Math.sin(phi);
+        const z = distance * Math.cos(theta);
+        return [x, y, z];
+    }
+    
+    static calculateFaceNormal = (vertices, face) => {
+        if (face.length < 3) {
+            throw new Error('Needs at least 3 vertices');
+        }
+    
+        const v0 = vertices[face[0]];
+        const v1 = vertices[face[1]];
+        const v2 = vertices[face[2]];
+    
+        const u = Trigonometry.subtractVectors(v1, v0);
+        const v = Trigonometry.subtractVectors(v2, v0);
+    
+        const normal = Trigonometry.crossProduct(u, v);
+        return Trigonometry.normalizeVector(normal);
+    }
+
+    static generateSphere(radius = 30, latSegs = 8, lonSegs = 8) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let lat = 0; lat <= latSegs; lat++) {
+            const u = (lat / latSegs) * Math.PI;
+            for (let lon = 0; lon <= lonSegs; lon++) {
+                const v = (lon / lonSegs) * 2 * Math.PI;
+                vertices.push([radius * Math.sin(u) * Math.cos(v), radius * Math.cos(u), radius * Math.sin(u) * Math.sin(v)]);
+            }
+        }
+        for (let lat = 0; lat < latSegs; lat++) {
+            for (let lon = 0; lon < lonSegs; lon++) {
+                const v0 = lat * (lonSegs + 1) + lon;
+                const v1 = v0 + 1;
+                const v2 = (lat + 1) * (lonSegs + 1) + lon + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateCylinder(radius = 25, height = 40, segs = 12) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        const halfH = height / 2;
+        for (let i = 0; i < segs; i++) {
+            const angle = (i / segs) * 2 * Math.PI;
+            vertices.push([radius * Math.cos(angle), halfH, radius * Math.sin(angle)]);
+        }
+        for (let i = 0; i < segs; i++) {
+            const angle = (i / segs) * 2 * Math.PI;
+            vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
+        }
+        const topFace = [];
+        for (let i = 0; i < segs; i++) topFace.push(i);
+        faces.push(topFace);
+        const bottomFace = [];
+        for (let i = segs - 1; i >= 0; i--) bottomFace.push(segs + i);
+        faces.push(bottomFace);
+        for (let i = 0; i < segs; i++) {
+            const next = (i + 1) % segs;
+            edges.push([i, next]);
+            edges.push([segs + i, segs + next]);
+            edges.push([i, segs + i]);
+            faces.push([i, next, segs + next, segs + i]);
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateTorus(ringRadius = 30, tubeRadius = 12, ringSegs = 12, tubeSegs = 8) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let i = 0; i <= ringSegs; i++) {
+            const u = (i / ringSegs) * 2 * Math.PI;
+            for (let j = 0; j <= tubeSegs; j++) {
+                const v = (j / tubeSegs) * 2 * Math.PI;
+                vertices.push([(ringRadius + tubeRadius * Math.cos(v)) * Math.cos(u), tubeRadius * Math.sin(v), (ringRadius + tubeRadius * Math.cos(v)) * Math.sin(u)]);
+            }
+        }
+        for (let i = 0; i < ringSegs; i++) {
+            for (let j = 0; j < tubeSegs; j++) {
+                const v0 = i * (tubeSegs + 1) + j;
+                const v1 = v0 + 1;
+                const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateHeart(size = 30, uSegs = 16, vSegs = 10) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let i = 0; i <= uSegs; i++) {
+            const u = (i / uSegs) * 2 * Math.PI;
+            for (let j = 0; j <= vSegs; j++) {
+                const v = (j / vSegs) * Math.PI;
+                const sv = Math.sin(v);
+                const x = sv * (15 * Math.sin(u) - 4 * Math.sin(3 * u));
+                const y = 8 * Math.cos(v);
+                const z = sv * (15 * Math.cos(u) - 5 * Math.cos(2 * u) - 2 * Math.cos(3 * u) - Math.cos(4 * u));
+                vertices.push([x * size / 15, y * size / 15, z * size / 15]);
+            }
+        }
+        for (let i = 0; i < uSegs; i++) {
+            for (let j = 0; j < vSegs; j++) {
+                const v0 = i * (vSegs + 1) + j;
+                const v1 = v0 + 1;
+                const v2 = (i + 1) * (vSegs + 1) + j + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }
+
+    static generateInfinity(size = 30, tubeRadius = 8, ringSegs = 16, tubeSegs = 8) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        for (let i = 0; i <= ringSegs; i++) {
+            const u = (i / ringSegs) * 2 * Math.PI;
+            const denom = 1 + Math.sin(u) * Math.sin(u);
+            const cx = size * Math.cos(u) / denom;
+            const cy = size * Math.sin(u) * Math.cos(u) / denom;
+            const du = 0.001;
+            const ud = u + du;
+            const denomD = 1 + Math.sin(ud) * Math.sin(ud);
+            const tx = size * Math.cos(ud) / denomD - cx;
+            const ty = size * Math.sin(ud) * Math.cos(ud) / denomD - cy;
+            const tLen = Math.sqrt(tx * tx + ty * ty) || 1;
+            const nx = -ty / tLen;
+            const ny = tx / tLen;
+            for (let j = 0; j <= tubeSegs; j++) {
+                const v = (j / tubeSegs) * 2 * Math.PI;
+                vertices.push([cx + tubeRadius * (Math.cos(v) * nx), cy + tubeRadius * (Math.cos(v) * ny), tubeRadius * Math.sin(v)]);
+            }
+        }
+        for (let i = 0; i < ringSegs; i++) {
+            for (let j = 0; j < tubeSegs; j++) {
+                const v0 = i * (tubeSegs + 1) + j;
+                const v1 = v0 + 1;
+                const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
+                const v3 = v2 - 1;
+                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
+                faces.push([v0, v1, v2, v3]);
+            }
+        }
+        return { vertices, edges, faces };
+    }                   
 }
 
 class Figure {
@@ -538,188 +714,8 @@ class Figure {
         }
         return sumZ / this.vertices.length;
     }
-
 }
 
-class ThreeD {
-    static calculateCenter = (vertices, face) => {
-        let center = [0, 0, 0];
-        face.forEach(index => {
-            center[0] += vertices[index][0];
-            center[1] += vertices[index][1];
-            center[2] += vertices[index][2];
-        });
-        center[0] /= face.length;
-        center[1] /= face.length;
-        center[2] /= face.length;
-        return center;
-    }
-        
-    static calculateCameraPosition = (distance, theta, phi) => {
-        const x = distance * Math.sin(theta) * Math.cos(phi);
-        const y = distance * Math.sin(theta) * Math.sin(phi);
-        const z = distance * Math.cos(theta);
-        return [x, y, z];
-    }
-    
-    static calculateFaceNormal = (vertices, face) => {
-        if (face.length < 3) {
-            throw new Error('Needs at least 3 vertices');
-        }
-    
-        const v0 = vertices[face[0]];
-        const v1 = vertices[face[1]];
-        const v2 = vertices[face[2]];
-    
-        const u = Trigonometry.subtractVectors(v1, v0);
-        const v = Trigonometry.subtractVectors(v2, v0);
-    
-        const normal = Trigonometry.crossProduct(u, v);
-        return Trigonometry.normalizeVector(normal);
-    }
-
-    static generateSphere(radius = 30, latSegs = 8, lonSegs = 8) {
-        const vertices = [];
-        const edges = [];
-        const faces = [];
-        for (let lat = 0; lat <= latSegs; lat++) {
-            const u = (lat / latSegs) * Math.PI;
-            for (let lon = 0; lon <= lonSegs; lon++) {
-                const v = (lon / lonSegs) * 2 * Math.PI;
-                vertices.push([radius * Math.sin(u) * Math.cos(v), radius * Math.cos(u), radius * Math.sin(u) * Math.sin(v)]);
-            }
-        }
-        for (let lat = 0; lat < latSegs; lat++) {
-            for (let lon = 0; lon < lonSegs; lon++) {
-                const v0 = lat * (lonSegs + 1) + lon;
-                const v1 = v0 + 1;
-                const v2 = (lat + 1) * (lonSegs + 1) + lon + 1;
-                const v3 = v2 - 1;
-                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
-            }
-        }
-        return { vertices, edges, faces };
-    }
-
-    static generateCylinder(radius = 25, height = 40, segs = 12) {
-        const vertices = [];
-        const edges = [];
-        const faces = [];
-        const halfH = height / 2;
-        for (let i = 0; i < segs; i++) {
-            const angle = (i / segs) * 2 * Math.PI;
-            vertices.push([radius * Math.cos(angle), halfH, radius * Math.sin(angle)]);
-        }
-        for (let i = 0; i < segs; i++) {
-            const angle = (i / segs) * 2 * Math.PI;
-            vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
-        }
-        const topFace = [];
-        for (let i = 0; i < segs; i++) topFace.push(i);
-        faces.push(topFace);
-        const bottomFace = [];
-        for (let i = segs - 1; i >= 0; i--) bottomFace.push(segs + i);
-        faces.push(bottomFace);
-        for (let i = 0; i < segs; i++) {
-            const next = (i + 1) % segs;
-            edges.push([i, next]);
-            edges.push([segs + i, segs + next]);
-            edges.push([i, segs + i]);
-            faces.push([i, next, segs + next, segs + i]);
-        }
-        return { vertices, edges, faces };
-    }
-
-    static generateTorus(ringRadius = 30, tubeRadius = 12, ringSegs = 12, tubeSegs = 8) {
-        const vertices = [];
-        const edges = [];
-        const faces = [];
-        for (let i = 0; i <= ringSegs; i++) {
-            const u = (i / ringSegs) * 2 * Math.PI;
-            for (let j = 0; j <= tubeSegs; j++) {
-                const v = (j / tubeSegs) * 2 * Math.PI;
-                vertices.push([(ringRadius + tubeRadius * Math.cos(v)) * Math.cos(u), tubeRadius * Math.sin(v), (ringRadius + tubeRadius * Math.cos(v)) * Math.sin(u)]);
-            }
-        }
-        for (let i = 0; i < ringSegs; i++) {
-            for (let j = 0; j < tubeSegs; j++) {
-                const v0 = i * (tubeSegs + 1) + j;
-                const v1 = v0 + 1;
-                const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
-                const v3 = v2 - 1;
-                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
-            }
-        }
-        return { vertices, edges, faces };
-    }
-
-    static generateHeart(size = 30, uSegs = 16, vSegs = 10) {
-        const vertices = [];
-        const edges = [];
-        const faces = [];
-        for (let i = 0; i <= uSegs; i++) {
-            const u = (i / uSegs) * 2 * Math.PI;
-            for (let j = 0; j <= vSegs; j++) {
-                const v = (j / vSegs) * Math.PI;
-                const sv = Math.sin(v);
-                const x = sv * (15 * Math.sin(u) - 4 * Math.sin(3 * u));
-                const y = 8 * Math.cos(v);
-                const z = sv * (15 * Math.cos(u) - 5 * Math.cos(2 * u) - 2 * Math.cos(3 * u) - Math.cos(4 * u));
-                vertices.push([x * size / 15, y * size / 15, z * size / 15]);
-            }
-        }
-        for (let i = 0; i < uSegs; i++) {
-            for (let j = 0; j < vSegs; j++) {
-                const v0 = i * (vSegs + 1) + j;
-                const v1 = v0 + 1;
-                const v2 = (i + 1) * (vSegs + 1) + j + 1;
-                const v3 = v2 - 1;
-                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
-            }
-        }
-        return { vertices, edges, faces };
-    }
-
-    static generateInfinity(size = 30, tubeRadius = 8, ringSegs = 16, tubeSegs = 8) {
-        const vertices = [];
-        const edges = [];
-        const faces = [];
-        for (let i = 0; i <= ringSegs; i++) {
-            const u = (i / ringSegs) * 2 * Math.PI;
-            const denom = 1 + Math.sin(u) * Math.sin(u);
-            const cx = size * Math.cos(u) / denom;
-            const cy = size * Math.sin(u) * Math.cos(u) / denom;
-            const du = 0.001;
-            const ud = u + du;
-            const denomD = 1 + Math.sin(ud) * Math.sin(ud);
-            const tx = size * Math.cos(ud) / denomD - cx;
-            const ty = size * Math.sin(ud) * Math.cos(ud) / denomD - cy;
-            const tLen = Math.sqrt(tx * tx + ty * ty) || 1;
-            const nx = -ty / tLen;
-            const ny = tx / tLen;
-            for (let j = 0; j <= tubeSegs; j++) {
-                const v = (j / tubeSegs) * 2 * Math.PI;
-                vertices.push([cx + tubeRadius * (Math.cos(v) * nx), cy + tubeRadius * (Math.cos(v) * ny), tubeRadius * Math.sin(v)]);
-            }
-        }
-        for (let i = 0; i < ringSegs; i++) {
-            for (let j = 0; j < tubeSegs; j++) {
-                const v0 = i * (tubeSegs + 1) + j;
-                const v1 = v0 + 1;
-                const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
-                const v3 = v2 - 1;
-                edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
-            }
-        }
-        return { vertices, edges, faces };
-    }
-
-
-}
 
 let primitives = [
    {
@@ -894,22 +890,22 @@ let primitives = [
         },
         {
             name: "sphere",
-            ...ThreeD.generateSphere()
+            ...ThreeDWorld.generateSphere()
         },
         {
             name: "cylinder",
-            ...ThreeD.generateCylinder()
+            ...ThreeDWorld.generateCylinder()
         },
         {
             name: "torus",
-            ...ThreeD.generateTorus()
+            ...ThreeDWorld.generateTorus()
         },
         {
             name: "heart",
-            ...ThreeD.generateHeart()
+            ...ThreeDWorld.generateHeart()
         },
         {
             name: "infinity",
-            ...ThreeD.generateInfinity()
+            ...ThreeDWorld.generateInfinity()
         },
     ]
