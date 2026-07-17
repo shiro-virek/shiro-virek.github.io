@@ -17,7 +17,8 @@ class ThreeDWorld {
         this.primitive = primitives[0];
         this.rotationMode = 0;      
         this.cameraMode = 0;
-        this.lightDirection = [0, 0, 1]  
+        this.lightDirection = [0, 0, 1] ;
+        this.enableFog = true;        
     }
     
     draw() {
@@ -162,9 +163,7 @@ class ThreeDWorld {
         if (finalAlpha < 0) finalAlpha = 0;
         if (finalAlpha > 1) finalAlpha = 1;
 
-        let enableFog = false;
-
-        const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${enableFog ? finalAlpha.toFixed(2) : 1})`;
+        const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${this.enableFog ? finalAlpha.toFixed(2) : 1})`;
         
         ctx.beginPath();
         let screenPoint = this.worldToScreen(face.worldVertices[0]);

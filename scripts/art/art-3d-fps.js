@@ -85,7 +85,7 @@
 
         drawHorizon = () => {
             let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
-            let horizonY = this.width / 2 + (Math.tan(angleRad) * this.FOV);
+            let horizonY = this.height / 2 + (Math.tan(angleRad) * this.FOV);
 
             let skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
             
