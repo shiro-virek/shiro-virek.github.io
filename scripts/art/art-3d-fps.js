@@ -294,35 +294,7 @@
                 globals.floorCenterZ += config.tileSize;
             }    
         }
-
-        drawSingleFace = (face) => {
-            const dist = face.viewZ;
-            let fogAlpha = Numbers.scale(dist, 2000, 5000, 1, 0);
-            if (fogAlpha < 0) fogAlpha = 0;
-
-            let finalAlpha = fogAlpha * face.life;
-            if (finalAlpha < 0) finalAlpha = 0;
-            if (finalAlpha > 1) finalAlpha = 1;
-
-            const color = `hsla(${face.hue}, 100%, ${face.lightness}%, ${finalAlpha.toFixed(2)})`;
-            
-            ctx.beginPath();
-            let screenPoint = this.worldToScreen(face.worldVertices[0]);
-            ctx.moveTo(screenPoint[0], screenPoint[1]);
-            
-            for (let i = 1; i < face.worldVertices.length; i++) {
-                screenPoint = this.worldToScreen(face.worldVertices[i]);
-                ctx.lineTo(screenPoint[0], screenPoint[1]);
-            }
-            
-            ctx.closePath();
-            ctx.fillStyle = color;
-            ctx.strokeStyle = color; 
-            ctx.lineWidth = 1;    
-            ctx.fill();
-            ctx.stroke();
-        }
-
+      
         applyCameraTransform = (point) => {
             let x = point[0] - this.cameraX;
             let y = point[1] - this.cameraY;
