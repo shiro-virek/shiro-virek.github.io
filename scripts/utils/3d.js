@@ -33,11 +33,17 @@ class ThreeDWorld {
     }
 
     worldToScreen = (point) => {
-        const rotatedPoint = this.applyCameraRotation(point); 
-        
-        const x = rotatedPoint[0];
-        const y = rotatedPoint[1];
-        const z = rotatedPoint[2];
+        let transformedPoint;
+
+        if (this.cameraMode == 0) {
+            transformedPoint = this.applyCameraRotation(point);
+        } else {
+            transformedPoint = this.applyCameraTransform(point);
+        }
+
+        const x = transformedPoint[0];
+        const y = transformedPoint[1];
+        const z = transformedPoint[2];
 
         let scaleFactor = 0;
 

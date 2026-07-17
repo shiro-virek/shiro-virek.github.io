@@ -20,10 +20,11 @@
         floorHue: 0,
         enemiesSpeed: 10,
         secretPoints: 10,
-		enemyDamage: 5,
-		enemyPoints: 5,
-		enemyCount: 40,
-		buildingsCount: 80,
+        enemyDamage: 5,
+        enemyPoints: 5,
+        enemyCount: 40,
+        buildingsCount: 80,
+        rotationMode: 0,
     };    
 
     class FPSWorld extends ThreeDWorld {
@@ -36,7 +37,7 @@
             this.cameraY = -200; 
             this.cameraZ = 0;
 
-            this.cameraRotationX = 5;
+            this.cameraRotationX = -10;
             this.cameraRotationZ = 0;
 
             this.drawFigureFaces = true;
