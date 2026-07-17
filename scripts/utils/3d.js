@@ -574,7 +574,7 @@ class ThreeD {
 }
 
 let primitives = [
- /*   {
+   {
     name: "cube",
             vertices: [
                 [-20, -20, -20],
@@ -744,7 +744,6 @@ let primitives = [
                 [11,6,7],[11,7,8],[11,8,9],[11,9,10],[11,10,6]
             ]
         },
-        */
         {
             name: "sphere",
             ...ThreeD.generateSphere()

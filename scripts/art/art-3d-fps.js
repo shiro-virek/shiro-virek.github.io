@@ -1,79 +1,4 @@
 {
-    const figureTypes = [
-        {
-            name: "cube",
-            vertices: [
-                [-20, -20, -20],
-                [20, -20, -20],
-                [20, 20, -20],
-                [-20, 20, -20],
-                [-20, -20, 20],
-                [20, -20, 20],
-                [20, 20, 20],
-                [-20, 20, 20]
-            ],
-            faces: [
-                [0, 1, 2, 3],
-                [0, 4, 5, 1],
-                [1, 5, 6, 2],
-                [3, 2, 6, 7],
-                [0, 3, 7, 4],
-                [4, 7, 6, 5]
-            ]
-        },
-        {
-            name: "hex_prism",
-            vertices: [
-                [-15, 20, -26], [15, 20, -26], [30, 20, 0], 
-                [15, 20, 26], [-15, 20, 26], [-30, 20, 0],
-                [-15, -20, -26], [15, -20, -26], [30, -20, 0], 
-                [15, -20, 26], [-15, -20, 26], [-30, -20, 0]
-            ],
-            faces: [
-                [0, 1, 2, 3, 4, 5], 
-                [11, 10, 9, 8, 7, 6],    
-                [0, 6, 7, 1],
-                [1, 7, 8, 2],
-                [2, 8, 9, 3],
-                [3, 9, 10, 4],
-                [4, 10, 11, 5],
-                [5, 11, 6, 0]
-            ]
-        },
-        {
-            name: "pyramid",
-            vertices: [
-                [-20, -20, -20], 
-                [20, -20, -20],  
-                [20, -20, 20],   
-                [-20, -20, 20],  
-                [0, 20, 0]       
-            ],
-            faces: [
-                [3, 2, 1, 0],
-                [0, 1, 4],   
-                [1, 2, 4],   
-                [2, 3, 4],  
-                [3, 0, 4]     
-            ]
-        },
-        {
-            name: "octahedron",
-            vertices: [
-                [0, -30, 0], 
-                [0, 30, 0], 
-                [-20, 0, -20], 
-                [20, 0, -20],  
-                [20, 0, 20],   
-                [-20, 0, 20]   
-            ],
-            faces: [
-                [1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2],
-                [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
-            ]
-        }
-    ];
-
     const globals = {
         random: Objects.getRandomObject(),
         world: null,
@@ -90,7 +15,7 @@
     const config = {
         randomize: true,
         FOV: 1000,
-        figureInfo: figureTypes[globals.random.nextInt(0, figureTypes.length - 1)],
+        figureInfo: primitives[globals.random.nextInt(0, primitives.length - 1)],
         rotationMode: 0,
         tileSize: 500,
         floorSize: 4000,
@@ -845,8 +770,8 @@
             let segments = config.worldSize / segmentSize + 1;
             for (let j = -segments; j < segments; j++) {
                 let wall = new Figure();
-                wall.vertices = Objects.clone(figureTypes[0].vertices);
-                wall.faces = Objects.clone(figureTypes[0].faces);            
+                wall.vertices = Objects.clone(primitives[0].vertices);
+                wall.faces = Objects.clone(primitives[0].faces);            
 
                 wall.scaleX(segmentSize / cubeSize);
                 wall.scaleY(20);
@@ -880,8 +805,8 @@
         for (let x = -config.floorSize; x <= config.floorSize; x += config.tileSize) {
             for (let z = -config.floorSize; z <= config.floorSize; z += config.tileSize) {
                 let floorTile = new Figure();
-                floorTile.vertices = Objects.clone(figureTypes[0].vertices);
-                floorTile.faces = Objects.clone(figureTypes[0].faces);
+                floorTile.vertices = Objects.clone(primitives[0].vertices);
+                floorTile.faces = Objects.clone(primitives[0].faces);
                 
                 floorTile.scaleX(11); 
                 floorTile.scaleZ(11); 
@@ -906,8 +831,8 @@
 
         for (let i = 0; i < config.buildingsCount; i++) {
             let building = new Figure();
-            building.vertices = Objects.clone(figureTypes[0].vertices);
-            building.faces = Objects.clone(figureTypes[0].faces);
+            building.vertices = Objects.clone(primitives[0].vertices);
+            building.faces = Objects.clone(primitives[0].faces);
             
             let h = globals.random.nextInt(5, 15);
             building.scaleY(h); 
@@ -932,8 +857,8 @@
     let addEnemies = () => {
         for (let i = 0; i < config.enemyCount; i++) {
             let enemy = new Figure();
-            enemy.vertices = Objects.clone(figureTypes[1].vertices); 
-            enemy.faces = Objects.clone(figureTypes[1].faces);
+            enemy.vertices = Objects.clone(primitives[1].vertices); 
+            enemy.faces = Objects.clone(primitives[1].faces);
 
             let posX = globals.random.nextInt(-config.worldSize, config.worldSize);
             let posZ = globals.random.nextInt(-config.worldSize, config.worldSize);
@@ -957,8 +882,8 @@
     let addPyramids = () => {
         for (let i = 0; i < 10; i++) {
             let pyramid = new Figure();
-            pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
-            pyramid.faces = Objects.clone(figureTypes[2].faces);
+            pyramid.vertices = Objects.clone(primitives[2].vertices); 
+            pyramid.faces = Objects.clone(primitives[2].faces);
 
             pyramid.rotateX(180);
             pyramid.scale(8); 
@@ -982,8 +907,8 @@
 
     let addSecretObject = () => {
         let pyramid = new Figure();
-        pyramid.vertices = Objects.clone(figureTypes[2].vertices); 
-        pyramid.faces = Objects.clone(figureTypes[2].faces);
+        pyramid.vertices = Objects.clone(primitives[2].vertices); 
+        pyramid.faces = Objects.clone(primitives[2].faces);
 
         pyramid.rotateX(180);
         pyramid.scale(8); 
