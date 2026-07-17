@@ -16,6 +16,7 @@ class ThreeDWorld {
         this.drawFigureFaces = false;
         this.primitive = primitives[0];
         this.rotationMode = 0;      
+        this.cameraMode = 0;
         this.lightDirection = [0, 0, 1]  
     }
     
@@ -37,10 +38,19 @@ class ThreeDWorld {
         const y = rotatedPoint[1];
         const z = rotatedPoint[2];
 
-        let depth = z + this.cameraZ;
-        if (depth < 1) depth = 1; 
+        let scaleFactor = 0;
 
-        const scaleFactor = this.FOV / depth;
+        if (this.cameraMode == 0){            
+            let depth = z + this.cameraZ;
+            if (depth < 1) depth = 1; 
+
+            scaleFactor = this.FOV / depth;
+        }else{
+            if (z <= 1) return [-9999, -9999]; 
+
+            scaleFactor = this.FOV / z;
+        }
+
         
         const projectedX = (x * scaleFactor) + this.width / 2;
         const projectedY = (y * scaleFactor) + this.height / 2;
@@ -156,6 +166,7 @@ class ThreeDWorld {
         y = newY;
         
         return [x, y, z];
+    
     }
 }
 

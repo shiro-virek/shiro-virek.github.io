@@ -29,9 +29,11 @@
 		buildingsCount: 80,
     };    
 
-    class ThreeDWorld {
+    class FPSWorld extends ThreeDWorld {
         constructor() {
-            this.figures = [];
+            super();
+
+            this.cameraMode = 1;
 
             this.cameraX = 0;
             this.cameraY = -200; 
@@ -46,7 +48,7 @@
             const origin = originalFig.center; 
 
             originalFig.faces.forEach((faceIndices, index) => {
-                let piece = new Figure();
+                let piece = new Character();
                 
                 piece.vertices = faceIndices.map(vIdx => Objects.clone(originalFig.vertices[vIdx]));
                 
@@ -321,23 +323,6 @@
             ctx.stroke();
         }
 
-        worldToScreen = (point) => {
-            const viewPoint = this.applyCameraTransform(point); 
-            
-            const x = viewPoint[0];
-            const y = viewPoint[1];
-            const z = viewPoint[2];
-
-            if (z <= 1) return [-9999, -9999]; 
-
-            const scaleFactor = config.FOV / z;
-            
-            const projectedX = (x * scaleFactor) + halfWidth;
-            const projectedY = (y * scaleFactor) + halfHeight;
-            
-            return [projectedX, projectedY];    
-        }
-
         applyCameraTransform = (point) => {
             let x = point[0] - this.cameraX;
             let y = point[1] - this.cameraY;
@@ -416,7 +401,7 @@
             let worldY = yFinal + this.cameraY;
             let worldZ = zFinal + this.cameraZ;
 
-            let figure = new Figure();
+            let figure = new Character();
             figure.vertices = Objects.clone(fig.vertices);
             figure.faces = Objects.clone(fig.faces);
 
@@ -433,26 +418,6 @@
             this.figures.push(figure);
         }
         
-        applyCameraRotation = (point) => {
-            let x = point[0];
-            let y = point[1];
-            let z = point[2];
-                        
-            let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
-            let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
-            let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
-            y = newY;
-            z = newZ;
-
-            let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
-            let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
-            newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
-            x = newX;
-            y = newY;
-            
-            return [x, y, z];
-        }
-
         drawCrossHair = () => {
             const size = 10;
             ctx.strokeStyle = 'white';
@@ -515,16 +480,13 @@
         }
     }
 
-    class Figure {
+    class Character extends Figure {
         constructor() {
+            super();
             this.solid = false;
             this.infinite = false;
             this.breakable = false;
             this.secret = false;
-            this.vertices = [];
-            this.edges = [];
-            this.faces = []; 
-            this.hue = globals.random.nextInt(1, 360);
             this.isDebris = false;
             this.isEnemy = false;
             this.life = 1.0;
@@ -541,93 +503,6 @@
             this.translateX(Math.cos(this.rotationAngle) * distance);
             this.translateZ(Math.sin(this.rotationAngle) * distance);
             this.setupCollision();
-        }
-
-        rotateZ = (angle) => {
-            angle = Trigonometry.sexagesimalToRadian(angle);
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
-                this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle); 
-                this.vertices[i][0] = x;
-            }
-        }
-
-        rotateY = (angle) => {
-            angle = Trigonometry.sexagesimalToRadian(angle);
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
-                this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle); 
-                this.vertices[i][0] = x;
-            }
-        }
-
-        rotateX = (angle) => {
-            angle = Trigonometry.sexagesimalToRadian(angle);
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
-                this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle); 
-                this.vertices[i][1] = y;
-            }
-        }
-
-        scale = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] *= factor;
-                this.vertices[i][1] *= factor;
-                this.vertices[i][2] *= factor;
-            }
-        }
-
-        scaleX = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] *= factor;
-            }
-        }
-
-        scaleY = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][1] *= factor;
-            }
-        }
-
-        scaleZ = (factor) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][2] *= factor;
-            }
-        }
-
-        shearX = (amount) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][1] = this.vertices[i][1] + amount * this.vertices[i][0];
-                this.vertices[i][2] = this.vertices[i][2] + amount * this.vertices[i][0];
-            }
-        }
-
-        shearY = (amount) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] = this.vertices[i][0] + amount * this.vertices[i][1];
-                this.vertices[i][2] = this.vertices[i][2] + amount * this.vertices[i][1];
-            }
-        }
-
-        shearZ = (amount) => {
-            for (let i = this.vertices.length - 1; i >= 0; i--) {
-                this.vertices[i][0] = this.vertices[i][0] + amount * this.vertices[i][2];
-                this.vertices[i][1] = this.vertices[i][1] + amount * this.vertices[i][2];
-            }
-        }
-
-        translateX = (d) => { for(let v of this.vertices) v[0]+=d; }
-        translateY = (d) => { for(let v of this.vertices) v[1]+=d; }
-        translateZ = (d) => { for(let v of this.vertices) v[2]+=d; }
-
-        getAverageZ = () => {
-            let sumZ = 0;
-            for (let i = 0; i < this.vertices.length; i++) {
-                let rotatedVertex = globals.world.applyCameraRotation(this.vertices[i]);
-                sumZ += rotatedVertex[2];
-            }
-            return sumZ / this.vertices.length;
         }
 
         setupCollision = () => {
@@ -695,41 +570,6 @@
             });
         }
 
-        shouldDrawFace = (rotatedVertices) => {
-            const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
-            const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
-    
-            const normal = Trigonometry.crossProduct(vector1, vector2);
-            const cameraDirection = [0, 0, 1];
-            
-            return Trigonometry.dotProduct(normal, cameraDirection) > 0;
-        }
-
-        getLightness = (rotatedVertices) => {
-            const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
-            const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
-            
-            let normal = Trigonometry.crossProduct(vector1, vector2);
-        
-            let magnitude = Math.sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
-
-            if (magnitude === 0) magnitude = 1;
-
-            normal[0] /= magnitude;
-            normal[1] /= magnitude;
-            normal[2] /= magnitude;
-
-            const lightDirection = [0, 0, 1];
-        
-            const dotProduct = Trigonometry.dotProduct(normal, lightDirection);
-            
-            const lightness = Numbers.scale(dotProduct, 0, 1, 20, 70); 
-
-            if (lightness < 0) return 0;
-            if (lightness > 100) return 100;
-            return lightness;
-        }
-
         drawFace = (indices, lightness) => {
             for (let i = 0; i < indices.length; i++) {
                 const viewPoint = globals.world.applyCameraTransform(this.vertices[indices[i]]);
@@ -769,7 +609,7 @@
             let segmentSize = config.worldSize / 20;
             let segments = config.worldSize / segmentSize + 1;
             for (let j = -segments; j < segments; j++) {
-                let wall = new Figure();
+                let wall = new Character();
                 wall.vertices = Objects.clone(primitives[0].vertices);
                 wall.faces = Objects.clone(primitives[0].faces);            
 
@@ -804,7 +644,7 @@
 
         for (let x = -config.floorSize; x <= config.floorSize; x += config.tileSize) {
             for (let z = -config.floorSize; z <= config.floorSize; z += config.tileSize) {
-                let floorTile = new Figure();
+                let floorTile = new Character();
                 floorTile.vertices = Objects.clone(primitives[0].vertices);
                 floorTile.faces = Objects.clone(primitives[0].faces);
                 
@@ -830,7 +670,7 @@
     let addBuildings = () => {
 
         for (let i = 0; i < config.buildingsCount; i++) {
-            let building = new Figure();
+            let building = new Character();
             building.vertices = Objects.clone(primitives[0].vertices);
             building.faces = Objects.clone(primitives[0].faces);
             
@@ -856,7 +696,7 @@
 
     let addEnemies = () => {
         for (let i = 0; i < config.enemyCount; i++) {
-            let enemy = new Figure();
+            let enemy = new Character();
             enemy.vertices = Objects.clone(primitives[1].vertices); 
             enemy.faces = Objects.clone(primitives[1].faces);
 
@@ -881,7 +721,7 @@
 
     let addPyramids = () => {
         for (let i = 0; i < 10; i++) {
-            let pyramid = new Figure();
+            let pyramid = new Character();
             pyramid.vertices = Objects.clone(primitives[2].vertices); 
             pyramid.faces = Objects.clone(primitives[2].faces);
 
@@ -906,7 +746,7 @@
     }
 
     let addSecretObject = () => {
-        let pyramid = new Figure();
+        let pyramid = new Character();
         pyramid.vertices = Objects.clone(primitives[2].vertices); 
         pyramid.faces = Objects.clone(primitives[2].faces);
 
@@ -975,7 +815,7 @@
         globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
         initCanvas();
-        globals.world = new ThreeDWorld();
+        globals.world = new FPSWorld();
         addEvents();
         setInitialFigures();
         window.requestAnimationFrame(loop);
