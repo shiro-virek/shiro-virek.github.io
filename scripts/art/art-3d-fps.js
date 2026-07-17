@@ -260,32 +260,6 @@
             }    
         }
                                
-        moveForward = (speed) => {
-            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
-            this.cameraX -= Math.sin(angleRad) * speed;
-            this.cameraZ += Math.cos(angleRad) * speed;
-        }
-
-        moveRight = (speed) => {
-            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
-            this.cameraX -= Math.sin(angleRad) * speed;
-            this.cameraZ += Math.cos(angleRad) * speed;
-        }
-
-        moveCameraY = (speed) => {
-            let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
-            this.cameraX -= Math.sin(angleRad) * speed;
-            this.cameraY += Math.cos(angleRad) * speed;
-        }
-
-        rotate = (dPitch, dYaw) => {
-            this.cameraRotationX += dPitch;
-            this.cameraRotationZ += dYaw;
-
-            if (this.cameraRotationX > 90) this.cameraRotationX = 90;
-            if (this.cameraRotationX < -90) this.cameraRotationX = -90;
-        }
-
         addFigure = (screenX, screenY, fig = this.primitive) => {
             const spawnDistance = 500; 
 
