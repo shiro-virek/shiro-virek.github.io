@@ -26,6 +26,7 @@
             this.dy =  (globals.random.next() - 0.5) * 5;
             this.dx =  (globals.random.next() - 0.5) * 5;
             this.mass = Math.pow(this.radius, 3) * Math.PI * 4 / 3;
+            this.dragging = false;
         }
 
         draw = () => {
@@ -180,7 +181,7 @@
 
     let addEvents = () => {
         canvas.addEventListener('click', e => {
-            addBall(e.offsetX, e.offsetY);
+         
         }, false);
     }
 
@@ -218,6 +219,23 @@
     }
 
     window.trackMouse = (xMouse, yMouse) => {
+        if (clicking && xMouse > 0 && xMouse < width && yMouse > 0 && yMouse < height) {
+            let ballClicked = false;
+            
+            for (let ball of globals.balls) {
+                let catX = ball.x - xMouse;
+                let catY = ball.y - yMouse;
+                let distance = Math.sqrt(catX * catX + catY * catY);
+                let minDistance = ball.radius;
+        
+                if (distance < minDistance) {                        
+                    ball.x = xMouse;
+                    ball.y = yMouse;
+                    ballClicked = true;
+                }            
+            }
+            if (!ballClicked) addBall(xMouse, yMouse);
+        }
     }
     
 	window.clearCanvas = () => {		

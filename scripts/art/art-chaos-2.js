@@ -15,6 +15,7 @@
         maxRadius: 200,
         stiffness: 0.05,
         friction: 0.85,
+        trail: 1,
         functions: [updateFunction1, updateFunction2, updateFunction3, updateFunction4, updateFunction5, updateFunction6, 
             updateFunction7, updateFunction8, updateFunction9, updateFunction10, updateFunction11, updateFunction12, 
             updateFunction13, updateFunction14, updateFunction15, updateFunction16],
@@ -133,6 +134,13 @@
         }
     }
 
+    let addSpecialControls = () => {
+        let trail = () => {          
+		    config.trail = 0.1;
+        }
+        Browser.addButton("btnTrail", "👣", trail);
+    }
+
     let init = () => {
         config.dotsRows = Math.floor(height / (config.dotRadio + config.dotPadding));
         config.dotsColumns = Math.floor(width / (config.dotRadio + config.dotPadding));
@@ -142,6 +150,7 @@
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);
+        addSpecialControls();
     }
 
     let addEvents = () => {
@@ -363,7 +372,7 @@
     }
 
     window.draw = (delta) => {
-        drawBackground(ctx, canvas);
+        drawBackground(ctx, canvas, config.trail);
         
         if (!clicking){ 
             for (let xi = 0; xi < config.dotsColumns; xi++) {

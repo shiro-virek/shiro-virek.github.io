@@ -5,12 +5,12 @@
     };
 
 	const config = {
-		minimumHeight: 40,
-		maximumHeight: 360,
-		firstFloorHeight: 20,
+		minimumHeight: Math.floor(Math.max(width, height) / 40),
+		maximumHeight: Math.floor(Math.max(width, height) / 4),
+		firstFloorHeight: Math.floor(Math.max(width, height) / 70),
 		CWHues: [232, 203, 189, 173, 162],
 		HeliportColors: ["#FF0000", "#FFFFFF", "#000000"],
-		minimumDistanceBetweenBuildings: 60,
+		minimumDistanceBetweenBuildings: Math.floor(Math.max(width, height) / 23),
 	}
 
 	const WindowTypes = Object.freeze({
@@ -46,7 +46,7 @@
 				let tilt = 0;
 				for (let y=0; y < buildingRows; y++) {
 					this.addBuilding(x * distance + y * 15, y * distance + tilt);
-					tilt += 30;
+					tilt += Math.floor(Math.max(width, height) / 45);
 				}
 			}
 		}
@@ -106,9 +106,9 @@
 			this.height = globals.random.nextInt(config.minimumHeight, config.maximumHeight);
 			this.windowRows = this.randomizeRowsNumber();
 			this.windowCols = globals.random.nextInt(1, 5);
-			this.margin = globals.random.nextInt(0, 15);
-			this.padding = globals.random.nextInt(0, 15);
-			this.width = globals.random.nextInt(40, 60);
+			this.margin = globals.random.nextInt(0, Math.floor(Math.max(width, height) / 90));
+			this.padding = globals.random.nextInt(0, Math.floor(Math.max(width, height) / 90));
+			this.width = globals.random.nextInt(Math.floor(Math.max(width, height) / 35),Math.floor(Math.max(width, height) / 23));
 			this.CWHue = config.CWHues[globals.random.nextInt(0, config.CWHues.length - 1)];
 			this.CWLight = globals.random.nextInt(10, 50);
 			this.CWSaturation = globals.random.nextInt(0, 100);
@@ -270,7 +270,7 @@
 				ctx.ellipse(this.x, this.y - this.height - this.heightFactor, this.heliport.width / 2, this.heliport.height / 2, Math.PI, 0, 2 * Math.PI);
 				ctx.stroke();
 
-				ctx.font = "8px sans-serif";
+				ctx.font = `${Math.floor(Math.max(width, height) / 170)}px sans-serif`;
 				ctx.fillStyle = this.heliport.color;
 				ctx.textAlign = "center";
 				ctx.textBaseline = "middle";

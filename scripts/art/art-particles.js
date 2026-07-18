@@ -18,6 +18,7 @@
 		drawQuadtree: false,
         movementFunctions: [movementFunction1, movementFunction2, movementFunction3, movementFunction4, movementFunction5, movementFunction6],
         reactionFunctions: [reactionFunction1, reactionFunction2, reactionFunction3, reactionFunction4],
+        trail: 1,
     };
 
     const Figures = Object.freeze({
@@ -241,6 +242,13 @@
 
     }
 
+    let addSpecialControls = () => {
+        let trail = () => {          
+		    config.trail = 0.1;
+        }
+        Browser.addButton("btnTrail", "👣", trail);
+	}
+
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
@@ -252,6 +260,7 @@
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);
+		addSpecialControls();
     }
 
     let addEvents = () => {
@@ -264,7 +273,7 @@
     }
     
     window.draw = (delta) => {
-        drawBackground(ctx, canvas);
+        drawBackground(ctx, canvas, config.trail);
 
         globals.mesh.populateQuadTree();
 
