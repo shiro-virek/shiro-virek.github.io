@@ -9,6 +9,7 @@
 
     const config = {
         randomize: true,
+        trail: 1,
     };    
 
     class Character {
@@ -101,6 +102,11 @@
     let addSpecialControls = () => {
         globals.joystick = new Joystick(100, height - 100);
         globals.joystick.add();
+
+        let trail = () => {          
+		    config.trail = 0.1;
+        }
+        Browser.addButton("btnTrail", "👣", trail);
     }
 
     let addEvents = () => {
@@ -113,7 +119,7 @@
     }
     
     window.draw = (delta) => {
-        drawBackground(ctx, canvas);
+        drawBackground(ctx, canvas, config.trail);
 
         let factor = delta / FRAME_TIME;
         globals.character.rotationAngle = globals.joystick.angle;

@@ -28,7 +28,8 @@
 		tentaclesCount: 5,
 		hue: 0,
         functionIndex: 1,
-        functions: [circle, pentagon, hexagon, square] 
+        functions: [circle, pentagon, hexagon, square],
+        trail: 1,
     };
 
 	function circle(color, i){
@@ -205,7 +206,6 @@
 		Touch.simulateTouchEvent('touchstart', [touch1, touch2, touch3], canvas);
 	}
 
-
     let addSpecialControls = () => {
         let addTentacle = () => {
 			config.tentaclesCount++;
@@ -213,12 +213,17 @@
 			addSlices(); 
         }
         Browser.addButton("btnAddTentacle", "🐙", addTentacle);
+
+        let trail = () => {          
+		    config.trail = 0.1;
+        }
+        Browser.addButton("btnTrail", "👣", trail);
 	}
 	
 	window.draw = (delta) => {
 		if (config.rotateAuto) config.rotationAngle += config.rotationIncrement * (delta / FRAME_TIME);
 
-		drawBackground(ctx, canvas);
+		drawBackground(ctx, canvas, config.trail);
 		
 		for (let i = 0; i < config.slicesCount * config.tentaclesCount; i++) {
 			globals.slices[i].update(delta);
