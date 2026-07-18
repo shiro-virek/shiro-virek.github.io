@@ -219,7 +219,7 @@
     }
 
     window.trackMouse = (xMouse, yMouse) => {
-        if (clicking) {
+        if (clicking && xMouse > 0 && xMouse < width && yMouse > 0 && yMouse < height) {
             let ballClicked = false;
             
             for (let ball of globals.balls) {
