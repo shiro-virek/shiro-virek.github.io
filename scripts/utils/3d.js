@@ -229,6 +229,7 @@ class ThreeDWorld {
         figure.vertices = Objects.clone(this.primitive.vertices);
         figure.edges = Objects.clone(this.primitive.edges);
         figure.faces = Objects.clone(this.primitive.faces);
+        figure.doubleSided = this.primitive.doubleSided || false;
 
         const scaleFactor = this.FOV / this.cameraZ;
         let worldX = centeredX / scaleFactor;
@@ -377,10 +378,10 @@ class ThreeDWorld {
             vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
         }
         const topFace = [];
-        for (let i = 0; i < segs; i++) topFace.push(i);
+        for (let i = segs - 1; i >= 0; i--) topFace.push(i);
         faces.push(topFace);
         const bottomFace = [];
-        for (let i = segs - 1; i >= 0; i--) bottomFace.push(segs + i);
+        for (let i = 0; i < segs; i++) bottomFace.push(segs + i);
         faces.push(bottomFace);
         for (let i = 0; i < segs; i++) {
             const next = (i + 1) % segs;
@@ -487,6 +488,8 @@ class Figure {
         this.faces = [];
         this.world = world;
         this.hue = this.world.random.nextInt(1, 360);
+        this.rotationAccumX = 0;
+        this.rotationAccumY = 0;
     }
 
     rotateZ = (angle) => {
@@ -500,6 +503,7 @@ class Figure {
     }
 
     rotateY = (angle) => {
+        this.rotationAccumY += angle;
         angle = Trigonometry.sexagesimalToRadian(angle);
 
         for (let i = this.vertices.length - 1; i >= 0; i--) {
@@ -510,6 +514,7 @@ class Figure {
     }
 
     rotateX = (angle) => {
+        this.rotationAccumX += angle;
         angle = Trigonometry.sexagesimalToRadian(angle);
 
         for (let i = this.vertices.length - 1; i >= 0; i--) {
@@ -672,6 +677,8 @@ class Figure {
     }
         
     shouldDrawFace = (rotatedVertices) => {
+        if (this.doubleSided) return true;
+
         const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
         const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
 
@@ -696,9 +703,26 @@ class Figure {
         normal[2] /= magnitude;
         // -----------------------------------
     
-        const dotProduct = Trigonometry.dotProduct(normal, this.world.lightDirection);
+        let lightDir = [...this.world.lightDirection];
+        if (this.rotationAccumX !== 0) {
+            const angle = Trigonometry.sexagesimalToRadian(this.rotationAccumX);
+            let y = lightDir[1] * Math.cos(angle) + lightDir[2] * (-Math.sin(angle));
+            let z = lightDir[1] * Math.sin(angle) + lightDir[2] * Math.cos(angle);
+            lightDir = [lightDir[0], y, z];
+        }
+        if (this.rotationAccumY !== 0) {
+            const angle = Trigonometry.sexagesimalToRadian(this.rotationAccumY);
+            let x = lightDir[0] * Math.cos(angle) + lightDir[2] * Math.sin(angle);
+            let z = lightDir[0] * (-Math.sin(angle)) + lightDir[2] * Math.cos(angle);
+            lightDir = [x, lightDir[1], z];
+        }
+        if (this.world.cameraRotationX !== 0 || this.world.cameraRotationZ !== 0) {
+            lightDir = this.world.applyCameraRotation(lightDir);
+        }
+        let dotProduct = Trigonometry.dotProduct(normal, lightDir);
+        if (this.doubleSided) dotProduct = Math.abs(dotProduct);
         
-        const lightness = Numbers.scale(dotProduct, 0, 1, 20, 70); 
+        const lightness = Numbers.scale(dotProduct, 0, 1, 30, 85); 
 
         if (lightness < 0) return 0;
         if (lightness > 100) return 100;
@@ -856,7 +880,7 @@ let primitives = [
                 [0, 1], [0, 2], [0, 3], [1, 2], [2, 3], [1, 3]
             ],
             faces: [
-                [0,1,2],[0,3,1],[0,2,3],[1,3,2]
+                [0,1,2],[0,3,1],[0,3,2],[1,2,3]
             ]
         },
         {
@@ -897,14 +921,17 @@ let primitives = [
         },
         {
             name: "torus",
+            doubleSided: true,
             ...ThreeDWorld.generateTorus()
         },
         {
             name: "heart",
+            doubleSided: true,
             ...ThreeDWorld.generateHeart()
         },
         {
             name: "infinity",
+            doubleSided: true,
             ...ThreeDWorld.generateInfinity()
         },
     ]
