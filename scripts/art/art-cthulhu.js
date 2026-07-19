@@ -213,11 +213,6 @@
 			addSlices(); 
         }
         Browser.addButton("btnAddTentacle", "🐙", addTentacle);
-
-        let trail = () => {          
-		    config.trail = 0.1;
-        }
-        Browser.addButton("btnTrail", "👣", trail);
 	}
 	
 	window.draw = (delta) => {
