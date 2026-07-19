@@ -699,9 +699,14 @@ class Figure {
         normal[2] /= magnitude;
         // -----------------------------------
     
-        const dotProduct = Trigonometry.dotProduct(normal, this.world.lightDirection);
+        let lightDir = this.world.lightDirection;
+        if (this.world.cameraRotationX !== 0 || this.world.cameraRotationZ !== 0) {
+            lightDir = this.world.applyCameraRotation(lightDir);
+        }
+        let dotProduct = Trigonometry.dotProduct(normal, lightDir);
+        if (this.doubleSided) dotProduct = Math.abs(dotProduct);
         
-        const lightness = Numbers.scale(dotProduct, 0, 1, 20, 70); 
+        const lightness = Numbers.scale(dotProduct, 0, 1, 30, 85); 
 
         if (lightness < 0) return 0;
         if (lightness > 100) return 100;
@@ -905,6 +910,7 @@ let primitives = [
         },
         {
             name: "heart",
+            doubleSided: true,
             ...ThreeDWorld.generateHeart()
         },
         {
