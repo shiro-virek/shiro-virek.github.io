@@ -488,6 +488,8 @@ class Figure {
         this.faces = [];
         this.world = world;
         this.hue = this.world.random.nextInt(1, 360);
+        this.rotationAccumX = 0;
+        this.rotationAccumY = 0;
     }
 
     rotateZ = (angle) => {
@@ -501,6 +503,7 @@ class Figure {
     }
 
     rotateY = (angle) => {
+        this.rotationAccumY += angle;
         angle = Trigonometry.sexagesimalToRadian(angle);
 
         for (let i = this.vertices.length - 1; i >= 0; i--) {
@@ -511,6 +514,7 @@ class Figure {
     }
 
     rotateX = (angle) => {
+        this.rotationAccumX += angle;
         angle = Trigonometry.sexagesimalToRadian(angle);
 
         for (let i = this.vertices.length - 1; i >= 0; i--) {
@@ -699,7 +703,19 @@ class Figure {
         normal[2] /= magnitude;
         // -----------------------------------
     
-        let lightDir = this.world.lightDirection;
+        let lightDir = [...this.world.lightDirection];
+        if (this.rotationAccumX !== 0) {
+            const angle = Trigonometry.sexagesimalToRadian(this.rotationAccumX);
+            let y = lightDir[1] * Math.cos(angle) + lightDir[2] * (-Math.sin(angle));
+            let z = lightDir[1] * Math.sin(angle) + lightDir[2] * Math.cos(angle);
+            lightDir = [lightDir[0], y, z];
+        }
+        if (this.rotationAccumY !== 0) {
+            const angle = Trigonometry.sexagesimalToRadian(this.rotationAccumY);
+            let x = lightDir[0] * Math.cos(angle) + lightDir[2] * Math.sin(angle);
+            let z = lightDir[0] * (-Math.sin(angle)) + lightDir[2] * Math.cos(angle);
+            lightDir = [x, lightDir[1], z];
+        }
         if (this.world.cameraRotationX !== 0 || this.world.cameraRotationZ !== 0) {
             lightDir = this.world.applyCameraRotation(lightDir);
         }
