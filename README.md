@@ -27,7 +27,7 @@ Explore **40+ interactive generative art scenes**, from particle systems and fra
 | Bokeh | Soft bokeh circle effects |
 | Skyscrapers | Procedural city skyline |
 | Metro | Subway map-like visuals |
-| 3D / 3D w/lights | Interactive 3D wireframes with lighting |
+| 3D | Interactive 3D wireframes with lighting |
 | Chaos / Chaos 2 | Strange attractor visualizations |
 | Screen / Screen 2 | Pixel manipulation & halftone effects |
 | Conway | Conway's Game of Life (load images, toggle cells) |
