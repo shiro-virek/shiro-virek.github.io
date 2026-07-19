@@ -229,6 +229,7 @@ class ThreeDWorld {
         figure.vertices = Objects.clone(this.primitive.vertices);
         figure.edges = Objects.clone(this.primitive.edges);
         figure.faces = Objects.clone(this.primitive.faces);
+        figure.doubleSided = this.primitive.doubleSided || false;
 
         const scaleFactor = this.FOV / this.cameraZ;
         let worldX = centeredX / scaleFactor;
@@ -377,10 +378,10 @@ class ThreeDWorld {
             vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
         }
         const topFace = [];
-        for (let i = 0; i < segs; i++) topFace.push(i);
+        for (let i = segs - 1; i >= 0; i--) topFace.push(i);
         faces.push(topFace);
         const bottomFace = [];
-        for (let i = segs - 1; i >= 0; i--) bottomFace.push(segs + i);
+        for (let i = 0; i < segs; i++) bottomFace.push(segs + i);
         faces.push(bottomFace);
         for (let i = 0; i < segs; i++) {
             const next = (i + 1) % segs;
@@ -672,6 +673,8 @@ class Figure {
     }
         
     shouldDrawFace = (rotatedVertices) => {
+        if (this.doubleSided) return true;
+
         const vector1 = Trigonometry.subtractVectors(rotatedVertices[1], rotatedVertices[0]);
         const vector2 = Trigonometry.subtractVectors(rotatedVertices[2], rotatedVertices[0]);
 
@@ -856,7 +859,7 @@ let primitives = [
                 [0, 1], [0, 2], [0, 3], [1, 2], [2, 3], [1, 3]
             ],
             faces: [
-                [0,1,2],[0,3,1],[0,2,3],[1,3,2]
+                [0,1,2],[0,3,1],[0,3,2],[1,2,3]
             ]
         },
         {
@@ -897,6 +900,7 @@ let primitives = [
         },
         {
             name: "torus",
+            doubleSided: true,
             ...ThreeDWorld.generateTorus()
         },
         {
@@ -905,6 +909,7 @@ let primitives = [
         },
         {
             name: "infinity",
+            doubleSided: true,
             ...ThreeDWorld.generateInfinity()
         },
     ]
