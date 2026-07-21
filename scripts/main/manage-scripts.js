@@ -43,6 +43,7 @@ const art = [
                 { "name": "chaos-2", "display": "Chaos 2"},
                 { "name": "particles", "display": "Particles"},
                 { "name": "screen-led", "display": "Led screen"},
+                { "name": "cubes", "display": "Cubes"},
             ];
 const scripts = [];
 

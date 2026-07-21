@@ -735,11 +735,11 @@
 
     let drawFace = (vertices, lightness, hue) => {
         for (let i = 0; i < vertices.length; i++) {
-                const viewPoint = globals.world.applyCameraTransform(this.vertices[i]);
+                const viewPoint = globals.world.applyCameraTransform(vertices[i]);
                 if (viewPoint[2] < 10) return; 
         }
         
-        const distPoint = globals.world.applyCameraTransform(this.vertices[0]);
+        const distPoint = globals.world.applyCameraTransform(vertices[0]);
         const distance = distPoint[2];
         
         let alpha = Numbers.scale(distance, 2000, 5000, 1, 0);
@@ -749,11 +749,11 @@
         let color = `hsla(${this.hue}, 100%, ${lightness}%, ${alpha})`;
         
         ctx.beginPath();
-        let vertex = globals.world.worldToScreen(this.vertices[0]);
+        let vertex = globals.world.worldToScreen(vertices[0]);
         ctx.moveTo(vertex[0], vertex[1]);
         
-        for (let i = 1; i < indices.length; i++) {
-            vertex = globals.world.worldToScreen(this.vertices[i]);
+        for (let i = 1; i < vertices.length; i++) {
+            vertex = globals.world.worldToScreen(vertices[i]);
             ctx.lineTo(vertex[0], vertex[1]);
         }
         ctx.closePath();
