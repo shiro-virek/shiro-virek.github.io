@@ -481,6 +481,210 @@ class ThreeDWorld {
     }                   
 }
 
+class OpenWorld extends ThreeDWorld {
+    constructor(width, height, random, drawLine, drawPoint, drawFace) {
+        super(width, height, random, drawLine, drawPoint, drawFace);
+
+        this.cameraMode = 1;
+
+        this.cameraX = 0;
+        this.cameraY = -200; 
+        this.cameraZ = 0;
+
+        this.cameraRotationX = -10;
+        this.cameraRotationZ = 0;
+
+        this.drawFigureFaces = true;
+        this.drawFigureEdges = false;
+        this.drawFigureVertices = false;
+
+        this.floorHue = this.random.nextInt(1, 360);  
+        this.skyShift = this.random.nextInt(0, 360);
+
+        this.floorCenterX = 0;
+        this.floorCenterZ = 0;
+
+        this.tileSize = 500;
+        this.floorSize = 4000;
+        this.worldSize = 10000;
+        this.floorHue = 0;
+    }
+
+    fragmentFigure = (originalFig) => {
+        const originalHue = originalFig.hue;
+        const origin = originalFig.center; 
+
+        originalFig.faces.forEach((faceIndices, index) => {
+            let piece = new Character(this);
+            
+            piece.vertices = faceIndices.map(vIdx => Objects.clone(originalFig.vertices[vIdx]));
+            
+            const newFaceIndices = [];
+            for (let i = 0; i < faceIndices.length; i++) newFaceIndices.push(i);
+            piece.faces = [newFaceIndices];
+
+            piece.setupCollision();
+            
+            piece.isDebris = true;
+            piece.hue = originalHue;
+            piece.breakable = false;
+            piece.fadeOutSpeed = 0.01 + (Math.random() * 0.02);
+
+            let dirX = piece.center[0] - origin[0];
+            let dirY = piece.center[1] - origin[1]; 
+            let dirZ = piece.center[2] - origin[2];
+
+            let mag = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
+            if (mag === 0) mag = 1; 
+
+            let force = 15; 
+            piece.vx = (dirX / mag) * force + (Math.random() * 4 - 2); 
+            piece.vz = (dirZ / mag) * force + (Math.random() * 4 - 2);
+            
+            piece.vy = (Math.random() * -10 - 5); 
+
+            this.figures.push(piece);
+        });
+    }
+
+    drawHorizon = () => {
+        let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
+        let horizonY = this.height / 2 + (Math.tan(angleRad) * this.FOV);
+
+        let skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
+        
+        skyGradient.addColorStop(0, `hsl(${this.skyShift}, 100%, 5%)`); 
+        skyGradient.addColorStop(0.5, `hsl(${this.skyShift}, 100%, 20%)`); 
+        skyGradient.addColorStop(1, `hsl(${this.skyShift}, 100%, 60%)`); 
+
+        ctx.fillStyle = skyGradient;
+        ctx.fillRect(0, 0, width, horizonY);
+
+        let voidGradient = ctx.createLinearGradient(0, horizonY, 0, height);
+        
+        voidGradient.addColorStop(0, `hsla(${this.skyShift}, 100%, 50%, 0.13)`); 
+        voidGradient.addColorStop(0.3, `hsla(${this.skyShift}, 100%, 50%, 0.2)`); 
+        voidGradient.addColorStop(1, `hsla(${this.skyShift}, 100%, 50%, 0.4)`);  
+
+        ctx.fillStyle = voidGradient;
+        ctx.fillRect(0, horizonY, this.width, this.height - horizonY);
+
+        ctx.strokeStyle = `hsla(${this.skyShift}, 100%, 50%, 0.15)`; 
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, horizonY);
+        ctx.lineTo(this.width, horizonY);
+        ctx.stroke();
+    }
+
+    draw = () => {
+        super.draw();
+
+        this.translateInfiniteFloor();
+    }
+
+    checkCollisionObject = (nextX, nextZ) => {
+        const playerSize = 60; 
+
+        for (let fig of this.figures.filter(f => !f.isEnemy)) {
+            if (!fig.solid) continue; 
+
+            const collisionX = nextX + playerSize > fig.bounds.minX && 
+                            nextX - playerSize < fig.bounds.maxX;
+                            
+            const collisionZ = nextZ + playerSize > fig.bounds.minZ && 
+                            nextZ - playerSize < fig.bounds.maxZ;
+
+            if (collisionX && collisionZ) {
+                return true; 
+            }
+        }
+        return false;
+    }
+
+    translateInfiniteFloor = () => {    
+        if (this.cameraX < this.floorCenterX - this.tileSize && this.cameraX > -this.worldSize + this.tileSize * (this.floorSize / 1000 * 2)) {
+            this.figures.filter(face => face.infinite).forEach(face => {    
+                face.translateX(-this.tileSize);          
+            });
+
+            this.floorCenterX -= this.tileSize;
+        }    
+                    
+        if (this.cameraX > this.floorCenterX + this.tileSize && this.cameraX < this.worldSize - this.tileSize * (this.floorSize / 1000 * 2)) {
+            this.figures.filter(face => face.infinite).forEach(face => {    
+                face.translateX(this.tileSize);          
+            });
+
+            this.floorCenterX += this.tileSize;
+        }    
+
+        if (this.cameraZ < this.floorCenterZ - this.tileSize && this.cameraZ > -this.worldSize + this.tileSize * (this.floorSize / 1000 * 2)) {
+            this.figures.filter(face => face.infinite).forEach(face => {    
+                face.translateZ(-this.tileSize);          
+            });
+
+            this.floorCenterZ -= this.tileSize;
+        }    
+                    
+        if (this.cameraZ > this.floorCenterZ + this.tileSize && this.cameraZ < this.worldSize - this.tileSize * (this.floorSize / 1000 * 2)) {
+            this.figures.filter(face => face.infinite).forEach(face => {    
+                face.translateZ(this.tileSize);          
+            });
+
+            this.floorCenterZ += this.tileSize;
+        }    
+    }
+                            
+    addFigure = (screenX, screenY, fig = this.primitive) => {
+        const spawnDistance = 500; 
+
+        let centeredX = screenX - this.width / 2;
+        let centeredY = screenY - this.height / 2;
+
+        let localX = centeredX * spawnDistance / this.FOV;
+        let localY = centeredY * spawnDistance / this.FOV;
+        let localZ = spawnDistance; 
+
+        let angleX = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
+
+        let y1 = localY * Math.cos(angleX) - localZ * Math.sin(angleX);
+        let z1 = localY * Math.sin(angleX) + localZ * Math.cos(angleX);
+        let x1 = localX;
+
+        let angleZ = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
+
+        let xFinal = x1 * Math.cos(angleZ) - z1 * Math.sin(angleZ);
+        let zFinal = x1 * Math.sin(angleZ) + z1 * Math.cos(angleZ);
+        let yFinal = y1;
+
+        let worldX = xFinal + this.cameraX;
+        let worldY = yFinal + this.cameraY;
+        let worldZ = zFinal + this.cameraZ;
+
+        let figure = new Character(this);
+        figure.vertices = Objects.clone(fig.vertices);
+        figure.faces = Objects.clone(fig.faces);
+
+        figure.translateX(worldX);
+        figure.translateY(worldY);
+        figure.translateZ(worldZ); 
+
+        figure.cachedZ = figure.getAverageZ();
+
+        figure.solid = true;
+        figure.breakable = false;
+        figure.setupCollision();
+        
+        this.figures.push(figure);
+    }
+
+
+
+    
+}
+
+
 class Figure {
     constructor(world) {
         this.vertices = [];
@@ -738,6 +942,50 @@ class Figure {
         return sumZ / this.vertices.length;
     }
 }
+
+
+
+
+    class Character extends Figure {
+        constructor(world) {
+            super(world);
+            this.solid = false;
+            this.infinite = false;
+            this.breakable = false;
+            this.secret = false;
+            this.isDebris = false;
+            this.isEnemy = false;
+            this.life = 1.0;
+            this.vx = 0; 
+            this.vy = 0;
+            this.vz = 0; 
+            this.gravity = 0.5; 
+            this.fadeOutSpeed = 0;
+            this.rotationAngle = 0;
+            this.setupCollision();
+        }
+
+        moveAuto(distance) {
+            this.translateX(Math.cos(this.rotationAngle) * distance);
+            this.translateZ(Math.sin(this.rotationAngle) * distance);
+            this.setupCollision();
+        }
+
+        setupCollision = () => {
+            let minX = Infinity, maxX = -Infinity;
+            let minZ = Infinity, maxZ = -Infinity;
+
+            this.vertices.forEach(v => {
+                if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
+                if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
+            });
+
+            this.bounds = { minX, maxX, minZ, maxZ };
+            
+            this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
+        }
+    }
+
 
 
 let primitives = [

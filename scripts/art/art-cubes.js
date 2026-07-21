@@ -15,19 +15,7 @@
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
-        globals.world = new ThreeDWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
-
-        globals.world.cameraMode = 1;
-        globals.world.cameraX = 0;
-        globals.world.cameraY = -200; 
-        globals.world.cameraZ = 0;
-
-        globals.world.cameraRotationX = -10;
-        globals.world.cameraRotationZ = 0;
-
-        globals.world.drawFigureFaces = true;
-        globals.world.drawFigureEdges = false;
-        globals.world.drawFigureVertices = false;
+        globals.world = new FPSWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
 
         initCanvas();
         addEvents();
