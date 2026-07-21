@@ -15,13 +15,20 @@
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
-        globals.world = new FPSWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
+        globals.world = new OpenWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
 
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);        
 
-        globals.world.addFigure(500, 500);
+        let side = 100;
+        let rows = Math.floor(globals.world.width / side);
+        let columns = Math.floor(globals.world.height / side);
+        for (let x = 0; x < rows; x++){
+            for (let z = 0; z < columns; z++){            
+                globals.world.addFigure(x * side, z * side);
+            }
+        }
     }
 
     let addEvents = () => {
@@ -37,7 +44,7 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {  
-
+            globals.world.rotate(-movY / 50, -movX / 50);
         }
     }
     

@@ -678,12 +678,8 @@ class OpenWorld extends ThreeDWorld {
         
         this.figures.push(figure);
     }
-
-
-
-    
+   
 }
-
 
 class Figure {
     constructor(world) {
@@ -943,50 +939,45 @@ class Figure {
     }
 }
 
-
-
-
-    class Character extends Figure {
-        constructor(world) {
-            super(world);
-            this.solid = false;
-            this.infinite = false;
-            this.breakable = false;
-            this.secret = false;
-            this.isDebris = false;
-            this.isEnemy = false;
-            this.life = 1.0;
-            this.vx = 0; 
-            this.vy = 0;
-            this.vz = 0; 
-            this.gravity = 0.5; 
-            this.fadeOutSpeed = 0;
-            this.rotationAngle = 0;
-            this.setupCollision();
-        }
-
-        moveAuto(distance) {
-            this.translateX(Math.cos(this.rotationAngle) * distance);
-            this.translateZ(Math.sin(this.rotationAngle) * distance);
-            this.setupCollision();
-        }
-
-        setupCollision = () => {
-            let minX = Infinity, maxX = -Infinity;
-            let minZ = Infinity, maxZ = -Infinity;
-
-            this.vertices.forEach(v => {
-                if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
-                if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
-            });
-
-            this.bounds = { minX, maxX, minZ, maxZ };
-            
-            this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
-        }
+class Character extends Figure {
+    constructor(world) {
+        super(world);
+        this.solid = false;
+        this.infinite = false;
+        this.breakable = false;
+        this.secret = false;
+        this.isDebris = false;
+        this.isEnemy = false;
+        this.life = 1.0;
+        this.vx = 0; 
+        this.vy = 0;
+        this.vz = 0; 
+        this.gravity = 0.5; 
+        this.fadeOutSpeed = 0;
+        this.rotationAngle = 0;
+        this.setupCollision();
     }
 
+    moveAuto(distance) {
+        this.translateX(Math.cos(this.rotationAngle) * distance);
+        this.translateZ(Math.sin(this.rotationAngle) * distance);
+        this.setupCollision();
+    }
 
+    setupCollision = () => {
+        let minX = Infinity, maxX = -Infinity;
+        let minZ = Infinity, maxZ = -Infinity;
+
+        this.vertices.forEach(v => {
+            if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
+            if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
+        });
+
+        this.bounds = { minX, maxX, minZ, maxZ };
+        
+        this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
+    }
+}
 
 let primitives = [
    {
