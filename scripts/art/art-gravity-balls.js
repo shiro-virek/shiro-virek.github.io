@@ -9,6 +9,7 @@
         damping: 0.9,
         drawQuadtree: false,
         opacity: 1,
+        useAccelerometer: false,
     };
 
     const globals = {
@@ -151,6 +152,22 @@
         getRight = () => this.x + this.radius;
     }
 
+    let iniciarSensor = () => {    
+        window.addEventListener('deviceorientation', (event) => {
+            let smoothBeta = 0;
+            let smoothGamma = 0;
+            const SMOOTHING = 0.15; // Ajustar entre 0.05 (muy suave) y 0.3 (más rápido)
+
+            let beta = event.beta || 0;   // Inclinación Frontal [-180, 180]
+            let gamma = event.gamma || 0; // Inclinación Lateral [-90, 90]
+
+            smoothBeta += (beta - smoothBeta) * SMOOTHING;
+            smoothGamma += (gamma - smoothGamma) * SMOOTHING;
+
+            console.log(smoothBeta)
+        });
+    }
+
     let init = () => {
         initCanvas();
 
@@ -198,6 +215,31 @@
             config.gravity = -config.gravity;
         }
         Browser.addButton("btnChangeGravity", "↕️", changeGravity);
+
+        let toggleAccelerometer = () => {
+            
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                const permission = DeviceOrientationEvent.requestPermission();
+                if (permission === 'granted') {
+                    iniciarSensor();
+                } else {
+                    console.log('Permiso denegado por el usuario.');
+                }
+                } catch (error) {
+                    console.log('Error al solicitar permisos.');
+                }
+            } else if ('DeviceOrientationEvent' in window) {
+                // Android y otros navegadores compatibles
+                iniciarSensor();
+            } else {
+                console.log('Tu dispositivo o navegador no soporta DeviceOrientation.');
+            }
+                
+            config.useAccelerometer = !config.useAccelerometer;
+
+        }
+        Browser.addButton("btnUseAccelerometer", "🔛", toggleAccelerometer);
     }
     
     window.draw = (delta) => {
