@@ -139,9 +139,8 @@
         }
 
         move = (delta) => {
-            const GRAVITY_SCALE = 6;
-
             if (config.useAccelerometer) {
+                const GRAVITY_SCALE = 7;
                 let betaRad = globals.smoothBeta * Math.PI / 180;
                 let gammaRad = globals.smoothGamma * Math.PI / 180;
 
@@ -151,7 +150,7 @@
                 this.dx += gx * config.gravity * GRAVITY_SCALE * (delta / FRAME_TIME);
                 this.dy += gy * config.gravity * GRAVITY_SCALE * (delta / FRAME_TIME);
             } else {
-                this.dy += config.gravity * GRAVITY_SCALE * (delta / FRAME_TIME);
+                this.dy += config.gravity * 2 * (delta / FRAME_TIME);
             }
 
             this.y += this.dy * (delta / FRAME_TIME);
