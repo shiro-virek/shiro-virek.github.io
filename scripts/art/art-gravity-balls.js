@@ -139,12 +139,14 @@
         }
 
         move = (delta) => {
-            this.dy += config.gravity * (delta / FRAME_TIME);
-            const SENSITIVITY = 5;
-            this.y += this.dy * (delta / FRAME_TIME) + globals.smoothBeta / SENSITIVITY;
-            this.x += this.dx * (delta / FRAME_TIME) + globals.smoothGamma / SENSITIVITY;
+            const SENSITIVITY = 30;
+            this.dy += (config.gravity + globals.smoothBeta / SENSITIVITY) * (delta / FRAME_TIME)  ;
+         
+            this.y += this.dy * (delta / FRAME_TIME);
+            this.x += (this.dx + (globals.smoothGamma / SENSITIVITY)) * (delta / FRAME_TIME);
 
             this.dx *= config.damping;
+            this.dy *= config.damping;
             if (Math.abs(this.dx) < 0.15) this.dx = 0;
             if (Math.abs(this.dy) < 0.15) this.dy = 0;
         }
