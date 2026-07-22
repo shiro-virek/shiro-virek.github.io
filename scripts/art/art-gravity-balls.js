@@ -238,7 +238,10 @@
             }
                 
             config.useAccelerometer = !config.useAccelerometer;
-
+            if (!config.useAccelerometer){
+                globals.smoothBeta = 0;
+                globals.smoothGamma = 0;
+            }
         }
         Browser.addButton("btnUseAccelerometer", "🔛", toggleAccelerometer);
     }
