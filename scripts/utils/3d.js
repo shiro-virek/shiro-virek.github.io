@@ -255,6 +255,8 @@ class ThreeDWorld {
         figure.translateY(worldY);
 
         this.figures.push(figure);
+
+        return figure;
     }
 
     applyCameraRotation = (point) => {
@@ -677,6 +679,8 @@ class OpenWorld extends ThreeDWorld {
         figure.setupCollision();
         
         this.figures.push(figure);
+
+        return figure;
     }
    
 }

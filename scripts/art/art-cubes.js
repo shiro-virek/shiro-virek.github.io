@@ -26,7 +26,10 @@
         let columns = Math.floor(globals.world.height / side);
         for (let x = 0; x < rows; x++){
             for (let z = 0; z < columns; z++){            
-                globals.world.addFigure(x * side, z * side);
+                let figure = globals.world.addFigure(x * side, z * side);
+                figure.direction = globals.random.nextBool() ? -1 : 1;
+                figure.maxZ = globals.random.nextInt(450, 500);
+                figure.minZ = globals.random.nextInt(400, 450);
             }
         }
     }
@@ -39,6 +42,21 @@
     
     window.draw = () => {
         drawBackground(ctx, canvas);
+        globals.world.figures.forEach(fig => {
+            let averageZ = fig.getAverageZ();
+            if (averageZ > fig.maxZ) {
+                fig.direction = -1;
+                fig.maxZ = globals.random.nextInt(450, 500);
+                //fig.hue = globals.random.nextInt(0, 360);
+            }
+            if  (averageZ < fig.minZ){
+                fig.direction = 1;
+                fig.minZ = globals.random.nextInt(400, 450);
+                //fig.hue = globals.random.nextInt(0, 360);
+            }
+
+            fig.translateZ(fig.direction * 3);
+        });        
         globals.world.draw();
     }
 
