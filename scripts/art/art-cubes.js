@@ -8,10 +8,6 @@
         randomize: true,
     };    
 
-    let drawFace = (vertices, lightness, hue) => {
-  
-    }
-
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
@@ -30,7 +26,6 @@
                 figure.direction = globals.random.nextBool() ? -1 : 1;
                 figure.maxZ = globals.random.nextInt(485, 500);
                 figure.minZ = globals.random.nextInt(465, 485);
-                console.log(figure.getAverageZ());
             }
         }
     }
@@ -39,6 +34,26 @@
     }
 
     let randomize = () => {
+    }
+
+    let drawFace = (vertices, lightness, hue, alpha) => {
+        const color = `hsla(${hue}, 100%, ${lightness}%, ${alpha})`;
+        
+        ctx.beginPath();
+        let screenPoint = globals.world.worldToScreen(vertices[0]);
+        ctx.moveTo(screenPoint[0], screenPoint[1]);
+        
+        for (let i = 1; i < vertices.length; i++) {
+            screenPoint = globals.world.worldToScreen(vertices[i]);
+            ctx.lineTo(screenPoint[0], screenPoint[1]);
+        }
+        
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color; 
+        ctx.lineWidth = 1;    
+        ctx.fill();
+        ctx.stroke();
     }
     
     window.draw = () => {
