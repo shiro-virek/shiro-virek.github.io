@@ -509,7 +509,6 @@ class OpenWorld extends ThreeDWorld {
         this.tileSize = 500;
         this.floorSize = 4000;
         this.worldSize = 10000;
-        this.floorHue = 0;
     }
 
     fragmentFigure = (originalFig) => {
