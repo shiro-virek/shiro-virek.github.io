@@ -140,7 +140,7 @@
 
         move = (delta) => {
             this.dy += config.gravity * (delta / FRAME_TIME);
-            const SENSITIVITY = 30;
+            const SENSITIVITY = 10;
             this.y += this.dy * (delta / FRAME_TIME) + globals.smoothBeta / SENSITIVITY;
             this.x += this.dx * (delta / FRAME_TIME) + globals.smoothGamma / SENSITIVITY;
 
