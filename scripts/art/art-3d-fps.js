@@ -504,36 +504,24 @@
         }
     }
 
-    let drawFace = (vertices, lightness, hue) => {
-       /* for (let i = 0; i < vertices.length; i++) {
-                const viewPoint = globals.world.applyCameraTransform(vertices[i]);
-                if (viewPoint[2] < 10) return; 
-        }
-        
-        const distPoint = globals.world.applyCameraTransform(vertices[0]);
-        const distance = distPoint[2];
-        
-        let alpha = Numbers.scale(distance, 2000, 5000, 1, 0);
-        if (alpha < 0) alpha = 0;
-        if (alpha > 1) alpha = 1;
-
-        let color = `hsla(${this.hue}, 100%, ${lightness}%, ${alpha})`;
+    let drawFace = (vertices, lightness, hue, alpha) => {
+        const color = `hsla(${hue}, 100%, ${lightness}%, ${alpha})`;
         
         ctx.beginPath();
-        let vertex = globals.world.worldToScreen(vertices[0]);
-        ctx.moveTo(vertex[0], vertex[1]);
+        let screenPoint = globals.world.worldToScreen(vertices[0]);
+        ctx.moveTo(screenPoint[0], screenPoint[1]);
         
         for (let i = 1; i < vertices.length; i++) {
-            vertex = globals.world.worldToScreen(vertices[i]);
-            ctx.lineTo(vertex[0], vertex[1]);
+            screenPoint = globals.world.worldToScreen(vertices[i]);
+            ctx.lineTo(screenPoint[0], screenPoint[1]);
         }
-        ctx.closePath();
         
+        ctx.closePath();
         ctx.fillStyle = color;
         ctx.strokeStyle = color; 
         ctx.lineWidth = 1;    
         ctx.fill();
-        ctx.stroke();*/
+        ctx.stroke();
     }
 
     window.draw = (delta) => {
