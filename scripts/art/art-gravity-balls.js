@@ -16,6 +16,8 @@
         random: null,
         balls: [],
         quad: null,
+        smoothBeta: 0,
+        smoothGamma: 0,
     }
 
     class Ball {
@@ -138,8 +140,9 @@
 
         move = (delta) => {
             this.dy += config.gravity * (delta / FRAME_TIME);
-            this.y += this.dy * (delta / FRAME_TIME);
-            this.x += this.dx * (delta / FRAME_TIME);
+            const SENSITIVITY = 30;
+            this.y += this.dy * (delta / FRAME_TIME) + globals.smoothBeta / SENSITIVITY;
+            this.x += this.dx * (delta / FRAME_TIME) + globals.smoothGamma / SENSITIVITY;
 
             this.dx *= config.damping;
             if (Math.abs(this.dx) < 0.15) this.dx = 0;
@@ -154,15 +157,13 @@
 
     let iniciarSensor = () => {    
         window.addEventListener('deviceorientation', (event) => {
-            let smoothBeta = 0;
-            let smoothGamma = 0;
-            const SMOOTHING = 0.15; // Ajustar entre 0.05 (muy suave) y 0.3 (más rápido)
+            const SMOOTHING = 0.15;
 
-            let beta = event.beta || 0;   // Inclinación Frontal [-180, 180]
-            let gamma = event.gamma || 0; // Inclinación Lateral [-90, 90]
+            let beta = event.beta || 0;  
+            let gamma = event.gamma || 0;
 
-            smoothBeta += (beta - smoothBeta) * SMOOTHING;
-            smoothGamma += (gamma - smoothGamma) * SMOOTHING;
+            globals.smoothBeta += (beta - globals.smoothBeta) * SMOOTHING;
+            globals.smoothGamma += (gamma - globals.smoothGamma) * SMOOTHING;
 
             console.log(smoothBeta)
         });
