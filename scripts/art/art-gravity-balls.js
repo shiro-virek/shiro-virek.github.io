@@ -139,12 +139,26 @@
         }
 
         move = (delta) => {
-            this.dy += config.gravity * (delta / FRAME_TIME);
-            const SENSITIVITY = 5;
-            this.y += this.dy * (delta / FRAME_TIME) + globals.smoothBeta / SENSITIVITY;
-            this.x += this.dx * (delta / FRAME_TIME) + globals.smoothGamma / SENSITIVITY;
+            const GRAVITY_SCALE = 6;
+
+            if (config.useAccelerometer) {
+                let betaRad = globals.smoothBeta * Math.PI / 180;
+                let gammaRad = globals.smoothGamma * Math.PI / 180;
+
+                let gx = Math.sin(gammaRad);
+                let gy = Math.sin(betaRad);
+
+                this.dx += gx * config.gravity * GRAVITY_SCALE * (delta / FRAME_TIME);
+                this.dy += gy * config.gravity * GRAVITY_SCALE * (delta / FRAME_TIME);
+            } else {
+                this.dy += config.gravity * GRAVITY_SCALE * (delta / FRAME_TIME);
+            }
+
+            this.y += this.dy * (delta / FRAME_TIME);
+            this.x += this.dx * (delta / FRAME_TIME);
 
             this.dx *= config.damping;
+            this.dy *= config.damping;
             if (Math.abs(this.dx) < 0.15) this.dx = 0;
             if (Math.abs(this.dy) < 0.15) this.dy = 0;
         }
@@ -155,7 +169,7 @@
         getRight = () => this.x + this.radius;
     }
 
-    let iniciarSensor = () => {    
+    let initSensor = () => {    
         window.addEventListener('deviceorientation', (event) => {
             const SMOOTHING = 0.15;
 
@@ -223,7 +237,7 @@
                 try {
                 const permission = DeviceOrientationEvent.requestPermission();
                 if (permission === 'granted') {
-                    iniciarSensor();
+                    initSensor();
                 } else {
                     console.log('Permiso denegado por el usuario.');
                 }
@@ -231,8 +245,8 @@
                     console.log('Error al solicitar permisos.');
                 }
             } else if ('DeviceOrientationEvent' in window) {
-                // Android y otros navegadores compatibles
-                iniciarSensor();
+                // Android
+                initSensor();
             } else {
                 console.log('Tu dispositivo o navegador no soporta DeviceOrientation.');
             }
