@@ -52,6 +52,7 @@
         config.colorShift = globals.random.nextInt(0, 360);
         config.rainbow = globals.random.nextBool();
         config.animateRainbow = globals.random.nextBool();
+        config.animateCamera = globals.random.nextBool();
     }
 
     let drawFace = (vertices, lightness, hue, alpha) => {
@@ -94,7 +95,13 @@
             } 
         });
 
-        //globals.world.rotate(0, 0.2)
+        if (config.animateCamera){
+            let orbitAngle = performance.now() * 0.0005;
+            let radius = 700;
+            globals.world.cameraX = Math.cos(orbitAngle) * radius;
+            globals.world.cameraZ = Math.sin(orbitAngle) * radius;
+            globals.world.cameraRotationZ = orbitAngle * 180 / Math.PI + 90;
+        }
 
         globals.world.draw();
     }
