@@ -1147,6 +1147,7 @@ let primitives = [
         },
         {
             name: "icosahedron",
+            doubleSided: true,
             vertices: [
                 [0, 16, 0], [14.304, 7.152, 0], [4.416, 7.152, 13.616],
                 [-11.584, 7.152, 8.416], [-11.584, 7.152, -8.416], [4.416, 7.152, -13.616],
@@ -1175,10 +1176,12 @@ let primitives = [
         },
         {
             name: "sphere",
+            doubleSided: true,
             ...ThreeDWorld.generateSphere()
         },
         {
             name: "cylinder",
+            doubleSided: true,
             ...ThreeDWorld.generateCylinder()
         },
         {
