@@ -8,6 +8,7 @@
         randomize: true,
         rainbow: true,
         animateRainbow: true,
+        animateCamera: true,
         colorShift: 0,
     };    
 
@@ -73,7 +74,8 @@
         ctx.stroke();
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
+        let factor = delta / FRAME_TIME;
         drawBackground(ctx, canvas);
         
         globals.world.figures.forEach(fig => {
@@ -83,14 +85,17 @@
             if (fig.yOffset < fig.minY) {
                 fig.direction = 1;
             }
-            fig.yOffset += fig.direction * 2;
-            fig.translateY(fig.direction * 2);
+            fig.yOffset += fig.direction * 2 * factor;
+            fig.translateY(fig.direction * 2 * factor);
 
             if (config.animateRainbow){
                 fig.hue += 1;
                 if (fig.hue > 360) fig.hue = 0;
             } 
         });
+
+        //globals.world.rotate(0, 0.2)
+
         globals.world.draw();
     }
 
