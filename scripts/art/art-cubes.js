@@ -28,8 +28,8 @@
         for (let x = 0; x < rows; x++){
             for (let z = 0; z < columns; z++){            
                 let figure = globals.world.addFigureAt(x * side - offset, 50, z * side - offset);
-                figure.direction = 1;
-                figure.yOffset = 0;
+                figure.direction = globals.random.nextBool() ? -1 : 1;
+                figure.yOffset = globals.random.nextRange(-15,15);
                 figure.maxY = 30;
                 figure.minY = -30;
             }
