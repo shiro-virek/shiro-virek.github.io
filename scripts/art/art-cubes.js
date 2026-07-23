@@ -28,9 +28,10 @@
         for (let x = 0; x < rows; x++){
             for (let z = 0; z < columns; z++){            
                 let figure = globals.world.addFigureAt(x * side - offset, 50, z * side - offset);
-                figure.direction = globals.random.nextBool() ? -1 : 1;
-                figure.mayY = globals.random.nextInt(50, 100);
-                figure.minY = globals.random.nextInt(0, 50);
+                figure.direction = 1;
+                figure.yOffset = 0;
+                figure.maxY = 30;
+                figure.minY = -30;
             }
         }
     }
@@ -65,18 +66,15 @@
         drawBackground(ctx, canvas);
         
         globals.world.figures.forEach(fig => {
-            let averageZ = fig.getAverageZ();
-            if (averageZ > fig.mayY) {
+            if (fig.yOffset > fig.maxY) {
                 fig.direction = -1;
-                fig.mayY = globals.random.nextInt(50, 100);
             }
-            if  (averageZ < fig.minY){
+            if (fig.yOffset < fig.minY) {
                 fig.direction = 1;
-                fig.minY = globals.random.nextInt(0, 50);
             }
-
+            fig.yOffset += fig.direction * 2;
             fig.translateY(fig.direction * 2);
-        }); 
+        });
         globals.world.draw();
     }
 

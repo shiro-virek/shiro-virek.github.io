@@ -951,6 +951,15 @@ class Figure {
         }
         return sumZ / this.vertices.length;
     }
+
+    getAverageY = () => {
+        let sumY = 0;
+        for (let i = 0; i < this.vertices.length; i++) {
+            let rotatedVertex = this.world.applyCameraRotation(this.vertices[i]);
+            sumY += rotatedVertex[1];
+        }
+        return sumY / this.vertices.length;
+    }
 }
 
 class Character extends Figure {
