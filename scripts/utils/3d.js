@@ -237,6 +237,21 @@ class ThreeDWorld {
         return figure;
     }
 
+    addFigureAt(x, y, z) {
+        let figure = new Figure(this);
+        figure.vertices = Objects.clone(this.primitive.vertices);
+        figure.edges = Objects.clone(this.primitive.edges);
+        figure.faces = Objects.clone(this.primitive.faces);
+        figure.doubleSided = this.primitive.doubleSided || false;
+
+        figure.translateX(x);
+        figure.translateY(y);
+        figure.translateZ(z);
+
+        this.figures.push(figure);
+        return figure;
+    }
+
     applyCameraRotation = (point) => {
         let x = point[0];
         let y = point[1];
@@ -659,7 +674,25 @@ class OpenWorld extends ThreeDWorld {
 
         return figure;
     }
-   
+
+    addFigureAt = (worldX, worldY, worldZ, fig = this.primitive) => {
+        let figure = new Character(this);
+        figure.vertices = Objects.clone(fig.vertices);
+        figure.faces = Objects.clone(fig.faces);
+
+        figure.translateX(worldX);
+        figure.translateY(worldY);
+        figure.translateZ(worldZ);
+
+        figure.cachedZ = figure.getAverageZ();
+        figure.solid = true;
+        figure.breakable = false;
+        figure.setupCollision();
+
+        this.figures.push(figure);
+        return figure;
+    }
+
 }
 
 class Figure {
@@ -917,6 +950,15 @@ class Figure {
             sumZ += rotatedVertex[2];
         }
         return sumZ / this.vertices.length;
+    }
+
+    getAverageY = () => {
+        let sumY = 0;
+        for (let i = 0; i < this.vertices.length; i++) {
+            let rotatedVertex = this.world.applyCameraRotation(this.vertices[i]);
+            sumY += rotatedVertex[1];
+        }
+        return sumY / this.vertices.length;
     }
 }
 

@@ -6,6 +6,9 @@
 
     const config = {
         randomize: true,
+        rainbow: true,
+        animateRainbow: true,
+        colorShift: 0,
     };    
 
     let init = () => {
@@ -13,19 +16,30 @@
         if (config.randomize) randomize();
         globals.world = new OpenWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
 
+        globals.world.cameraY = -300;
+        globals.world.cameraZ = -700;
+        globals.world.cameraRotationX = -30;
+
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);        
 
-        let side = 100;
-        let rows = Math.floor(globals.world.width / side) + 1;
-        let columns = Math.floor(globals.world.height / side) + 1;
+        let side = 40;
+        let rows = Math.floor(Math.max(width, height) / 70);
+        let columns = Math.floor(Math.max(width, height) / 70);
+        let offset = ((rows - 1) * side) / 2;
         for (let x = 0; x < rows; x++){
             for (let z = 0; z < columns; z++){            
-                let figure = globals.world.addFigure(x * side, z * side);
+                let figure = globals.world.addFigureAt(x * side - offset, 50, z * side - offset);
                 figure.direction = globals.random.nextBool() ? -1 : 1;
-                figure.maxZ = globals.random.nextInt(485, 500);
-                figure.minZ = globals.random.nextInt(465, 485);
+                figure.yOffset = globals.random.nextRange(-15,15);
+                figure.maxY = 30;
+                figure.minY = -30;
+                if (config.rainbow){
+                    let hue = config.colorShift + Numbers.scale(x * z, 0, rows * columns, 0, 360);
+                    if (hue > 0) hue = 360 - hue;
+                    figure.hue = hue;
+                }
             }
         }
     }
@@ -34,6 +48,9 @@
     }
 
     let randomize = () => {
+        config.colorShift = globals.random.nextInt(0, 360);
+        config.rainbow = globals.random.nextBool();
+        config.animateRainbow = globals.random.nextBool();
     }
 
     let drawFace = (vertices, lightness, hue, alpha) => {
@@ -58,19 +75,22 @@
     
     window.draw = () => {
         drawBackground(ctx, canvas);
+        
         globals.world.figures.forEach(fig => {
-            let averageZ = fig.getAverageZ();
-            if (averageZ > fig.maxZ) {
+            if (fig.yOffset > fig.maxY) {
                 fig.direction = -1;
-                fig.maxZ = globals.random.nextInt(485, 500);
             }
-            if  (averageZ < fig.minZ){
+            if (fig.yOffset < fig.minY) {
                 fig.direction = 1;
-                fig.minZ = globals.random.nextInt(465, 485);
             }
+            fig.yOffset += fig.direction * 2;
+            fig.translateY(fig.direction * 2);
 
-            fig.translateZ(fig.direction * 2);
-        });        
+            if (config.animateRainbow){
+                fig.hue += 1;
+                if (fig.hue > 360) fig.hue = 0;
+            } 
+        });
         globals.world.draw();
     }
 
