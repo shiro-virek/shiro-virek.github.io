@@ -13,19 +13,24 @@
         if (config.randomize) randomize();
         globals.world = new OpenWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
 
+        globals.world.cameraY = -300;
+        globals.world.cameraZ = -700;
+        globals.world.cameraRotationX = -30;
+
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);        
 
         let side = 100;
-        let rows = Math.floor(globals.world.width / side) + 1;
-        let columns = Math.floor(globals.world.height / side) + 1;
+        let rows = 7;
+        let columns = 7;
+        let offset = ((rows - 1) * side) / 2;
         for (let x = 0; x < rows; x++){
             for (let z = 0; z < columns; z++){            
-                let figure = globals.world.addFigure(x * side, z * side);
+                let figure = globals.world.addFigureAt(x * side - offset, 50, z * side - offset);
                 figure.direction = globals.random.nextBool() ? -1 : 1;
-                figure.maxZ = globals.random.nextInt(485, 500);
-                figure.minZ = globals.random.nextInt(465, 485);
+                figure.mayY = globals.random.nextInt(50, 100);
+                figure.minY = globals.random.nextInt(0, 50);
             }
         }
     }
@@ -58,19 +63,20 @@
     
     window.draw = () => {
         drawBackground(ctx, canvas);
+        
         globals.world.figures.forEach(fig => {
             let averageZ = fig.getAverageZ();
-            if (averageZ > fig.maxZ) {
+            if (averageZ > fig.mayY) {
                 fig.direction = -1;
-                fig.maxZ = globals.random.nextInt(485, 500);
+                fig.mayY = globals.random.nextInt(50, 100);
             }
-            if  (averageZ < fig.minZ){
+            if  (averageZ < fig.minY){
                 fig.direction = 1;
-                fig.minZ = globals.random.nextInt(465, 485);
+                fig.minY = globals.random.nextInt(0, 50);
             }
 
-            fig.translateZ(fig.direction * 2);
-        });        
+            fig.translateY(fig.direction * 2);
+        }); 
         globals.world.draw();
     }
 
