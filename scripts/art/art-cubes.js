@@ -8,6 +8,7 @@
         randomize: true,
         rainbow: true,
         animateRainbow: true,
+        animateCamera: true,
         colorShift: 0,
     };    
 
@@ -51,6 +52,7 @@
         config.colorShift = globals.random.nextInt(0, 360);
         config.rainbow = globals.random.nextBool();
         config.animateRainbow = globals.random.nextBool();
+        config.animateCamera = globals.random.nextBool();
     }
 
     let drawFace = (vertices, lightness, hue, alpha) => {
@@ -73,7 +75,8 @@
         ctx.stroke();
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
+        let factor = delta / FRAME_TIME;
         drawBackground(ctx, canvas);
         
         globals.world.figures.forEach(fig => {
@@ -83,14 +86,23 @@
             if (fig.yOffset < fig.minY) {
                 fig.direction = 1;
             }
-            fig.yOffset += fig.direction * 2;
-            fig.translateY(fig.direction * 2);
+            fig.yOffset += fig.direction * 2 * factor;
+            fig.translateY(fig.direction * 2 * factor);
 
             if (config.animateRainbow){
                 fig.hue += 1;
                 if (fig.hue > 360) fig.hue = 0;
             } 
         });
+
+        if (config.animateCamera){
+            let orbitAngle = performance.now() * 0.0005;
+            let radius = 700;
+            globals.world.cameraX = Math.cos(orbitAngle) * radius;
+            globals.world.cameraZ = Math.sin(orbitAngle) * radius;
+            globals.world.cameraRotationZ = orbitAngle * 180 / Math.PI + 90;
+        }
+
         globals.world.draw();
     }
 
