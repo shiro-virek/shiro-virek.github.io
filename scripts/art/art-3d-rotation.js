@@ -99,6 +99,26 @@
             config.tool = 4;
         }
         Browser.addButton("btnSetRotateFigureTool", "↩️", setRotateFigureTool);
+
+        let setMoveXTool = () => {    
+            config.tool = 5;
+        }
+        Browser.addButton("btnSetMoveXTool", "X", setMoveXTool);
+
+        let setMoveYTool = () => {    
+            config.tool = 6;
+        }
+        Browser.addButton("btnSetMoveYTool", "Y", setMoveYTool);
+
+        let setMoveZTool = () => {    
+            config.tool = 7;
+        }
+        Browser.addButton("btnSetMoveZTool", "Z", setMoveZTool);
+
+        let setDeleteTool = () => {    
+            config.tool = 8;
+        }
+        Browser.addButton("btnSetDeleteTool", "🗑", setDeleteTool);
     }
 
     let randomize = () => {
@@ -129,15 +149,25 @@
 		});
 
 		canvas.addEventListener('click', function (e) {
+            handleDeleteFigure();
+
             if (!mouseMoved && !figureSelectedOnMousedown)
-                globals.world.addFigure(e.offsetX, e.offsetY);
+                globals.world.addFigure(e.offsetX, e.offsetY);   
 		});
 
 		canvas.addEventListener('touchend', e => {
+            handleDeleteFigure();
             if (!mouseMoved)
                 globals.world.addFigure(e.offsetX, e.offsetY);         
-            globals.selectedFigure = null;
+            globals.selectedFigure = null;            
 		}, false);  
+    }
+
+    let handleDeleteFigure = () => {
+        if (config.tool == 8 && globals.selectedFigure) {
+            let index = globals.world.figures.indexOf(globals.selectedFigure);
+            globals.world.figures.splice(index, 1);
+        }
     }
 
     let moveLight = (cx, cy) => {
@@ -180,6 +210,21 @@
                     if (globals.selectedFigure) {
                         globals.selectedFigure.rotateYAroundCenter(movX);
                         globals.selectedFigure.rotateXAroundCenter(-movY);
+                    }
+                    break;
+                case 5:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.translateX(-movX);
+                    }
+                    break;
+                case 6:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.translateY(-movY);
+                    }
+                    break;
+                case 7:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.translateZ(movY);
                     }
                     break;
                 default:
