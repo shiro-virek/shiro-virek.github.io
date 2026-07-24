@@ -26,16 +26,18 @@
         ctx.stroke();
     }
 
+    let figureSelectedOnMousedown = false;
+
     let selectFigure = (x, y) => {
         let minZ = Infinity;
+        globals.selectedFigure = null;
 
-        globals.world.figures.forEach((figure, index) => {
+        globals.world.figures.forEach((figure) => {
             figure.faces.forEach(faceIndices => {
                 const rotatedVertices = faceIndices.map(i => 
                     globals.world.applyCameraRotation(figure.vertices[i])
                 );
 
-                if (rotatedVertices.some(v => v[2] <= 1)) return;
                 if (!figure.shouldDrawFace(rotatedVertices)) return;
 
                 const screenPoints = faceIndices.map(i => globals.world.worldToScreen(figure.vertices[i]));
@@ -49,6 +51,8 @@
                 }
             });
         });
+
+        figureSelectedOnMousedown = globals.selectedFigure !== null;
     }
 
     let addSpecialControls = () => {
@@ -115,21 +119,20 @@
             selectFigure(e.offsetX, e.offsetY);
 		});
 
-
         canvas.addEventListener('mouseup', function (e) {           
             globals.selectedFigure = null;
 		});
 
+		canvas.addEventListener('click', function (e) {
+            if (!mouseMoved && !figureSelectedOnMousedown)
+                globals.world.addFigure(e.offsetX, e.offsetY);
+		});
+
 		canvas.addEventListener('touchend', e => {
-            if (!mouseMoved && !globals.selectedFigure)
+            if (!mouseMoved)
                 globals.world.addFigure(e.offsetX, e.offsetY);         
             globals.selectedFigure = null;
 		}, false);  
-
-		canvas.addEventListener('click', function (e) {
-            if (!mouseMoved && !globals.selectedFigure)
-                globals.world.addFigure(e.offsetX, e.offsetY);
-		});
     }
 
     let moveLight = (cx, cy) => {
@@ -163,8 +166,10 @@
                     moveLight(width - x, height - y);
                     break;
                 case 3:
-                    if (globals.selectedFigure) 
-                        globals.selectedFigure.scale(movY);
+                    if (globals.selectedFigure) {
+                        let factor = 1 + movY * 0.005;
+                        if (factor > 0.01) globals.selectedFigure.scale(factor);
+                    }
                     break;
                 default:
                     break;
