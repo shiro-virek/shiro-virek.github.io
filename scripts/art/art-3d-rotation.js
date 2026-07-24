@@ -27,7 +27,6 @@
     }
 
     let selectFigure = (x, y) => {
-        globals.selectedFigure = null;
         let minZ = Infinity;
 
         globals.world.figures.forEach((figure, index) => {
@@ -45,7 +44,7 @@
                     let avgZ = figure.getAverageZ();
                     if (avgZ < minZ) {
                         minZ = avgZ;
-                        globals.selectedFigure = index; 
+                        globals.selectedFigure = figure;                         
                     }
                 }
             });
@@ -86,6 +85,11 @@
             config.tool = 2;
         }
         Browser.addButton("btnSetMoveLightTool", "💡", setMoveLightTool);
+
+        let setScaleTool = () => {    
+            config.tool = 3;
+        }
+        Browser.addButton("btnSetScaleTool", "📐", setScaleTool);
     }
 
     let randomize = () => {
@@ -107,13 +111,23 @@
     }
 
     let addEvents = () => {
+        canvas.addEventListener('mousedown', function (e) {           
+            selectFigure(e.offsetX, e.offsetY);
+		});
+
+
+        canvas.addEventListener('mouseup', function (e) {           
+            globals.selectedFigure = null;
+		});
+
 		canvas.addEventListener('touchend', e => {
-            if (!mouseMoved)
-                globals.world.addFigure(e.offsetX, e.offsetY);
+            if (!mouseMoved && !globals.selectedFigure)
+                globals.world.addFigure(e.offsetX, e.offsetY);         
+            globals.selectedFigure = null;
 		}, false);  
 
 		canvas.addEventListener('click', function (e) {
-            if (!mouseMoved)
+            if (!mouseMoved && !globals.selectedFigure)
                 globals.world.addFigure(e.offsetX, e.offsetY);
 		});
     }
@@ -130,8 +144,6 @@
     
     window.trackMouse = (x, y) => {        
         if (clicking) {
-            selectFigure(x, y);
-
             switch (config.tool) {
                 case 0:
                     globals.world.cameraRotationZ += movX * 0.1; 
@@ -149,6 +161,10 @@
                     break;
                 case 2: 
                     moveLight(width - x, height - y);
+                    break;
+                case 3:
+                    if (globals.selectedFigure) 
+                        globals.selectedFigure.scale(movY);
                     break;
                 default:
                     break;
