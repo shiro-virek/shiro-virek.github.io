@@ -769,6 +769,92 @@ class Figure {
         }
     }
 
+    getCenter = () => {
+        let cx = 0, cy = 0, cz = 0;
+        for (let i = 0; i < this.vertices.length; i++) {
+            cx += this.vertices[i][0];
+            cy += this.vertices[i][1];
+            cz += this.vertices[i][2];
+        }
+        const n = this.vertices.length;
+        return [cx / n, cy / n, cz / n];
+    }
+
+    rotateXAroundCenter = (angle) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][1] -= center[1];
+            this.vertices[i][2] -= center[2];
+        }
+        this.rotationAccumX += angle;
+        angle = Trigonometry.sexagesimalToRadian(angle);
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
+            this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle);
+            this.vertices[i][1] = y;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][1] += center[1];
+            this.vertices[i][2] += center[2];
+        }
+    }
+
+    rotateYAroundCenter = (angle) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] -= center[0];
+            this.vertices[i][2] -= center[2];
+        }
+        this.rotationAccumY += angle;
+        angle = Trigonometry.sexagesimalToRadian(angle);
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
+            this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle);
+            this.vertices[i][0] = x;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] += center[0];
+            this.vertices[i][2] += center[2];
+        }
+    }
+
+    rotateZAroundCenter = (angle) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] -= center[0];
+            this.vertices[i][1] -= center[1];
+        }
+        angle = Trigonometry.sexagesimalToRadian(angle);
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
+            this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle);
+            this.vertices[i][0] = x;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] += center[0];
+            this.vertices[i][1] += center[1];
+        }
+    }
+
+    scaleAroundCenter = (factor) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] -= center[0];
+            this.vertices[i][1] -= center[1];
+            this.vertices[i][2] -= center[2];
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] *= factor;
+            this.vertices[i][1] *= factor;
+            this.vertices[i][2] *= factor;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] += center[0];
+            this.vertices[i][1] += center[1];
+            this.vertices[i][2] += center[2];
+        }
+    }
+
     scaleX = (factor) => {
         for (let i = this.vertices.length - 1; i >= 0; i--) {
             this.vertices[i][0] *= factor;
