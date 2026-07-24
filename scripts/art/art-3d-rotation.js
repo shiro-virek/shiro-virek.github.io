@@ -40,8 +40,9 @@
 
         let changeFigure = () => {
             globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)];
+            document.getElementById('btnChangeFigure').textContent = globals.world.primitive.icon;
         }
-        Browser.addButton("btnChangeFigure", "🔴", changeFigure);
+        Browser.addButton("btnChangeFigure", globals.world.primitive.icon, changeFigure);
         
         let setRotationTool = () => {       
             if (config.tool == 0){
