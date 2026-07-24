@@ -44,6 +44,7 @@ const art = [
                 { "name": "particles", "display": "Particles"},
                 { "name": "screen-led", "display": "Led screen"},
                 { "name": "cubes", "display": "Cubes"},
+                { "name": "radial-pixels", "display": "Radial pixels"},
             ];
 const scripts = [];
 
