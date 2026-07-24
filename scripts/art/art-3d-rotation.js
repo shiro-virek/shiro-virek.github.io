@@ -43,15 +43,16 @@
         }
         Browser.addButton("btnChangeFigure", "🔴", changeFigure);
         
-        let setRotationTool = () => {    
-            config.tool = 0;
+        let setRotationTool = () => {       
+            if (config.tool == 0){
+                config.tool = 1;
+                document.getElementById('btnSetRotationTool').textContent = '🔄';
+            }else{
+                config.tool = 0;
+                document.getElementById('btnSetRotationTool').textContent = '🔃';    
+            }                          
         }        
         Browser.addButton("btnSetRotationTool", "🔄", setRotationTool);
-
-        let setRotation2Tool = () => {    
-            config.tool = 1;
-        }
-        Browser.addButton("btnSetRotation2Tool", "🔄", setRotation2Tool);
 
         let setMoveLightTool = () => {    
             config.tool = 2;
