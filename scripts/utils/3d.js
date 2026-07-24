@@ -356,7 +356,8 @@ class ThreeDWorld {
                 faces.push([v0, v1, v2, v3]);
             }
         }
-        return { vertices, edges, faces };
+        let icon = '⏺';
+        return { vertices, edges, faces, icon };
     }
 
     static generateCylinder(radius = 25, height = 40, segs = 12) {
@@ -385,7 +386,8 @@ class ThreeDWorld {
             edges.push([i, segs + i]);
             faces.push([i, next, segs + next, segs + i]);
         }
-        return { vertices, edges, faces };
+        let icon = '█';
+        return { vertices, edges, faces, icon };
     }
 
     static generateTorus(ringRadius = 30, tubeRadius = 12, ringSegs = 12, tubeSegs = 8) {
@@ -409,7 +411,8 @@ class ThreeDWorld {
                 faces.push([v0, v1, v2, v3]);
             }
         }
-        return { vertices, edges, faces };
+        let icon = '◉';
+        return { vertices, edges, faces, icon };
     }
 
     static generateHeart(size = 30, uSegs = 16, vSegs = 10) {
@@ -436,8 +439,9 @@ class ThreeDWorld {
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
                 faces.push([v0, v1, v2, v3]);
             }
-        }
-        return { vertices, edges, faces };
+        }        
+        let icon = '♥︎';
+        return { vertices, edges, faces, icon };
     }
 
     static generateInfinity(size = 30, tubeRadius = 8, ringSegs = 16, tubeSegs = 8) {
@@ -471,8 +475,9 @@ class ThreeDWorld {
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
                 faces.push([v0, v1, v2, v3]);
             }
-        }
-        return { vertices, edges, faces };
+        }        
+        let icon = '∞';
+        return { vertices, edges, faces, icon };
     }                   
 }
 
@@ -764,6 +769,92 @@ class Figure {
         }
     }
 
+    getCenter = () => {
+        let cx = 0, cy = 0, cz = 0;
+        for (let i = 0; i < this.vertices.length; i++) {
+            cx += this.vertices[i][0];
+            cy += this.vertices[i][1];
+            cz += this.vertices[i][2];
+        }
+        const n = this.vertices.length;
+        return [cx / n, cy / n, cz / n];
+    }
+
+    rotateXAroundCenter = (angle) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][1] -= center[1];
+            this.vertices[i][2] -= center[2];
+        }
+        this.rotationAccumX += angle;
+        angle = Trigonometry.sexagesimalToRadian(angle);
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            let y = this.vertices[i][1] * Math.cos(angle) + this.vertices[i][2] * (-Math.sin(angle));
+            this.vertices[i][2] = this.vertices[i][1] * Math.sin(angle) + this.vertices[i][2] * Math.cos(angle);
+            this.vertices[i][1] = y;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][1] += center[1];
+            this.vertices[i][2] += center[2];
+        }
+    }
+
+    rotateYAroundCenter = (angle) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] -= center[0];
+            this.vertices[i][2] -= center[2];
+        }
+        this.rotationAccumY += angle;
+        angle = Trigonometry.sexagesimalToRadian(angle);
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][2] * Math.sin(angle);
+            this.vertices[i][2] = this.vertices[i][0] * (-Math.sin(angle)) + this.vertices[i][2] * Math.cos(angle);
+            this.vertices[i][0] = x;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] += center[0];
+            this.vertices[i][2] += center[2];
+        }
+    }
+
+    rotateZAroundCenter = (angle) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] -= center[0];
+            this.vertices[i][1] -= center[1];
+        }
+        angle = Trigonometry.sexagesimalToRadian(angle);
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            let x = this.vertices[i][0] * Math.cos(angle) + this.vertices[i][1] * (-Math.sin(angle));
+            this.vertices[i][1] = this.vertices[i][0] * Math.sin(angle) + this.vertices[i][1] * Math.cos(angle);
+            this.vertices[i][0] = x;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] += center[0];
+            this.vertices[i][1] += center[1];
+        }
+    }
+
+    scaleAroundCenter = (factor) => {
+        const center = this.getCenter();
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] -= center[0];
+            this.vertices[i][1] -= center[1];
+            this.vertices[i][2] -= center[2];
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] *= factor;
+            this.vertices[i][1] *= factor;
+            this.vertices[i][2] *= factor;
+        }
+        for (let i = this.vertices.length - 1; i >= 0; i--) {
+            this.vertices[i][0] += center[0];
+            this.vertices[i][1] += center[1];
+            this.vertices[i][2] += center[2];
+        }
+    }
+
     scaleX = (factor) => {
         for (let i = this.vertices.length - 1; i >= 0; i--) {
             this.vertices[i][0] *= factor;
@@ -1027,7 +1118,8 @@ let primitives = [
                 [3,7,4,0],
                 [1,5,6,2],
                 [3,2,6,7]
-            ]
+            ], 
+            icon: '❒',
         },
         {
             name: "hex_prism",
@@ -1051,7 +1143,8 @@ let primitives = [
                 [3, 9, 10, 4],
                 [4, 10, 11, 5],
                 [5, 11, 6, 0]
-            ]
+            ],
+            icon: '⬣'
         },
         {
             name: "pyramid",
@@ -1072,7 +1165,8 @@ let primitives = [
                 [1, 2, 4],   
                 [2, 3, 4],  
                 [3, 0, 4]     
-            ]
+            ], 
+            icon: '▲'
         },
         {
             name: "octahedron",
@@ -1092,7 +1186,8 @@ let primitives = [
             faces: [
                 [1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2],
                 [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 2, 5]
-            ]
+            ],
+            icon: '♢'
         },      
         {
             "name": "star",
@@ -1131,7 +1226,8 @@ let primitives = [
                 [11,13,15],[11,15,17],[11,17,19],
                 [0,1,11,10],[1,2,12,11],[2,3,13,12],[3,4,14,13],[4,5,15,14],
                 [5,6,16,15],[6,7,17,16],[7,8,18,17],[8,9,19,18],[9,0,10,19]
-            ]
+            ],
+            icon: "★",
         },       
         {
             name: "pyramid2",
@@ -1143,7 +1239,8 @@ let primitives = [
             ],
             faces: [
                 [0,1,2],[0,3,1],[0,3,2],[1,2,3]
-            ]
+            ],
+            icon: '△'
         },
         {
             name: "icosahedron",
@@ -1172,7 +1269,8 @@ let primitives = [
                 [1,2,6],[2,3,7],[3,4,8],[4,5,9],[5,1,10],
                 [2,7,6],[3,8,7],[4,9,8],[5,10,9],[1,6,10],
                 [11,6,7],[11,7,8],[11,8,9],[11,9,10],[11,10,6]
-            ]
+            ],
+            icon: '12'
         },
         {
             name: "sphere",
