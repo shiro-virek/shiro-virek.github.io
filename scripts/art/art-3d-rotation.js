@@ -2,6 +2,7 @@
     const globals = {
         random: null,
         world: null,
+        selectedFigure: null,
     };
 
     const config = {
@@ -23,6 +24,32 @@
         ctx.strokeStyle = color; 
         ctx.fill();
         ctx.stroke();
+    }
+
+    let selectFigure = (x, y) => {
+        globals.selectedFigure = null;
+        let minZ = Infinity;
+
+        globals.world.figures.forEach((figure, index) => {
+            figure.faces.forEach(faceIndices => {
+                const rotatedVertices = faceIndices.map(i => 
+                    globals.world.applyCameraRotation(figure.vertices[i])
+                );
+
+                if (rotatedVertices.some(v => v[2] <= 1)) return;
+                if (!figure.shouldDrawFace(rotatedVertices)) return;
+
+                const screenPoints = faceIndices.map(i => globals.world.worldToScreen(figure.vertices[i]));
+
+                if (Trigonometry.isPointInPoly([x, y], screenPoints)) {
+                    let avgZ = figure.getAverageZ();
+                    if (avgZ < minZ) {
+                        minZ = avgZ;
+                        globals.selectedFigure = index; 
+                    }
+                }
+            });
+        });
     }
 
     let addSpecialControls = () => {
@@ -103,6 +130,8 @@
     
     window.trackMouse = (x, y) => {        
         if (clicking) {
+            selectFigure(x, y);
+
             switch (config.tool) {
                 case 0:
                     globals.world.cameraRotationZ += movX * 0.1; 
@@ -124,6 +153,7 @@
                 default:
                     break;
             }
+
         }
     }
 
