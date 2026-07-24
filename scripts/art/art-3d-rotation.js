@@ -6,7 +6,7 @@
     };
 
     const config = {
-        tool: 1, // 0: rotate, 1: rotate2, 2: move light
+        tool: 1, // 0: rotate, 1: rotate2, 2: move light, 3: scale
     };  
 
     let drawFace = (vertices, lightness, hue) => {
@@ -94,6 +94,11 @@
             config.tool = 3;
         }
         Browser.addButton("btnSetScaleTool", "📐", setScaleTool);
+
+        let setRotateFigureTool = () => {    
+            config.tool = 4;
+        }
+        Browser.addButton("btnSetRotateFigureTool", "↩️", setRotateFigureTool);
     }
 
     let randomize = () => {
@@ -169,6 +174,15 @@
                     if (globals.selectedFigure) {
                         let factor = 1 + movY * 0.005;
                         if (factor > 0.01) globals.selectedFigure.scale(factor);
+                    }
+                    break;
+                case 4:
+                    if (globals.selectedFigure) {
+                        let factorY = 1 + movY * 0.005;
+                        if (factorY > 0.01) globals.selectedFigure.rotateY(factorY);
+
+                        let factorZ = 1 + movZ * 0.005;
+                        if (factorZ > 0.01) globals.selectedFigure.rotateZ(factorZ);
                     }
                     break;
                 default:
