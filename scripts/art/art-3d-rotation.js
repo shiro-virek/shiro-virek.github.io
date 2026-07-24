@@ -154,13 +154,12 @@
             selectFigure(e.offsetX, e.offsetY);
 		});
 
-        canvas.addEventListener('mouseup', function (e) {           
+        canvas.addEventListener('mouseup', function (e) {
+            handleDeleteFigure();
             globals.selectedFigure = null;
 		});
 
 		canvas.addEventListener('click', function (e) {
-            handleDeleteFigure();
-
             if (!mouseMoved && !figureSelectedOnMousedown)
                 globals.world.addFigure(e.offsetX, e.offsetY);   
 		});
@@ -176,7 +175,7 @@
     let handleDeleteFigure = () => {
         if (config.tool == 8 && globals.selectedFigure) {
             let index = globals.world.figures.indexOf(globals.selectedFigure);
-            globals.world.figures.splice(index, 1);
+            if (index > -1) globals.world.figures.splice(index, 1);
         }
     }
 
