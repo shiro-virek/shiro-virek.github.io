@@ -154,6 +154,11 @@
             selectFigure(e.offsetX, e.offsetY);
 		});
 
+        canvas.addEventListener('touchstart', function (e) {
+            const rect = canvas.getBoundingClientRect();
+            selectFigure(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+		}, { passive: true });
+
         canvas.addEventListener('mouseup', function (e) {
             handleDeleteFigure();
             globals.selectedFigure = null;
@@ -166,9 +171,12 @@
 
 		canvas.addEventListener('touchend', e => {
             handleDeleteFigure();
-            if (!mouseMoved)
-                globals.world.addFigure(e.offsetX, e.offsetY);         
-            globals.selectedFigure = null;            
+            if (!mouseMoved) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.changedTouches[0].clientX - rect.left;
+                const y = e.changedTouches[0].clientY - rect.top;
+                globals.world.addFigure(x, y);         
+            }
 		}, false);  
     }
 

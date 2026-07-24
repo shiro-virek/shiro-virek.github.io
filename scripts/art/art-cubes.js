@@ -108,7 +108,10 @@
 
     window.trackMouse = (x, y) => {
         if (clicking) {  
-            globals.world.rotate(-movY / 50, -movX / 50);
+            globals.world.figures.forEach(figure => {
+                figure.rotateX(-(movY / 3));
+                figure.rotateY(movX / 3);
+            });
         }
     }
     
