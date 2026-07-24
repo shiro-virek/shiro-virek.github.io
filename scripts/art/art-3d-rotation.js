@@ -71,52 +71,61 @@
         let changeFigure = () => {
             globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)];
             document.getElementById('btnChangeFigure').textContent = globals.world.primitive.icon;
-        }
+       }
         Browser.addButton("btnChangeFigure", globals.world.primitive.icon, changeFigure);
         
         let setRotationTool = () => {       
             if (config.tool == 0){
                 config.tool = 1;
                 document.getElementById('btnSetRotationTool').textContent = '🔄';
+                Browser.setInfo("Rotate camera 1 tool");
             }else{
                 config.tool = 0;
-                document.getElementById('btnSetRotationTool').textContent = '🔃';    
+                document.getElementById('btnSetRotationTool').textContent = '🔃';   
+                Browser.setInfo("Rotate camera 2 tool"); 
             }                          
         }        
         Browser.addButton("btnSetRotationTool", "🔄", setRotationTool);
 
         let setMoveLightTool = () => {    
             config.tool = 2;
+            Browser.setInfo("Move light tool");
         }
         Browser.addButton("btnSetMoveLightTool", "💡", setMoveLightTool);
 
         let setScaleTool = () => {    
             config.tool = 3;
+            Browser.setInfo("Scale figure tool");
         }
         Browser.addButton("btnSetScaleTool", "📐", setScaleTool);
 
         let setRotateFigureTool = () => {    
             config.tool = 4;
+            Browser.setInfo("Rotate figure tool");
         }
         Browser.addButton("btnSetRotateFigureTool", "↩️", setRotateFigureTool);
 
         let setMoveXTool = () => {    
             config.tool = 5;
+            Browser.setInfo("Rotate Move X tool");
         }
         Browser.addButton("btnSetMoveXTool", "X", setMoveXTool);
 
         let setMoveYTool = () => {    
             config.tool = 6;
+            Browser.setInfo("Move Y tool");
         }
         Browser.addButton("btnSetMoveYTool", "Y", setMoveYTool);
 
         let setMoveZTool = () => {    
             config.tool = 7;
+            Browser.setInfo("Move Z tool");
         }
         Browser.addButton("btnSetMoveZTool", "Z", setMoveZTool);
 
         let setDeleteTool = () => {    
             config.tool = 8;
+            Browser.setInfo("Delete tool");
         }
         Browser.addButton("btnSetDeleteTool", "🗑", setDeleteTool);
     }
@@ -137,6 +146,7 @@
         window.requestAnimationFrame(loop)
 
         addSpecialControls();
+        Browser.setInfo("Rotate camera 1 tool");
     }
 
     let addEvents = () => {
