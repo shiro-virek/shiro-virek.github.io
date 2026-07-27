@@ -209,10 +209,14 @@
                     if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
                     break;
                 case 1:              
+                    /*
                     globals.world.figures.forEach(figure => {
                         figure.rotateX(movY);
                         figure.rotateY(movX);
                     });
+                    */
+
+                    globals.world.orbitCamera(movX / 3, -movY / 3);
                     break;
                 case 2: 
                     moveLight(width - x, height - y);
