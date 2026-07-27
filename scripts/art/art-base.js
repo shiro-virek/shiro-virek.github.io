@@ -21,7 +21,7 @@
     let randomize = () => {
     }
     
-    window.draw = () => {
+    window.draw = (delta) => {
         drawBackground(ctx, canvas);
     }
 

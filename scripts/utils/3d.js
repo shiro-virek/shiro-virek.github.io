@@ -8,6 +8,7 @@ class ThreeDWorld {
         this.drawFace = drawFace;
         this.figures = [];
         this.cameraRotationX = 0; 
+        this.cameraRotationY = 0;
         this.cameraRotationZ = 0;
         this.cameraZ = 1000;
         this.FOV = 800;
@@ -198,6 +199,11 @@ class ThreeDWorld {
         if (this.cameraRotationX < -90) this.cameraRotationX = -90;
     }
 
+    orbitCamera = (dYaw, dPitch) => {
+        this.cameraRotationY += dYaw;
+        this.cameraRotationX += dPitch;
+    }
+
     addFigure(x, y) {
         let centeredX = x - this.width / 2;
         let centeredY = y - this.height / 2;
@@ -209,25 +215,33 @@ class ThreeDWorld {
         figure.faces = Objects.clone(this.primitive.faces);
         figure.doubleSided = this.primitive.doubleSided || false;
 
-        const scaleFactor = this.FOV / this.cameraZ;
-        let worldX = centeredX / scaleFactor;
-        let worldY = centeredY / scaleFactor;
-        let worldZ = 0; 
-        
-        if (this.cameraRotationZ !== 0) {
-            let angleZ = Trigonometry.sexagesimalToRadian(this.cameraRotationZ); 
-            let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
-            let newY = worldX * Math.sin(angleZ) + worldY * Math.cos(angleZ);
-            worldX = newX;
-            worldY = newY;
-        }
+        let rz = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
+        let ry = Trigonometry.sexagesimalToRadian(this.cameraRotationY);
+        let rx = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
 
-        if (this.cameraRotationX !== 0) {
-            let angleX = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
-            let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
-            let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
-            worldY = newY;
-        }
+        let cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+        let cosY = Math.cos(ry), sinY = Math.sin(ry);
+        let cosX = Math.cos(rx), sinX = Math.sin(rx);
+
+        let cx = centeredX / this.FOV;
+        let cy = centeredY / this.FOV;
+
+        let R02 = sinZ * sinX - cosZ * sinY * cosX;
+        let R12 = cosZ * sinX + sinZ * sinY * cosX;
+        let R22 = cosY * cosX;
+
+        let depth = this.cameraZ * R22 / (R02 * cx + R12 * cy + R22);
+
+        let R00 = cosZ * cosY;
+        let R10 = -sinZ * cosY;
+        let R20 = sinY;
+
+        let R01 = cosZ * sinY * sinX + sinZ * cosX;
+        let R11 = cosZ * cosX - sinZ * sinY * sinX;
+        let R21 = -cosY * sinX;
+
+        let worldX = depth * (R00 * cx + R10 * cy) + R20 * (depth - this.cameraZ);
+        let worldY = depth * (R01 * cx + R11 * cy) + R21 * (depth - this.cameraZ);
 
         figure.translateX(worldX);
         figure.translateY(worldY);
@@ -263,8 +277,14 @@ class ThreeDWorld {
         y = newY;
         z = newZ;
 
+        let angleY = Trigonometry.sexagesimalToRadian(-this.cameraRotationY);
+        let newX = x * Math.cos(angleY) + z * Math.sin(angleY);
+        newZ = -x * Math.sin(angleY) + z * Math.cos(angleY);
+        x = newX;
+        z = newZ;
+
         let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
-        let newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
+        newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
         newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
         x = newX;
         y = newY;
@@ -696,6 +716,31 @@ class OpenWorld extends ThreeDWorld {
 
         this.figures.push(figure);
         return figure;
+    }
+
+    orbitCamera = (dYaw, dPitch) => {
+        if (this._orbitYaw === undefined) {
+            this._orbitRadius = Math.sqrt(
+                this.cameraX * this.cameraX +
+                this.cameraY * this.cameraY +
+                this.cameraZ * this.cameraZ
+            ) || 700;
+            this._orbitYaw = Trigonometry.angleBetweenTwoPoints(0, 0, this.cameraX, this.cameraZ);
+            const horizDist = Math.sqrt(this.cameraX * this.cameraX + this.cameraZ * this.cameraZ);
+            this._orbitPitch = Math.atan2(-this.cameraY, horizDist) * 180 / Math.PI;
+        }
+
+        this._orbitYaw += dYaw;
+        this._orbitPitch = Math.max(-89, Math.min(89, this._orbitPitch + dPitch));
+
+        const yawRad = Trigonometry.sexagesimalToRadian(this._orbitYaw);
+        const pitchRad = Trigonometry.sexagesimalToRadian(this._orbitPitch);
+
+        this.cameraX = this._orbitRadius * Math.cos(pitchRad) * Math.cos(yawRad);
+        this.cameraZ = this._orbitRadius * Math.cos(pitchRad) * Math.sin(yawRad);
+        this.cameraY = -this._orbitRadius * Math.sin(pitchRad);
+        this.cameraRotationZ = this._orbitYaw + 90;
+        this.cameraRotationX = -this._orbitPitch;
     }
 
 }

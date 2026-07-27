@@ -204,15 +204,12 @@
                     globals.world.cameraRotationZ += movX * 0.1; 
                     globals.world.cameraRotationX += movY * 0.1; 
 
-                    const maxPitch = 89;
+                    const maxPitch = 89; 
                     if (globals.world.cameraRotationX > maxPitch) globals.world.cameraRotationX = maxPitch;
                     if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
                     break;
                 case 1:              
-                    globals.world.figures.forEach(figure => {
-                        figure.rotateX(movY);
-                        figure.rotateY(movX);
-                    });
+                    globals.world.orbitCamera(movX / 3, -movY / 3);
                     break;
                 case 2: 
                     moveLight(width - x, height - y);
