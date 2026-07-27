@@ -215,25 +215,33 @@ class ThreeDWorld {
         figure.faces = Objects.clone(this.primitive.faces);
         figure.doubleSided = this.primitive.doubleSided || false;
 
-        const scaleFactor = this.FOV / this.cameraZ;
-        let worldX = centeredX / scaleFactor;
-        let worldY = centeredY / scaleFactor;
-        let worldZ = 0; 
-        
-        if (this.cameraRotationZ !== 0) {
-            let angleZ = Trigonometry.sexagesimalToRadian(this.cameraRotationZ); 
-            let newX = worldX * Math.cos(angleZ) + worldY * (-Math.sin(angleZ));
-            let newY = worldX * Math.sin(angleZ) + worldY * Math.cos(angleZ);
-            worldX = newX;
-            worldY = newY;
-        }
+        let rz = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
+        let ry = Trigonometry.sexagesimalToRadian(this.cameraRotationY);
+        let rx = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
 
-        if (this.cameraRotationX !== 0) {
-            let angleX = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
-            let newY = worldY * Math.cos(angleX) + worldZ * (-Math.sin(angleX));
-            let newZ = worldY * Math.sin(angleX) + worldZ * Math.cos(angleX);
-            worldY = newY;
-        }
+        let cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+        let cosY = Math.cos(ry), sinY = Math.sin(ry);
+        let cosX = Math.cos(rx), sinX = Math.sin(rx);
+
+        let cx = centeredX / this.FOV;
+        let cy = centeredY / this.FOV;
+
+        let R02 = sinZ * sinX - cosZ * sinY * cosX;
+        let R12 = cosZ * sinX + sinZ * sinY * cosX;
+        let R22 = cosY * cosX;
+
+        let depth = this.cameraZ * R22 / (R02 * cx + R12 * cy + R22);
+
+        let R00 = cosZ * cosY;
+        let R10 = -sinZ * cosY;
+        let R20 = sinY;
+
+        let R01 = cosZ * sinY * sinX + sinZ * cosX;
+        let R11 = cosZ * cosX - sinZ * sinY * sinX;
+        let R21 = -cosY * sinX;
+
+        let worldX = depth * (R00 * cx + R10 * cy) + R20 * (depth - this.cameraZ);
+        let worldY = depth * (R01 * cx + R11 * cy) + R21 * (depth - this.cameraZ);
 
         figure.translateX(worldX);
         figure.translateY(worldY);
