@@ -198,6 +198,31 @@ class ThreeDWorld {
         if (this.cameraRotationX < -90) this.cameraRotationX = -90;
     }
 
+    orbitCamera = (dYaw, dPitch) => {
+        if (this._orbitYaw === undefined) {
+            this._orbitRadius = Math.sqrt(
+                this.cameraX * this.cameraX +
+                this.cameraY * this.cameraY +
+                this.cameraZ * this.cameraZ
+            ) || 700;
+            this._orbitYaw = Trigonometry.angleBetweenTwoPoints(0, 0, this.cameraX, this.cameraZ);
+            const horizDist = Math.sqrt(this.cameraX * this.cameraX + this.cameraZ * this.cameraZ);
+            this._orbitPitch = Math.atan2(-this.cameraY, horizDist) * 180 / Math.PI;
+        }
+
+        this._orbitYaw += dYaw;
+        this._orbitPitch = Math.max(-89, Math.min(89, this._orbitPitch + dPitch));
+
+        const yawRad = Trigonometry.sexagesimalToRadian(this._orbitYaw);
+        const pitchRad = Trigonometry.sexagesimalToRadian(this._orbitPitch);
+
+        this.cameraX = this._orbitRadius * Math.cos(pitchRad) * Math.cos(yawRad);
+        this.cameraZ = this._orbitRadius * Math.cos(pitchRad) * Math.sin(yawRad);
+        this.cameraY = -this._orbitRadius * Math.sin(pitchRad);
+        this.cameraRotationZ = this._orbitYaw + 90;
+        this.cameraRotationX = -this._orbitPitch;
+    }
+
     addFigure(x, y) {
         let centeredX = x - this.width / 2;
         let centeredY = y - this.height / 2;

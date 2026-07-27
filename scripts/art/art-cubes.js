@@ -21,6 +21,8 @@
         globals.world.cameraZ = -700;
         globals.world.cameraRotationX = -30;
 
+        globals.world.orbitCamera(0, 0);
+
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);        
@@ -96,22 +98,16 @@
         });
 
         if (config.animateCamera){
-            let orbitAngle = performance.now() * 0.0005;
-            let radius = 700;
-            globals.world.cameraX = Math.cos(orbitAngle) * radius;
-            globals.world.cameraZ = Math.sin(orbitAngle) * radius;
-            globals.world.cameraRotationZ = orbitAngle * 180 / Math.PI + 90;
+            let speed = 0.0005 * (180 / Math.PI);
+            globals.world.orbitCamera(delta * speed, 0);
         }
 
         globals.world.draw();
     }
 
     window.trackMouse = (x, y) => {
-        if (clicking) {  
-            globals.world.figures.forEach(figure => {
-                figure.rotateX(-(movY / 3));
-                figure.rotateY(movX / 3);
-            });
+        if (clicking) {
+            globals.world.orbitCamera(-movX / 3, -movY / 3);
         }
     }
     

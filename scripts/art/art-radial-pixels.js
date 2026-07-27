@@ -25,6 +25,9 @@
         drawBackground(ctx, canvas);
 
         radialPixel(200, 200, 20, 5, 0, 100, "rgba(255,0,0,1)");
+
+
+        radialPixel(200, 200, 20, 5, 100, 190, "rgba(255,255,0,1)");
     }
 
     let radialPixel = (x, y, radius, wideness, startAngle, endAngle, color) => {
@@ -42,8 +45,10 @@
         ctx.arc(x, y, radius - wideness, endAngle, startAngle, 1);
 
         ctx.lineTo(point.x, point.y);
-
         ctx.fill();
+      
+
+        //ctx.endPath(); 
     }
 
     window.trackMouse = (x, y) => {
