@@ -342,7 +342,7 @@ class Basic3DWorld {
                 const v2 = (lat + 1) * (lonSegs + 1) + lon + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }
         let icon = '⏺';
@@ -363,17 +363,17 @@ class Basic3DWorld {
             vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
         }
         const topFace = [];
-        for (let i = segs - 1; i >= 0; i--) topFace.push(i);
+        for (let i = 0; i < segs; i++) topFace.push(i);
         faces.push(topFace);
         const bottomFace = [];
-        for (let i = 0; i < segs; i++) bottomFace.push(segs + i);
+        for (let i = segs - 1; i >= 0; i--) bottomFace.push(segs + i);
         faces.push(bottomFace);
         for (let i = 0; i < segs; i++) {
             const next = (i + 1) % segs;
             edges.push([i, next]);
             edges.push([segs + i, segs + next]);
             edges.push([i, segs + i]);
-            faces.push([i, next, segs + next, segs + i]);
+            faces.push([i, segs + i, segs + next, next]);
         }
         let icon = '█';
         return { vertices, edges, faces, icon };
@@ -397,7 +397,7 @@ class Basic3DWorld {
                 const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }
         let icon = '◉';
@@ -426,7 +426,7 @@ class Basic3DWorld {
                 const v2 = (i + 1) * (vSegs + 1) + j + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }        
         let icon = '♥︎';
@@ -439,17 +439,18 @@ class Basic3DWorld {
         const faces = [];
         for (let i = 0; i <= ringSegs; i++) {
             const u = (i / ringSegs) * 2 * Math.PI;
-            const denom = 1 + Math.sin(u) * Math.sin(u);
-            const cx = size * Math.cos(u) / denom;
-            const cy = size * Math.sin(u) * Math.cos(u) / denom;
-            const du = 0.001;
-            const ud = u + du;
-            const denomD = 1 + Math.sin(ud) * Math.sin(ud);
-            const tx = size * Math.cos(ud) / denomD - cx;
-            const ty = size * Math.sin(ud) * Math.cos(ud) / denomD - cy;
-            const tLen = Math.sqrt(tx * tx + ty * ty) || 1;
-            const nx = -ty / tLen;
-            const ny = tx / tLen;
+            const sinU = Math.sin(u);
+            const cosU = Math.cos(u);
+            const D = 1 + sinU * sinU;
+            const D2 = D * D;
+            const cx = size * cosU / D;
+            const cy = size * sinU * cosU / D;
+            const dDdu = 2 * sinU * cosU;
+            const dcx = size * (-sinU * D - cosU * dDdu) / D2;
+            const dcy = size * ((cosU * cosU - sinU * sinU) * D - sinU * cosU * dDdu) / D2;
+            const tLen = Math.sqrt(dcx * dcx + dcy * dcy) || 1;
+            const nx = -dcy / tLen;
+            const ny = dcx / tLen;
             for (let j = 0; j <= tubeSegs; j++) {
                 const v = (j / tubeSegs) * 2 * Math.PI;
                 vertices.push([cx + tubeRadius * (Math.cos(v) * nx), cy + tubeRadius * (Math.cos(v) * ny), tubeRadius * Math.sin(v)]);
@@ -1499,22 +1500,18 @@ let primitives = [
         },
         {
             name: "sphere",
-            doubleSided: true,
             ...Basic3DWorld.generateSphere()
         },
         {
             name: "cylinder",
-            doubleSided: true,
             ...Basic3DWorld.generateCylinder()
         },
         {
             name: "torus",
-            doubleSided: true,
             ...Basic3DWorld.generateTorus()
         },
         {
             name: "heart",
-            doubleSided: true,
             ...Basic3DWorld.generateHeart()
         },
         {
