@@ -12,11 +12,13 @@
     let drawFace = (vertices, lightness, hue) => {
         let color = `hsl(${hue}, ${100}%, ${lightness}%)`;
         
-        ctx.beginPath();            
-        ctx.moveTo(vertices[0][0], vertices[0][1]);
+        ctx.beginPath();
+        let p = globals.world.worldToScreen(vertices[0]);
+        ctx.moveTo(p[0], p[1]);
         
         for (let i = 1; i < vertices.length; i++) {
-            ctx.lineTo(vertices[i][0], vertices[i][1]);
+            p = globals.world.worldToScreen(vertices[i]);
+            ctx.lineTo(p[0], p[1]);
         }
         ctx.closePath();
         
@@ -34,11 +36,11 @@
 
         globals.world.figures.forEach((figure) => {
             figure.faces.forEach(faceIndices => {
-                const rotatedVertices = faceIndices.map(i => 
-                    globals.world.applyCameraRotation(figure.vertices[i])
+                const viewVertices = faceIndices.map(i => 
+                    globals.world.applyCameraTransform(figure.vertices[i])
                 );
 
-                if (!figure.shouldDrawFace(rotatedVertices)) return;
+                if (!figure.shouldDrawFace(viewVertices)) return;
 
                 const screenPoints = faceIndices.map(i => globals.world.worldToScreen(figure.vertices[i]));
 
@@ -140,7 +142,7 @@
     let init = () => {
         initCanvas();        
         globals.random = Objects.getRandomObject();
-        globals.world = new ThreeDWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
+        globals.world = new OpenWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
         randomize();
         addEvents();
         window.requestAnimationFrame(loop)
