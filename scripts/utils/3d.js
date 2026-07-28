@@ -1,4 +1,4 @@
-class ThreeDWorld {
+class Basic3DWorld {
     constructor(width, height, random, drawLine, drawPoint, drawFace) {
         this.width = width;
         this.height = height;
@@ -7,17 +7,18 @@ class ThreeDWorld {
         this.drawPoint = drawPoint;
         this.drawFace = drawFace;
         this.figures = [];
+        this.cameraX = 0;
+        this.cameraY = 0;
         this.cameraRotationX = 0; 
         this.cameraRotationY = 0;
         this.cameraRotationZ = 0;
-        this.cameraZ = 1000;
+        this.cameraZ = -1000;
         this.FOV = 800;
         this.drawFigureEdges = true;
         this.drawFigureVertices = false;
         this.drawFigureFaces = false;
         this.primitive = primitives[0];
-        this.rotationMode = 0;      
-        this.cameraMode = 0;
+        this.rotationMode = 0;    
         this.lightDirection = [0, 0, 1] ;
         this.enableFog = true;        
     }
@@ -37,30 +38,18 @@ class ThreeDWorld {
     worldToScreen = (point) => {
         let transformedPoint;
 
-        if (this.cameraMode == 0) {
-            transformedPoint = this.applyCameraRotation(point);
-        } else {
-            transformedPoint = this.applyCameraTransform(point);
-        }
-
+        transformedPoint = this.applyCameraTransform(point);
+        
         const x = transformedPoint[0];
         const y = transformedPoint[1];
         const z = transformedPoint[2];
 
         let scaleFactor = 0;
 
-        if (this.cameraMode == 0){            
-            let depth = z + this.cameraZ;
-            if (depth < 1) depth = 1; 
+        if (z <= 1) return [-9999, -9999]; 
 
-            scaleFactor = this.FOV / depth;
-        }else{
-            if (z <= 1) return [-9999, -9999]; 
-
-            scaleFactor = this.FOV / z;
-        }
-
-        
+        scaleFactor = this.FOV / z;
+             
         const projectedX = (x * scaleFactor) + this.width / 2;
         const projectedY = (y * scaleFactor) + this.height / 2;
         
@@ -91,74 +80,55 @@ class ThreeDWorld {
         return [projectedX, projectedY];
     }
 
-    drawFaces = () => {
+    drawFaces = () => {    
+        let allFaces = [];
 
-        if (this.cameraMode == 0) {
+        this.figures.forEach(figure => {
+            figure.faces.forEach(faceIndices => {
+                const viewVertices = faceIndices.map(index => 
+                    this.applyCameraTransform(figure.vertices[index])
+                );
 
-            this.figures.forEach(figure => {
-                figure.cachedZ = figure.getAverageZ();
-            });
-
-            this.figures.sort((a, b) => {
-                if (isNaN(a.cachedZ)) return 1; 
-                if (isNaN(b.cachedZ)) return -1;
-                
-                return b.cachedZ - a.cachedZ;
-            });
-
-            this.figures.forEach(figure => {
-                figure.drawFaces(ctx);
-            });
-
-        }else{
-
-            let allFaces = [];
-
-            this.figures.forEach(figure => {
-                figure.faces.forEach(faceIndices => {
-                    const viewVertices = faceIndices.map(index => 
-                        this.applyCameraTransform(figure.vertices[index])
-                    );
-
-                    let isBehindCamera = false;
-                    for (let v of viewVertices) {
-                        if (v[2] <= 1) {
-                            isBehindCamera = true;
-                            break;
-                        }
+                let isBehindCamera = false;
+                for (let v of viewVertices) {
+                    if (v[2] <= 1) {
+                        isBehindCamera = true;
+                        break;
                     }
-                    if (isBehindCamera) return;
+                }
+                if (isBehindCamera) return;
 
-                    if (figure.shouldDrawFace(viewVertices)) {
-                        let sumZ = 0;
-                        viewVertices.forEach(v => sumZ += v[2]);
-                        const avgZ = sumZ / viewVertices.length;
+                if (figure.shouldDrawFace(viewVertices)) {
+                    let sumZ = 0;
+                    viewVertices.forEach(v => sumZ += v[2]);
+                    const avgZ = sumZ / viewVertices.length;
 
-                        allFaces.push({
-                            worldVertices: faceIndices.map(index => figure.vertices[index]),
-                            viewZ: avgZ,
-                            hue: figure.hue,
-                            life: figure.isDebris ? figure.life : 1.0,
-                            lightness: figure.getLightness(viewVertices)
-                        });
-                    }
-                });
+                    const worldVertices = faceIndices.map(index => figure.vertices[index]);
+                    allFaces.push({
+                        worldVertices: worldVertices,
+                        viewZ: avgZ,
+                        hue: figure.hue,
+                        life: figure.isDebris ? figure.life : 1.0,
+                        lightness: figure.getLightness(worldVertices)
+                    });
+                }
             });
+        });
 
-            allFaces.sort((a, b) => b.viewZ - a.viewZ);
+        allFaces.sort((a, b) => b.viewZ - a.viewZ);
 
-            allFaces.forEach(face => {
-                const dist = face.viewZ;
-                let fogAlpha = Numbers.scale(dist, 2000, 5000, 1, 0);
-                if (fogAlpha < 0) fogAlpha = 0;
+        allFaces.forEach(face => {
+            const dist = face.viewZ;
+            let fogAlpha = Numbers.scale(dist, 2000, 5000, 1, 0);
+            if (fogAlpha < 0) fogAlpha = 0;
 
-                let finalAlpha = fogAlpha * face.life;
-                if (finalAlpha < 0) finalAlpha = 0;
-                if (finalAlpha > 1) finalAlpha = 1;
+            let finalAlpha = fogAlpha * face.life;
+            if (finalAlpha < 0) finalAlpha = 0;
+            if (finalAlpha > 1) finalAlpha = 1;
 
-                this.drawFace(face.worldVertices, face.lightness, face.hue, this.enableFog ? finalAlpha : 1)
-            });
-        }
+            this.drawFace(face.worldVertices, face.lightness, face.hue, this.enableFog ? finalAlpha : 1)
+        });
+    
     }
 
     drawEdges = () => {
@@ -236,8 +206,8 @@ class ThreeDWorld {
         let B = R01 - cx * R21;
         let C = R10 - cy * R20;
         let D = R11 - cy * R21;
-        let E1 = cx * this.cameraZ;
-        let E2 = cy * this.cameraZ;
+        let E1 = -cx * this.cameraZ;
+        let E2 = -cy * this.cameraZ;
 
         let det = A * D - B * C;
         let worldX = (E1 * D - E2 * B) / det;
@@ -372,7 +342,7 @@ class ThreeDWorld {
                 const v2 = (lat + 1) * (lonSegs + 1) + lon + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }
         let icon = '⏺';
@@ -393,17 +363,17 @@ class ThreeDWorld {
             vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
         }
         const topFace = [];
-        for (let i = segs - 1; i >= 0; i--) topFace.push(i);
+        for (let i = 0; i < segs; i++) topFace.push(i);
         faces.push(topFace);
         const bottomFace = [];
-        for (let i = 0; i < segs; i++) bottomFace.push(segs + i);
+        for (let i = segs - 1; i >= 0; i--) bottomFace.push(segs + i);
         faces.push(bottomFace);
         for (let i = 0; i < segs; i++) {
             const next = (i + 1) % segs;
             edges.push([i, next]);
             edges.push([segs + i, segs + next]);
             edges.push([i, segs + i]);
-            faces.push([i, next, segs + next, segs + i]);
+            faces.push([i, segs + i, segs + next, next]);
         }
         let icon = '█';
         return { vertices, edges, faces, icon };
@@ -427,7 +397,7 @@ class ThreeDWorld {
                 const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }
         let icon = '◉';
@@ -456,7 +426,7 @@ class ThreeDWorld {
                 const v2 = (i + 1) * (vSegs + 1) + j + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }        
         let icon = '♥︎';
@@ -469,17 +439,18 @@ class ThreeDWorld {
         const faces = [];
         for (let i = 0; i <= ringSegs; i++) {
             const u = (i / ringSegs) * 2 * Math.PI;
-            const denom = 1 + Math.sin(u) * Math.sin(u);
-            const cx = size * Math.cos(u) / denom;
-            const cy = size * Math.sin(u) * Math.cos(u) / denom;
-            const du = 0.001;
-            const ud = u + du;
-            const denomD = 1 + Math.sin(ud) * Math.sin(ud);
-            const tx = size * Math.cos(ud) / denomD - cx;
-            const ty = size * Math.sin(ud) * Math.cos(ud) / denomD - cy;
-            const tLen = Math.sqrt(tx * tx + ty * ty) || 1;
-            const nx = -ty / tLen;
-            const ny = tx / tLen;
+            const sinU = Math.sin(u);
+            const cosU = Math.cos(u);
+            const D = 1 + sinU * sinU;
+            const D2 = D * D;
+            const cx = size * cosU / D;
+            const cy = size * sinU * cosU / D;
+            const dDdu = 2 * sinU * cosU;
+            const dcx = size * (-sinU * D - cosU * dDdu) / D2;
+            const dcy = size * ((cosU * cosU - sinU * sinU) * D - sinU * cosU * dDdu) / D2;
+            const tLen = Math.sqrt(dcx * dcx + dcy * dcy) || 1;
+            const nx = -dcy / tLen;
+            const ny = dcx / tLen;
             for (let j = 0; j <= tubeSegs; j++) {
                 const v = (j / tubeSegs) * 2 * Math.PI;
                 vertices.push([cx + tubeRadius * (Math.cos(v) * nx), cy + tubeRadius * (Math.cos(v) * ny), tubeRadius * Math.sin(v)]);
@@ -492,7 +463,7 @@ class ThreeDWorld {
                 const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }        
         let icon = '∞';
@@ -500,11 +471,29 @@ class ThreeDWorld {
     }                   
 }
 
-class OpenWorld extends ThreeDWorld {
+class Open3DWorld {
     constructor(width, height, random, drawLine, drawPoint, drawFace) {
-        super(width, height, random, drawLine, drawPoint, drawFace);
-
-        this.cameraMode = 1;
+        this.width = width;
+        this.height = height;
+        this.random = random;
+        this.drawLine = drawLine;
+        this.drawPoint = drawPoint;
+        this.drawFace = drawFace;
+        this.figures = [];
+        this.cameraX = 0;
+        this.cameraY = 0;
+        this.cameraRotationX = 0; 
+        this.cameraRotationY = 0;
+        this.cameraRotationZ = 0;
+        this.cameraZ = -1000;
+        this.FOV = 800;
+        this.drawFigureEdges = true;
+        this.drawFigureVertices = false;
+        this.drawFigureFaces = false;
+        this.primitive = primitives[0];
+        this.rotationMode = 0;    
+        this.lightDirection = [0, 0, 1];
+        this.enableFog = true;     
 
         this.cameraX = 0;
         this.cameraY = -200; 
@@ -596,7 +585,14 @@ class OpenWorld extends ThreeDWorld {
     }
 
     draw = () => {
-        super.draw();
+        if (this.drawFigureFaces)
+            this.drawFaces();
+
+        if (this.drawFigureEdges || (!this.drawFigureFaces && !this.drawFigureEdges && !this.drawFigureVertices))
+            this.drawEdges();
+        
+        if (this.drawFigureVertices)
+            this.drawVertices();
 
         this.translateInfiniteFloor();
     }
@@ -682,6 +678,7 @@ class OpenWorld extends ThreeDWorld {
 
         let figure = new Character(this);
         figure.vertices = Objects.clone(fig.vertices);
+        figure.edges = Objects.clone(fig.edges || []);
         figure.faces = Objects.clone(fig.faces);
 
         figure.translateX(worldX);
@@ -702,6 +699,7 @@ class OpenWorld extends ThreeDWorld {
     addFigureAt = (worldX, worldY, worldZ, fig = this.primitive) => {
         let figure = new Character(this);
         figure.vertices = Objects.clone(fig.vertices);
+        figure.edges = Objects.clone(fig.edges || []);
         figure.faces = Objects.clone(fig.faces);
 
         figure.translateX(worldX);
@@ -740,6 +738,193 @@ class OpenWorld extends ThreeDWorld {
         this.cameraY = -this._orbitRadius * Math.sin(pitchRad);
         this.cameraRotationZ = this._orbitYaw + 90;
         this.cameraRotationX = -this._orbitPitch;
+    }
+
+    worldToScreen = (point) => {
+        let transformedPoint;
+
+        transformedPoint = this.applyCameraTransform(point);
+        
+        const x = transformedPoint[0];
+        const y = transformedPoint[1];
+        const z = transformedPoint[2];
+
+        let scaleFactor = 0;
+
+        if (z <= 1) return [-9999, -9999]; 
+
+        scaleFactor = this.FOV / z;
+             
+        const projectedX = (x * scaleFactor) + this.width / 2;
+        const projectedY = (y * scaleFactor) + this.height / 2;
+        
+        return [projectedX, projectedY];    
+    }
+
+    worldToScreenOblique = (point, angleX, angleY) => {
+        const radianX = (angleX * Math.PI) / 180;
+        const radianY = (angleY * Math.PI) / 180;
+
+        const projectedX = point[0] + point[2] * Math.tan(radianY);
+        const projectedY = point[1] + point[2] * Math.tan(radianX);
+
+        return [projectedX, projectedY];
+    }
+
+    worldToScreenIsometric = (point) => {
+        const isoMatrix = [
+            Math.sqrt(3) / 2, -1 / 2, 0,
+            Math.sqrt(3) / 2, 1 / 2, 0,
+            0, 0, 1
+        ];
+
+        const projectedX = isoMatrix[0] * point[0] + isoMatrix[1] * point[1] + isoMatrix[2] * point[2];
+        const projectedY = isoMatrix[3] * point[0] + isoMatrix[4] * point[1] + isoMatrix[5] * point[2];
+        const projectedZ = isoMatrix[6] * point[0] + isoMatrix[7] * point[1] + isoMatrix[8] * point[2];
+
+        return [projectedX, projectedY];
+    }
+
+    drawFaces = () => {    
+        let allFaces = [];
+
+        this.figures.forEach(figure => {
+            figure.faces.forEach(faceIndices => {
+                const viewVertices = faceIndices.map(index => 
+                    this.applyCameraTransform(figure.vertices[index])
+                );
+
+                let isBehindCamera = false;
+                for (let v of viewVertices) {
+                    if (v[2] <= 1) {
+                        isBehindCamera = true;
+                        break;
+                    }
+                }
+                if (isBehindCamera) return;
+
+                if (figure.shouldDrawFace(viewVertices)) {
+                    let sumZ = 0;
+                    viewVertices.forEach(v => sumZ += v[2]);
+                    const avgZ = sumZ / viewVertices.length;
+
+                    const worldVertices = faceIndices.map(index => figure.vertices[index]);
+                    allFaces.push({
+                        worldVertices: worldVertices,
+                        viewZ: avgZ,
+                        hue: figure.hue,
+                        life: figure.isDebris ? figure.life : 1.0,
+                        lightness: figure.getLightness(worldVertices)
+                    });
+                }
+            });
+        });
+
+        allFaces.sort((a, b) => b.viewZ - a.viewZ);
+
+        allFaces.forEach(face => {
+            const dist = face.viewZ;
+            let fogAlpha = Numbers.scale(dist, 2000, 5000, 1, 0);
+            if (fogAlpha < 0) fogAlpha = 0;
+
+            let finalAlpha = fogAlpha * face.life;
+            if (finalAlpha < 0) finalAlpha = 0;
+            if (finalAlpha > 1) finalAlpha = 1;
+
+            this.drawFace(face.worldVertices, face.lightness, face.hue, this.enableFog ? finalAlpha : 1)
+        });
+    
+    }
+
+    drawEdges = () => {
+        for (let i = this.figures.length - 1; i >= 0; i--) {
+            this.figures[i].drawEdges(ctx);
+        }
+    }
+
+    drawVertices = () => {
+        for (let i = this.figures.length - 1; i >= 0; i--) {
+            this.figures[i].drawVertices(ctx);
+        }
+    }
+
+    applyCameraRotation = (point) => {
+        let x = point[0];
+        let y = point[1];
+        let z = point[2];
+                    
+        let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
+        let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
+        let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
+        y = newY;
+        z = newZ;
+
+        let angleY = Trigonometry.sexagesimalToRadian(-this.cameraRotationY);
+        let newX = x * Math.cos(angleY) + z * Math.sin(angleY);
+        newZ = -x * Math.sin(angleY) + z * Math.cos(angleY);
+        x = newX;
+        z = newZ;
+
+        let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
+        newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
+        newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
+        x = newX;
+        y = newY;
+        
+        return [x, y, z];
+    
+    }
+
+    applyCameraTransform = (point) => {
+        let x = point[0] - this.cameraX;
+        let y = point[1] - this.cameraY;
+        let z = point[2] - this.cameraZ;
+        
+        let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
+        let cosZ = Math.cos(angleZ);
+        let sinZ = Math.sin(angleZ);
+        
+        let nx = x * cosZ - z * sinZ;
+        let nz = x * sinZ + z * cosZ;
+        x = nx;
+        z = nz;
+
+        let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX);
+        let cosX = Math.cos(angleX);
+        let sinX = Math.sin(angleX);
+        
+        let ny = y * cosX - z * sinX;
+        nz = y * sinX + z * cosX;
+        y = ny;
+        z = nz;
+        
+        return [x, y, z];
+    }
+
+    moveForward = (speed) => {
+        let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
+        this.cameraX -= Math.sin(angleRad) * speed;
+        this.cameraZ += Math.cos(angleRad) * speed;
+    }
+
+    moveRight = (speed) => {
+        let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
+        this.cameraX -= Math.sin(angleRad) * speed;
+        this.cameraZ += Math.cos(angleRad) * speed;
+    }
+
+    moveCameraY = (speed) => {
+        let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
+        this.cameraX -= Math.sin(angleRad) * speed;
+        this.cameraY += Math.cos(angleRad) * speed;
+    }
+
+    rotate = (dPitch, dYaw) => {
+        this.cameraRotationX += dPitch;
+        this.cameraRotationZ += dYaw;
+
+        if (this.cameraRotationX > 90) this.cameraRotationX = 90;
+        if (this.cameraRotationX < -90) this.cameraRotationX = -90;
     }
 
 }
@@ -1065,9 +1250,6 @@ class Figure {
             let z = lightDir[0] * (-Math.sin(angle)) + lightDir[2] * Math.cos(angle);
             lightDir = [x, lightDir[1], z];
         }
-        if (this.world.cameraRotationX !== 0 || this.world.cameraRotationZ !== 0) {
-            lightDir = this.world.applyCameraRotation(lightDir);
-        }
         let dotProduct = Trigonometry.dotProduct(normal, lightDir);
         if (this.doubleSided) dotProduct = Math.abs(dotProduct);
         
@@ -1081,8 +1263,8 @@ class Figure {
     getAverageZ = () => {
         let sumZ = 0;
         for (let i = 0; i < this.vertices.length; i++) {
-            let rotatedVertex = this.world.applyCameraRotation(this.vertices[i]);
-            sumZ += rotatedVertex[2];
+            let transformed = this.world.applyCameraTransform(this.vertices[i]);
+            sumZ += transformed[2];
         }
         return sumZ / this.vertices.length;
     }
@@ -1090,8 +1272,8 @@ class Figure {
     getAverageY = () => {
         let sumY = 0;
         for (let i = 0; i < this.vertices.length; i++) {
-            let rotatedVertex = this.world.applyCameraRotation(this.vertices[i]);
-            sumY += rotatedVertex[1];
+            let transformed = this.world.applyCameraTransform(this.vertices[i]);
+            sumY += transformed[1];
         }
         return sumY / this.vertices.length;
     }
@@ -1318,27 +1500,22 @@ let primitives = [
         },
         {
             name: "sphere",
-            doubleSided: true,
-            ...ThreeDWorld.generateSphere()
+            ...Basic3DWorld.generateSphere()
         },
         {
             name: "cylinder",
-            doubleSided: true,
-            ...ThreeDWorld.generateCylinder()
+            ...Basic3DWorld.generateCylinder()
         },
         {
             name: "torus",
-            doubleSided: true,
-            ...ThreeDWorld.generateTorus()
+            ...Basic3DWorld.generateTorus()
         },
         {
             name: "heart",
-            doubleSided: true,
-            ...ThreeDWorld.generateHeart()
+            ...Basic3DWorld.generateHeart()
         },
         {
             name: "infinity",
-            doubleSided: true,
-            ...ThreeDWorld.generateInfinity()
+            ...Basic3DWorld.generateInfinity()
         },
     ]

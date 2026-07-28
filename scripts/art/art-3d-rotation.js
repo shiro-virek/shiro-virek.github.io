@@ -6,17 +6,20 @@
     };
 
     const config = {
-        tool: 1, // 0: rotate, 1: rotate2, 2: move light, 3: scale
+        tool: 1, 
+        displayMode: 1,
     };  
 
     let drawFace = (vertices, lightness, hue) => {
         let color = `hsl(${hue}, ${100}%, ${lightness}%)`;
         
-        ctx.beginPath();            
-        ctx.moveTo(vertices[0][0], vertices[0][1]);
+        ctx.beginPath();
+        let p = globals.world.worldToScreen(vertices[0]);
+        ctx.moveTo(p[0], p[1]);
         
         for (let i = 1; i < vertices.length; i++) {
-            ctx.lineTo(vertices[i][0], vertices[i][1]);
+            p = globals.world.worldToScreen(vertices[i]);
+            ctx.lineTo(p[0], p[1]);
         }
         ctx.closePath();
         
@@ -34,11 +37,11 @@
 
         globals.world.figures.forEach((figure) => {
             figure.faces.forEach(faceIndices => {
-                const rotatedVertices = faceIndices.map(i => 
-                    globals.world.applyCameraRotation(figure.vertices[i])
+                const viewVertices = faceIndices.map(i => 
+                    globals.world.applyCameraTransform(figure.vertices[i])
                 );
 
-                if (!figure.shouldDrawFace(rotatedVertices)) return;
+                if (!figure.shouldDrawFace(viewVertices)) return;
 
                 const screenPoints = faceIndices.map(i => globals.world.worldToScreen(figure.vertices[i]));
 
@@ -74,16 +77,10 @@
        }
         Browser.addButton("btnChangeFigure", globals.world.primitive.icon, changeFigure);
         
-        let setRotationTool = () => {       
-            if (config.tool == 0){
-                config.tool = 1;
-                document.getElementById('btnSetRotationTool').textContent = '🔄';
-                Browser.setInfo("Rotate camera 1 tool");
-            }else{
-                config.tool = 0;
-                document.getElementById('btnSetRotationTool').textContent = '🔃';   
-                Browser.setInfo("Rotate camera 2 tool"); 
-            }                          
+        let setRotationTool = () => {    
+            config.tool = 1;
+            document.getElementById('btnSetRotationTool').textContent = '🔄';
+            Browser.setInfo("Rotate camera tool");                      
         }        
         Browser.addButton("btnSetRotationTool", "🔄", setRotationTool);
 
@@ -128,25 +125,39 @@
             Browser.setInfo("Delete tool");
         }
         Browser.addButton("btnSetDeleteTool", "🗑", setDeleteTool);
+
+        let setDisplayMode = () => {    
+            config.displayMode++;
+            if (config.displayMode == 5) config.displayMode = 1;
+
+            globals.world.drawFigureVertices = config.displayMode == 1 || config.displayMode == 3;
+            globals.world.drawFigureEdges =  config.displayMode == 2 || config.displayMode == 3;
+            globals.world.drawFigureFaces = config.displayMode == 4;
+
+            Browser.setInfo("Change display mode tool");
+        }
+        Browser.addButton("btnSetDisplayMode", "⌗", setDisplayMode);
     }
 
     let randomize = () => {
 		globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)]
-        globals.world.drawFigureEdges = globals.random.nextBool();
-        globals.world.drawFigureVertices = globals.random.nextBool();
-        globals.world.drawFigureFaces = !(globals.world.drawFigureEdges || globals.world.drawFigureVertices);
     }
 
     let init = () => {
         initCanvas();        
         globals.random = Objects.getRandomObject();
-        globals.world = new ThreeDWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
+        globals.world = new Open3DWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
+        globals.world.cameraY = -300;
+        globals.world.cameraZ = -700;
+        globals.world.cameraRotationX = -30;
+
+        globals.world.orbitCamera(0, 0);
         randomize();
         addEvents();
         window.requestAnimationFrame(loop)
 
         addSpecialControls();
-        Browser.setInfo("Rotate camera 1 tool");
+        Browser.setInfo("Rotate camera tool");
     }
 
     let addEvents = () => {
@@ -200,14 +211,6 @@
     window.trackMouse = (x, y) => {        
         if (clicking) {
             switch (config.tool) {
-                case 0:
-                    globals.world.cameraRotationZ += movX * 0.1; 
-                    globals.world.cameraRotationX += movY * 0.1; 
-
-                    const maxPitch = 89; 
-                    if (globals.world.cameraRotationX > maxPitch) globals.world.cameraRotationX = maxPitch;
-                    if (globals.world.cameraRotationX < -maxPitch) globals.world.cameraRotationX = -maxPitch;
-                    break;
                 case 1:              
                     globals.world.orbitCamera(movX / 3, -movY / 3);
                     break;
