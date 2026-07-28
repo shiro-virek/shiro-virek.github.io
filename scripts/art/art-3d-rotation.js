@@ -7,6 +7,7 @@
 
     const config = {
         tool: 1, 
+        displayMode: 1,
     };  
 
     let drawFace = (vertices, lightness, hue) => {
@@ -124,19 +125,33 @@
             Browser.setInfo("Delete tool");
         }
         Browser.addButton("btnSetDeleteTool", "🗑", setDeleteTool);
+
+        let setDisplayMode = () => {    
+            config.displayMode++;
+            if (config.displayMode == 5) config.displayMode = 1;
+
+            globals.world.drawFigureVertices = config.displayMode == 1 || config.displayMode == 3;
+            globals.world.drawFigureEdges =  config.displayMode == 2 || config.displayMode == 3;
+            globals.world.drawFigureFaces = config.displayMode == 4;
+
+            Browser.setInfo("Change display mode tool");
+        }
+        Browser.addButton("btnSetDisplayMode", "⌗", setDisplayMode);
     }
 
     let randomize = () => {
 		globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)]
-        globals.world.drawFigureEdges = globals.random.nextBool();
-        globals.world.drawFigureVertices = globals.random.nextBool();
-        globals.world.drawFigureFaces = !(globals.world.drawFigureEdges || globals.world.drawFigureVertices);
     }
 
     let init = () => {
         initCanvas();        
         globals.random = Objects.getRandomObject();
         globals.world = new Open3DWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
+        globals.world.cameraY = -300;
+        globals.world.cameraZ = -700;
+        globals.world.cameraRotationX = -30;
+
+        globals.world.orbitCamera(0, 0);
         randomize();
         addEvents();
         window.requestAnimationFrame(loop)
