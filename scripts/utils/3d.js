@@ -463,7 +463,7 @@ class Basic3DWorld {
                 const v2 = (i + 1) * (tubeSegs + 1) + j + 1;
                 const v3 = v2 - 1;
                 edges.push([v0, v1], [v1, v2], [v2, v3], [v3, v0]);
-                faces.push([v0, v1, v2, v3]);
+                faces.push([v0, v3, v2, v1]);
             }
         }        
         let icon = '∞';
@@ -1516,7 +1516,6 @@ let primitives = [
         },
         {
             name: "infinity",
-            doubleSided: true,
             ...Basic3DWorld.generateInfinity()
         },
     ]
