@@ -58,17 +58,21 @@
         figureSelectedOnMousedown = globals.selectedFigure !== null;
     }
 
+    let setZoom = (delta) => {
+        let r = globals.world._orbitRadius;
+        if (r === undefined) return;
+        r += delta;
+        if (r < 100) r = 100;
+        if (r > 3000) r = 3000;
+        globals.world._orbitRadius = r;
+        globals.world.orbitCamera(0, 0);
+    }
+
     let addSpecialControls = () => {
-        let grow = () => {
-            globals.world.cameraZ -= 10;
-            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
-        }
+        let grow = () => setZoom(-50);
         Browser.addButton("btnGrow", "+", grow);
 
-        let shrink = () => {
-            globals.world.cameraZ += 10;
-            if (globals.world.cameraZ < 100) globals.world.cameraZ = 100;
-        }
+        let shrink = () => setZoom(50);
         Browser.addButton("btnShrink", "-", shrink);
 
         let changeFigure = () => {

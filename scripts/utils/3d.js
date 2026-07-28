@@ -1136,8 +1136,7 @@ class Figure {
 
     drawVertex = (point, color) => {
         let vertex = this.world.worldToScreen(point);
-
-        let newColor = `hsl(${Numbers.scale(point[2], -500, 500, 300, 360)}, ${100}%, ${50}%)`;
+        let newColor = `hsl(${Numbers.scale(point[2], -300, 300, 0, 360)}, ${100}%, ${50}%)`;
 
         this.world.drawPoint(ctx, vertex[0], vertex[1], newColor);
     }
