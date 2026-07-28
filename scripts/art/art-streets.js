@@ -111,8 +111,8 @@
                         }
                     }
 
-                    if (street.growing1) street.length1 += 2 * (delta / FRAME_TIME);
-                    if (street.growing2) street.length2 += 2 * (delta / FRAME_TIME);
+                    if (street.growing1) street.length1 += 0.5 * (delta / FRAME_TIME);
+                    if (street.growing2) street.length2 += 0.5 * (delta / FRAME_TIME);
                 }
 			} 
         }

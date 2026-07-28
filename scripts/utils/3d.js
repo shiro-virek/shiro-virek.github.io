@@ -215,39 +215,37 @@ class ThreeDWorld {
         figure.faces = Objects.clone(this.primitive.faces);
         figure.doubleSided = this.primitive.doubleSided || false;
 
-        let rz = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
-        let ry = Trigonometry.sexagesimalToRadian(this.cameraRotationY);
+        const spawnDistance = 500;
+        let totalDepth = spawnDistance + this.cameraZ;
+
+        let localX = centeredX * totalDepth / this.FOV;
+        let localY = centeredY * totalDepth / this.FOV;
+        let localZ = spawnDistance;
+
         let rx = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
+        let ry = Trigonometry.sexagesimalToRadian(this.cameraRotationY);
+        let rz = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
 
         let cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+        let x1 = localX * cosZ - localY * sinZ;
+        let y1 = localX * sinZ + localY * cosZ;
+        let z1 = localZ;
+
         let cosY = Math.cos(ry), sinY = Math.sin(ry);
+        let x2 = x1 * cosY + z1 * sinY;
+        let z2 = -x1 * sinY + z1 * cosY;
+        let y2 = y1;
+
         let cosX = Math.cos(rx), sinX = Math.sin(rx);
+        let xFinal = x2;
+        let yFinal = y2 * cosX - z2 * sinX;
+        let zFinal = y2 * sinX + z2 * cosX;
 
-        let cx = centeredX / this.FOV;
-        let cy = centeredY / this.FOV;
-
-        let R02 = sinZ * sinX - cosZ * sinY * cosX;
-        let R12 = cosZ * sinX + sinZ * sinY * cosX;
-        let R22 = cosY * cosX;
-
-        let depth = this.cameraZ * R22 / (R02 * cx + R12 * cy + R22);
-
-        let R00 = cosZ * cosY;
-        let R10 = -sinZ * cosY;
-        let R20 = sinY;
-
-        let R01 = cosZ * sinY * sinX + sinZ * cosX;
-        let R11 = cosZ * cosX - sinZ * sinY * sinX;
-        let R21 = -cosY * sinX;
-
-        let worldX = depth * (R00 * cx + R10 * cy) + R20 * (depth - this.cameraZ);
-        let worldY = depth * (R01 * cx + R11 * cy) + R21 * (depth - this.cameraZ);
-
-        figure.translateX(worldX);
-        figure.translateY(worldY);
+        figure.translateX(xFinal);
+        figure.translateY(yFinal);
+        figure.translateZ(zFinal);
 
         this.figures.push(figure);
-
         return figure;
     }
 
@@ -731,7 +729,7 @@ class OpenWorld extends ThreeDWorld {
         }
 
         this._orbitYaw += dYaw;
-        this._orbitPitch = Math.max(-89, Math.min(89, this._orbitPitch + dPitch));
+        this._orbitPitch = this._orbitPitch + dPitch;
 
         const yawRad = Trigonometry.sexagesimalToRadian(this._orbitYaw);
         const pitchRad = Trigonometry.sexagesimalToRadian(this._orbitPitch);
