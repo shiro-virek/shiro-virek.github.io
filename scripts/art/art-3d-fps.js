@@ -21,7 +21,7 @@
         rotationMode: 0,
     };    
 
-    class FPSWorld extends OpenWorld {
+    class FPSWorld extends Open3DWorld {
         constructor(width, height, random, drawLine, drawPoint, drawFace) {
             super(width, height, random, drawLine, drawPoint, drawFace);
         }

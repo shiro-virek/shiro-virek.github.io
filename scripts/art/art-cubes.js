@@ -15,7 +15,7 @@
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
-        globals.world = new OpenWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
+        globals.world = new Open3DWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
 
         globals.world.cameraY = -300;
         globals.world.cameraZ = -700;

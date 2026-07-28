@@ -1,4 +1,4 @@
-class ThreeDWorld {
+class Basic3DWorld {
     constructor(width, height, random, drawLine, drawPoint, drawFace) {
         this.width = width;
         this.height = height;
@@ -470,9 +470,29 @@ class ThreeDWorld {
     }                   
 }
 
-class OpenWorld extends ThreeDWorld {
+class Open3DWorld {
     constructor(width, height, random, drawLine, drawPoint, drawFace) {
-        super(width, height, random, drawLine, drawPoint, drawFace);
+        this.width = width;
+        this.height = height;
+        this.random = random;
+        this.drawLine = drawLine;
+        this.drawPoint = drawPoint;
+        this.drawFace = drawFace;
+        this.figures = [];
+        this.cameraX = 0;
+        this.cameraY = 0;
+        this.cameraRotationX = 0; 
+        this.cameraRotationY = 0;
+        this.cameraRotationZ = 0;
+        this.cameraZ = -1000;
+        this.FOV = 800;
+        this.drawFigureEdges = true;
+        this.drawFigureVertices = false;
+        this.drawFigureFaces = false;
+        this.primitive = primitives[0];
+        this.rotationMode = 0;    
+        this.lightDirection = [0, 0, 1];
+        this.enableFog = true;     
 
         this.cameraX = 0;
         this.cameraY = -200; 
@@ -564,7 +584,14 @@ class OpenWorld extends ThreeDWorld {
     }
 
     draw = () => {
-        super.draw();
+        if (this.drawFigureFaces)
+            this.drawFaces();
+
+        if (this.drawFigureEdges || (!this.drawFigureFaces && !this.drawFigureEdges && !this.drawFigureVertices))
+            this.drawEdges();
+        
+        if (this.drawFigureVertices)
+            this.drawVertices();
 
         this.translateInfiniteFloor();
     }
@@ -710,6 +737,193 @@ class OpenWorld extends ThreeDWorld {
         this.cameraY = -this._orbitRadius * Math.sin(pitchRad);
         this.cameraRotationZ = this._orbitYaw + 90;
         this.cameraRotationX = -this._orbitPitch;
+    }
+
+    worldToScreen = (point) => {
+        let transformedPoint;
+
+        transformedPoint = this.applyCameraTransform(point);
+        
+        const x = transformedPoint[0];
+        const y = transformedPoint[1];
+        const z = transformedPoint[2];
+
+        let scaleFactor = 0;
+
+        if (z <= 1) return [-9999, -9999]; 
+
+        scaleFactor = this.FOV / z;
+             
+        const projectedX = (x * scaleFactor) + this.width / 2;
+        const projectedY = (y * scaleFactor) + this.height / 2;
+        
+        return [projectedX, projectedY];    
+    }
+
+    worldToScreenOblique = (point, angleX, angleY) => {
+        const radianX = (angleX * Math.PI) / 180;
+        const radianY = (angleY * Math.PI) / 180;
+
+        const projectedX = point[0] + point[2] * Math.tan(radianY);
+        const projectedY = point[1] + point[2] * Math.tan(radianX);
+
+        return [projectedX, projectedY];
+    }
+
+    worldToScreenIsometric = (point) => {
+        const isoMatrix = [
+            Math.sqrt(3) / 2, -1 / 2, 0,
+            Math.sqrt(3) / 2, 1 / 2, 0,
+            0, 0, 1
+        ];
+
+        const projectedX = isoMatrix[0] * point[0] + isoMatrix[1] * point[1] + isoMatrix[2] * point[2];
+        const projectedY = isoMatrix[3] * point[0] + isoMatrix[4] * point[1] + isoMatrix[5] * point[2];
+        const projectedZ = isoMatrix[6] * point[0] + isoMatrix[7] * point[1] + isoMatrix[8] * point[2];
+
+        return [projectedX, projectedY];
+    }
+
+    drawFaces = () => {    
+        let allFaces = [];
+
+        this.figures.forEach(figure => {
+            figure.faces.forEach(faceIndices => {
+                const viewVertices = faceIndices.map(index => 
+                    this.applyCameraTransform(figure.vertices[index])
+                );
+
+                let isBehindCamera = false;
+                for (let v of viewVertices) {
+                    if (v[2] <= 1) {
+                        isBehindCamera = true;
+                        break;
+                    }
+                }
+                if (isBehindCamera) return;
+
+                if (figure.shouldDrawFace(viewVertices)) {
+                    let sumZ = 0;
+                    viewVertices.forEach(v => sumZ += v[2]);
+                    const avgZ = sumZ / viewVertices.length;
+
+                    const worldVertices = faceIndices.map(index => figure.vertices[index]);
+                    allFaces.push({
+                        worldVertices: worldVertices,
+                        viewZ: avgZ,
+                        hue: figure.hue,
+                        life: figure.isDebris ? figure.life : 1.0,
+                        lightness: figure.getLightness(worldVertices)
+                    });
+                }
+            });
+        });
+
+        allFaces.sort((a, b) => b.viewZ - a.viewZ);
+
+        allFaces.forEach(face => {
+            const dist = face.viewZ;
+            let fogAlpha = Numbers.scale(dist, 2000, 5000, 1, 0);
+            if (fogAlpha < 0) fogAlpha = 0;
+
+            let finalAlpha = fogAlpha * face.life;
+            if (finalAlpha < 0) finalAlpha = 0;
+            if (finalAlpha > 1) finalAlpha = 1;
+
+            this.drawFace(face.worldVertices, face.lightness, face.hue, this.enableFog ? finalAlpha : 1)
+        });
+    
+    }
+
+    drawEdges = () => {
+        for (let i = this.figures.length - 1; i >= 0; i--) {
+            this.figures[i].drawEdges(ctx);
+        }
+    }
+
+    drawVertices = () => {
+        for (let i = this.figures.length - 1; i >= 0; i--) {
+            this.figures[i].drawVertices(ctx);
+        }
+    }
+
+    applyCameraRotation = (point) => {
+        let x = point[0];
+        let y = point[1];
+        let z = point[2];
+                    
+        let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX); 
+        let newY = y * Math.cos(angleX) + z * (-Math.sin(angleX));
+        let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
+        y = newY;
+        z = newZ;
+
+        let angleY = Trigonometry.sexagesimalToRadian(-this.cameraRotationY);
+        let newX = x * Math.cos(angleY) + z * Math.sin(angleY);
+        newZ = -x * Math.sin(angleY) + z * Math.cos(angleY);
+        x = newX;
+        z = newZ;
+
+        let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
+        newX = x * Math.cos(angleZ) + y * (-Math.sin(angleZ));
+        newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
+        x = newX;
+        y = newY;
+        
+        return [x, y, z];
+    
+    }
+
+    applyCameraTransform = (point) => {
+        let x = point[0] - this.cameraX;
+        let y = point[1] - this.cameraY;
+        let z = point[2] - this.cameraZ;
+        
+        let angleZ = Trigonometry.sexagesimalToRadian(-this.cameraRotationZ);
+        let cosZ = Math.cos(angleZ);
+        let sinZ = Math.sin(angleZ);
+        
+        let nx = x * cosZ - z * sinZ;
+        let nz = x * sinZ + z * cosZ;
+        x = nx;
+        z = nz;
+
+        let angleX = Trigonometry.sexagesimalToRadian(-this.cameraRotationX);
+        let cosX = Math.cos(angleX);
+        let sinX = Math.sin(angleX);
+        
+        let ny = y * cosX - z * sinX;
+        nz = y * sinX + z * cosX;
+        y = ny;
+        z = nz;
+        
+        return [x, y, z];
+    }
+
+    moveForward = (speed) => {
+        let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ);
+        this.cameraX -= Math.sin(angleRad) * speed;
+        this.cameraZ += Math.cos(angleRad) * speed;
+    }
+
+    moveRight = (speed) => {
+        let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationZ + 90);
+        this.cameraX -= Math.sin(angleRad) * speed;
+        this.cameraZ += Math.cos(angleRad) * speed;
+    }
+
+    moveCameraY = (speed) => {
+        let angleRad = Trigonometry.sexagesimalToRadian(this.cameraRotationX);
+        this.cameraX -= Math.sin(angleRad) * speed;
+        this.cameraY += Math.cos(angleRad) * speed;
+    }
+
+    rotate = (dPitch, dYaw) => {
+        this.cameraRotationX += dPitch;
+        this.cameraRotationZ += dYaw;
+
+        if (this.cameraRotationX > 90) this.cameraRotationX = 90;
+        if (this.cameraRotationX < -90) this.cameraRotationX = -90;
     }
 
 }
@@ -1286,26 +1500,26 @@ let primitives = [
         {
             name: "sphere",
             doubleSided: true,
-            ...ThreeDWorld.generateSphere()
+            ...Basic3DWorld.generateSphere()
         },
         {
             name: "cylinder",
             doubleSided: true,
-            ...ThreeDWorld.generateCylinder()
+            ...Basic3DWorld.generateCylinder()
         },
         {
             name: "torus",
             doubleSided: true,
-            ...ThreeDWorld.generateTorus()
+            ...Basic3DWorld.generateTorus()
         },
         {
             name: "heart",
             doubleSided: true,
-            ...ThreeDWorld.generateHeart()
+            ...Basic3DWorld.generateHeart()
         },
         {
             name: "infinity",
             doubleSided: true,
-            ...ThreeDWorld.generateInfinity()
+            ...Basic3DWorld.generateInfinity()
         },
     ]

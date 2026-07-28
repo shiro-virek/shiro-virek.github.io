@@ -142,7 +142,7 @@
     let init = () => {
         initCanvas();        
         globals.random = Objects.getRandomObject();
-        globals.world = new OpenWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
+        globals.world = new Basic3DWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
         randomize();
         addEvents();
         window.requestAnimationFrame(loop)
