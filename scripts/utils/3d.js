@@ -731,7 +731,7 @@ class OpenWorld extends ThreeDWorld {
         }
 
         this._orbitYaw += dYaw;
-        this._orbitPitch = Math.max(-89, Math.min(89, this._orbitPitch + dPitch));
+        this._orbitPitch = this._orbitPitch + dPitch;
 
         const yawRad = Trigonometry.sexagesimalToRadian(this._orbitYaw);
         const pitchRad = Trigonometry.sexagesimalToRadian(this._orbitPitch);

@@ -107,7 +107,7 @@
 
         let setMoveXTool = () => {    
             config.tool = 5;
-            Browser.setInfo("Rotate Move X tool");
+            Browser.setInfo("Move X tool");
         }
         Browser.addButton("btnSetMoveXTool", "X", setMoveXTool);
 
