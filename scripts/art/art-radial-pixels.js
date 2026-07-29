@@ -10,6 +10,7 @@
 
     const config = {
         randomize: true,
+        mode: 1,
     };    
 
 
@@ -47,23 +48,6 @@
         }
 
         update = () => {                           
-        }
-
-        setCartesianPixel = (x, y, color) => {
-            let cx = x - this.slicesNumber / 2;
-
-            let cy = y - this.levelsNumber / 2;
-
-            let polar = Trigonometry.cartesianToPolar(cx, cy);
-            let angleDeg = Trigonometry.radToDeg(polar.theta);
-            if (angleDeg < 0) angleDeg += 360;
-            let newX = Math.floor(Numbers.scale(angleDeg, 0, 360, 0, this.slicesNumber));
-            if (newX > this.slicesNumber) newX = this.slicesNumber;
-            let maxR = Math.hypot(this.slicesNumber / 2, this.levelsNumber / 2);
-            let newY = Math.floor(Numbers.scale(polar.r, 0, maxR, 0, this.levelsNumber));
-            if (newY > this.levelsNumber) newY = this.levelsNumber;
-
-            this.radialPixels[newX][newY].color = color;
         }
     }
 
@@ -104,18 +88,26 @@
 
             for (let s = 0; s <= globals.radialScreen.slicesNumber; s++) {
                 for (let l = 0; l <= globals.radialScreen.levelsNumber; l++) {
-                    let angleDeg = (s + 0.5) * globals.radialScreen.slicesAngle;
-                    let angleRad = Trigonometry.degToRad(angleDeg);
-                    let r = ((l + 0.5) / globals.radialScreen.levelsNumber) * maxR;
+                    let color = null;
 
-                    let imgX = Math.floor(halfW + r * Math.cos(angleRad));
-                    let imgY = Math.floor(halfH + r * Math.sin(angleRad));
+                    if (config.mode == 1){
+                        let angleDeg = (s + 0.5) * globals.radialScreen.slicesAngle;
+                        let angleRad = Trigonometry.degToRad(angleDeg);
+                        let r = ((l + 0.5) / globals.radialScreen.levelsNumber) * maxR;
 
-                    imgX = Math.max(0, Math.min(imgW - 1, imgX));
-                    imgY = Math.max(0, Math.min(imgH - 1, imgY));
+                        let imgX = Math.floor(halfW + r * Math.cos(angleRad));
+                        let imgY = Math.floor(halfH + r * Math.sin(angleRad));
 
-                    let index = (imgY * imgW + imgX) * 4;
-                    let color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
+                        imgX = Math.max(0, Math.min(imgW - 1, imgX));
+                        imgY = Math.max(0, Math.min(imgH - 1, imgY));
+
+                        let index = (imgY * imgW + imgX) * 4;
+                        color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
+                    }else{
+                        let index = (l * globals.radialScreen.slicesNumber + s) * 4;
+                        color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
+                    }                   
+                    
                     globals.radialScreen.radialPixels[s][l].color = color;
                 }
             }            
@@ -148,6 +140,13 @@
         uploader.addEventListener('change', function(e) {
             Upload.uploadPicture(e, globals.img, loadImage);
         });
+
+        let toggleMode = () => { 
+			config.mode = config.mode == 1 ? 2 : 1;
+            loadImage();
+        }
+        
+        Browser.addButton("btnToggleMode", "🚅", toggleMode);
     }
 
     let addEvents = () => {

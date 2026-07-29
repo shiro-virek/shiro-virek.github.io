@@ -680,6 +680,7 @@ class Open3DWorld {
         figure.vertices = Objects.clone(fig.vertices);
         figure.edges = Objects.clone(fig.edges || []);
         figure.faces = Objects.clone(fig.faces);
+        figure.doubleSided = fig.doubleSided || false;
 
         figure.translateX(worldX);
         figure.translateY(worldY);
@@ -701,6 +702,7 @@ class Open3DWorld {
         figure.vertices = Objects.clone(fig.vertices);
         figure.edges = Objects.clone(fig.edges || []);
         figure.faces = Objects.clone(fig.faces);
+        figure.doubleSided = fig.doubleSided || false;
 
         figure.translateX(worldX);
         figure.translateY(worldY);
