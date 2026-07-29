@@ -48,6 +48,13 @@
 
         update = () => {                           
         }
+
+        setCartesianPixel = (x, y, color) => {
+            let polar = Trigonometry.cartesianToPolar(x, y);
+            let newX = Math.floor(Numbers.scale(Trigonometry.radToDeg(polar.theta), 0, 360, 0, this.slicesNumber));
+            let newY = Math.floor(Numbers.scale(polar.r, 0, 50, 0, this.levelsNumber));
+            this.radialPixels[newX][newY].color = color;
+        }
     }
 
     class RadialPixel {
@@ -85,7 +92,9 @@
                     let index = (y * globals.radialScreen.slicesNumber + x) * 4;
 
                     let color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
-                    globals.radialScreen.radialPixels[x][y].color = color;
+                    
+                    //globals.radialScreen.radialPixels[x][y].color = color;
+                    globals.radialScreen.setCartesianPixel(x, y, color);
                 }
             }            
         };
@@ -94,7 +103,7 @@
     let init = () => {
 		globals.random = Objects.getRandomObject();
         globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
-        globals.radialScreen = new RadialScreen(height / 2, 20, 20);
+        globals.radialScreen = new RadialScreen(height / 2, 50, 50);
         if (config.randomize) randomize();
         initCanvas();
         addEvents();

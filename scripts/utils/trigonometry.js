@@ -5,6 +5,10 @@ class Trigonometry {
 	    return deg * (Math.PI / 180.0);
 	}
 
+    static radToDeg(rad) {
+        return rad * (180 / Math.PI);
+    }
+
     static polarToCartesian = (r, theta) => {
         let x = r * Math.cos(theta);
         let y = r * Math.sin(theta);
