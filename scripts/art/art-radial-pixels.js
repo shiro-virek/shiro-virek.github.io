@@ -132,6 +132,8 @@
         window.requestAnimationFrame(loop);
 
         addSpecialControls();
+
+        loadImage();
     }
 
     let addSpecialControls = () => {
