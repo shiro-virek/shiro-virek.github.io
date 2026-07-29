@@ -179,12 +179,17 @@
             globals.selectedFigure = null;
 		});
 
-		canvas.addEventListener('click', function (e) {
+        canvas.addEventListener('click', function (e) {
+            if (globals._touchUsed) {
+                globals._touchUsed = false;
+                return;
+            }
             if (!mouseMoved && !figureSelectedOnMousedown)
                 globals.world.addFigure(e.offsetX, e.offsetY);   
 		});
 
 		canvas.addEventListener('touchend', e => {
+            globals._touchUsed = true;
             handleDeleteFigure();
             if (!mouseMoved) {
                 const rect = canvas.getBoundingClientRect();
