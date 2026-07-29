@@ -69,27 +69,25 @@
         globals.img.src = source;
 
         globals.img.onload = function () {
-            /*
-            globals.canvasImg.width = config.ledColumns;
-            globals.canvasImg.height = config.ledRows;
+            
+            globals.canvasImg.width =  globals.radialScreen.slicesNumber;
+            globals.canvasImg.height = globals.radialScreen.levelsNumber;
 
             const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
             
             globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
-            globals.imgData = globals.ctxImg.getImageData(0, 0, config.ledColumns, config.ledRows).data;
+            globals.imgData = globals.ctxImg.getImageData(0, 0, globals.radialScreen.slicesNumber, globals.radialScreen.levelsNumber).data;
 
             
-            for (let y = 0; y < config.ledRows; y++) {
-                for (let x = 0; x < config.ledColumns; x++) {
-                    let index = (y * config.ledColumns + x) * 4;
-                    globals.ledScreen.leds[x][y].r = globals.imgData[index];
-                    globals.ledScreen.leds[x][y].g = globals.imgData[index + 1];
-                    globals.ledScreen.leds[x][y].b = globals.imgData[index + 2];
-                    globals.ledScreen.leds[x][y].lightness = Numbers.scale(Color.getLightness(globals.imgData[index], globals.imgData[index+1], globals.imgData[index+2]), 0, 250, 0, 100);
+            for (let y = 1; y <= globals.radialScreen.slicesNumber; y++) {
+                for (let x = 1; x <= globals.radialScreen.levelsNumber; x++) {
+                    let index = (y * globals.radialScreen.slicesNumber + x) * 4;
+
+                    let color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
+                    globals.radialScreen.radialPixels[x][y].color = color;
                 }
-            }
-            */
+            }            
         };
     }
 
@@ -129,24 +127,6 @@
         globals.radialScreen.update();
         drawBackground(ctx, canvas);
         globals.radialScreen.draw(ctx);
-
-        /*
-        radialPixel(200, 200, 20, 5, 0, 100, "rgba(255,0,0,1)");
-        radialPixel(200, 200, 20, 5, 100, 190, "rgba(255,255,0,1)");
-        radialPixel(200, 200, 20, 5, 190, 360, "rgba(0,255,255,1)");
-
-        radialPixel(200, 200, 15, 5, 0, 100, "rgba(255,0,255,1)");
-        radialPixel(200, 200, 15, 5, 100, 190, "rgba(0,255,0,1)");
-        radialPixel(200, 200, 15, 5, 190, 360, "rgba(255,255,255,1)");
-
-        radialPixel(200, 200, 10, 5, 0, 100, "rgba(255,0,0,1)");
-        radialPixel(200, 200, 10, 5, 100, 190, "rgba(255,255,0,1)");
-        radialPixel(200, 200, 10, 5, 190, 360, "rgba(0,255,255,1)");
-
-        radialPixel(200, 200, 5, 5, 0, 100, "rgba(255,0,255,1)");
-        radialPixel(200, 200, 5, 5, 100, 190, "rgba(0,255,0,1)");
-        radialPixel(200, 200, 5, 5, 190, 360, "rgba(255,255,255,1)");
-        */
     }
 
     let getArcEndPoint = (c1,c2,radius,angle) => {
