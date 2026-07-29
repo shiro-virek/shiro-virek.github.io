@@ -38,10 +38,6 @@
             }
         }
 
-        setPixel = (slice, level, color = "#FFF") => {            
-           this.radialPixels[slice][level].color = color;
-        }
-
         draw = (ctx) => {
             for (let x = 0; x <= this.slicesNumber; x++) {
                 for (let y = 0; y <= this.levelsNumber; y++) {
@@ -55,10 +51,11 @@
     }
 
     class RadialPixel {
-        constructor(radialScreen, sliceNumber, levelNumber) {
+        constructor(radialScreen, sliceNumber, levelNumber, color = "#FFF") {
             this.sliceNumber = sliceNumber;
             this.levelNumber = levelNumber;
             this.radialScreen = radialScreen;
+            this.color = color;
         }
 
         draw = (ctx) => {
@@ -164,7 +161,7 @@
         endAngle *= Trigonometry.RAD_CONST; 
   
         ctx.arc(x, y, radius, startAngle, endAngle, 0);
-        ctx.arc(x, y, radius - wideness, endAngle, startAngle, 1);
+        ctx.arc(x, y, Math.max(0, radius - wideness), endAngle, startAngle, 1);
 
         ctx.fill();
     }
