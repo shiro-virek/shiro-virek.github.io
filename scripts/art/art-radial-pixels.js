@@ -11,6 +11,8 @@
     const config = {
         randomize: true,
         mode: 1,
+        rows: 50,
+        columns: 50,
     };    
 
 
@@ -70,18 +72,20 @@
         globals.img.src = source;
 
         globals.img.onload = function () {
-            
-            globals.canvasImg.width =  globals.radialScreen.slicesNumber;
-            globals.canvasImg.height = globals.radialScreen.levelsNumber;
+            const sampleScale = 4;
+            const subSamples = 3;
+
+            let imgW = globals.radialScreen.slicesNumber * sampleScale;
+            let imgH = globals.radialScreen.levelsNumber * sampleScale;
+            globals.canvasImg.width = imgW;
+            globals.canvasImg.height = imgH;
 
             const { newImgHeight, newImgWidth, newOriginX, newOriginY } = Screen.adaptImageToScreen(globals.img, globals.canvasImg);
             
             globals.ctxImg.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
-            globals.imgData = globals.ctxImg.getImageData(0, 0, globals.radialScreen.slicesNumber, globals.radialScreen.levelsNumber).data;
+            globals.imgData = globals.ctxImg.getImageData(0, 0, imgW, imgH).data;
 
-            let imgW = globals.radialScreen.slicesNumber;
-            let imgH = globals.radialScreen.levelsNumber;
             let halfW = imgW / 2;
             let halfH = imgH / 2;
             let maxR = Math.hypot(halfW, halfH);
@@ -91,18 +95,29 @@
                     let color = null;
 
                     if (config.mode == 1){
-                        let angleDeg = (s + 0.5) * globals.radialScreen.slicesAngle;
-                        let angleRad = Trigonometry.degToRad(angleDeg);
-                        let r = ((l + 0.5) / globals.radialScreen.levelsNumber) * maxR;
+                        let totalR = 0, totalG = 0, totalB = 0, count = 0;
 
-                        let imgX = Math.floor(halfW + r * Math.cos(angleRad));
-                        let imgY = Math.floor(halfH + r * Math.sin(angleRad));
+                        for (let sa = 0; sa < subSamples; sa++) {
+                            for (let sr = 0; sr < subSamples; sr++) {
+                                let angleDeg = (s + (sa + 0.5) / subSamples) * globals.radialScreen.slicesAngle;
+                                let angleRad = Trigonometry.degToRad(angleDeg);
+                                let r = ((l + (sr + 0.5) / subSamples) / globals.radialScreen.levelsNumber) * maxR;
 
-                        imgX = Math.max(0, Math.min(imgW - 1, imgX));
-                        imgY = Math.max(0, Math.min(imgH - 1, imgY));
+                                let imgX = Math.floor(halfW + r * Math.cos(angleRad));
+                                let imgY = Math.floor(halfH + r * Math.sin(angleRad));
 
-                        let index = (imgY * imgW + imgX) * 4;
-                        color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
+                                imgX = Math.max(0, Math.min(imgW - 1, imgX));
+                                imgY = Math.max(0, Math.min(imgH - 1, imgY));
+
+                                let idx = (imgY * imgW + imgX) * 4;
+                                totalR += globals.imgData[idx];
+                                totalG += globals.imgData[idx + 1];
+                                totalB += globals.imgData[idx + 2];
+                                count++;
+                            }
+                        }
+
+                        color = `rgb(${Math.round(totalR / count)}, ${Math.round(totalG / count)}, ${Math.round(totalB / count)})`;
                     }else{
                         let index = (l * globals.radialScreen.slicesNumber + s) * 4;
                         color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
@@ -116,9 +131,10 @@
 
     let init = () => {
 		globals.random = Objects.getRandomObject();
-        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
-        globals.radialScreen = new RadialScreen(height / 2, 50, 50);
         if (config.randomize) randomize();
+        globals.ctxImg = globals.canvasImg.getContext("2d", { willReadFrequently: true });
+        globals.radialScreen = new RadialScreen(height / 2, config.columns, config.rows);
+ 
         initCanvas();
         addEvents();
         window.requestAnimationFrame(loop);
@@ -146,13 +162,15 @@
             loadImage();
         }
         
-        Browser.addButton("btnToggleMode", "🚅", toggleMode);
+        Browser.addButton("btnToggleMode", "🔀", toggleMode);
     }
 
     let addEvents = () => {
     }
 
     let randomize = () => {
+        config.rows = globals.random.nextInt(30, 100);
+        config.columns = config.rows;
     }
     
     window.draw = (delta) => {                
