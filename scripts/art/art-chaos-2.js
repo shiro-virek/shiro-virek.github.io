@@ -135,9 +135,9 @@
     }
 
     let addSpecialControls = () => {
-        let trail = () => {          
-		    config.trail = 0.1;
-        }
+    let trail = () => {          
+        config.trail = config.trail === 1 ? 0.1 : 1;
+    }
         Browser.addButton("btnTrail", "👣", trail);
     }
 
