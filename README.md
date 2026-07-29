@@ -35,6 +35,7 @@ Explore **40+ interactive generative art scenes**, from particle systems and fra
 | Bouncing Balls | Physics-based ball simulation |
 | Cthulhu | Tentacle-like generative art |
 | CRT | CRT monitor scanline effect |
+| Cubes | Rotating 3D cubes with lighting |
 | Distortion | Image lens distortion effects |
 | Blinkenlights | Cellular automaton variants |
 | Shader | WebGL fragment shader sandbox |
@@ -52,7 +53,9 @@ Explore **40+ interactive generative art scenes**, from particle systems and fra
 | Video | Video playback with effects |
 | 3D FPS | First-person 3D walkthrough with virtual joystick|
 | Joystick | Virtual joystick interaction |
+| Led screen | LED matrix display with 3D shapes |
 | Particles | Particles visualization |
+| Radial pixels | Polar-mapped image on radial grid |
 
 ---
 
