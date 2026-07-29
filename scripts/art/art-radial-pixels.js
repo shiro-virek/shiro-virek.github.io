@@ -50,9 +50,20 @@
         }
 
         setCartesianPixel = (x, y, color) => {
-            let polar = Trigonometry.cartesianToPolar(x, y);
-            let newX = Math.floor(Numbers.scale(Trigonometry.radToDeg(polar.theta), 0, 360, 0, this.slicesNumber));
-            let newY = Math.floor(Numbers.scale(polar.r, 0, 50, 0, this.levelsNumber));
+            let cx = x - this.slicesNumber / 2;
+
+            let cy = y - this.levelsNumber / 2;
+
+
+            let polar = Trigonometry.cartesianToPolar(cx, cy);
+            let angleDeg = Trigonometry.radToDeg(polar.theta);
+            if (angleDeg < 0) angleDeg += 360;
+            let newX = Math.floor(Numbers.scale(angleDeg, 0, 360, 0, this.slicesNumber));
+            if (newX > this.slicesNumber) newX = this.slicesNumber;
+            let maxR = Math.hypot(this.slicesNumber / 2, this.levelsNumber / 2);
+            let newY = Math.floor(Numbers.scale(polar.r, 0, maxR, 0, this.levelsNumber));
+            if (newY > this.levelsNumber) newY = this.levelsNumber;
+
             this.radialPixels[newX][newY].color = color;
         }
     }
@@ -87,8 +98,9 @@
             globals.imgData = globals.ctxImg.getImageData(0, 0, globals.radialScreen.slicesNumber, globals.radialScreen.levelsNumber).data;
 
             
-            for (let y = 1; y <= globals.radialScreen.slicesNumber; y++) {
-                for (let x = 1; x <= globals.radialScreen.levelsNumber; x++) {
+            for (let y = 0; y < globals.radialScreen.levelsNumber; y++) {
+                for (let x = 0; x < globals.radialScreen.slicesNumber; x++) {
+
                     let index = (y * globals.radialScreen.slicesNumber + x) * 4;
 
                     let color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
