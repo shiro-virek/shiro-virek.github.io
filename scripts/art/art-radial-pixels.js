@@ -54,7 +54,6 @@
 
             let cy = y - this.levelsNumber / 2;
 
-
             let polar = Trigonometry.cartesianToPolar(cx, cy);
             let angleDeg = Trigonometry.radToDeg(polar.theta);
             if (angleDeg < 0) angleDeg += 360;
@@ -97,16 +96,27 @@
 
             globals.imgData = globals.ctxImg.getImageData(0, 0, globals.radialScreen.slicesNumber, globals.radialScreen.levelsNumber).data;
 
-            
-            for (let y = 0; y < globals.radialScreen.levelsNumber; y++) {
-                for (let x = 0; x < globals.radialScreen.slicesNumber; x++) {
+            let imgW = globals.radialScreen.slicesNumber;
+            let imgH = globals.radialScreen.levelsNumber;
+            let halfW = imgW / 2;
+            let halfH = imgH / 2;
+            let maxR = Math.hypot(halfW, halfH);
 
-                    let index = (y * globals.radialScreen.slicesNumber + x) * 4;
+            for (let s = 0; s <= globals.radialScreen.slicesNumber; s++) {
+                for (let l = 0; l <= globals.radialScreen.levelsNumber; l++) {
+                    let angleDeg = (s + 0.5) * globals.radialScreen.slicesAngle;
+                    let angleRad = Trigonometry.degToRad(angleDeg);
+                    let r = ((l + 0.5) / globals.radialScreen.levelsNumber) * maxR;
 
+                    let imgX = Math.floor(halfW + r * Math.cos(angleRad));
+                    let imgY = Math.floor(halfH + r * Math.sin(angleRad));
+
+                    imgX = Math.max(0, Math.min(imgW - 1, imgX));
+                    imgY = Math.max(0, Math.min(imgH - 1, imgY));
+
+                    let index = (imgY * imgW + imgX) * 4;
                     let color = `rgb(${globals.imgData[index]}, ${globals.imgData[index + 1]}, ${globals.imgData[index + 2]})`;
-                    
-                    //globals.radialScreen.radialPixels[x][y].color = color;
-                    globals.radialScreen.setCartesianPixel(x, y, color);
+                    globals.radialScreen.radialPixels[s][l].color = color;
                 }
             }            
         };
