@@ -24,31 +24,27 @@
     window.draw = (delta) => {
         drawBackground(ctx, canvas);
 
-        radialPixel(200, 200, 20, 5, 0, 100, "rgba(255,0,0,1)");
 
 
         radialPixel(200, 200, 20, 5, 100, 190, "rgba(255,255,0,1)");
+        radialPixel(200, 200, 20, 5, 0, 100, "rgba(255,0,0,1)");
+    }
+
+    let getArcEndPoint = (c1,c2,radius,angle) => {
+        return [c1+Math.cos(angle)*radius,c2+Math.sin(angle)*radius];
     }
 
     let radialPixel = (x, y, radius, wideness, startAngle, endAngle, color) => {
         ctx.fillStyle = color;  
-
+        
         ctx.beginPath();
-
         startAngle *= Trigonometry.RAD_CONST;
         endAngle *= Trigonometry.RAD_CONST; 
-   
+  
         ctx.arc(x, y, radius, startAngle, endAngle, 0);
-
-        let point = Trigonometry.newPointAngleDistance(x, y, endAngle, radius - wideness);
-
         ctx.arc(x, y, radius - wideness, endAngle, startAngle, 1);
 
-        ctx.lineTo(point.x, point.y);
         ctx.fill();
-      
-
-        //ctx.endPath(); 
     }
 
     window.trackMouse = (x, y) => {
