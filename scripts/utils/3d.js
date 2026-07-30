@@ -177,7 +177,7 @@ class Open3DWorld {
         }    
     }
                             
-    addFigure = (screenX, screenY, fig = this.primitive) => {
+    addFigure = (screenX, screenY, fig = this.primitive, hue) => {
         const spawnDistance = 500; 
 
         let centeredX = screenX - this.width / 2;
@@ -218,6 +218,8 @@ class Open3DWorld {
         figure.solid = true;
         figure.breakable = false;
         figure.setupCollision();
+
+        figure.hue = hue;
         
         this.figures.push(figure);
 
