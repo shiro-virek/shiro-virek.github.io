@@ -106,23 +106,17 @@
         }
         Browser.addButton("btnSetRotateFigureTool", "↩️", setRotateFigureTool);
 
-        let setMoveXTool = () => {    
-            config.tool = 5;
-            Browser.setInfo("Move X tool");
-        }
-        Browser.addButton("btnSetMoveXTool", "X", setMoveXTool);
-
-        let setMoveYTool = () => {    
-            config.tool = 6;
-            Browser.setInfo("Move Y tool");
-        }
-        Browser.addButton("btnSetMoveYTool", "Y", setMoveYTool);
-
-        let setMoveZTool = () => {    
-            config.tool = 7;
-            Browser.setInfo("Move Z tool");
-        }
-        Browser.addButton("btnSetMoveZTool", "Z", setMoveZTool);
+        let cycleMoveTool = () => {
+            const labels = ['X', 'Y', 'Z'];
+            const tools = [5, 6, 7];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 2) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleMoveTool').textContent = labels[current];
+            Browser.setInfo(`Move ${labels[current]} tool`);
+        };
+        Browser.addButton('btnCycleMoveTool', 'X', cycleMoveTool);
 
         let setDeleteTool = () => {    
             config.tool = 8;
@@ -141,6 +135,44 @@
             Browser.setInfo("Change display mode tool");
         }
         Browser.addButton("btnSetDisplayMode", "⌗", setDisplayMode);
+
+        let toggleCanvasPanel = () => {
+            let panel = document.getElementById('floatCanvasPanel');
+            if (panel) {
+                panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+                return;
+            }
+            panel = document.createElement('div');
+            panel.id = 'floatCanvasPanel';
+            Object.assign(panel.style, {
+                position: 'fixed',
+                right: '60px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '100px',
+                height: '100px',
+                background: 'rgba(30,30,30,0.95)',
+                border: '2px solid rgba(255,255,255,0.3)',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '9999',
+                overflow: 'hidden'
+            });
+            const c = document.createElement('canvas');
+            c.id = 'miniCanvas';
+            c.width = 100;
+            c.height = 100;
+            Object.assign(c.style, {
+                width: '100px',
+                height: '100px',
+                display: 'block'
+            });
+            panel.appendChild(c);
+            document.body.appendChild(panel);
+        };
+        Browser.addButton('btnCanvasToggle', '🎨', toggleCanvasPanel);
     }
 
     let randomize = () => {
