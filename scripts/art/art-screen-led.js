@@ -145,9 +145,14 @@
         config.ledRows = Math.floor((height - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
         config.ledColumns = Math.floor((width - config.ledMargin)/ (config.ledDiameter + config.ledPadding));
         globals.ledScreen = new LedScreen();           
-        globals.world = new Basic3DWorld(config.ledColumns, config.ledRows, globals.random, globals.ledScreen.drawLine, globals.ledScreen.drawPoint, drawFace);
+        globals.world = new Open3DWorld(config.ledColumns, config.ledRows, globals.random, globals.ledScreen.drawLine, globals.ledScreen.drawPoint, drawFace);
+
+        globals.world.cameraY = 0;
+        globals.world.cameraZ = -1280;
+        globals.world.cameraRotationX = 0;
+        
         if (config.randomize) randomize();
-        globals.world.addFigure(0, 0);
+        globals.world.addFigureAt(0, 0, 0);
         globals.world.figures[0].scaleX(0.4);
         globals.world.figures[0].scaleY(0.4);
         globals.world.figures[0].scaleZ(0.4);
