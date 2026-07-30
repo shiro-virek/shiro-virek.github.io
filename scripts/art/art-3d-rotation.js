@@ -160,17 +160,30 @@
                 zIndex: '9999',
                 overflow: 'hidden'
             });
+
+            let paletteWidth = 100;
+            let paletteHeight = 100;
             const c = document.createElement('canvas');
             c.id = 'miniCanvas';
-            c.width = 100;
-            c.height = 100;
+            c.width = paletteWidth;
+            c.height = paletteHeight;
             Object.assign(c.style, {
-                width: '100px',
-                height: '100px',
+                width: `${paletteWidth}px`,
+                height: `${paletteHeight}px`,
                 display: 'block'
             });
             panel.appendChild(c);
             document.body.appendChild(panel);
+
+            const ctx = c.getContext("2d");
+            for (let x = 0; x < paletteWidth; x++) {
+                for (let y = 0; y < paletteWidth; y++) { 
+                    let hue = Numbers.scale(x, 0, paletteWidth, 0, 360)    
+                    let lightness = Numbers.scale(y, 0, paletteHeight, 0, 100)             
+                    let color = `hsl(${hue}, 100%, ${lightness}%)`;
+                    Drawing.drawSquare(ctx, x, y, 1, 0, color)
+                }
+            }
         };
         Browser.addButton('btnCanvasToggle', '🎨', toggleCanvasPanel);
     }
