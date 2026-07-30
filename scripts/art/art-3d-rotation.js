@@ -376,7 +376,7 @@
 
         canvas.addEventListener('mouseup', function (e) {
             handleDeleteFigure();
-            globals.selectedFigure = null;
+            if (config.tool !== 9) globals.selectedFigure = null;
 		});
 
         canvas.addEventListener('click', function (e) {
@@ -384,7 +384,7 @@
                 globals._touchUsed = false;
                 return;
             }
-            if (!mouseMoved && !figureSelectedOnMousedown)
+            if (!mouseMoved && (!figureSelectedOnMousedown || config.tool === 9))
                 handleClick(e.offsetX, e.offsetY);   
 		});
 
