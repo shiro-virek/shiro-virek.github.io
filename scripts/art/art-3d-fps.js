@@ -182,7 +182,7 @@
             let segmentSize = globals.world.worldSize / 20;
             let segments = globals.world.worldSize / segmentSize + 1;
             for (let j = -segments; j < segments; j++) {
-                let wall = new Character(globals.world);
+                let wall = new Figure(globals.world);
                 wall.vertices = Objects.clone(primitives[0].vertices);
                 wall.faces = Objects.clone(primitives[0].faces);            
 
@@ -217,7 +217,7 @@
 
         for (let x = -globals.world.floorSize; x <= globals.world.floorSize; x += globals.world.tileSize) {
             for (let z = -globals.world.floorSize; z <= globals.world.floorSize; z += globals.world.tileSize) {
-                let floorTile = new Character(globals.world);
+                let floorTile = new Figure(globals.world);
                 floorTile.vertices = Objects.clone(primitives[0].vertices);
                 floorTile.faces = Objects.clone(primitives[0].faces);
                 
@@ -243,7 +243,7 @@
     let addBuildings = () => {
 
         for (let i = 0; i < config.buildingsCount; i++) {
-            let building = new Character(globals.world);
+            let building = new Figure(globals.world);
             building.vertices = Objects.clone(primitives[0].vertices);
             building.faces = Objects.clone(primitives[0].faces);
             
@@ -269,7 +269,7 @@
 
     let addEnemies = () => {
         for (let i = 0; i < config.enemyCount; i++) {
-            let enemy = new Character(globals.world);
+            let enemy = new Figure(globals.world);
             enemy.vertices = Objects.clone(primitives[1].vertices); 
             enemy.faces = Objects.clone(primitives[1].faces);
 
@@ -294,7 +294,7 @@
 
     let addPyramids = () => {
         for (let i = 0; i < 10; i++) {
-            let pyramid = new Character(globals.world);
+            let pyramid = new Figure(globals.world);
             pyramid.vertices = Objects.clone(primitives[2].vertices); 
             pyramid.faces = Objects.clone(primitives[2].faces);
 
@@ -319,7 +319,7 @@
     }
 
     let addSecretObject = () => {
-        let pyramid = new Character(globals.world);
+        let pyramid = new Figure(globals.world);
         pyramid.vertices = Objects.clone(primitives[2].vertices); 
         pyramid.faces = Objects.clone(primitives[2].faces);
 

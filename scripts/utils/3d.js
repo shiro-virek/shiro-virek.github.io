@@ -49,7 +49,7 @@ class Open3DWorld {
         const origin = originalFig.center; 
 
         originalFig.faces.forEach((faceIndices, index) => {
-            let piece = new Character(this);
+            let piece = new Figure(this);
             
             piece.vertices = faceIndices.map(vIdx => Objects.clone(originalFig.vertices[vIdx]));
             
@@ -177,7 +177,7 @@ class Open3DWorld {
         }    
     }
                             
-    addFigure = (screenX, screenY, fig = this.primitive) => {
+    addFigure = (screenX, screenY, fig = this.primitive, hue) => {
         const spawnDistance = 500; 
 
         let centeredX = screenX - this.width / 2;
@@ -203,7 +203,7 @@ class Open3DWorld {
         let worldY = yFinal + this.cameraY;
         let worldZ = zFinal + this.cameraZ;
 
-        let figure = new Character(this);
+        let figure = new Figure(this);
         figure.vertices = Objects.clone(fig.vertices);
         figure.edges = Objects.clone(fig.edges || []);
         figure.faces = Objects.clone(fig.faces);
@@ -218,6 +218,8 @@ class Open3DWorld {
         figure.solid = true;
         figure.breakable = false;
         figure.setupCollision();
+
+        figure.hue = hue;
         
         this.figures.push(figure);
 
@@ -225,7 +227,7 @@ class Open3DWorld {
     }
 
     addFigureAt = (worldX, worldY, worldZ, fig = this.primitive) => {
-        let figure = new Character(this);
+        let figure = new Figure(this);
         figure.vertices = Objects.clone(fig.vertices);
         figure.edges = Objects.clone(fig.edges || []);
         figure.faces = Objects.clone(fig.faces);
@@ -614,6 +616,20 @@ class Figure {
         this.hue = this.world.random.nextInt(1, 360);
         this.rotationAccumX = 0;
         this.rotationAccumY = 0;
+        this.solid = false;
+        this.infinite = false;
+        this.breakable = false;
+        this.secret = false;
+        this.isDebris = false;
+        this.isEnemy = false;
+        this.life = 1.0;
+        this.vx = 0;
+        this.vy = 0;
+        this.vz = 0;
+        this.gravity = 0.5;
+        this.fadeOutSpeed = 0;
+        this.rotationAngle = 0;
+        this.setupCollision();
     }
 
     rotateZ = (angle) => {
@@ -951,26 +967,6 @@ class Figure {
             sumY += transformed[1];
         }
         return sumY / this.vertices.length;
-    }
-}
-
-class Character extends Figure {
-    constructor(world) {
-        super(world);
-        this.solid = false;
-        this.infinite = false;
-        this.breakable = false;
-        this.secret = false;
-        this.isDebris = false;
-        this.isEnemy = false;
-        this.life = 1.0;
-        this.vx = 0; 
-        this.vy = 0;
-        this.vz = 0; 
-        this.gravity = 0.5; 
-        this.fadeOutSpeed = 0;
-        this.rotationAngle = 0;
-        this.setupCollision();
     }
 
     moveAuto(distance) {

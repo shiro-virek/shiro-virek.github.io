@@ -3,6 +3,7 @@
         random: null,
         world: null,
         selectedFigure: null,
+        selectedColor: "hsl(0, 100%, 50%)",
     };
 
     const config = {
@@ -106,23 +107,17 @@
         }
         Browser.addButton("btnSetRotateFigureTool", "↩️", setRotateFigureTool);
 
-        let setMoveXTool = () => {    
-            config.tool = 5;
-            Browser.setInfo("Move X tool");
-        }
-        Browser.addButton("btnSetMoveXTool", "X", setMoveXTool);
-
-        let setMoveYTool = () => {    
-            config.tool = 6;
-            Browser.setInfo("Move Y tool");
-        }
-        Browser.addButton("btnSetMoveYTool", "Y", setMoveYTool);
-
-        let setMoveZTool = () => {    
-            config.tool = 7;
-            Browser.setInfo("Move Z tool");
-        }
-        Browser.addButton("btnSetMoveZTool", "Z", setMoveZTool);
+        let cycleMoveTool = () => {
+            const labels = ['X', 'Y', 'Z'];
+            const tools = [5, 6, 7];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 2) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleMoveTool').textContent = labels[current];
+            Browser.setInfo(`Move ${labels[current]} tool`);
+        };
+        Browser.addButton('btnCycleMoveTool', 'X', cycleMoveTool);
 
         let setDeleteTool = () => {    
             config.tool = 8;
@@ -141,6 +136,76 @@
             Browser.setInfo("Change display mode tool");
         }
         Browser.addButton("btnSetDisplayMode", "⌗", setDisplayMode);
+
+        let toggleCanvasPanel = () => {
+            config.tool = 9;
+            Browser.setInfo("Color tool");
+
+            let panel = document.getElementById('floatCanvasPanel');
+            if (panel) {
+                panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+                return;
+            }
+
+            let paletteWidth = 200;
+            let paletteHeight = 200;
+            panel = document.createElement('div');
+            panel.id = 'floatCanvasPanel';
+            Object.assign(panel.style, {
+                position: 'fixed',
+                right: '60px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: `${paletteWidth}px`,
+                height: `${paletteHeight}px`,
+                background: 'rgba(30,30,30,0.95)',
+                border: '2px solid rgba(255,255,255,0.3)',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '9999',
+                overflow: 'hidden'
+            });
+
+            const c = document.createElement('canvas');
+            c.id = 'miniCanvas';
+            c.width = paletteWidth;
+            c.height = paletteHeight;
+            Object.assign(c.style, {
+                width: `${paletteWidth}px`,
+                height: `${paletteHeight}px`,
+                display: 'block'
+            });
+            panel.appendChild(c);
+            document.body.appendChild(panel);
+
+            let getColor = (x, y) => {
+                let hue = Numbers.scale(x, 0, paletteWidth, 0, 360)    
+                let lightness = Numbers.scale(y, 0, paletteHeight, 0, 100)             
+                let color = `hsl(${hue}, 100%, ${lightness}%)`;
+                return color;
+            }
+
+            const ctx = c.getContext("2d");
+            for (let x = 0; x < paletteWidth; x++) {
+                for (let y = 0; y < paletteHeight; y++) { 
+                    Drawing.drawSquare(ctx, x, y, 1, 0, getColor(x, y))
+                }
+            }
+
+            let miniCanvas = document.getElementById("miniCanvas");
+            var rect = miniCanvas.getBoundingClientRect();
+            miniCanvas.addEventListener('click', function(event) {
+                var x = event.clientX - rect.left;
+                var y = event.clientY - rect.top;
+               
+                globals.selectedColor = getColor(x, y);
+
+                panel.style.display = 'none';
+            }, false);
+        };
+        Browser.addButton('btnCanvasToggle', '🎨', toggleCanvasPanel);
     }
 
     let randomize = () => {
@@ -164,6 +229,11 @@
         Browser.setInfo("Rotate camera tool");
     }
 
+    let getHue = (hslStr) => {
+        const match = hslStr.match(/[\d.]+/);
+        return match ? parseFloat(match[0]) : null;
+    };
+
     let addEvents = () => {
         canvas.addEventListener('mousedown', function (e) {           
             selectFigure(e.offsetX, e.offsetY);
@@ -185,7 +255,7 @@
                 return;
             }
             if (!mouseMoved && !figureSelectedOnMousedown)
-                globals.world.addFigure(e.offsetX, e.offsetY);   
+                globals.world.addFigure(e.offsetX, e.offsetY, globals.world.primitive, getHue(globals.selectedColor));   
 		});
 
 		canvas.addEventListener('touchend', e => {
@@ -195,7 +265,7 @@
                 const rect = canvas.getBoundingClientRect();
                 const x = e.changedTouches[0].clientX - rect.left;
                 const y = e.changedTouches[0].clientY - rect.top;
-                globals.world.addFigure(x, y);         
+                globals.world.addFigure(x, y, globals.world.primitive, getHue(globals.selectedColor));         
             }
 		}, false);  
     }
@@ -251,6 +321,11 @@
                 case 7:
                     if (globals.selectedFigure) {
                         globals.selectedFigure.translateZ(movY);
+                    }
+                    break;
+                case 9:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.hue = getHue(globals.selectedColor);
                     }
                     break;
                 default:
