@@ -76,10 +76,12 @@
         let shrink = () => setZoom(50);
         Browser.addButton("btnShrink", "-", shrink);
 
+        let _figureIndex = 0;
         let changeFigure = () => {
             config.tool = 10;
             Browser.setInfo("Add figure tool");       
-            globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)];
+            _figureIndex = (_figureIndex + 1) % primitives.length;
+            globals.world.primitive = primitives[_figureIndex];
             document.getElementById('btnChangeFigure').textContent = globals.world.primitive.icon;
        }
         Browser.addButton("btnChangeFigure", globals.world.primitive.icon, changeFigure);
