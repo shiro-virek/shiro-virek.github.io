@@ -84,30 +84,29 @@
        }
         Browser.addButton("btnChangeFigure", globals.world.primitive.icon, changeFigure);
         
-        let setRotationTool = () => {    
-            config.tool = 1;
-            document.getElementById('btnSetRotationTool').textContent = '🔄';
-            Browser.setInfo("Rotate camera tool");                      
-        }        
-        Browser.addButton("btnSetRotationTool", "🔄", setRotationTool);
+        let cycleCameraTool = () => {
+            const labels = ['🔄', '💡'];
+            const tools = [1, 2];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 1) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleCameraTool').textContent = labels[current];
+            Browser.setInfo(current === 0 ? "Rotate camera tool" : "Move light tool");
+        };
+        Browser.addButton('btnCycleCameraTool', '🔄', cycleCameraTool);
 
-        let setMoveLightTool = () => {    
-            config.tool = 2;
-            Browser.setInfo("Move light tool");
-        }
-        Browser.addButton("btnSetMoveLightTool", "💡", setMoveLightTool);
-
-        let setScaleTool = () => {    
-            config.tool = 3;
-            Browser.setInfo("Scale figure tool");
-        }
-        Browser.addButton("btnSetScaleTool", "📐", setScaleTool);
-
-        let setRotateFigureTool = () => {    
-            config.tool = 4;
-            Browser.setInfo("Rotate figure tool");
-        }
-        Browser.addButton("btnSetRotateFigureTool", "↩️", setRotateFigureTool);
+        let cycleTransformTool = () => {
+            const labels = ['📐', '↩️'];
+            const tools = [3, 4];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 1) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleTransformTool').textContent = labels[current];
+            Browser.setInfo(current === 0 ? "Scale figure tool" : "Rotate figure tool");
+        };
+        Browser.addButton('btnCycleTransformTool', '📐', cycleTransformTool);
 
         let cycleMoveTool = () => {
             const labels = ['X', 'Y', 'Z'];
