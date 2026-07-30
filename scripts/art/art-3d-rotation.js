@@ -96,10 +96,10 @@
             document.getElementById('btnCycleCameraTool').textContent = labels[current];
             Browser.setInfo(current === 0 ? "Rotate camera tool" : "Move light tool");
         };
-        Browser.addButton('btnCycleCameraTool', '🔄', cycleCameraTool);
+        Browser.addButton('btnCycleCameraTool', '🎥', cycleCameraTool);
 
         let cycleTransformTool = () => {
-            const labels = ['📐', '↩️'];
+            const labels = ['📐', '🔄'];
             const tools = [3, 4];
             let current = tools.indexOf(config.tool);
             if (current === -1 || current === 1) current = 0;
@@ -111,16 +111,40 @@
         Browser.addButton('btnCycleTransformTool', '📐', cycleTransformTool);
 
         let cycleMoveTool = () => {
-            const labels = ['X', 'Y', 'Z'];
+            const labels = ['↔', '↕', '⟳'];
             const tools = [5, 6, 7];
             let current = tools.indexOf(config.tool);
             if (current === -1 || current === 2) current = 0;
             else current++;
             config.tool = tools[current];
             document.getElementById('btnCycleMoveTool').textContent = labels[current];
-            Browser.setInfo(`Move ${labels[current]} tool`);
+            Browser.setInfo(`Move ${['X', 'Y', 'Z'][current]} tool`);
         };
-        Browser.addButton('btnCycleMoveTool', 'X', cycleMoveTool);
+        Browser.addButton('btnCycleMoveTool', '↔', cycleMoveTool);
+
+        let cycleScaleTool = () => {
+            const labels = ['SX', 'SY', 'SZ'];
+            const tools = [11, 12, 13];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 2) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleScaleTool').textContent = labels[current];
+            Browser.setInfo(`Scale ${['X', 'Y', 'Z'][current]} tool`);
+        };
+        Browser.addButton('btnCycleScaleTool', 'SX', cycleScaleTool);
+
+        let cycleShearTool = () => {
+            const labels = ['HX', 'HY', 'HZ'];
+            const tools = [14, 15, 16];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 2) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleShearTool').textContent = labels[current];
+            Browser.setInfo(`Shear ${['X', 'Y', 'Z'][current]} tool`);
+        };
+        Browser.addButton('btnCycleShearTool', 'HX', cycleShearTool);
 
         let setDeleteTool = () => {    
             config.tool = 8;
@@ -427,6 +451,39 @@
                 case 7:
                     if (globals.selectedFigure) {
                         globals.selectedFigure.translateZ(movY);
+                    }
+                    break;
+                case 11:
+                    if (globals.selectedFigure) {
+                        let factor = 1 + movY * 0.005;
+                        if (factor > 0.01) globals.selectedFigure.scaleX(factor);
+                    }
+                    break;
+                case 12:
+                    if (globals.selectedFigure) {
+                        let factor = 1 + movY * 0.005;
+                        if (factor > 0.01) globals.selectedFigure.scaleY(factor);
+                    }
+                    break;
+                case 13:
+                    if (globals.selectedFigure) {
+                        let factor = 1 + movY * 0.005;
+                        if (factor > 0.01) globals.selectedFigure.scaleZ(factor);
+                    }
+                    break;
+                case 14:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.shearX(movY * 0.01);
+                    }
+                    break;
+                case 15:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.shearY(movY * 0.01);
+                    }
+                    break;
+                case 16:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.shearZ(movY * 0.01);
                     }
                     break;
                 default:
