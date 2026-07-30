@@ -142,6 +142,8 @@
                 panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
                 return;
             }
+            let paletteWidth = 200;
+            let paletteHeight = 200;
             panel = document.createElement('div');
             panel.id = 'floatCanvasPanel';
             Object.assign(panel.style, {
@@ -149,8 +151,8 @@
                 right: '60px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                width: '100px',
-                height: '100px',
+                width: `${paletteWidth}px`,
+                height: `${paletteHeight}px`,
                 background: 'rgba(30,30,30,0.95)',
                 border: '2px solid rgba(255,255,255,0.3)',
                 borderRadius: '6px',
@@ -161,8 +163,6 @@
                 overflow: 'hidden'
             });
 
-            let paletteWidth = 100;
-            let paletteHeight = 100;
             const c = document.createElement('canvas');
             c.id = 'miniCanvas';
             c.width = paletteWidth;
@@ -177,7 +177,7 @@
 
             const ctx = c.getContext("2d");
             for (let x = 0; x < paletteWidth; x++) {
-                for (let y = 0; y < paletteWidth; y++) { 
+                for (let y = 0; y < paletteHeight; y++) { 
                     let hue = Numbers.scale(x, 0, paletteWidth, 0, 360)    
                     let lightness = Numbers.scale(y, 0, paletteHeight, 0, 100)             
                     let color = `hsl(${hue}, 100%, ${lightness}%)`;
