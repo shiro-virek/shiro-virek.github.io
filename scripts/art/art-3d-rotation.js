@@ -7,7 +7,7 @@
     };
 
     const config = {
-        tool: 1, 
+        tool: 10, 
         displayMode: 1,
     };  
 
@@ -77,6 +77,8 @@
         Browser.addButton("btnShrink", "-", shrink);
 
         let changeFigure = () => {
+            config.tool = 10;
+            Browser.setInfo("Add figure tool");       
             globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)];
             document.getElementById('btnChangeFigure').textContent = globals.world.primitive.icon;
        }
@@ -226,7 +228,7 @@
         window.requestAnimationFrame(loop)
 
         addSpecialControls();
-        Browser.setInfo("Rotate camera tool");
+        Browser.setInfo("Add figure tool");
     }
 
     let getHue = (hslStr) => {
@@ -234,6 +236,21 @@
         return match ? parseFloat(match[0]) : null;
     };
 
+    let handleClick = (x, y) => {    
+        switch (config.tool) {      
+            case 9:
+                if (globals.selectedFigure) {
+                    globals.selectedFigure.hue = getHue(globals.selectedColor);
+                }
+                break;                
+            case 10:
+                globals.world.addFigure(x, y, globals.world.primitive, getHue(globals.selectedColor));  
+                break;
+            default:
+                break;
+        }
+    } 
+    
     let addEvents = () => {
         canvas.addEventListener('mousedown', function (e) {           
             selectFigure(e.offsetX, e.offsetY);
@@ -255,7 +272,7 @@
                 return;
             }
             if (!mouseMoved && !figureSelectedOnMousedown)
-                globals.world.addFigure(e.offsetX, e.offsetY, globals.world.primitive, getHue(globals.selectedColor));   
+                handleClick(e.offsetX, e.offsetY);   
 		});
 
 		canvas.addEventListener('touchend', e => {
@@ -265,7 +282,7 @@
                 const rect = canvas.getBoundingClientRect();
                 const x = e.changedTouches[0].clientX - rect.left;
                 const y = e.changedTouches[0].clientY - rect.top;
-                globals.world.addFigure(x, y, globals.world.primitive, getHue(globals.selectedColor));         
+                handleClick(x, y);         
             }
 		}, false);  
     }
@@ -321,11 +338,6 @@
                 case 7:
                     if (globals.selectedFigure) {
                         globals.selectedFigure.translateZ(movY);
-                    }
-                    break;
-                case 9:
-                    if (globals.selectedFigure) {
-                        globals.selectedFigure.hue = getHue(globals.selectedColor);
                     }
                     break;
                 default:
