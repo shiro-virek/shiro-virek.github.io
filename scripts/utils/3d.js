@@ -482,7 +482,7 @@ class Open3DWorld {
             }
         }
         let icon = '⏺';
-        return { vertices, edges, faces, icon };
+        return { vertices, edges, faces, icon, doubleSided: true };
     }
 
     static generateCylinder(radius = 25, height = 40, segs = 12) {
@@ -566,7 +566,7 @@ class Open3DWorld {
             }
         }        
         let icon = '♥︎';
-        return { vertices, edges, faces, icon };
+        return { vertices, edges, faces, icon, doubleSided: true };
     }
 
     static generateInfinity(size = 30, tubeRadius = 8, ringSegs = 16, tubeSegs = 8) {

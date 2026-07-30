@@ -85,7 +85,7 @@
         Browser.addButton("btnChangeFigure", globals.world.primitive.icon, changeFigure);
         
         let cycleCameraTool = () => {
-            const labels = ['🔄', '💡'];
+            const labels = ['🎥', '💡'];
             const tools = [1, 2];
             let current = tools.indexOf(config.tool);
             if (current === -1 || current === 1) current = 0;
