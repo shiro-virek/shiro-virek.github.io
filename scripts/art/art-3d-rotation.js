@@ -126,6 +126,94 @@
         }
         Browser.addButton("btnSetDeleteTool", "🗑", setDeleteTool);
 
+        let downloadScene = () => {
+            let data = {
+                version: 1,
+                camera: {
+                    x: globals.world.cameraX, y: globals.world.cameraY, z: globals.world.cameraZ,
+                    rotationX: globals.world.cameraRotationX, rotationZ: globals.world.cameraRotationZ
+                },
+                world: {
+                    lightDirection: globals.world.lightDirection,
+                    FOV: globals.world.FOV,
+                    drawFigureEdges: globals.world.drawFigureEdges,
+                    drawFigureFaces: globals.world.drawFigureFaces,
+                    drawFigureVertices: globals.world.drawFigureVertices,
+                    floorHue: globals.world.floorHue,
+                    skyShift: globals.world.skyShift
+                },
+                primitive: globals.world.primitive,
+                figures: globals.world.figures.map(f => ({
+                    vertices: f.vertices, edges: f.edges, faces: f.faces,
+                    hue: f.hue, solid: f.solid, doubleSided: f.doubleSided,
+                    infinite: f.infinite, breakable: f.breakable,
+                    rotationAccumX: f.rotationAccumX, rotationAccumY: f.rotationAccumY
+                }))
+            };
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+            a.download = 'scene.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+            Browser.setInfo("Scene downloaded");
+        };
+        Browser.addButton("btnDownloadScene", "💾", downloadScene);
+
+        let uploadScene = () => {
+            let input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                let file = e.target.files[0];
+                if (!file) return;
+                let reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        let data = JSON.parse(event.target.result);
+                        if (!data.figures || !data.camera) { Browser.setInfo("Invalid scene file"); return; }
+                        globals.world.figures = [];
+                        data.figures.forEach(fd => {
+                            let figure = new Figure(globals.world);
+                            figure.vertices = fd.vertices;
+                            figure.edges = fd.edges;
+                            figure.faces = fd.faces;
+                            figure.hue = fd.hue;
+                            figure.solid = fd.solid !== undefined ? fd.solid : true;
+                            figure.doubleSided = fd.doubleSided || false;
+                            figure.infinite = fd.infinite || false;
+                            figure.breakable = fd.breakable || false;
+                            figure.rotationAccumX = fd.rotationAccumX || 0;
+                            figure.rotationAccumY = fd.rotationAccumY || 0;
+                            figure.setupCollision();
+                            globals.world.figures.push(figure);
+                        });
+                        if (data.camera) {
+                            globals.world.cameraX = data.camera.x;
+                            globals.world.cameraY = data.camera.y;
+                            globals.world.cameraZ = data.camera.z;
+                            globals.world.cameraRotationX = data.camera.rotationX;
+                            globals.world.cameraRotationZ = data.camera.rotationZ;
+                        }
+                        if (data.world) {
+                            if (data.world.lightDirection) globals.world.lightDirection = data.world.lightDirection;
+                            if (data.world.FOV) globals.world.FOV = data.world.FOV;
+                            if (data.world.drawFigureEdges !== undefined) globals.world.drawFigureEdges = data.world.drawFigureEdges;
+                            if (data.world.drawFigureFaces !== undefined) globals.world.drawFigureFaces = data.world.drawFigureFaces;
+                            if (data.world.drawFigureVertices !== undefined) globals.world.drawFigureVertices = data.world.drawFigureVertices;
+                            if (data.world.floorHue !== undefined) globals.world.floorHue = data.world.floorHue;
+                            if (data.world.skyShift !== undefined) globals.world.skyShift = data.world.skyShift;
+                        }
+                        if (data.primitive) globals.world.primitive = data.primitive;
+                        globals.selectedFigure = null;
+                        Browser.setInfo("Scene loaded");
+                    } catch (err) { Browser.setInfo("Error loading scene"); }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        };
+        Browser.addButton("btnUploadScene", "📂", uploadScene);
+
         let setDisplayMode = () => {    
             config.displayMode++;
             if (config.displayMode == 5) config.displayMode = 1;
