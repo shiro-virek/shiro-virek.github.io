@@ -21,6 +21,7 @@
         rotationMode: 0,
         controlMode: 'joystick',
         keysStep: 10,
+        sensitivity: 10
     };    
 
     class FPSWorld extends Open3DWorld {
@@ -377,6 +378,7 @@
                 config.controlMode = 'wasd';
                 document.getElementById('btnToggleControlMode').textContent = '🕹️';
                 Joystick.hide();
+                canvas.requestPointerLock(); 
             } else {
                 config.controlMode = 'joystick';
                 document.getElementById('btnToggleControlMode').textContent = '⌨️';
@@ -417,6 +419,13 @@
                 globals.world.checkShoot();  
             }
 		});
+
+        document.addEventListener('mousemove', e => {
+            if (config.controlMode === 'wasd'){
+                globals.world.rotate(-e.movementY / config.sensitivity, -e.movementX / config.sensitivity);
+            }
+        });
+
     }
 
     let updateObjects = (delta) => {
@@ -526,12 +535,6 @@
                 globals.world.rotate(-globals.joystickR.deltaY / 100 * factor, -globals.joystickR.deltaX / 100 * factor);
             } else if (config.rotationMode === 1) {
                 globals.world.moveCameraY(globals.joystickR.deltaY / 30 * factor);
-            }
-        }else{
-            if (config.rotationMode === 0) {
-                globals.world.rotate(movY / 15, movX / 15);
-            } else if (config.rotationMode === 1) {
-                globals.world.moveCameraY(movY);
             }
         }
     }

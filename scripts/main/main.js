@@ -116,6 +116,10 @@ let initCanvas = () => {
 
     window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
     window.addEventListener('keyup',   e => { keys[e.key.toLowerCase()] = false; });
+
+    document.addEventListener('pointerlockchange', () => {
+        canvas.style.cursor = document.pointerLockElement ? 'none' : '';
+    });
 }
 
 let loop = (timestamp) => {
