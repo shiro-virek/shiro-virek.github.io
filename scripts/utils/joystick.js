@@ -1,4 +1,12 @@
 class Joystick {
+    static hide = () => {
+        document.querySelectorAll('.joystick').forEach(el => el.style.display = 'none');
+    }
+
+    static show = () => {
+        document.querySelectorAll('.joystick').forEach(el => el.style.display = 'inline-block');
+    }
+
     constructor (originX, originY) {
         this.originX = originX;
         this.originY = originY;

@@ -375,9 +375,11 @@
             if (config.controlMode === 'joystick') {
                 config.controlMode = 'wasd';
                 document.getElementById('btnToggleControlMode').textContent = '🕹️';
+                Joystick.hide();
             } else {
                 config.controlMode = 'joystick';
                 document.getElementById('btnToggleControlMode').textContent = '⌨️';
+                Joystick.show();
             }
         }
         Browser.addButton("btnToggleControlMode", "⌨️", toggleControlMode);
