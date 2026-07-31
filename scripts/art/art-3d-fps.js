@@ -573,7 +573,7 @@
     }
 
 	window.clearCanvas = () => {		
-        globals.world.figures = [];
+        Sound.error();
 	}
 
     init();
