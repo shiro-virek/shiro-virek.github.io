@@ -390,7 +390,7 @@
             globals.world.checkShoot();   
         }
 
-        Browser.addButton("btnShoot", "🔫", shoot, -10, 80, 60, 60);
+        Browser.addButton("btnShoot", "🔫", shoot, -10, 100, 60, 60);
 
         globals.joystickL = new Joystick(100, height - 100);
         globals.joystickL.add();
@@ -411,14 +411,11 @@
     }
 
     let addEvents = () => {
-		canvas.addEventListener('touchend', e => {
-            if (!mouseMoved)
-                globals.world.addFigure(e.offsetX, e.offsetY);
-		}, false);  
-
-		canvas.addEventListener('click', function (e) {
-            if (!mouseMoved)
-                globals.world.addFigure(e.offsetX, e.offsetY);
+        canvas.addEventListener('click', function (e) {
+            if (config.controlMode === 'wasd'){
+                Sound.ping(10); 
+                globals.world.checkShoot();  
+            }
 		});
     }
 
@@ -523,10 +520,19 @@
 
     let moveCamera = (delta) => {
         let factor = delta / FRAME_TIME;
-        if (config.rotationMode === 0) {
-            globals.world.rotate(-globals.joystickR.deltaY / 100 * factor, -globals.joystickR.deltaX / 100 * factor);
-        } else if (config.rotationMode === 1) {
-            globals.world.moveCameraY(globals.joystickR.deltaY / 30 * factor);
+        
+        if (config.controlMode === 'joystick'){
+            if (config.rotationMode === 0) {
+                globals.world.rotate(-globals.joystickR.deltaY / 100 * factor, -globals.joystickR.deltaX / 100 * factor);
+            } else if (config.rotationMode === 1) {
+                globals.world.moveCameraY(globals.joystickR.deltaY / 30 * factor);
+            }
+        }else{
+            if (config.rotationMode === 0) {
+                globals.world.rotate(movY / 15, movX / 15);
+            } else if (config.rotationMode === 1) {
+                globals.world.moveCameraY(movY);
+            }
         }
     }
 
