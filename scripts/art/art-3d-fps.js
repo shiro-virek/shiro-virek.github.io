@@ -426,14 +426,30 @@
 
             if (fig.isEnemy) {
                 fig.rotationAngle += (globals.world.random.nextBool()? 0.1 : -0.1) * factor;
-                fig.moveAuto(config.enemiesSpeed * factor);    
+                fig.moveAuto(config.enemiesSpeed * factor);
 
-                if ((fig.center[0] <= -config.worldSize)
-                    || (fig.center[0] >= config.worldSize)
-                    || (fig.center[2] <= -config.worldSize)
-                    || (fig.center[2] >= config.worldSize)) {
-                    fig.rotationAngle += 3.14 * factor;
+                let angle = fig.rotationAngle;
+                let limitX = globals.world.worldSize - (fig.bounds.maxX - fig.center[0]);
+                let limitZ = globals.world.worldSize - (fig.bounds.maxZ - fig.center[2]);
+
+                if (fig.center[0] < -limitX) {
+                    fig.translateX(-limitX - fig.center[0]);
+                    angle = Math.atan2(Math.sin(angle), -Math.cos(angle));
+                } else if (fig.center[0] > limitX) {
+                    fig.translateX(limitX - fig.center[0]);
+                    angle = Math.atan2(Math.sin(angle), -Math.cos(angle));
                 }
+
+                if (fig.center[2] < -limitZ) {
+                    fig.translateZ(-limitZ - fig.center[2]);
+                    angle = Math.atan2(-Math.sin(angle), Math.cos(angle));
+                } else if (fig.center[2] > limitZ) {
+                    fig.translateZ(limitZ - fig.center[2]);
+                    angle = Math.atan2(-Math.sin(angle), Math.cos(angle));
+                }
+
+                fig.rotationAngle = angle;
+                fig.setupCollision();
             }
 
             if (fig.isDebris) {
