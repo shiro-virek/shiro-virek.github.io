@@ -20,6 +20,7 @@
         buildingsCount: 80,
         rotationMode: 0,
         controlMode: 'joystick',
+        keysStep: 10,
     };    
 
     class FPSWorld extends Open3DWorld {
@@ -479,8 +480,18 @@
 
     let moveCharacter = (delta) => {
         let factor = delta / FRAME_TIME;
-        const forwardSpeed = -globals.joystickL.deltaY / 5; 
-        const sideSpeed = -globals.joystickL.deltaX / 5;
+        let forwardSpeed = 0;
+        let sideSpeed = 0;
+
+        if (config.controlMode === 'joystick'){
+            forwardSpeed = -globals.joystickL.deltaY / 5; 
+            sideSpeed = -globals.joystickL.deltaX / 5;
+        }else{
+            if (keys['w']) forwardSpeed = config.keysStep; 
+            if (keys['s']) forwardSpeed = -config.keysStep; 
+            if (keys['a']) sideSpeed = config.keysStep; 
+            if (keys['d']) sideSpeed = -config.keysStep; 
+        }
         
         let angleRad = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ);
         let angleRadR = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ + 90);
