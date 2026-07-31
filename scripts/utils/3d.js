@@ -482,7 +482,7 @@ class Open3DWorld {
             }
         }
         let icon = '⏺';
-        return { vertices, edges, faces, icon };
+        return { vertices, edges, faces, icon, doubleSided: true };
     }
 
     static generateCylinder(radius = 25, height = 40, segs = 12) {
@@ -512,6 +512,29 @@ class Open3DWorld {
             faces.push([i, segs + i, segs + next, next]);
         }
         let icon = '█';
+        return { vertices, edges, faces, icon };
+    }
+
+    static generateCone(radius = 25, height = 40, segs = 12) {
+        const vertices = [];
+        const edges = [];
+        const faces = [];
+        const halfH = height / 2;
+        vertices.push([0, halfH, 0]);
+        for (let i = 0; i < segs; i++) {
+            const angle = (i / segs) * 2 * Math.PI;
+            vertices.push([radius * Math.cos(angle), -halfH, radius * Math.sin(angle)]);
+        }
+        for (let i = 0; i < segs; i++) {
+            const next = (i + 1) % segs;
+            faces.push([0, next + 1, i + 1]);
+            edges.push([0, i + 1]);
+            edges.push([i + 1, next + 1]);
+        }
+        const bottomFace = [];
+        for (let i = segs; i >= 1; i--) bottomFace.push(i);
+        faces.push(bottomFace);
+        let icon = '△';
         return { vertices, edges, faces, icon };
     }
 
@@ -566,7 +589,7 @@ class Open3DWorld {
             }
         }        
         let icon = '♥︎';
-        return { vertices, edges, faces, icon };
+        return { vertices, edges, faces, icon, doubleSided: true };
     }
 
     static generateInfinity(size = 30, tubeRadius = 8, ringSegs = 16, tubeSegs = 8) {
@@ -1176,6 +1199,10 @@ let primitives = [
         {
             name: "cylinder",
             ...Open3DWorld.generateCylinder()
+        },
+        {
+            name: "cone",
+            ...Open3DWorld.generateCone()
         },
         {
             name: "torus",

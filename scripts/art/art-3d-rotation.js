@@ -7,7 +7,7 @@
     };
 
     const config = {
-        tool: 1, 
+        tool: 10, 
         displayMode: 1,
     };  
 
@@ -76,54 +76,169 @@
         let shrink = () => setZoom(50);
         Browser.addButton("btnShrink", "-", shrink);
 
+        let _figureIndex = 0;
         let changeFigure = () => {
-            globals.world.primitive = primitives[globals.random.nextInt(0, primitives.length - 1)];
+            config.tool = 10;
+            Browser.setInfo("Add figure tool");       
+            _figureIndex = (_figureIndex + 1) % primitives.length;
+            globals.world.primitive = primitives[_figureIndex];
             document.getElementById('btnChangeFigure').textContent = globals.world.primitive.icon;
        }
         Browser.addButton("btnChangeFigure", globals.world.primitive.icon, changeFigure);
         
-        let setRotationTool = () => {    
-            config.tool = 1;
-            document.getElementById('btnSetRotationTool').textContent = '🔄';
-            Browser.setInfo("Rotate camera tool");                      
-        }        
-        Browser.addButton("btnSetRotationTool", "🔄", setRotationTool);
+        let cycleCameraTool = () => {
+            const labels = ['🎥', '💡'];
+            const tools = [1, 2];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 1) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleCameraTool').textContent = labels[current];
+            Browser.setInfo(current === 0 ? "Rotate camera tool" : "Move light tool");
+        };
+        Browser.addButton('btnCycleCameraTool', '🎥', cycleCameraTool);
 
-        let setMoveLightTool = () => {    
-            config.tool = 2;
-            Browser.setInfo("Move light tool");
-        }
-        Browser.addButton("btnSetMoveLightTool", "💡", setMoveLightTool);
-
-        let setScaleTool = () => {    
-            config.tool = 3;
-            Browser.setInfo("Scale figure tool");
-        }
-        Browser.addButton("btnSetScaleTool", "📐", setScaleTool);
-
-        let setRotateFigureTool = () => {    
-            config.tool = 4;
-            Browser.setInfo("Rotate figure tool");
-        }
-        Browser.addButton("btnSetRotateFigureTool", "↩️", setRotateFigureTool);
+        let cycleTransformTool = () => {
+            const labels = ['📐', '🔄'];
+            const tools = [3, 4];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 1) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleTransformTool').textContent = labels[current];
+            Browser.setInfo(current === 0 ? "Scale figure tool" : "Rotate figure tool");
+        };
+        Browser.addButton('btnCycleTransformTool', '📐', cycleTransformTool);
 
         let cycleMoveTool = () => {
-            const labels = ['X', 'Y', 'Z'];
+            const labels = ['↔', '↕', '⟳'];
             const tools = [5, 6, 7];
             let current = tools.indexOf(config.tool);
             if (current === -1 || current === 2) current = 0;
             else current++;
             config.tool = tools[current];
             document.getElementById('btnCycleMoveTool').textContent = labels[current];
-            Browser.setInfo(`Move ${labels[current]} tool`);
+            Browser.setInfo(`Move ${['X', 'Y', 'Z'][current]} tool`);
         };
-        Browser.addButton('btnCycleMoveTool', 'X', cycleMoveTool);
+        Browser.addButton('btnCycleMoveTool', '↔', cycleMoveTool);
+
+        let cycleScaleTool = () => {
+            const labels = ['SX', 'SY', 'SZ'];
+            const tools = [11, 12, 13];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 2) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleScaleTool').textContent = labels[current];
+            Browser.setInfo(`Scale ${['X', 'Y', 'Z'][current]} tool`);
+        };
+        Browser.addButton('btnCycleScaleTool', 'SX', cycleScaleTool);
+
+        let cycleShearTool = () => {
+            const labels = ['HX', 'HY', 'HZ'];
+            const tools = [14, 15, 16];
+            let current = tools.indexOf(config.tool);
+            if (current === -1 || current === 2) current = 0;
+            else current++;
+            config.tool = tools[current];
+            document.getElementById('btnCycleShearTool').textContent = labels[current];
+            Browser.setInfo(`Shear ${['X', 'Y', 'Z'][current]} tool`);
+        };
+        Browser.addButton('btnCycleShearTool', 'HX', cycleShearTool);
 
         let setDeleteTool = () => {    
             config.tool = 8;
             Browser.setInfo("Delete tool");
         }
         Browser.addButton("btnSetDeleteTool", "🗑", setDeleteTool);
+
+        let downloadScene = () => {
+            let data = {
+                version: 1,
+                camera: {
+                    x: globals.world.cameraX, y: globals.world.cameraY, z: globals.world.cameraZ,
+                    rotationX: globals.world.cameraRotationX, rotationZ: globals.world.cameraRotationZ
+                },
+                world: {
+                    lightDirection: globals.world.lightDirection,
+                    FOV: globals.world.FOV,
+                    drawFigureEdges: globals.world.drawFigureEdges,
+                    drawFigureFaces: globals.world.drawFigureFaces,
+                    drawFigureVertices: globals.world.drawFigureVertices,
+                    floorHue: globals.world.floorHue,
+                    skyShift: globals.world.skyShift
+                },
+                primitive: globals.world.primitive,
+                figures: globals.world.figures.map(f => ({
+                    vertices: f.vertices, edges: f.edges, faces: f.faces,
+                    hue: f.hue, solid: f.solid, doubleSided: f.doubleSided,
+                    infinite: f.infinite, breakable: f.breakable,
+                    rotationAccumX: f.rotationAccumX, rotationAccumY: f.rotationAccumY
+                }))
+            };
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+            a.download = 'scene.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+            Browser.setInfo("Scene downloaded");
+        };
+        Browser.addButton("btnDownloadScene", "💾", downloadScene);
+
+        let uploadScene = () => {
+            let input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                let file = e.target.files[0];
+                if (!file) return;
+                let reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        let data = JSON.parse(event.target.result);
+                        if (!data.figures || !data.camera) { Browser.setInfo("Invalid scene file"); return; }
+                        globals.world.figures = [];
+                        data.figures.forEach(fd => {
+                            let figure = new Figure(globals.world);
+                            figure.vertices = fd.vertices;
+                            figure.edges = fd.edges;
+                            figure.faces = fd.faces;
+                            figure.hue = fd.hue;
+                            figure.solid = fd.solid !== undefined ? fd.solid : true;
+                            figure.doubleSided = fd.doubleSided || false;
+                            figure.infinite = fd.infinite || false;
+                            figure.breakable = fd.breakable || false;
+                            figure.rotationAccumX = fd.rotationAccumX || 0;
+                            figure.rotationAccumY = fd.rotationAccumY || 0;
+                            figure.setupCollision();
+                            globals.world.figures.push(figure);
+                        });
+                        if (data.camera) {
+                            globals.world.cameraX = data.camera.x;
+                            globals.world.cameraY = data.camera.y;
+                            globals.world.cameraZ = data.camera.z;
+                            globals.world.cameraRotationX = data.camera.rotationX;
+                            globals.world.cameraRotationZ = data.camera.rotationZ;
+                        }
+                        if (data.world) {
+                            if (data.world.lightDirection) globals.world.lightDirection = data.world.lightDirection;
+                            if (data.world.FOV) globals.world.FOV = data.world.FOV;
+                            if (data.world.drawFigureEdges !== undefined) globals.world.drawFigureEdges = data.world.drawFigureEdges;
+                            if (data.world.drawFigureFaces !== undefined) globals.world.drawFigureFaces = data.world.drawFigureFaces;
+                            if (data.world.drawFigureVertices !== undefined) globals.world.drawFigureVertices = data.world.drawFigureVertices;
+                            if (data.world.floorHue !== undefined) globals.world.floorHue = data.world.floorHue;
+                            if (data.world.skyShift !== undefined) globals.world.skyShift = data.world.skyShift;
+                        }
+                        if (data.primitive) globals.world.primitive = data.primitive;
+                        globals.selectedFigure = null;
+                        Browser.setInfo("Scene loaded");
+                    } catch (err) { Browser.setInfo("Error loading scene"); }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        };
+        Browser.addButton("btnUploadScene", "📂", uploadScene);
 
         let setDisplayMode = () => {    
             config.displayMode++;
@@ -226,7 +341,7 @@
         window.requestAnimationFrame(loop)
 
         addSpecialControls();
-        Browser.setInfo("Rotate camera tool");
+        Browser.setInfo("Add figure tool");
     }
 
     let getHue = (hslStr) => {
@@ -234,6 +349,21 @@
         return match ? parseFloat(match[0]) : null;
     };
 
+    let handleClick = (x, y) => {    
+        switch (config.tool) {      
+            case 9:
+                if (globals.selectedFigure) {
+                    globals.selectedFigure.hue = getHue(globals.selectedColor);
+                }
+                break;                
+            case 10:
+                globals.world.addFigure(x, y, globals.world.primitive, getHue(globals.selectedColor));  
+                break;
+            default:
+                break;
+        }
+    } 
+    
     let addEvents = () => {
         canvas.addEventListener('mousedown', function (e) {           
             selectFigure(e.offsetX, e.offsetY);
@@ -246,7 +376,7 @@
 
         canvas.addEventListener('mouseup', function (e) {
             handleDeleteFigure();
-            globals.selectedFigure = null;
+            if (config.tool !== 9) globals.selectedFigure = null;
 		});
 
         canvas.addEventListener('click', function (e) {
@@ -254,8 +384,8 @@
                 globals._touchUsed = false;
                 return;
             }
-            if (!mouseMoved && !figureSelectedOnMousedown)
-                globals.world.addFigure(e.offsetX, e.offsetY, globals.world.primitive, getHue(globals.selectedColor));   
+            if (!mouseMoved && (!figureSelectedOnMousedown || config.tool === 9))
+                handleClick(e.offsetX, e.offsetY);   
 		});
 
 		canvas.addEventListener('touchend', e => {
@@ -265,7 +395,7 @@
                 const rect = canvas.getBoundingClientRect();
                 const x = e.changedTouches[0].clientX - rect.left;
                 const y = e.changedTouches[0].clientY - rect.top;
-                globals.world.addFigure(x, y, globals.world.primitive, getHue(globals.selectedColor));         
+                handleClick(x, y);         
             }
 		}, false);  
     }
@@ -323,9 +453,37 @@
                         globals.selectedFigure.translateZ(movY);
                     }
                     break;
-                case 9:
+                case 11:
                     if (globals.selectedFigure) {
-                        globals.selectedFigure.hue = getHue(globals.selectedColor);
+                        let factor = 1 + movY * 0.005;
+                        if (factor > 0.01) globals.selectedFigure.scaleX(factor);
+                    }
+                    break;
+                case 12:
+                    if (globals.selectedFigure) {
+                        let factor = 1 + movY * 0.005;
+                        if (factor > 0.01) globals.selectedFigure.scaleY(factor);
+                    }
+                    break;
+                case 13:
+                    if (globals.selectedFigure) {
+                        let factor = 1 + movY * 0.005;
+                        if (factor > 0.01) globals.selectedFigure.scaleZ(factor);
+                    }
+                    break;
+                case 14:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.shearX(movY * 0.01);
+                    }
+                    break;
+                case 15:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.shearY(movY * 0.01);
+                    }
+                    break;
+                case 16:
+                    if (globals.selectedFigure) {
+                        globals.selectedFigure.shearZ(movY * 0.01);
                     }
                     break;
                 default:
