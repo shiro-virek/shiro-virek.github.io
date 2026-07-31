@@ -19,6 +19,7 @@
         enemyCount: 40,
         buildingsCount: 80,
         rotationMode: 0,
+        controlMode: 'joystick',
     };    
 
     class FPSWorld extends Open3DWorld {
@@ -369,6 +370,17 @@
             }                
         }
         Browser.addButton("btnToggleRotation", "🔁", toggleRotation);
+
+        let toggleControlMode = () => {
+            if (config.controlMode === 'joystick') {
+                config.controlMode = 'wasd';
+                document.getElementById('btnToggleControlMode').textContent = '🕹️';
+            } else {
+                config.controlMode = 'joystick';
+                document.getElementById('btnToggleControlMode').textContent = '⌨️';
+            }
+        }
+        Browser.addButton("btnToggleControlMode", "⌨️", toggleControlMode);
 
         let shoot = () => {      
             Sound.ping(10); 
