@@ -19,6 +19,9 @@
         enemyCount: 40,
         buildingsCount: 80,
         rotationMode: 0,
+        controlMode: 'joystick',
+        keysStep: 10,
+        sensitivity: 10
     };    
 
     class FPSWorld extends Open3DWorld {
@@ -370,12 +373,26 @@
         }
         Browser.addButton("btnToggleRotation", "🔁", toggleRotation);
 
+        let toggleControlMode = () => {
+            if (config.controlMode === 'joystick') {
+                config.controlMode = 'wasd';
+                document.getElementById('btnToggleControlMode').textContent = '🕹️';
+                Joystick.hide();
+                canvas.requestPointerLock(); 
+            } else {
+                config.controlMode = 'joystick';
+                document.getElementById('btnToggleControlMode').textContent = '⌨️';
+                Joystick.show();
+            }
+        }
+        Browser.addButton("btnToggleControlMode", "⌨️", toggleControlMode);
+
         let shoot = () => {      
             Sound.ping(10); 
             globals.world.checkShoot();   
         }
 
-        Browser.addButton("btnShoot", "🔫", shoot, -10, 80, 60, 60);
+        Browser.addButton("btnShoot", "🔫", shoot, -10, 100, 60, 60);
 
         globals.joystickL = new Joystick(100, height - 100);
         globals.joystickL.add();
@@ -396,15 +413,19 @@
     }
 
     let addEvents = () => {
-		canvas.addEventListener('touchend', e => {
-            if (!mouseMoved)
-                globals.world.addFigure(e.offsetX, e.offsetY);
-		}, false);  
-
-		canvas.addEventListener('click', function (e) {
-            if (!mouseMoved)
-                globals.world.addFigure(e.offsetX, e.offsetY);
+        canvas.addEventListener('click', function (e) {
+            if (config.controlMode === 'wasd'){
+                Sound.ping(10); 
+                globals.world.checkShoot();  
+            }
 		});
+
+        document.addEventListener('mousemove', e => {
+            if (config.controlMode === 'wasd'){
+                globals.world.rotate(-e.movementY / config.sensitivity, -e.movementX / config.sensitivity);
+            }
+        });
+
     }
 
     let updateObjects = (delta) => {
@@ -414,14 +435,30 @@
 
             if (fig.isEnemy) {
                 fig.rotationAngle += (globals.world.random.nextBool()? 0.1 : -0.1) * factor;
-                fig.moveAuto(config.enemiesSpeed * factor);    
+                fig.moveAuto(config.enemiesSpeed * factor);
 
-                if ((fig.center[0] <= -config.worldSize)
-                    || (fig.center[0] >= config.worldSize)
-                    || (fig.center[2] <= -config.worldSize)
-                    || (fig.center[2] >= config.worldSize)) {
-                    fig.rotationAngle += 3.14 * factor;
+                let angle = fig.rotationAngle;
+                let limitX = globals.world.worldSize - (fig.bounds.maxX - fig.center[0]);
+                let limitZ = globals.world.worldSize - (fig.bounds.maxZ - fig.center[2]);
+
+                if (fig.center[0] < -limitX) {
+                    fig.translateX(-limitX - fig.center[0]);
+                    angle = Math.atan2(Math.sin(angle), -Math.cos(angle));
+                } else if (fig.center[0] > limitX) {
+                    fig.translateX(limitX - fig.center[0]);
+                    angle = Math.atan2(Math.sin(angle), -Math.cos(angle));
                 }
+
+                if (fig.center[2] < -limitZ) {
+                    fig.translateZ(-limitZ - fig.center[2]);
+                    angle = Math.atan2(-Math.sin(angle), Math.cos(angle));
+                } else if (fig.center[2] > limitZ) {
+                    fig.translateZ(limitZ - fig.center[2]);
+                    angle = Math.atan2(-Math.sin(angle), Math.cos(angle));
+                }
+
+                fig.rotationAngle = angle;
+                fig.setupCollision();
             }
 
             if (fig.isDebris) {
@@ -449,8 +486,18 @@
 
     let moveCharacter = (delta) => {
         let factor = delta / FRAME_TIME;
-        const forwardSpeed = -globals.joystickL.deltaY / 5; 
-        const sideSpeed = -globals.joystickL.deltaX / 5;
+        let forwardSpeed = 0;
+        let sideSpeed = 0;
+
+        if (config.controlMode === 'joystick'){
+            forwardSpeed = -globals.joystickL.deltaY / 5; 
+            sideSpeed = -globals.joystickL.deltaX / 5;
+        }else{
+            if (keys['w']) forwardSpeed = config.keysStep; 
+            if (keys['s']) forwardSpeed = -config.keysStep; 
+            if (keys['a']) sideSpeed = config.keysStep; 
+            if (keys['d']) sideSpeed = -config.keysStep; 
+        }
         
         let angleRad = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ);
         let angleRadR = Trigonometry.sexagesimalToRadian(globals.world.cameraRotationZ + 90);
@@ -482,10 +529,13 @@
 
     let moveCamera = (delta) => {
         let factor = delta / FRAME_TIME;
-        if (config.rotationMode === 0) {
-            globals.world.rotate(-globals.joystickR.deltaY / 100 * factor, -globals.joystickR.deltaX / 100 * factor);
-        } else if (config.rotationMode === 1) {
-            globals.world.moveCameraY(globals.joystickR.deltaY / 30 * factor);
+        
+        if (config.controlMode === 'joystick'){
+            if (config.rotationMode === 0) {
+                globals.world.rotate(-globals.joystickR.deltaY / 100 * factor, -globals.joystickR.deltaX / 100 * factor);
+            } else if (config.rotationMode === 1) {
+                globals.world.moveCameraY(globals.joystickR.deltaY / 30 * factor);
+            }
         }
     }
 
@@ -545,7 +595,7 @@
     }
 
 	window.clearCanvas = () => {		
-        globals.world.figures = [];
+        Sound.error();
 	}
 
     init();
