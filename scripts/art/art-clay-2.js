@@ -48,7 +48,17 @@
             
             ctx.drawImage(globals.img, newOriginX, newOriginY, newImgWidth, newImgHeight);
 
-            globals.baseImageData = ctx.getImageData(0, 0, width, height);
+            //globals.baseImageData = ctx.getImageData(0, 0, width, height);
+
+            globals.imgData = ctx.getImageData(0, 0, width, height).data;
+
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    const index = (y * width + x) * 4;
+                    globals.heightMap[y * width + x] =  Numbers.scale(Color.getLightness(globals.imgData[index], globals.imgData[index+1], globals.imgData[index+2]), 0, 255, 0, 100);
+                }
+            }
+
             requestAnimationFrame(loop);
         };
 
