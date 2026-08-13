@@ -81,6 +81,7 @@ const PRECACHE_URLS = [
     '/scripts/art/art-screen-led.js',
     '/scripts/art/art-cubes.js',
     '/scripts/art/art-radial-pixels.js',
+    '/scripts/art/art-tetris.js',
 ];
 
 self.addEventListener('install', (e) => {

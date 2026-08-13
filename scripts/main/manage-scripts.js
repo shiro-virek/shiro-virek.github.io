@@ -45,6 +45,7 @@ const art = [
                 { "name": "screen-led", "display": "Led screen"},
                 { "name": "cubes", "display": "Cubes"},
                 { "name": "radial-pixels", "display": "Radial pixels"},
+                { "name": "tetris", "display": "Tetris"},
             ];
 const scripts = [];
 
