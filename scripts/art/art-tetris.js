@@ -2,10 +2,12 @@
     const globals = {
         random: null,
         world: null,
+        tetris: null,
     };
 
     const config = {
         randomize: true,
+        side: 40,
     };    
 
     class Tetris {            
@@ -45,17 +47,24 @@
 
         static pieces = [Tetris.piece1, Tetris.piece2, Tetris.piece3, Tetris.piece4, Tetris.piece5, Tetris.piece6, Tetris.piece7];
 
+        update = () => {
+            globals.world.figures.forEach(element => {
+                element.translateY(config.side);
+            });
+        }
+
         newPiece = () => {
+            let hue = globals.random.nextInt(0, 360);
             this.piece = Tetris.pieces[globals.random.nextInt(0, Tetris.pieces.length)];
 
-            let side = 40;
-            let offset = ((this.piece.length - 1) * side) / 2;
+            let offset = ((this.piece.length - 1) * config.side) / 2;
 
             for (let x = 0; x < this.piece.length; x++){
                 for (let y = 0; y < this.piece[x].length; y++){
                     if (this.piece[x][y] === 1){
                         //this.addBlock(x, y);
-                        let figure = globals.world.addFigureAt(x * side - offset, 50, y * side - offset);
+                        let figure = globals.world.addFigureAt(x * config.side - offset, 50, y * config.side - offset);
+                        figure.hue = hue;
                     }
                 }
             }
@@ -109,7 +118,7 @@
 
         globals.world.orbitCamera(0, 0);
 
-		this.tetris = new Tetris();
+		globals.tetris = new Tetris();
 
         initCanvas();
         addEvents();
@@ -124,6 +133,8 @@
     
     window.draw = (delta) => {
         drawBackground(ctx, canvas);
+
+        globals.tetris.update();
 
         globals.world.draw();
     }
