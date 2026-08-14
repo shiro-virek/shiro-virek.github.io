@@ -65,12 +65,13 @@
             this.piece = Tetris.pieces[globals.random.nextInt(0, Tetris.pieces.length)];
 
             let offset = ((this.piece.length - 1) * config.side) / 2;
+            let topY = yAtScreenY(-config.side, 0, 50);
 
             for (let x = 0; x < this.piece.length; x++){
                 for (let y = 0; y < this.piece[x].length; y++){
                     if (this.piece[x][y] === 1){
                         //this.addBlock(x, y);
-                        let figure = globals.world.addFigureAt(x * config.side - offset, y * config.side - offset, 50);
+                        let figure = globals.world.addFigureAt(x * config.side - offset, y * config.side + topY, 50);
                         figure.hue = hue;
                     }
                 }
@@ -92,6 +93,25 @@
             this.newPiece();
         }
         
+    }
+
+    let yAtScreenY = (screenY, worldX, worldZ) => {
+        const w = globals.world;
+
+        let angleZ = Trigonometry.sexagesimalToRadian(-w.cameraRotationZ);
+        let sinZ = Math.sin(angleZ);
+        let cosZ = Math.cos(angleZ);
+        let z2 = (worldX - w.cameraX) * sinZ + (worldZ - w.cameraZ) * cosZ;
+
+        let angleX = Trigonometry.sexagesimalToRadian(-w.cameraRotationX);
+        let sinX = Math.sin(angleX);
+        let cosX = Math.cos(angleX);
+
+        let k = (screenY - height / 2) / w.FOV;
+
+        let yRel = z2 * (sinX + k * cosX) / (cosX - k * sinX);
+
+        return w.cameraY + yRel;
     }
 
     let drawFace = (vertices, lightness, hue, alpha) => {
