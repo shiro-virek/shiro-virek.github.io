@@ -47,10 +47,17 @@
 
         static pieces = [Tetris.piece1, Tetris.piece2, Tetris.piece3, Tetris.piece4, Tetris.piece5, Tetris.piece6, Tetris.piece7];
 
-        update = () => {
-            globals.world.figures.forEach(element => {
-                element.translateY(config.side);
-            });
+        update = (delta) => {
+            this.fallAccum += this.fallSpeed * delta / 1000;
+
+            let cells = Math.floor(this.fallAccum / config.side);
+
+            if (cells > 0) {
+                this.fallAccum %= config.side;
+                globals.world.figures.forEach(element => {
+                    element.translateY(cells * config.side);
+                });
+            }
         }
 
         newPiece = () => {
@@ -63,7 +70,7 @@
                 for (let y = 0; y < this.piece[x].length; y++){
                     if (this.piece[x][y] === 1){
                         //this.addBlock(x, y);
-                        let figure = globals.world.addFigureAt(x * config.side - offset, 50, y * config.side - offset);
+                        let figure = globals.world.addFigureAt(x * config.side - offset, y * config.side - offset, 50);
                         figure.hue = hue;
                     }
                 }
@@ -80,6 +87,8 @@
         
         constructor () {
             this.board = [];
+            this.fallSpeed = 120;
+            this.fallAccum = 0;
             this.newPiece();
         }
         
@@ -112,7 +121,7 @@
         
         globals.world = new Open3DWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
 
-        globals.world.cameraY = -300;
+        globals.world.cameraY = -500;
         globals.world.cameraZ = -700;
         globals.world.cameraRotationX = -30;
 
@@ -134,7 +143,7 @@
     window.draw = (delta) => {
         drawBackground(ctx, canvas);
 
-        globals.tetris.update();
+        globals.tetris.update(delta);
 
         globals.world.draw();
     }
