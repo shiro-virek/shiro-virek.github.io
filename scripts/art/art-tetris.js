@@ -167,10 +167,10 @@
 
         globals.world.draw();
     }
-
+    
     window.trackMouse = (x, y) => {
-        if (clicking) {  
-
+        if (clicking) {
+            globals.world.orbitCamera(movX / 3, -movY / 3);
         }
     }
     
