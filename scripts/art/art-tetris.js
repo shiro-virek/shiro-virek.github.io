@@ -92,8 +92,10 @@
                     e.setupCollision();
                 });
 
-                if (maxPenetration > 0)
+                if (maxPenetration > 0){
                     moving.forEach(e => e.moving = false);
+                    this.newPiece();
+                }
             }
         }
 
