@@ -124,11 +124,10 @@ class Open3DWorld {
         this.translateInfiniteFloor();
     }
 
-    checkCollisionObject = (nextX, nextZ) => {
-        const playerSize = 60; 
-
+    checkCollisionObject = (nextX, nextZ, playerSize = 60, nextY = null, omit = []) => {
         for (let fig of this.figures.filter(f => !f.isEnemy)) {
             if (!fig.solid) continue; 
+            if (omit.includes(fig)) continue;
 
             const collisionX = nextX + playerSize > fig.bounds.minX && 
                             nextX - playerSize < fig.bounds.maxX;
@@ -136,9 +135,15 @@ class Open3DWorld {
             const collisionZ = nextZ + playerSize > fig.bounds.minZ && 
                             nextZ - playerSize < fig.bounds.maxZ;
 
-            if (collisionX && collisionZ) {
-                return true; 
+            if (!collisionX || !collisionZ) continue;
+
+            if (nextY !== null) {
+                const collisionY = nextY + playerSize > fig.bounds.minY && 
+                                nextY - playerSize < fig.bounds.maxY;
+                if (!collisionY) continue;
             }
+
+            return true; 
         }
         return false;
     }

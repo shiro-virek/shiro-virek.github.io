@@ -54,24 +54,46 @@
 
             if (cells > 0) {
                 this.fallAccum %= config.side;
-                globals.world.figures.forEach(element => {
-                    if (element.moving){
-                        if (element.bounds.maxY > 500)
-                            this.newPiece();
+
+                if (globals.world.figures.some(f => f.moving && f.bounds.maxY > 500))
+                    this.newPiece();
+
+                const moving = globals.world.figures.filter(f => f.moving);
+                if (moving.length === 0) return;
+
+                if (keys['a']) moving.forEach(e => e.translateX(-cells * config.side));
+                if (keys['d']) moving.forEach(e => e.translateX(cells * config.side));
+                moving.forEach(e => e.setupCollision());
+
+                let maxPenetration = 0;
+                for (const element of moving) {
+                    const nextMinY = element.bounds.minY + cells * config.side;
+                    const nextMaxY = element.bounds.maxY + cells * config.side;
+
+                    for (const fig of globals.world.figures) {
+                        if (!fig.solid || moving.includes(fig)) continue;
+
+                        const xOverlap = element.bounds.maxX > fig.bounds.minX && element.bounds.minX < fig.bounds.maxX;
+                        const zOverlap = element.bounds.maxZ > fig.bounds.minZ && element.bounds.minZ < fig.bounds.maxZ;
+                        if (!xOverlap || !zOverlap) continue;
+
+                        const yOverlap = nextMaxY > fig.bounds.minY && nextMinY < fig.bounds.maxY;
+                        if (!yOverlap) continue;
+
+                        const penetration = nextMaxY - fig.bounds.minY;
+                        if (penetration > maxPenetration) maxPenetration = penetration;
                     }
+                }
+
+                const fall = Math.max(0, cells * config.side - maxPenetration);
+
+                moving.forEach(e => {
+                    e.translateY(fall);
+                    e.setupCollision();
                 });
 
-                globals.world.figures.forEach(element => {
-                    if (element.moving){
-                        //if (keys['w']) forwardSpeed = config.keysStep; 
-                        //if (keys['s']) forwardSpeed = -config.keysStep; 
-                        if (keys['a']) element.translateX(-cells * config.side); 
-                        if (keys['d']) element.translateX(cells * config.side);
-
-                        element.translateY(cells * config.side);
-                        element.setupCollision();                   
-                    }
-                });
+                if (maxPenetration > 0)
+                    moving.forEach(e => e.moving = false);
             }
         }
 
@@ -91,6 +113,7 @@
                         let figure = globals.world.addFigureAt(x * config.side - offset, y * config.side + topY, 50);
                         figure.hue = hue;
                         figure.moving = true;
+                        figure.solid = true;
                     }
                 }
             }
