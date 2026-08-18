@@ -12,7 +12,8 @@
 
     class Tetris {            
         static piece1 = [
-            [1, 1, 1, 1]
+            [1, 1, 1, 1],
+            [0, 0, 0, 0]
         ];
 
         static piece2 = [
