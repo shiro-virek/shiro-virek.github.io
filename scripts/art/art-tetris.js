@@ -55,7 +55,13 @@
             if (cells > 0) {
                 this.fallAccum %= config.side;
                 globals.world.figures.forEach(element => {
-                    element.translateY(cells * config.side);
+                    if (element.moving){
+                        if (element.bounds.maxY > 500){
+                            this.newPiece();
+                        }
+                        element.translateY(cells * config.side);
+                        element.setupCollision();
+                    }
                 });
             }
         }
@@ -67,12 +73,15 @@
             let offset = ((this.piece.length - 1) * config.side) / 2;
             let topY = yAtScreenY(-config.side, 0, 50);
 
+            globals.world.figures.forEach(element => element.moving = false);
+
             for (let x = 0; x < this.piece.length; x++){
                 for (let y = 0; y < this.piece[x].length; y++){
                     if (this.piece[x][y] === 1){
                         //this.addBlock(x, y);
                         let figure = globals.world.addFigureAt(x * config.side - offset, y * config.side + topY, 50);
                         figure.hue = hue;
+                        figure.moving = true;
                     }
                 }
             }

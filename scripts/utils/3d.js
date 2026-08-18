@@ -997,19 +997,20 @@ class Figure {
         this.translateZ(Math.sin(this.rotationAngle) * distance);
         this.setupCollision();
     }
-
+        
     setupCollision = () => {
         let minX = Infinity, maxX = -Infinity;
         let minZ = Infinity, maxZ = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
 
         this.vertices.forEach(v => {
             if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
+            if (v[1] < minY) minY = v[1]; if (v[1] > maxY) maxY = v[1];
             if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
         });
 
-        this.bounds = { minX, maxX, minZ, maxZ };
-        
-        this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
+        this.bounds = { minX, maxX, minZ, maxZ, minY, maxY };
+        this.center = [(minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2];
     }
 }
 
