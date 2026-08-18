@@ -59,6 +59,12 @@
                         if (element.bounds.maxY > 500){
                             this.newPiece();
                         }
+
+                        //if (keys['w']) forwardSpeed = config.keysStep; 
+                        //if (keys['s']) forwardSpeed = -config.keysStep; 
+                        if (keys['a']) element.translateX(-cells * config.side); 
+                        if (keys['d']) element.translateX(cells * config.side);
+
                         element.translateY(cells * config.side);
                         element.setupCollision();
                     }
