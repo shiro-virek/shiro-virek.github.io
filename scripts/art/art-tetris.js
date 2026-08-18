@@ -56,17 +56,20 @@
                 this.fallAccum %= config.side;
                 globals.world.figures.forEach(element => {
                     if (element.moving){
-                        if (element.bounds.maxY > 500){
+                        if (element.bounds.maxY > 500)
                             this.newPiece();
-                        }
+                    }
+                });
 
+                globals.world.figures.forEach(element => {
+                    if (element.moving){
                         //if (keys['w']) forwardSpeed = config.keysStep; 
                         //if (keys['s']) forwardSpeed = -config.keysStep; 
                         if (keys['a']) element.translateX(-cells * config.side); 
                         if (keys['d']) element.translateX(cells * config.side);
 
                         element.translateY(cells * config.side);
-                        element.setupCollision();
+                        element.setupCollision();                   
                     }
                 });
             }
@@ -74,7 +77,7 @@
 
         newPiece = () => {
             let hue = globals.random.nextInt(0, 360);
-            this.piece = Tetris.pieces[globals.random.nextInt(0, Tetris.pieces.length)];
+            this.piece = Tetris.pieces[globals.random.nextInt(0, Tetris.pieces.length - 1)];
 
             let offset = ((this.piece.length - 1) * config.side) / 2;
             let topY = yAtScreenY(-config.side, 0, 50);
