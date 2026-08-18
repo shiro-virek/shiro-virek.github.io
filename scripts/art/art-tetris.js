@@ -3,6 +3,8 @@
         random: null,
         world: null,
         tetris: null,
+        leftLimit: 0,
+        rightLimit: 0,
     };
 
     const config = {
@@ -62,8 +64,14 @@
                 const moving = globals.world.figures.filter(f => f.moving);
                 if (moving.length === 0) return;
 
-                if (keys['a']) moving.forEach(e => e.translateX(-cells * config.side));
-                if (keys['d']) moving.forEach(e => e.translateX(cells * config.side));
+                if (keys['a']) {
+                    const step = Math.min(cells * config.side, Math.min(...moving.map(f => f.bounds.minX)) - globals.leftLimit);
+                    if (step > 0) moving.forEach(e => e.translateX(-step));
+                }
+                if (keys['d']) {
+                    const step = Math.min(cells * config.side, globals.rightLimit - Math.max(...moving.map(f => f.bounds.maxX)));
+                    if (step > 0) moving.forEach(e => e.translateX(step));
+                }
                 moving.forEach(e => e.setupCollision());
 
                 let maxPenetration = 0;
@@ -182,7 +190,10 @@
     let init = () => {
 		globals.random = Objects.getRandomObject();
         if (config.randomize) randomize();
-        
+
+        globals.leftLimit = -config.side * 5;
+        globals.rightLimit = config.side * 5;
+
         globals.world = new Open3DWorld(width, height, globals.random, Drawing.drawLine, Drawing.drawDot, drawFace);
 
         globals.world.cameraY = -500;
