@@ -210,6 +210,16 @@
     }
 
     let addEvents = () => {
+        Browser.addButton("tetrisLeftButton", "◀", (e) => { e.preventDefault(); keys['a'] = true; });
+        Browser.addButton("tetrisRightButton", "▶", (e) => { e.preventDefault(); keys['d'] = true; });
+
+        ["tetrisLeftButton", "tetrisRightButton"].forEach(id => {
+            const btn = document.getElementById(id);
+            const key = id === "tetrisLeftButton" ? 'a' : 'd';
+            ['pointerup', 'pointercancel', 'pointerleave'].forEach(evt => {
+                btn.addEventListener(evt, () => { keys[key] = false; });
+            });
+        });
     }
 
     let randomize = () => {
