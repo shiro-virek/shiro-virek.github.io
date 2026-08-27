@@ -124,11 +124,10 @@ class Open3DWorld {
         this.translateInfiniteFloor();
     }
 
-    checkCollisionObject = (nextX, nextZ) => {
-        const playerSize = 60; 
-
+    checkCollisionObject = (nextX, nextZ, playerSize = 60, nextY = null, omit = []) => {
         for (let fig of this.figures.filter(f => !f.isEnemy)) {
             if (!fig.solid) continue; 
+            if (omit.includes(fig)) continue;
 
             const collisionX = nextX + playerSize > fig.bounds.minX && 
                             nextX - playerSize < fig.bounds.maxX;
@@ -136,9 +135,15 @@ class Open3DWorld {
             const collisionZ = nextZ + playerSize > fig.bounds.minZ && 
                             nextZ - playerSize < fig.bounds.maxZ;
 
-            if (collisionX && collisionZ) {
-                return true; 
+            if (!collisionX || !collisionZ) continue;
+
+            if (nextY !== null) {
+                const collisionY = nextY + playerSize > fig.bounds.minY && 
+                                nextY - playerSize < fig.bounds.maxY;
+                if (!collisionY) continue;
             }
+
+            return true; 
         }
         return false;
     }
@@ -997,19 +1002,20 @@ class Figure {
         this.translateZ(Math.sin(this.rotationAngle) * distance);
         this.setupCollision();
     }
-
+        
     setupCollision = () => {
         let minX = Infinity, maxX = -Infinity;
         let minZ = Infinity, maxZ = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
 
         this.vertices.forEach(v => {
             if (v[0] < minX) minX = v[0]; if (v[0] > maxX) maxX = v[0];
+            if (v[1] < minY) minY = v[1]; if (v[1] > maxY) maxY = v[1];
             if (v[2] < minZ) minZ = v[2]; if (v[2] > maxZ) maxZ = v[2];
         });
 
-        this.bounds = { minX, maxX, minZ, maxZ };
-        
-        this.center = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2];
+        this.bounds = { minX, maxX, minZ, maxZ, minY, maxY };
+        this.center = [(minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2];
     }
 }
 

@@ -159,8 +159,7 @@
             }
         }
 
-        checkCollisionEnemy = (nextX, nextZ) => {
-            const playerSize = 60; 
+        checkCollisionEnemy = (nextX, nextZ, playerSize = 60; ) => {
 
             for (let fig of this.figures.filter(f => f.isEnemy)) {
                 if (!fig.solid) continue; 
