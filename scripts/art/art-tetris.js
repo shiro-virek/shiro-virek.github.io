@@ -58,9 +58,14 @@
             if (cells > 0) {
                 this.fallAccum %= config.side;
 
-                if (globals.world.figures.some(f => f.moving && f.bounds.maxY > 500))
-                    this.newPiece();
-
+                if (globals.world.figures.some(f => !f.moving && f.bounds.minY < -200)){
+                    globals.world.figures.forEach(e => e.moving = false);
+                    Browser.setInfo("Game Over!");
+                }
+                else
+                    if (globals.world.figures.some(f => f.moving && f.bounds.maxY > 500))
+                        this.newPiece();
+               
                 const moving = globals.world.figures.filter(f => f.moving);
                 if (moving.length === 0) return;
 
